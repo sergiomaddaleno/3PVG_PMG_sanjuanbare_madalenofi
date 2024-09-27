@@ -106,11 +106,11 @@ files {
 }
 project"Window"
 
-kind "WindowedApp"
+kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
 includedirs "include"
-links "Tija"
+links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
