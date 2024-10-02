@@ -67,7 +67,7 @@ configurations { "Debug", "Release", "RelWithDebInfo" }
 architecture "x64"
 location "build"
 cppdialect "c++20"
-startproject "Window"
+startproject "WindowExample"
 filter "configurations:Debug"
 defines { "DEBUG" }
 symbols "On"
@@ -87,6 +87,7 @@ symbols "On"
 
 filter {}
 
+-----
 project "Motor"
 
 kind "StaticLib"
@@ -104,7 +105,8 @@ files {
 "src/stdafx.cpp", "src/stdafx.hpp",
 "src/Window.cpp", "include/tija/Window.hpp",
 }
-project"Window"
+-----
+project"WindowExample"
 
 kind "ConsoleApp"
 language "C++"
@@ -116,3 +118,18 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/examples/data" }
 files "examples/window.cpp"
+-----
+project"PR0_Window"
+
+kind "ConsoleApp"
+language "C++"
+targetdir "build/%{prj.name}/%{cfg.buildcfg}"
+includedirs "include"
+links "Motor"
+conan_config_exec("Debug")
+conan_config_exec("Release")
+conan_config_exec("RelWithDebInfo")
+debugargs { _MAIN_SCRIPT_DIR .. "/src" }
+files { "src/pr0_window.cc",
+		"include/tija/pr0_window.h"
+}
