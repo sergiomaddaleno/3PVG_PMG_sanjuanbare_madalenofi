@@ -12,15 +12,16 @@ public:
 
 	static std::optional<WindowSystem> make() {
 
+		WindowSystem ws_;
+
 		if (!glfwInit()) {
-			printf("Failed\n");
 			return std::nullopt;
 		}
-		return WindowSystem{};
+		return std::optional<WindowSystem>{ ws_ };
 	}
 
 	~WindowSystem() {
-		glfwTerminate();
+		glfwTerminate();*/
 	}
 
 private:
@@ -32,14 +33,25 @@ class Window {
 public:
 	GLFWwindow* window_;
 
-	static std::optional<Window> make(int x, int y, const std::string& name, WindowSystem& /*Doesnt do anything but helps user*/) {
+	Window(GLFWwindow* window) { window_ = window; }
 
-		auto loc_window = glfwCreateWindow(x, y, name.c_str(), NULL, NULL);
-		if (nullptr == loc_window){
+	static std::optional<Window> make(int x, int y, const std::string& name) {
+
+		GLFWwindow* w_ = glfwCreateWindow(x, y, name.c_str(), NULL, NULL);
+
+		if (nullptr == w_){
 			return std::nullopt;
 		}
 
-		return Window{ loc_window };
+		return std::optional<Window> { w_ };
+	}
+
+	GLFWwindow* GetWindow(){
+		return window_;
+	}
+
+	void SetWindowActive() {
+		glfwMakeContextCurrent(window_);
 	}
 
 	Window(Window&& other) {
@@ -53,25 +65,10 @@ public:
 		}
 	}
 
-	bool closePressed() {
-		//return glfwSetWindowShouldClose(window_, GLFW_FALSE);
-
-		/*
-		int state = glfwGetKey(window_, GLFW_KEY_E);
-
-		if (state == GLFW_PRESS)
-		{
-			return true;
-		}
-
-		*/
-		return false;
-	}
-
 private:
-	Window(GLFWwindow* window) : window_(window) {}
-	Window(const Window&) = delete;
-	Window& operator=(const Window&) = delete;
+	//Window(GLFWwindow* window) : window_(window) {}
+	//Window(const Window&) = delete;
+	//Window& operator=(const Window&) = delete;
 };
 
 
