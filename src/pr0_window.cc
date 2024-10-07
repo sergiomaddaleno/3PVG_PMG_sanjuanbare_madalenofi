@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <optional>
 #include <string>
-
+/*
 void glfwErrorCallback(int error, const char* description) {
 	printf("GLFW Error (%d): %s\n", error, description);
 }
@@ -30,3 +30,4 @@ int main(int, char**) {
 
 	return 0;
 }
+*/

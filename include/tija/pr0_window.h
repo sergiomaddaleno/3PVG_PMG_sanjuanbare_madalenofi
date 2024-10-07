@@ -21,7 +21,7 @@ public:
 	}
 
 	~WindowSystem() {
-		glfwTerminate();*/
+		glfwTerminate();
 	}
 
 private:
