@@ -1,33 +1,39 @@
 
-#include "tija/pr0_window.h"
-
-#include <GLFW/glfw3.h>
+#include <../include/tija/PR0_Window.h>
 #include <optional>
-#include <string>
-/*
-void glfwErrorCallback(int error, const char* description) {
-	printf("GLFW Error (%d): %s\n", error, description);
-}
 
-int main(int, char**) {
 
-	glfwSetErrorCallback(glfwErrorCallback);
+std::optional<WindowSystem> WindowSystem::make()
+{
+	WindowSystem ws_;
 
-	//---
-	glfwInit();
-	auto window = Window::make(800, 600, "Window");
-	//---
-
-	window->SetWindowActive();
-
-	bool done = false;
-	while (!done) {
-		
-		glfwSwapBuffers(window->GetWindow());
-		glfwPollEvents();
-		
+	if (!glfwInit()) {
+		return std::nullopt;
 	}
 
-	return 0;
+	return std::optional<WindowSystem>( ws_);
 }
-*/
+
+std::optional<Window> Window::make(int x, int y, const std::string& name)
+{
+	GLFWwindow* w_ = glfwCreateWindow(x, y, name.c_str(), NULL, NULL);
+
+	if (nullptr == w_) {
+		return std::nullopt;
+	}
+
+	return std::optional<Window>(w_ );
+}
+
+bool Window::closePressed()
+{
+	int state = glfwGetKey(window_, GLFW_KEY_ESCAPE);
+
+	if (state == GLFW_PRESS || glfwWindowShouldClose(window_))
+	{
+		return true;
+	}
+
+	return false;
+}
+

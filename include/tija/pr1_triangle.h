@@ -17,18 +17,12 @@ public:
 
 	 InfoTriangles My_triangle[3];
 
-
-
-	// Constructor that accepts an array of structs
 	Triangle(InfoTriangles t[3]) {
-		// Copy each element into InfoTriangles
+
 		for (int i = 0; i < 3; i++) {
 			My_triangle[i] = t[i];
 		}
 	}
-	
-
-
 
 	/*
 	Window(GLFWwindow* window) { window_ = window; }
@@ -71,4 +65,4 @@ private:
 };
 
 
-#endif // PR0
+#endif // PR1

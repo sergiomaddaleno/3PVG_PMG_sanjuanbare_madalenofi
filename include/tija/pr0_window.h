@@ -10,19 +10,9 @@ class WindowSystem {
 
 public:
 
-	static std::optional<WindowSystem> make() {
+	static std::optional<WindowSystem> make();
 
-		WindowSystem ws_;
-
-		if (!glfwInit()) {
-			return std::nullopt;
-		}
-		return std::optional<WindowSystem>{ ws_ };
-	}
-
-	~WindowSystem() {
-		glfwTerminate();
-	}
+	~WindowSystem() { glfwTerminate(); }
 
 private:
 	WindowSystem() {}
@@ -35,24 +25,13 @@ public:
 
 	Window(GLFWwindow* window) { window_ = window; }
 
-	static std::optional<Window> make(int x, int y, const std::string& name) {
+	static std::optional<Window> make(int x, int y, const std::string& name);
 
-		GLFWwindow* w_ = glfwCreateWindow(x, y, name.c_str(), NULL, NULL);
+	bool closePressed();
 
-		if (nullptr == w_){
-			return std::nullopt;
-		}
+	void SetWindowActive() { glfwMakeContextCurrent(window_); }
 
-		return std::optional<Window> { w_ };
-	}
-
-	GLFWwindow* GetWindow(){
-		return window_;
-	}
-
-	void SetWindowActive() {
-		glfwMakeContextCurrent(window_);
-	}
+	GLFWwindow* GetWindow(){ return window_; }
 
 	Window(Window&& other) {
 		window_ = other.window_;
