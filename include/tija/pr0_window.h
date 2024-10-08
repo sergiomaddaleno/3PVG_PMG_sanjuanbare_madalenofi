@@ -36,7 +36,7 @@ public:
 		glfwPollEvents();
 	}
 
-	GLFWwindow* GetWindow(){ return window_; }
+	GLFWwindow* GetWindow() const { return window_; }
 
 	Window(Window&& other) {
 		window_ = other.window_;
