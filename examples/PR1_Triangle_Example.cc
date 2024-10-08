@@ -49,16 +49,14 @@ int main(int, char**) {
     glfwInit();
     auto window = Window::make(800, 600, "Window");
     window->SetWindowActive();
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     //---
 
     glfwMakeContextCurrent(window->GetWindow());
     glewInit();
 
-    // Configuración de OpenGL
-    glViewport(0, 0, 800, 600); // Establece el tamaño de la ventana
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Color de fondo
-
-    glfwSwapInterval(1);
+    //glfwSwapInterval(1);
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
@@ -106,8 +104,7 @@ int main(int, char**) {
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (GLfloat*)mvp);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glfwSwapBuffers(window->GetWindow());
-        glfwPollEvents();
+        window->ProcessWindowEvents(window->GetWindow());
 
         bool close_pressed = window->closePressed();
         if (close_pressed) done = true;

@@ -31,6 +31,11 @@ public:
 
 	void SetWindowActive() { glfwMakeContextCurrent(window_); }
 
+	void ProcessWindowEvents(GLFWwindow* window){
+		glfwSwapBuffers(window); 
+		glfwPollEvents();
+	}
+
 	GLFWwindow* GetWindow(){ return window_; }
 
 	Window(Window&& other) {

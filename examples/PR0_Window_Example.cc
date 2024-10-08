@@ -18,13 +18,14 @@ int main(int, char**) {
 	glfwInit();
 	auto window = Window::make(800, 600, "Window");
 	window->SetWindowActive();
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//---
 
 	bool done = false;
 	while (!done) {
 
-		glfwSwapBuffers(window->GetWindow());
-		glfwPollEvents();
+		window->ProcessWindowEvents(window->GetWindow());
 
 		bool close_pressed = window->closePressed();
 		if (close_pressed) done = true;
