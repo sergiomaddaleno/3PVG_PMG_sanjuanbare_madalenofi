@@ -1,9 +1,9 @@
 #define GLFW_INCLUDE_NONE
 #include "tija/PR1_Triangle.h"
 #include "tija/PR0_Window.h"
-
-#include <GLFW/glfw3.h>
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include <tija/linmath.h>
 
 #include <optional>
@@ -43,18 +43,21 @@ int main(int, char**) {
     auto window = Window::make(800, 600, "Window");
     window->SetWindowActive();
 
-    Triangle tri_;
-    tri_.make();
+
+    auto tri_ = Triangle::make(1.0f);
+    
+    
+
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     //---
 
     glfwMakeContextCurrent(window->GetWindow());
     glewInit();
-
+    
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(tri_.my_triangle), tri_.my_triangle, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tri_->my_triangle), tri_->my_triangle, GL_STATIC_DRAW);
 
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
@@ -74,12 +77,12 @@ int main(int, char**) {
     vcol_location = glGetAttribLocation(program, "vCol");
 
     glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, sizeof(tri_.my_triangle[0]), (void*)0);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, sizeof(tri_->my_triangle[0]), (void*)0);
         glEnableVertexAttribArray(vcol_location);
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
-        sizeof(tri_.my_triangle[0]), (void*)(sizeof(float) * 2));
+        sizeof(tri_->my_triangle[0]), (void*)(sizeof(float) * 2));
     //glfwSwapInterval(1);
-
+    
     bool done = false;
     while (!done) {
 
