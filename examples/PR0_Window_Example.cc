@@ -25,7 +25,8 @@ int main(int, char**) {
 	bool done = false;
 	while (!done) {
 
-		window->ProcessWindowEvents(window->GetWindow());
+		glfwSwapBuffers(window->GetWindow());
+		glfwPollEvents();
 
 		bool close_pressed = window->closePressed();
 		if (close_pressed) done = true;

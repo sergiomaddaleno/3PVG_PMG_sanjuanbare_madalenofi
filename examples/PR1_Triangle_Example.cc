@@ -44,10 +44,7 @@ int main(int, char**) {
     window->SetWindowActive();
 
 
-    auto tri_ = Triangle::make(1.0f);
-    
-    
-
+    auto tri_ = Triangle::make(0.5f, Triangle::Color::Blue);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     //---
@@ -101,7 +98,8 @@ int main(int, char**) {
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (GLfloat*)mvp);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        window->ProcessWindowEvents(window->GetWindow());
+        glfwSwapBuffers(window->GetWindow());
+        glfwPollEvents();
 
         bool close_pressed = window->closePressed();
         if (close_pressed) done = true;
