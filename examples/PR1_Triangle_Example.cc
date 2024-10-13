@@ -9,6 +9,10 @@
 #include <optional>
 #include <string>
 
+struct Vec2 {
+    float x, y;
+};
+
 static const char* vertex_shader_text =
 "#version 110\n"
 "uniform mat4 MVP;\n"
@@ -36,13 +40,34 @@ GLint mvp_location, vpos_location, vcol_location;
 int width, height;
 mat4x4 m, p, mvp;
 
+Vec2 arrow_dir;
+float move_speed = 0.0005;
+
+void MoveTriangle(GLFWwindow* w) {
+
+    if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS) {
+        arrow_dir.y += move_speed;
+    }
+
+    if (glfwGetKey(w, GLFW_KEY_S) == GLFW_PRESS) {
+        arrow_dir.y -= move_speed;
+    }
+
+    if (glfwGetKey(w, GLFW_KEY_A) == GLFW_PRESS) {
+        arrow_dir.x -= move_speed;
+    }
+
+    if (glfwGetKey(w, GLFW_KEY_D) == GLFW_PRESS) {
+        arrow_dir.x += move_speed;
+    }
+}
+
 int main(int, char**) {
 
     //---
     glfwInit();
     auto window = Window::make(800, 600, "Window");
     window->SetWindowActive();
-
 
     auto tri_ = Triangle::make(0.5f, Triangle::Color::Blue);
 
@@ -78,7 +103,6 @@ int main(int, char**) {
         glEnableVertexAttribArray(vcol_location);
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
         sizeof(tri_->my_triangle[0]), (void*)(sizeof(float) * 2));
-    //glfwSwapInterval(1);
     
     bool done = false;
     while (!done) {
@@ -89,7 +113,10 @@ int main(int, char**) {
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        MoveTriangle(window->GetWindow());
+
         mat4x4_identity(m);
+        mat4x4_translate_in_place(m, arrow_dir.x, arrow_dir.y, 0.0f);
         mat4x4_rotate_Z(m, m, (float)glfwGetTime());
         mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
         mat4x4_mul(mvp, p, m);
