@@ -6,9 +6,9 @@
 Render::Render(GLuint program, GLint mvp_location)
     : program_(program), mvp_location_(mvp_location) {}
 
-std::optional<Render> Render::make(static const char* vertex_shader_text, static const char* fragment_shader_text, Triangle::PointsTriangle* vertices)
-{
-    
+std::optional<Render> Render::make(static const char* vertex_shader_text, static const char* fragment_shader_text, 
+    Triangle::PointsTriangle(&vertices)[3])
+{  
 
     GLuint vertex_buffer, vertex_shader, fragment_shader,program;
     GLint vpos_location, vcol_location, mvp_location;

@@ -33,7 +33,7 @@ public:
 
 	static std::optional<Triangle> make(float size_, Color color);
 
-	//PointsTriangle GetVertices(PointsTriangle tri[3]) { }
+	//PointsTriangle GetVertices() { }
 };
 
 #endif // PRT
