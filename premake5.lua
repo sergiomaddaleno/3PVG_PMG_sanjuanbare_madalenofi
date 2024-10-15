@@ -103,7 +103,6 @@ files {
 "src/build/conanfile.txt",
 "src/build/conan.lua",
 "src/stdafx.cpp", "src/stdafx.hpp",
-"src/Window.cpp", "include/tija/Window.hpp",
 }
 -----
 project"WindowExample"
@@ -117,7 +116,9 @@ conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/examples/data" }
-files "examples/Window.cpp"
+files { "src/*.cc",
+		"include/*.h",
+		"examples/window.cpp"}
 -----
 project"PR0_Window"
 
@@ -131,7 +132,7 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
-		"include/tija/*.h",
+		"include/*.h",
 		"examples/PR0_Window_Example.cc"
 }
 ------
@@ -148,6 +149,6 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
-		"include/tija/*.h",
+		"include/*.h",
 		"examples/PR1_Triangle_Example.cc"
 }
