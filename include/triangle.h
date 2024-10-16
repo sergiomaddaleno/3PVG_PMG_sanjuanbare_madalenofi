@@ -4,7 +4,7 @@
 
 #include <optional>
 #include <string>
-#include <tija/linmath.h>
+#include <../deps/linmath.h>
 
 class Triangle {
 

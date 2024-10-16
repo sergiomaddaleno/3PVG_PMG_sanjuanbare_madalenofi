@@ -1,6 +1,6 @@
-#include "..\include\tija\pr1_triangle.h"
 
-#include <tija/linmath.h>
+#include "..\include\triangle.h"
+#include <../deps/linmath.h>
 
 std::optional<Triangle> Triangle::make(float size_, Color color)
 {

@@ -6,8 +6,8 @@
 #include <string>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "tija/PR1_Triangle.h"
-#include <tija/linmath.h>
+#include "triangle.h"
+#include <../deps/linmath.h>
 
 class Render {
 

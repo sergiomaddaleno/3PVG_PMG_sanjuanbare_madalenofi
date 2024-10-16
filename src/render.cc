@@ -1,6 +1,6 @@
-#include "..\include\tija\pr2_render.h"
 
-#include <tija/linmath.h>
+#include "..\include\render.h"
+#include <../deps/linmath.h>
 
 
 Render::Render(GLuint program, GLint mvp_location)

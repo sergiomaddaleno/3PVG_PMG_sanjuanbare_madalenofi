@@ -1,13 +1,12 @@
 #define GLFW_INCLUDE_NONE
-#include "tija/PR1_Triangle.h"
-#include "tija/PR0_Window.h"
+#include "../include/triangle.h"
+#include "../include/window.h"
+#include "..\include\render.h"
 
-#include "..\include\tija\pr2_render.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <tija/linmath.h>
-
+#include <../deps/linmath.h>
 #include <optional>
 #include <string>
 
