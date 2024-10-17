@@ -2,6 +2,7 @@
 #include "../include/triangle.h"
 #include "../include/window.h"
 #include "..\include\render.h"
+#include "..\include\input.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -40,22 +41,22 @@ mat4x4 m, p, mvp;
 Vec2 arrow_dir;
 float move_speed = 0.0005;
 
-void MoveTriangle(GLFWwindow* w) {
+void MoveTriangle(GLFWwindow* w, Input &input) {
 
-    if (glfwGetKey(w, GLFW_KEY_W) == GLFW_PRESS) {
-        arrow_dir.y += move_speed;
-    }
-
-    if (glfwGetKey(w, GLFW_KEY_S) == GLFW_PRESS) {
-        arrow_dir.y -= move_speed;
-    }
-
-    if (glfwGetKey(w, GLFW_KEY_A) == GLFW_PRESS) {
+    if (input.isKeyPressed(Input::LEFT)) {
         arrow_dir.x -= move_speed;
     }
 
-    if (glfwGetKey(w, GLFW_KEY_D) == GLFW_PRESS) {
+    if (input.isKeyPressed(Input::RIGHT)) {
         arrow_dir.x += move_speed;
+    }
+
+    if (input.isKeyPressed(Input::UP)) {
+        arrow_dir.y += move_speed;
+    }
+
+    if (input.isKeyPressed(Input::DOWN)) {
+        arrow_dir.y -= move_speed;
     }
 }
 
@@ -73,6 +74,9 @@ int main(int, char**) {
     auto tri_ = Triangle::make(0.5f, Triangle::Color::Blue);    
     auto render = Render::make(vertex_shader_text, fragment_shader_text, tri_->my_triangle);
 
+    //--- Input
+    Input input{ window->GetWindow() };
+
     bool done = false;
     while (!done) {
 
@@ -83,7 +87,7 @@ int main(int, char**) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         //Triangle
-        MoveTriangle(window->GetWindow());
+        MoveTriangle(window->GetWindow(), input);
 
         mat4x4_identity(m);
         mat4x4_translate_in_place(m, arrow_dir.x, arrow_dir.y, 0.0f);
@@ -100,8 +104,7 @@ int main(int, char**) {
         glfwSwapBuffers(window->GetWindow());
         glfwPollEvents();
 
-        bool close_pressed = window->closePressed();
-        if (close_pressed) done = true;
+        if (window->closePressed()) done = true;
     }
 
     return 0;
