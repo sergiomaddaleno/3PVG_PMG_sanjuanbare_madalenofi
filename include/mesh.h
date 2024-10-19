@@ -1,19 +1,26 @@
 
 #ifndef MSL
 #define MSL
-
-#include <GLFW/glfw3.h>
+#include "../deps/tiny_obj_loader.h"
 #include "../deps/linmath.h"
 #include <string>
+#include <iostream>
 #include <vector>
 
 struct Vertex {
 	vec3 pos;
 	vec3 normal;
-	vec2 tex_coord;
+	vec3 tex_coord;
 };
 
+
+
 class Mesh {
+
+public:
+
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
 
 	Mesh() {
 
@@ -23,10 +30,12 @@ class Mesh {
 
 	}
 
+	
+
 	//--
 	
 
-	void LoadOBj(const char* file);
+	bool LoadOBj(const std::string& file);
 
 
 };

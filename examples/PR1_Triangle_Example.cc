@@ -72,8 +72,10 @@ int main(int, char**) {
 
     //--- Triangle
     auto tri_ = Triangle::make(0.5f, Triangle::Color::Blue);    
-    auto render = Render::make(vertex_shader_text, fragment_shader_text, tri_->my_triangle);
+    //auto render = Render::make();
 
+    Render r;
+    r.RenderDrawTriangle(vertex_shader_text,fragment_shader_text,tri_->my_triangle);
     //--- Input
     Input input{ window->GetWindow() };
 
@@ -95,9 +97,10 @@ int main(int, char**) {
         mat4x4_mul(mvp, p, m);
         //---
 
+       
         //Render of triangle
-        glUseProgram(render->GetProgram());
-        glUniformMatrix4fv(render->GetLocation(), 1, GL_FALSE, (GLfloat*)mvp);
+        glUseProgram(r.GetProgram());
+        glUniformMatrix4fv(r.GetLocation(), 1, GL_FALSE, (GLfloat*)mvp);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
 

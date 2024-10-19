@@ -3,23 +3,40 @@
 #include <../deps/linmath.h>
 
 
-Render::Render(GLuint program, GLint mvp_location)
-    : program_(program), mvp_location_(mvp_location) {}
+Render::Render() {}
 
-std::optional<Render> Render::make(static const char* vertex_shader_text, static const char* fragment_shader_text, 
-    Triangle::PointsTriangle(&vertices)[3])
+std::optional<Render> Render::make()
 {  
 
-    GLuint vertex_buffer, vertex_shader, fragment_shader,program;
-    GLint vpos_location, vcol_location, mvp_location;
-
+   
     glewInit();
+
+   
+    return std::optional<Render>();
+}
+
+GLuint Render::GetProgram()
+{
+    return program_;
+}
+
+GLint Render::GetLocation()
+{
+    return mvp_location_;
+}
+
+void Render::RenderDrawTriangle(static const char* vertex_shader_text, static const char* fragment_shader_text,
+    Triangle::PointsTriangle(&vertices)[3])
+{
+
+    GLuint vertex_buffer, vertex_shader, fragment_shader, program;
+    GLint vpos_location, vcol_location, mvp_location;
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-   
-     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-   
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
     glCompileShader(vertex_shader);
@@ -41,19 +58,12 @@ std::optional<Render> Render::make(static const char* vertex_shader_text, static
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (void*)0);
     glEnableVertexAttribArray(vcol_location);
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
-        sizeof(vertices[0]), (void*)(sizeof(float) * 2));
+    sizeof(vertices[0]), (void*)(sizeof(float) * 2));
 
-    return std::optional<Render>(Render(program, mvp_location));
-}
 
-GLuint Render::GetProgram()
-{
-    return program_;
-}
+    program_ = program;
+    mvp_location_ = mvp_location;
 
-GLint Render::GetLocation()
-{
-    return mvp_location_;
 }
 
 

@@ -16,13 +16,16 @@ public:
 	GLuint program_;
 	GLint mvp_location_;
 
-	Render(GLuint program, GLint mvp_location);
+	Render();
 
-	static std::optional<Render> make(static const char* vertex_shader_text, 
-		static const char* fragment_shader_text, Triangle::PointsTriangle(&vertices)[3]);
+	static std::optional<Render> make();
 
 	GLuint GetProgram();
 	GLint GetLocation();
+	void RenderDrawTriangle(static const char* vertex_shader_text, static const char* fragment_shader_text,
+		Triangle::PointsTriangle(&vertices)[3]);
+	void RenderMesh();
+
 };
 
 #endif // PRT
