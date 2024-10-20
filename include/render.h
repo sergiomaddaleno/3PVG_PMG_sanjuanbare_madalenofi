@@ -29,7 +29,7 @@ public:
 	void RenderDrawTriangle(static const char* vertex_shader_text, static const char* fragment_shader_text,
 		Triangle::PointsTriangle(&vertices)[3]);
 
-	void RenderMesh();
+	void RenderMesh(Mesh& m);
 
 };
 

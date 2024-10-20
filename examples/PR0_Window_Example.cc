@@ -28,9 +28,7 @@ int main(int, char**) {
 		glfwSwapBuffers(window->GetWindow());
 		glfwPollEvents();
 
-		bool close_pressed = window->closePressed();
-		if (close_pressed) done = true;
-
+		if (window->closePressed()) done = true;
 	}
 
 	return 0;
