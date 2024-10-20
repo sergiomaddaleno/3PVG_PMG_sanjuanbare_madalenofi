@@ -1,4 +1,4 @@
-#define GLFW_INCLUDE_NONE
+
 #include "../include/triangle.h"
 #include "../include/window.h"
 #include "..\include\render.h"
@@ -75,7 +75,9 @@ int main(int, char**) {
     //auto render = Render::make();
 
     Render r;
+    auto render = r.make();
     r.RenderDrawTriangle(vertex_shader_text,fragment_shader_text,tri_->my_triangle);
+
     //--- Input
     Input input{ window->GetWindow() };
 
@@ -96,7 +98,6 @@ int main(int, char**) {
         mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
         mat4x4_mul(mvp, p, m);
         //---
-
        
         //Render of triangle
         glUseProgram(r.GetProgram());

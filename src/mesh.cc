@@ -1,12 +1,10 @@
 
-
-//#define TINYOBJLOADER_IMPLEMENTATION
+#define TINYOBJLOADER_IMPLEMENTATION
 #include "../deps/tiny_obj_loader.h"
 #include "..\include\mesh.h"
 
 bool Mesh::LoadOBj(const std::string& file)
 {
-
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
@@ -66,8 +64,6 @@ bool Mesh::LoadOBj(const std::string& file)
                     attrib.texcoords[2 * index.texcoord_index + 1]
                 };
 
-
-                   
             }
             vertices.push_back(vertex);
             indices.push_back(indices.size());

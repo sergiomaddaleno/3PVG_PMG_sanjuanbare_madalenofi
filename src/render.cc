@@ -1,16 +1,14 @@
 
 #include "..\include\render.h"
+#include "..\include\mesh.h"
+
 #include <../deps/linmath.h>
 
-
-Render::Render() {}
+Render::Render() : VAO(0), VBO(0), EBO(0) {}
 
 std::optional<Render> Render::make()
 {  
-
-   
     glewInit();
-
    
     return std::optional<Render>();
 }
@@ -28,7 +26,6 @@ GLint Render::GetLocation()
 void Render::RenderDrawTriangle(static const char* vertex_shader_text, static const char* fragment_shader_text,
     Triangle::PointsTriangle(&vertices)[3])
 {
-
     GLuint vertex_buffer, vertex_shader, fragment_shader, program;
     GLint vpos_location, vcol_location, mvp_location;
 
@@ -60,10 +57,38 @@ void Render::RenderDrawTriangle(static const char* vertex_shader_text, static co
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
     sizeof(vertices[0]), (void*)(sizeof(float) * 2));
 
-
     program_ = program;
     mvp_location_ = mvp_location;
 
+}
+
+void Render::RenderMesh()
+{
+    Mesh m;
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, m.vertices.size() * sizeof(Vertex), m.vertices.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m.indices.size() * sizeof(unsigned int), m.indices.data(), GL_STATIC_DRAW);
+
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
 }
 
 

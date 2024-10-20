@@ -1,8 +1,10 @@
 
 #ifndef MSL
 #define MSL
-#include "../deps/tiny_obj_loader.h"
+
 #include "../deps/linmath.h"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <string>
 #include <iostream>
 #include <vector>
@@ -10,10 +12,8 @@
 struct Vertex {
 	vec3 pos;
 	vec3 normal;
-	vec3 tex_coord;
+	vec2 tex_coord;
 };
-
-
 
 class Mesh {
 
@@ -29,14 +29,8 @@ public:
 	~Mesh() {
 
 	}
-
 	
-
-	//--
-	
-
 	bool LoadOBj(const std::string& file);
-
 
 };
 
