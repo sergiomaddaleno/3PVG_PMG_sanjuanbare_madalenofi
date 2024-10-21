@@ -7,23 +7,42 @@
 #include "..\include\render.h"
 
 static const char* vertex_shader_text =
-"#version 110\n"
-"uniform mat4 MVP;\n"
-"attribute vec3 vCol;\n"
-"attribute vec2 vPos;\n"
-"varying vec3 color;\n"
+"#version 330 core\n"
+"layout(location = 0) in vec3 aPos;\n"        
+"layout(location = 1) in vec3 aNormal;\n"    
+"layout(location = 2) in vec2 aTexCoord;\n"   
+"out vec2 TexCoord;\n"                        
+"out vec3 Normal;\n"                          
+"out vec3 FragPos;\n"                        
+"uniform mat4 model;\n"                       
+"uniform mat4 view;\n"                       
+"uniform mat4 projection;\n"                  
 "void main()\n"
 "{\n"
-"    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
-"    color = vCol;\n"
+"    FragPos = vec3(model * vec4(aPos, 1.0));\n" 
+"    Normal = mat3(transpose(inverse(model))) * aNormal;\n" 
+"    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
+"    TexCoord = aTexCoord;\n"                  
 "}\n";
 
 static const char* fragment_shader_text =
-"#version 110\n"
-"varying vec3 color;\n"
+"#version 330 core\n"
+"out vec4 FragColor;\n"                       
+"in vec2 TexCoord;\n"                         
+"in vec3 Normal;\n"                           
+"in vec3 FragPos;\n"                           
+"uniform vec3 lightPos;\n"                    
+"uniform vec3 viewPos;\n"                      
 "void main()\n"
 "{\n"
-"    gl_FragColor = vec4(color, 1.0);\n"
+    
+"    vec3 norm = normalize(Normal);\n"
+    
+"    vec3 lightDir = normalize(lightPos - FragPos);\n"
+   
+"    float diff = max(dot(norm, lightDir), 0.0);\n"
+    
+"    FragColor = vec4(diff * vec3(1.0, 1.0, 1.0), 1.0); // Blanco\n"
 "}\n";
 
 void RenderMesh(const Mesh& mesh) {
@@ -61,7 +80,7 @@ int main(int, char**) {
 	while (!done) {
 
 		//RenderMesh(mesh_);
-		r.RenderMesh(mesh_);
+		r.RenderMesh(vertex_shader_text,fragment_shader_text,mesh_);
 
 		glfwSwapBuffers(window->GetWindow());
 		glfwPollEvents();

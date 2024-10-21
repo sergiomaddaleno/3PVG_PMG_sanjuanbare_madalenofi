@@ -17,6 +17,8 @@ public:
 	GLuint program_;
 	GLint mvp_location_;
 
+	mat4x4 model, view, projection;
+
 	GLuint VAO, VBO, EBO;
 
 	Render();
@@ -29,7 +31,7 @@ public:
 	void RenderDrawTriangle(static const char* vertex_shader_text, static const char* fragment_shader_text,
 		Triangle::PointsTriangle(&vertices)[3]);
 
-	void RenderMesh(Mesh& m);
+	void RenderMesh(static const char* vertex_shader_text, static const char* fragment_shader_text, Mesh& m);
 
 };
 

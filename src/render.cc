@@ -1,7 +1,7 @@
 
 #include "..\include\render.h"
 #include "..\include\mesh.h"
-
+#define M_PI 3.14159265358979323846
 #include <../deps/linmath.h>
 
 Render::Render() : VAO(0), VBO(0), EBO(0) {}
@@ -62,12 +62,62 @@ void Render::RenderDrawTriangle(static const char* vertex_shader_text, static co
 
 }
 
-void Render::RenderMesh(Mesh& m)
+void Render::RenderMesh(static const char* vertex_shader_text, static const char* fragment_shader_text, Mesh& m)
 {
+
+    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertex_shader_text, NULL);
+    glCompileShader(vertexShader);
+
+    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragment_shader_text, NULL);
+    glCompileShader(fragmentShader);
+
+    unsigned int shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    // --- Usar el programa de shaders ---
+    glUseProgram(shaderProgram);
+
+    // --- Limpieza de buffers ---
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+    glEnable(GL_DEPTH_TEST); // Habilita el test de profundidad
+
+    // --- Configurar matrices ---
+    mat4x4 model, view, projection;
+    mat4x4_identity(model);   
+
+    // --- Aplicar una rotación a la matriz model ---
+    float angle = (float)glfwGetTime();  
+    mat4x4_rotate(model, model, 0.0f, 1.0f, 0.0f, angle);
+    mat4x4_identity(view);
+    mat4x4_translate(view, 0.0f, -0.5f, -3.0f); 
+
+    mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);  
+
+    // Enviar las matrices al shader
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, (const GLfloat*)model);
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, (const GLfloat*)view);
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, (const GLfloat*)projection);
+
+    // --- Definir la posición de la luz y la cámara ---
+    vec3 lightPos = { 1.0f, 1.0f, 1.0f }; // Posición de la luz
+    glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, (const GLfloat*)&lightPos);
+
+    vec3 viewPos = { 1.0f, 1.0f, 3.0f }; // Posición de la cámara
+    glUniform3fv(glGetUniformLocation(shaderProgram, "viewPos"), 1, (const GLfloat*)&viewPos);
+
+    // --- Configurar los buffers (VAO, VBO, EBO) ---
+    unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
-    glGenBuffers(1, &VBO);
 
+    glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, m.vertices.size() * sizeof(Vertex), &m.vertices[0], GL_STATIC_DRAW);
 
@@ -75,24 +125,28 @@ void Render::RenderMesh(Mesh& m)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, m.indices.size() * sizeof(unsigned int), &m.indices[0], GL_STATIC_DRAW);
 
-    // Pos
+    // Posición
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
     glEnableVertexAttribArray(0);
 
-    // Normals
+    // Normales
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     glEnableVertexAttribArray(1);
 
-    // Tex
+    // Coordenadas de textura (puedes dejarlas aunque no las uses)
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
     glEnableVertexAttribArray(2);
 
+    // --- Dibujar la malla ---
     glBindVertexArray(VAO);
-
     glDrawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT, 0);
-
     glBindVertexArray(0);
+
+    // --- Limpiar el estado ---
+    glUseProgram(0);
+
 }
+
 
 
 
