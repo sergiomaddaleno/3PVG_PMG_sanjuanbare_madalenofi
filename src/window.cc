@@ -15,6 +15,11 @@ std::optional<WindowSystem> WindowSystem::make()
 
 std::optional<Window> Window::make(int x, int y, const std::string& name)
 {
+
+	if (!glfwInit()) {
+		return std::nullopt;
+	}
+
 	GLFWwindow* w_ = glfwCreateWindow(x, y, name.c_str(), NULL, NULL);
 
 	if (nullptr == w_) {
@@ -34,5 +39,11 @@ bool Window::closePressed()
 	}
 
 	return false;
+}
+
+void Window::UpdateWindow()
+{
+	glfwSwapBuffers(GetWindow());
+	glfwPollEvents();
 }
 

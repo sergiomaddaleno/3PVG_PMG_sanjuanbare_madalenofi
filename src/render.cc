@@ -86,17 +86,16 @@ void Render::RenderMesh(static const char* vertex_shader_text, static const char
 
     // --- Limpieza de buffers ---
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-    glEnable(GL_DEPTH_TEST); // Habilita el test de profundidad
+    glEnable(GL_DEPTH_TEST);
 
     // --- Configurar matrices ---
     mat4x4 model, view, projection;
     mat4x4_identity(model);   
 
-    // --- Aplicar una rotación a la matriz model ---
     float angle = (float)glfwGetTime();  
     mat4x4_rotate(model, model, 0.0f, 1.0f, 0.0f, angle);
     mat4x4_identity(view);
-    mat4x4_translate(view, 0.0f, -0.5f, -3.0f); 
+    mat4x4_translate(view, 0.0f, 0.0f, -3.0f); 
 
     mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);  
 
@@ -105,11 +104,10 @@ void Render::RenderMesh(static const char* vertex_shader_text, static const char
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, (const GLfloat*)view);
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, (const GLfloat*)projection);
 
-    // --- Definir la posición de la luz y la cámara ---
-    vec3 lightPos = { 1.0f, 1.0f, 1.0f }; // Posición de la luz
+    vec3 lightPos = { 1.0f, 1.0f, 1.0f };
     glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, (const GLfloat*)&lightPos);
 
-    vec3 viewPos = { 1.0f, 1.0f, 3.0f }; // Posición de la cámara
+    vec3 viewPos = { 1.0f, 1.0f, 3.0f }; 
     glUniform3fv(glGetUniformLocation(shaderProgram, "viewPos"), 1, (const GLfloat*)&viewPos);
 
     // --- Configurar los buffers (VAO, VBO, EBO) ---
@@ -133,7 +131,7 @@ void Render::RenderMesh(static const char* vertex_shader_text, static const char
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     glEnableVertexAttribArray(1);
 
-    // Coordenadas de textura (puedes dejarlas aunque no las uses)
+    // Coordenadas de textura 
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
     glEnableVertexAttribArray(2);
 

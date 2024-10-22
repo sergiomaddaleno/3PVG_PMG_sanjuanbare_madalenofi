@@ -32,6 +32,8 @@ public:
 
 	void SetWindowActive() { glfwMakeContextCurrent(window_); }
 
+	void UpdateWindow();
+
 	GLFWwindow* GetWindow() const { return window_; }
 
 	Window(Window&& other) {

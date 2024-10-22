@@ -12,16 +12,6 @@ bool Mesh::LoadOBj(const std::string& file)
 
 	bool obj = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file.c_str());
 
-    if (!warn.empty()) {
-        printf("Warning");
-        return false;
-    }
-
-    if (!err.empty()) {
-        printf("Error");
-        return false;
-    }
-
     if (!obj) {
         printf("Fail to charge OBJ");
         return false;

@@ -1,5 +1,4 @@
 
-
 #include "window.h"
 #include <optional>
 #include <string>
@@ -45,23 +44,11 @@ static const char* fragment_shader_text =
 "    FragColor = vec4(diff * vec3(1.0, 1.0, 1.0), 1.0); // Blanco\n"
 "}\n";
 
-void RenderMesh(const Mesh& mesh) {
-
-	/*glBegin(GL_TRIANGLES);
-	for (const auto& vertex : mesh.vertices) {
-		//glTexCoord2f(vertex.tex_coord[0],vertex.tex_coord[1]);
-		//glNormal3f(vertex.normal[0], vertex.normal[1], vertex.normal[2]);
-		glVertex3f(vertex.pos[0], vertex.pos[1], vertex.pos[2]);
-	}
-	glEnd();
-	*/
-}
-
 int main(int, char**) {
 
 	Mesh mesh_;
 
-	if (!mesh_.LoadOBj("../assets/SM_Teapot.obj")) {
+	if (!mesh_.LoadOBj("../assets/SM_Suzanne.obj")) {
 		return -1;
 	}
 	
@@ -79,14 +66,11 @@ int main(int, char**) {
 	bool done = false;
 	while (!done) {
 
-		//RenderMesh(mesh_);
 		r.RenderMesh(vertex_shader_text,fragment_shader_text,mesh_);
 
-		glfwSwapBuffers(window->GetWindow());
-		glfwPollEvents();
+		window->UpdateWindow();
 
 		if (window->closePressed()) done = true;
-
 	}
 
 	return 0;

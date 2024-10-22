@@ -105,8 +105,7 @@ int main(int, char**) {
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
 
-        glfwSwapBuffers(window->GetWindow());
-        glfwPollEvents();
+        window->UpdateWindow();
 
         if (window->closePressed()) done = true;
     }
