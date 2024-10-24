@@ -29,6 +29,19 @@ public:
 	~Mesh() {
 
 	}
+
+	Mesh(Mesh&& other) noexcept
+		: vertices(std::move(other.vertices)), indices(std::move(other.indices)) {
+	}
+
+	// Operador de asignación de movimiento
+	Mesh& operator=(Mesh&& other) noexcept {
+		if (this != &other) {
+			vertices = std::move(other.vertices);
+			indices = std::move(other.indices);
+		}
+		return *this;
+	}
 	
 	bool LoadOBj(const std::string& file);
 
