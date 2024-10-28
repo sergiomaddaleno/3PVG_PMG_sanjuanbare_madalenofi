@@ -62,15 +62,22 @@ void Render::RenderDrawTriangle(static const char* vertex_shader_text, static co
 
 }
 
-void Render::RenderMesh(static const char* vertex_shader_text, static const char* fragment_shader_text, Mesh& m)
-{
+#include <memory> // Necesario para std::unique_ptr
 
+void Render::RenderMesh(const char* vertex_shader_text, const char* fragment_shader_text, std::unique_ptr<Mesh>& m)
+{
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertex_shader_text, NULL);
+
+    // Cambios aquí
+    glShaderSource(vertexShader, 1, &vertex_shader_text, nullptr); // &vertex_shader_text es un puntero a la cadena
+
     glCompileShader(vertexShader);
 
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragment_shader_text, NULL);
+
+    // Cambios aquí
+    glShaderSource(fragmentShader, 1, &fragment_shader_text, nullptr); // &fragment_shader_text es un puntero a la cadena
+
     glCompileShader(fragmentShader);
 
     unsigned int shaderProgram = glCreateProgram();
@@ -85,19 +92,19 @@ void Render::RenderMesh(static const char* vertex_shader_text, static const char
     glUseProgram(shaderProgram);
 
     // --- Limpieza de buffers ---
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
     // --- Configurar matrices ---
     mat4x4 model, view, projection;
-    mat4x4_identity(model);   
+    mat4x4_identity(model);
 
-    float angle = (float)glfwGetTime();  
+    float angle = (float)glfwGetTime();
     mat4x4_rotate(model, model, 0.0f, 1.0f, 0.0f, angle);
     mat4x4_identity(view);
-    mat4x4_translate(view, 0.0f, 0.0f, -3.0f); 
+    mat4x4_translate(view, 0.0f, -3.0f, -10.0f);
 
-    mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);  
+    mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
 
     // Enviar las matrices al shader
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, (const GLfloat*)model);
@@ -107,7 +114,7 @@ void Render::RenderMesh(static const char* vertex_shader_text, static const char
     vec3 lightPos = { 1.0f, 1.0f, 1.0f };
     glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, (const GLfloat*)&lightPos);
 
-    vec3 viewPos = { 1.0f, 1.0f, 3.0f }; 
+    vec3 viewPos = { 1.0f, 1.0f, 3.0f };
     glUniform3fv(glGetUniformLocation(shaderProgram, "viewPos"), 1, (const GLfloat*)&viewPos);
 
     // --- Configurar los buffers (VAO, VBO, EBO) ---
@@ -117,11 +124,11 @@ void Render::RenderMesh(static const char* vertex_shader_text, static const char
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, m.vertices.size() * sizeof(Vertex), &m.vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m->vertices.size() * sizeof(Vertex), &m->vertices[0], GL_STATIC_DRAW); // Usar m->vertices
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m.indices.size() * sizeof(unsigned int), &m.indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->indices.size() * sizeof(unsigned int), &m->indices[0], GL_STATIC_DRAW); // Usar m->indices
 
     // Posición
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
@@ -137,13 +144,13 @@ void Render::RenderMesh(static const char* vertex_shader_text, static const char
 
     // --- Dibujar la malla ---
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, m.indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
     // --- Limpiar el estado ---
     glUseProgram(0);
-
 }
+
 
 
 

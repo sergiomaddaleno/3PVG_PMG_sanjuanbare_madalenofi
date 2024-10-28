@@ -46,9 +46,9 @@ static const char* fragment_shader_text =
 
 int main(int, char**) {
 
-	Mesh mesh_;
+	std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
 
-	if (!mesh_.LoadOBj("../assets/SM_Suzanne.obj")) {
+	if (!mesh_->LoadOBj("../assets/SM_Teapot.obj")) {
 		return -1;
 	}
 	

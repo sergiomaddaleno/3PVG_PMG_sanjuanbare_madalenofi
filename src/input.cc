@@ -16,14 +16,42 @@ void Input::global_key_callback(GLFWwindow* window, int key, int scancode, int a
 	input_map[window]->key_callback(key, scancode, action, mods);
 }
 
+void Input::pollEvents()
+{
+	glfwPollEvents();
+}
+
+
 void Input::key_callback(int key, int scancode, int action, int mods)
 {
-	keys[keyGLFW_map[key]] = (action != GLFW_RELEASE);
+	if (keyGLFW_map.find(key) != keyGLFW_map.end()) {
+		Keys mappedKey = keyGLFW_map[key];
+		if (action == GLFW_PRESS) {
+			keys[static_cast<int>(mappedKey)] = true; 
+		}
+		else if (action == GLFW_RELEASE) {
+			keys[static_cast<int>(mappedKey)] = false; 
+		}
+	}
+}
+
+bool Input::isKeyDown(Keys key)
+{
+	return keys[static_cast<int>(key)];
 }
 
 bool Input::isKeyPressed(Keys key)
 {
-	return keys[static_cast<int>(key)];
+	static std::vector<bool> previousKeys(Keys_End, false);
+
+	bool currentlyPressed = keys[static_cast<int>(key)];
+	bool wasPressed = previousKeys[static_cast<int>(key)];
+
+	// Actualizar el estado anterior
+	previousKeys[static_cast<int>(key)] = currentlyPressed;
+
+	// Retorna true si la tecla fue presionada este ciclo (de no presionada a presionada)
+	return currentlyPressed && !wasPressed;
 }
 
 bool Input::isKeyReleased(Keys key)

@@ -31,7 +31,7 @@ public:
 	void RenderDrawTriangle(static const char* vertex_shader_text, static const char* fragment_shader_text,
 		Triangle::PointsTriangle(&vertices)[3]);
 
-	void RenderMesh(static const char* vertex_shader_text, static const char* fragment_shader_text, Mesh& m);
+	void RenderMesh(static const char* vertex_shader_text, static const char* fragment_shader_text, std::unique_ptr<Mesh>& m);
 
 };
 

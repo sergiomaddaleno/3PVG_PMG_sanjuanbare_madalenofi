@@ -12,6 +12,7 @@
 #include <thread>
 #include <optional>
 #include <string>
+#include "..\include\input.h"
 
 static const char* vertex_shader_text =
 "#version 330 core\n"
@@ -60,17 +61,17 @@ void printf_() {
 int main(int, char**) {
     int currentMeshIndex = 0;
     bool loadingNewMesh = false;
-
+    
     std::vector<std::string> meshFiles = {
         "../assets/SM_Suzanne.obj",
         "../assets/SM_Teapot.obj",
-        "../assets/SM_Cube.obj"
+        "../assets/Mario.obj"
     };
 
-    Mesh mesh_;
+    std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
 
     // Cargar la primera malla al inicio
-    if (!mesh_.LoadOBj(meshFiles[currentMeshIndex])) {
+    if (!mesh_->LoadOBj(meshFiles[currentMeshIndex])) {
         std::cerr << "Error al cargar la malla inicial: " << meshFiles[currentMeshIndex] << std::endl;
         return -1;
     }
@@ -79,62 +80,66 @@ int main(int, char**) {
     auto window = Window::make(800, 600, "Window");
     window->SetWindowActive();
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
+    Input input{ window->GetWindow() };
     Render r;
     auto render = r.make();
 
     bool done = false;
     JobSystem jb;
 
-    auto lastChangeTime = std::chrono::steady_clock::now(); // Inicializa el temporizador
-    std::future<std::unique_ptr<Mesh>> monetemesh; // Declaración del futuro
-
+   
+    std::future<std::unique_ptr<Mesh>> monetemesh; 
     while (!done) {
-        // Comprobar si han pasado 3 segundos
+        input.pollEvents();
+      
         auto currentTime = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::seconds>(currentTime - lastChangeTime).count() >= 3 && !loadingNewMesh) {
-            // Cambiar al siguiente índice de malla cíclicamente
+        if (input.isKeyPressed(Input::RIGHT) && !loadingNewMesh) {
+           
             currentMeshIndex = (currentMeshIndex + 1) % meshFiles.size();
             std::string nextMeshFile = meshFiles[currentMeshIndex];
 
-            std::cout << "Cambiando a la malla: " << nextMeshFile << std::endl; // Mensaje de depuración
+            std::cout << "Cambiando a la malla: " << nextMeshFile << std::endl; 
 
-            // Cargar la nueva malla en segundo plano
+            
             loadingNewMesh = true;
             monetemesh = jb.Add_Task([nextMeshFile]() {
-                std::cout << "Intentando cargar la malla: " << nextMeshFile << std::endl; // Mensaje de depuración
+                std::cout << "Intentando cargar la malla: " << nextMeshFile << std::endl;
                 std::unique_ptr<Mesh> newMesh = std::make_unique<Mesh>();
                 if (newMesh->LoadOBj(nextMeshFile)) {
-                    std::cout << "Malla cargada exitosamente: " << nextMeshFile << std::endl; // Mensaje de depuración
-                    return newMesh; // Devuelve el nuevo Mesh si se carga correctamente
+                    std::cout << "Malla cargada exitosamente: " << nextMeshFile << std::endl; 
+                    return newMesh; 
                 }
                 else {
                     std::cerr << "Error al cargar la malla: " << nextMeshFile << std::endl;
-                    return std::unique_ptr<Mesh>(nullptr); // Devuelve nullptr si hay un error
+                    return std::unique_ptr<Mesh>(nullptr);
                 }
                 });
 
-            lastChangeTime = currentTime; // Reiniciar el temporizador
+           
         }
 
-        // Verificar si la tarea de carga ha terminado
-        if (loadingNewMesh && monetemesh.valid()) {
-            //if (monetemesh.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
-                std::unique_ptr<Mesh> loadedMesh = monetemesh.get();
-                if (loadedMesh) {
-                    mesh_ = std::move(*loadedMesh); // Reemplazar la malla actual
-                }
-                loadingNewMesh = false; // Resetea la bandera
-            //}
+      
+        if (loadingNewMesh && monetemesh.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+            std::unique_ptr<Mesh> loadedMesh = monetemesh.get();
+            if (loadedMesh) {
+               
+                mesh_ = std::move(loadedMesh);
+                std::cout << "Malla asignada exitosamente" << std::endl;
+            }
+            else {
+                std::cerr << "La carga de la malla falló" << std::endl;
+            }
+            loadingNewMesh = false; 
         }
+    
 
-        // Renderizar la malla actual
+      
         r.RenderMesh(vertex_shader_text, fragment_shader_text, mesh_);
 
-        // Actualizar la ventana
+        
         window->UpdateWindow();
 
-        // Salir si se presiona el botón de cerrar ventana
+       
         if (window->closePressed()) done = true;
     }
 

@@ -62,13 +62,16 @@ public:
 
 	static void global_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
+	void pollEvents();
+
 	void key_callback(int key, int scancode, int action, int mods);
 	
 	//bool isKeyUp(Keys key);
-	//bool isKeyDown(Keys key);
+	bool isKeyDown(Keys key);
 	bool isKeyPressed(Keys key);
 	bool isKeyReleased(Keys key);
 };
 
 
 #endif
+

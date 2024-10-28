@@ -39,7 +39,7 @@ int width, height;
 mat4x4 m, p, mvp;
 
 Vec2 arrow_dir;
-float move_speed = 0.0005;
+float move_speed = 0.05;
 
 void MoveTriangle(GLFWwindow* w, Input &input) {
 

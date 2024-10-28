@@ -30,20 +30,39 @@ public:
 
 	}
 
-	Mesh(Mesh&& other) noexcept
-		: vertices(std::move(other.vertices)), indices(std::move(other.indices)) {
-	}
+    Mesh(Mesh&& other) noexcept
+        : vertices(std::move(other.vertices)), indices(std::move(other.indices)) {
+        
+    }
 
-	// Operador de asignación de movimiento
-	Mesh& operator=(Mesh&& other) noexcept {
-		if (this != &other) {
-			vertices = std::move(other.vertices);
-			indices = std::move(other.indices);
-		}
-		return *this;
-	}
+    
+    Mesh& operator=(Mesh&& other) noexcept {
+        if (this != &other) {
+            
+            vertices = std::move(other.vertices);
+            indices = std::move(other.indices);
+        }
+        return *this;
+    }
+
+   
+    Mesh(const Mesh& other) {
+        vertices = other.vertices;
+        indices = other.indices;
+    }
+
+    
+    Mesh& operator=(const Mesh& other) {
+        if (this != &other) {
+            vertices = other.vertices;
+            indices = other.indices;
+        }
+        return *this;
+    }
 	
 	bool LoadOBj(const std::string& file);
+
+
 
 };
 
