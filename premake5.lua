@@ -184,3 +184,19 @@ files { "src/*.cc",
 		"include/*.h",
 		"examples/PR3_JobSystem_Example.cc"
 }
+
+project"PR4_ECSManager"
+
+kind "ConsoleApp"
+language "C++"
+targetdir "build/%{prj.name}/%{cfg.buildcfg}"
+includedirs "include"
+links "Motor"
+conan_config_exec("Debug")
+conan_config_exec("Release")
+conan_config_exec("RelWithDebInfo")
+debugargs { _MAIN_SCRIPT_DIR .. "/src" }
+files { "src/*.cc",
+		"include/*.h",
+		"examples/PR4_ECSManager_Example.cc"
+}
