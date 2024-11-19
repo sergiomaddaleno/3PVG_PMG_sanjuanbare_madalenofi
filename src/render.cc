@@ -1,8 +1,9 @@
 
 #include "..\include\render.h"
 #include "..\include\mesh.h"
-#define M_PI 3.14159265358979323846
 #include <../deps/linmath.h>
+#include <memory> 
+#define M_PI 3.14159265358979323846
 
 Render::Render() : VAO(0), VBO(0), EBO(0) {}
 
@@ -61,8 +62,6 @@ void Render::RenderDrawTriangle(static const char* vertex_shader_text, static co
     mvp_location_ = mvp_location;
 
 }
-
-#include <memory> // Necesario para std::unique_ptr
 
 void Render::RenderMesh(const char* vertex_shader_text, const char* fragment_shader_text, std::unique_ptr<Mesh>& m)
 {

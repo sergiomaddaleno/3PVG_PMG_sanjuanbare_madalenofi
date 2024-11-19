@@ -65,7 +65,7 @@ int main(int, char**) {
     std::vector<std::string> meshFiles = {
         "../assets/SM_Suzanne.obj",
         "../assets/SM_Teapot.obj",
-        "../assets/greymon.obj"
+        "../assets/SM_Teapot.obj",
     };
 
     std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
