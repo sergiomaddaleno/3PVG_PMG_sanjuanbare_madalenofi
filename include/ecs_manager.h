@@ -45,7 +45,7 @@ public:
 		// TODO: Inicializar la lista de componentes con la cantidad de entidades que ya hay
 		value->component_list_.resize(last_entity, std::nullopt);
 
-		component_list_map_.emplace(key, value);
+		component_list_map_.emplace(key, std::move(value));
 	}
 
 	template<typename T>

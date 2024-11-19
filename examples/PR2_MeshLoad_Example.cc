@@ -5,43 +5,37 @@
 #include "..\include\mesh.h"
 #include "..\include\render.h"
 
-static const char* vertex_shader_text =
+static const char* vertex_shader_text_normals =
 "#version 330 core\n"
-"layout(location = 0) in vec3 aPos;\n"        
-"layout(location = 1) in vec3 aNormal;\n"    
-"layout(location = 2) in vec2 aTexCoord;\n"   
-"out vec2 TexCoord;\n"                        
-"out vec3 Normal;\n"                          
-"out vec3 FragPos;\n"                        
-"uniform mat4 model;\n"                       
-"uniform mat4 view;\n"                       
-"uniform mat4 projection;\n"                  
-"void main()\n"
-"{\n"
-"    FragPos = vec3(model * vec4(aPos, 1.0));\n" 
-"    Normal = mat3(transpose(inverse(model))) * aNormal;\n" 
+"layout(location = 0) in vec3 aPos;\n"
+"layout(location = 1) in vec3 aNormal;\n"
+"layout(location = 2) in vec2 aTexCoord;\n"
+"out vec2 TexCoord;\n"
+"out vec3 normal;\n"
+"out vec3 FragPos;\n"
+"out vec3 pos;\n"
+"out vec2 uv;\n"
+"uniform mat4 model;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
+"void main() {\n"
+"    normal = mat3(transpose(inverse(model))) * aNormal;\n"
+"    pos = aPos;\n"
+"    uv = aTexCoord;\n"
+"    FragPos = aPos;\n"
 "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
-"    TexCoord = aTexCoord;\n"                  
 "}\n";
 
-static const char* fragment_shader_text =
+static const char* fragment_shader_text_normals =
 "#version 330 core\n"
-"out vec4 FragColor;\n"                       
-"in vec2 TexCoord;\n"                         
-"in vec3 Normal;\n"                           
-"in vec3 FragPos;\n"                           
-"uniform vec3 lightPos;\n"                    
-"uniform vec3 viewPos;\n"                      
-"void main()\n"
-"{\n"
-    
-"    vec3 norm = normalize(Normal);\n"
-    
-"    vec3 lightDir = normalize(lightPos - FragPos);\n"
-   
-"    float diff = max(dot(norm, lightDir), 0.0);\n"
-    
-"    FragColor = vec4(diff * vec3(1.0, 1.0, 1.0), 1.0); // Blanco\n"
+"out vec4 FragColor;\n"
+"in vec3 normal;\n"
+"in vec3 FragPos;\n"
+"in vec3 pos;\n"
+"in vec2 uv;\n"
+"void main() {\n"
+"    vec3 norm = normalize(normal);\n"
+"    FragColor = vec4(norm, 1.0);\n"
 "}\n";
 
 int main(int, char**) {

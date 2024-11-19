@@ -4,8 +4,29 @@
 #include <GLFW/glfw3.h>
 #include <optional>
 #include <string>
-
 #include "ecs_manager.h"
+
+struct RenderTest {
+	void myRenderprint();
+};
+struct PositionComponent {};
+
+RenderTest rc;
+PositionComponent pc;
+
+void RenderTest::myRenderprint() {
+	printf("print renderizado\n");
+}
+
+void renderSystem(std::vector<std::optional<RenderTest>>& rc) {
+	auto ri = rc.begin();
+	auto riend = rc.end();
+	for (; ri != riend ; ri++) {
+		// TODO OPENGL
+		ri->value().myRenderprint();
+	}
+}
+
 
 int main(int, char**) {
 
@@ -17,6 +38,10 @@ int main(int, char**) {
 	//---
 
 	ECSManager ecs;
+
+	auto entidad_0 = ecs.create_entity();
+	ecs.add_component_type<RenderTest>();
+	ecs.get_component<RenderTest>(entidad_0);
 
 	bool done = false;
 	while (!done) {

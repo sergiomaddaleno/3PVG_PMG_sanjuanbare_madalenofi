@@ -53,10 +53,42 @@ static const char* fragment_shader_text =
 "    FragColor = vec4(diff * vec3(1.0, 1.0, 1.0), 1.0); // Blanco\n"
 "}\n";
 
+static const char* vertex_shader_text_normals =
+"#version 330 core\n"
+"layout(location = 0) in vec3 aPos;\n"
+"layout(location = 1) in vec3 aNormal;\n"
+"layout(location = 2) in vec2 aTexCoord;\n"
+"out vec2 TexCoord;\n"
+"out vec3 normal;\n"
+"out vec3 FragPos;\n"
+"out vec3 pos;\n"
+"out vec2 uv;\n"
+"uniform mat4 model;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
+"void main() {\n"
+"    normal = mat3(transpose(inverse(model))) * aNormal;\n"
+"    pos = aPos;\n"
+"    uv = aTexCoord;\n"
+"    FragPos = aPos;\n"
+"    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
+"}\n";
+
+static const char* fragment_shader_text_normals =
+"#version 330 core\n"
+"out vec4 FragColor;\n"
+"in vec3 normal;\n"
+"in vec3 FragPos;\n"
+"in vec3 pos;\n"
+"in vec2 uv;\n"
+"void main() {\n"
+"    vec3 norm = normalize(normal);\n"
+"    FragColor = vec4(norm, 1.0);\n"
+"}\n";
+
 void printf_() {
 	std::cout << "Tarea 1 ejecutada\n";
 }
-
 
 int main(int, char**) {
     int currentMeshIndex = 0;
@@ -65,7 +97,7 @@ int main(int, char**) {
     std::vector<std::string> meshFiles = {
         "../assets/SM_Suzanne.obj",
         "../assets/SM_Teapot.obj",
-        "../assets/SM_Teapot.obj",
+        "../assets/Mario.obj",
     };
 
     std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
@@ -114,8 +146,6 @@ int main(int, char**) {
                     return std::unique_ptr<Mesh>(nullptr);
                 }
                 });
-
-           
         }
 
       
@@ -133,8 +163,7 @@ int main(int, char**) {
         }
     
 
-      
-        r.RenderMesh(vertex_shader_text, fragment_shader_text, mesh_);
+        r.RenderMesh(vertex_shader_text_normals, fragment_shader_text_normals, mesh_);
 
         
         window->UpdateWindow();
