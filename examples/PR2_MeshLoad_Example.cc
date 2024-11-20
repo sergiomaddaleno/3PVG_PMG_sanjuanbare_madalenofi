@@ -60,7 +60,7 @@ int main(int, char**) {
 	bool done = false;
 	while (!done) {
 
-		r.RenderMesh(vertex_shader_text,fragment_shader_text,mesh_);
+		r.RenderMesh(vertex_shader_text_normals,fragment_shader_text_normals,mesh_);
 
 		window->UpdateWindow();
 
