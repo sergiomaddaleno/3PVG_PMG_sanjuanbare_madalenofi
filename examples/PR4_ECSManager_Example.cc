@@ -5,6 +5,8 @@
 #include <optional>
 #include <string>
 #include "..\include\mesh.h"
+#include "..\include\render.h"
+
 #include "ecs_manager.h"
 #define M_PI 3.14159265358979323846
 
@@ -42,13 +44,10 @@ static const char* fragment_shader_text =
 "}\n";
 
 struct RenderTest {
-    //std::unique_ptr<Mesh>& m2; 
- 
-
+    std::unique_ptr<Mesh>& render_mesh; 
 };
-RenderTest rt;
 
-void renderSystem(std::vector<std::optional<RenderTest>>& rc, std::unique_ptr<Mesh>& m) {
+void renderSystem(std::vector<std::optional<RenderTest>>& rc) {
     
     
     for (auto& ri : rc) {
@@ -81,21 +80,21 @@ void renderSystem(std::vector<std::optional<RenderTest>>& rc, std::unique_ptr<Me
 
             float angle = (float)glfwGetTime();
             mat4x4_rotate(model, model, 0.0f, 1.0f, 0.0f, angle);
-           
 
-       
+
+
             mat4x4_translate_in_place(model, 0.0f, 0.0f, 0.0f);
 
             mat4x4_identity(view);
-           
-            
+
+
             mat4x4_translate(view, 0.0f, -1.0f, -10.0f);
 
-            
-            
-            
+
+
+
             mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
-            
+
             // Enviar matrices al shader
             glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, (const GLfloat*)model);
             glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, (const GLfloat*)view);
@@ -120,7 +119,7 @@ void renderSystem(std::vector<std::optional<RenderTest>>& rc, std::unique_ptr<Me
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->indices.size() * sizeof(unsigned int), &m->indices[0], GL_STATIC_DRAW);
 
-            // Configurar atributos de vértices
+            // Configurar atributos de v?rtices
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
             glEnableVertexAttribArray(0);
 
@@ -138,16 +137,13 @@ void renderSystem(std::vector<std::optional<RenderTest>>& rc, std::unique_ptr<Me
             // Limpiar estado
             glUseProgram(0);
 
-            // Incrementar el índice
-            
+            // Incrementar el ?ndice
         }
         else {
             printf("error\n");
         }
     }
 }
-
-
 
 int main(int, char**) {
 
@@ -157,35 +153,37 @@ int main(int, char**) {
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    glewInit();
+    glfwInit();
 	//---
 
-    std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
+    std::unique_ptr<Mesh> mesh_;
 
     if (!mesh_->LoadOBj("../assets/SM_Teapot.obj")) {
         return -1;
     }
-    glfwInit();
+
+    Render render_;
+    auto render = render_.make();
+    //---
+
 
 	ECSManager ecs;
 
 	auto entidad_0 = ecs.create_entity();
 	auto entidad_1 = ecs.create_entity();
 	ecs.add_component_type<RenderTest>();
-	ecs.add_component<RenderTest>(entidad_0);
-	//ecs.get_component<RenderTest>(entidad_0);
+    ecs.add_component<RenderTest>(entidad_0)->render_mesh = std::move(mesh_);
+    ecs.get_component<RenderTest>(entidad_0);
 
 	ecs.add_component<RenderTest>(entidad_1);
 	//ecs.get_component<RenderTest>(entidad_1);
-	
-
 	
 	bool done = false;
 	while (!done) {
 
 		window->UpdateWindow();
 
-		renderSystem(ecs.getComponentList<RenderTest>(),mesh_);
+		renderSystem(ecs.getComponentList<RenderTest>());
 
 		if (window->closePressed()) done = true;
 	}
