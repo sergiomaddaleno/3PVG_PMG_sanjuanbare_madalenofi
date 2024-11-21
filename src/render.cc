@@ -117,7 +117,6 @@ void Render::RenderMesh(const char* vertex_shader_text, const char* fragment_sha
     glUniform3fv(glGetUniformLocation(shaderProgram, "viewPos"), 1, (const GLfloat*)&viewPos);
 
     // --- Configurar los buffers (VAO, VBO, EBO) ---
-    unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 

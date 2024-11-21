@@ -4,6 +4,7 @@
 #include <string>
 #include "..\include\mesh.h"
 #include "..\include\render.h"
+#include "..\include\transform.h"
 #include "ecs_manager.h"
 #define M_PI 3.14159265358979323846
 
@@ -59,42 +60,14 @@ struct RenderComponent {
     }
 };
 
-struct Vec3 {
-    float x, y, z;
+std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
+std::unique_ptr<Mesh> mesh_2 = std::make_unique<Mesh>();
+std::unique_ptr<Mesh> mesh_3 = std::make_unique<Mesh>();
 
-    Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
+Render render_;
+ECSManager ecs;
 
-   
-    Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
-
-    
-    Vec3(const Vec3& other) : x(other.x), y(other.y), z(other.z) {}
-};
-
-struct PositionComponent {
-    
-    Vec3 position;  
-
-    
-    PositionComponent() : position(0.0f, 0.0f, 0.0f) {}
-
-    
-    PositionComponent(const PositionComponent& other) : position(other.position) {}
-
-    
-    PositionComponent& operator=(const PositionComponent& other) {
-        if (this != &other) {
-            position = other.position;
-        }
-        return *this;
-    }
-
-   
-    PositionComponent(const Vec3& newPosition) : position(newPosition) {}
-};
-
-
-void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<PositionComponent>>& pc) {
+void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<Transform>>& tc) {
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertex_shader_text, nullptr);
     glCompileShader(vertexShader);
@@ -117,19 +90,17 @@ void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<s
 
     
     auto ri = rc.begin();
-    auto pi = pc.begin();
+    auto ti = tc.begin();
     auto riend = rc.end();
-    auto piend = pc.end();
+    auto tiend = tc.end();
 
-    for (; ri != riend || pi != piend; ri++, pi++) {
+    for (; ri != riend || ti != tiend; ri++, ti++) {
         
 
-        if (ri->has_value() && pi->has_value()) {
-
+        if (ri->has_value() && ti->has_value()) {
 
             auto& renderComponent = *ri;
-            auto& positionComponent = *pi;
-
+            auto& transform_component = *ti;
 
             auto& mesh = renderComponent->render_mesh;
 
@@ -162,12 +133,9 @@ void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<s
             mat4x4 model, view, projection;
             mat4x4_identity(model);
 
-
-            mat4x4_translate(model, positionComponent->position.x, positionComponent->position.y, positionComponent->position.z);
-
-
-            float angle = (float)glfwGetTime();
-            mat4x4_rotate(model, model, 0.0f, 1.0f, 0.0f, angle);
+            mat4x4_translate(model, transform_component->position.x, transform_component->position.y, transform_component->position.z);
+            mat4x4_rotate(model, model, transform_component->rotation.x, transform_component->rotation.y, transform_component->rotation.z, transform_component->angle);
+            mat4x4_scale_aniso(model, model, transform_component->scale.x, transform_component->scale.y, transform_component->scale.z);
 
             mat4x4_identity(view);
             mat4x4_translate(view, 0.0f, -3.0f, -10.0f);
@@ -200,10 +168,6 @@ void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<s
 
 int main(int, char**) {
 
-    std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
-    std::unique_ptr<Mesh> mesh_2 = std::make_unique<Mesh>();
-    std::unique_ptr<Mesh> mesh_3 = std::make_unique<Mesh>();
-
     if (!mesh_->LoadOBj("../assets/SM_Teapot.obj")) {
         return -1;
     }
@@ -215,45 +179,58 @@ int main(int, char**) {
     if (!mesh_3->LoadOBj("../assets/Mario.obj")) {
         return -1;
     }
-
+    // ---
     glfwInit();
 
     auto window = Window::make(800, 600, "Window");
     window->SetWindowActive();
+    // ---
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    Render render_;
     auto render = render_.make();
 
-    ECSManager ecs;
+    // ---
 
     auto entidad_0 = ecs.create_entity();
     auto entidad_1 = ecs.create_entity();
     auto entidad_2 = ecs.create_entity();
 
     ecs.add_component_type<RenderComponent>();
-    ecs.add_component_type<PositionComponent>();
+    ecs.add_component_type<Transform>();
 
     ecs.add_component<RenderComponent>(entidad_0);
-    ecs.add_component<PositionComponent>(entidad_0);
+    ecs.add_component<Transform>(entidad_0);
     ecs.get_component<RenderComponent>(entidad_0)->render_mesh = std::move(mesh_);
-    ecs.get_component<PositionComponent>(entidad_0)->position = Vec3{ 3.0f, -1.0f, -5.0f };
+    ecs.get_component<Transform>(entidad_0)->position = Vec3{ 3.0f, -1.0f, -5.0f };
+    ecs.get_component<Transform>(entidad_0)->rotation = Vec3{ 0.0f, 1.0f, 0.0f };
+    ecs.get_component<Transform>(entidad_0)->scale = Vec3{ 2.0f, 2.0f, 2.0f };
 
     ecs.add_component<RenderComponent>(entidad_1);
-    ecs.add_component<PositionComponent>(entidad_1);
+    ecs.add_component<Transform>(entidad_1);
     ecs.get_component<RenderComponent>(entidad_1)->render_mesh = std::move(mesh_2);
-    ecs.get_component<PositionComponent>(entidad_1)->position = Vec3{ -3.0f, 1.0f, -5.0f };
+    ecs.get_component<Transform>(entidad_1)->position = Vec3{ -3.0f, 1.0f, -5.0f };
+    ecs.get_component<Transform>(entidad_1)->rotation = Vec3{ 1.0f, 0.0f, 0.0f };
 
     ecs.add_component<RenderComponent>(entidad_2);
-    ecs.add_component<PositionComponent>(entidad_2);
+    ecs.add_component<Transform>(entidad_2);
     ecs.get_component<RenderComponent>(entidad_2)->render_mesh = std::move(mesh_3);
-    ecs.get_component<PositionComponent>(entidad_2)->position = Vec3{ 2.0f, 2.0f, -5.0f };
+    ecs.get_component<Transform>(entidad_2)->position = Vec3{ 2.0f, 2.0f, -5.0f };
+    ecs.get_component<Transform>(entidad_2)->rotation = Vec3{ 1.0f, 1.0f, 0.0f };
 
     bool done = false;
     while (!done) {
         window->UpdateWindow();
-        renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<PositionComponent>());
+
+        
+        float angle = (float)glfwGetTime();
+        ecs.get_component<Transform>(entidad_0)->angle = angle;
+        ecs.get_component<Transform>(entidad_1)->angle = angle;
+        ecs.get_component<Transform>(entidad_2)->angle = angle;
+
+
+
+        renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<Transform>());
+
+
         if (window->closePressed()) done = true;
     }
 
