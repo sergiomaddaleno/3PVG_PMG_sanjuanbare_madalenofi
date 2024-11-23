@@ -118,6 +118,7 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/examples/data" }
 files { "src/*.cc",
 		"include/*.h",
+		"include/EcsComponents/*.h",
 		"examples/window.cpp"}
 -----
 project"PR0_Window"
@@ -133,6 +134,7 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
+		"include/EcsComponents/*.h",
 		"examples/PR0_Window_Example.cc"
 }
 ------
@@ -150,6 +152,7 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
+		"include/EcsComponents/*.h",
 		"examples/PR1_Triangle_Example.cc"
 }
 
@@ -166,6 +169,7 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
+		"include/EcsComponents/*.h",
 		"examples/PR2_MeshLoad_Example.cc"
 }
 
@@ -182,6 +186,7 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
+		"include/EcsComponents/*.h",
 		"examples/PR3_JobSystem_Example.cc"
 }
 
@@ -198,5 +203,6 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
+		"include/EcsComponents/*.h",
 		"examples/PR4_ECSManager_Example.cc"
 }

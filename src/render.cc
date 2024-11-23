@@ -24,6 +24,28 @@ GLint Render::GetLocation()
     return mvp_location_;
 }
 
+void Render::SetupShader(const char* vertex_shader_text, const char* fragment_shader_text) {
+    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertex_shader_text, nullptr);
+    glCompileShader(vertexShader);
+
+    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragment_shader_text, nullptr);
+    glCompileShader(fragmentShader);
+
+    program_ = glCreateProgram();
+    glAttachShader(program_, vertexShader);
+    glAttachShader(program_, fragmentShader);
+    glLinkProgram(program_);
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+}
+
+
 void Render::RenderDrawTriangle(static const char* vertex_shader_text, static const char* fragment_shader_text,
     Triangle::PointsTriangle(&vertices)[3])
 {
@@ -147,6 +169,84 @@ void Render::RenderMesh(const char* vertex_shader_text, const char* fragment_sha
 
     // --- Limpiar el estado ---
     glUseProgram(0);
+}
+
+void Render::RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc)
+{
+    auto ri = rc.begin();
+    auto ti = tc.begin();
+    auto riend = rc.end();
+    auto tiend = tc.end();
+
+    for (; ri != riend || ti != tiend; ri++, ti++) {
+
+
+        if (ri->has_value() && ti->has_value()) {
+
+            auto& renderComponent = *ri;
+            auto& transform_component = *ti;
+
+            auto& mesh = renderComponent->render_mesh;
+
+            glGenVertexArrays(1, &VAO);
+            glBindVertexArray(VAO);
+
+            glGenBuffers(1, &VBO);
+            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
+
+            glGenBuffers(1, &EBO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
+
+            // Configuración de atributos de vértices
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+            glEnableVertexAttribArray(0);
+
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+            glEnableVertexAttribArray(1);
+
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
+            glEnableVertexAttribArray(2);
+
+            glBindVertexArray(0);
+
+            glUseProgram(program_);
+
+            mat4x4 model, view, projection;
+            mat4x4_identity(model);
+
+            mat4x4_translate(model, transform_component->position.x, transform_component->position.y, transform_component->position.z);
+            mat4x4_rotate(model, model, transform_component->rotation.x, transform_component->rotation.y, transform_component->rotation.z, transform_component->angle);
+            mat4x4_scale_aniso(model, model, transform_component->scale.x, transform_component->scale.y, transform_component->scale.z);
+
+            mat4x4_identity(view);
+            mat4x4_translate(view, 0.0f, -3.0f, -10.0f);
+
+            mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
+
+            glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, (const GLfloat*)model);
+            glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, (const GLfloat*)view);
+            glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, (const GLfloat*)projection);
+
+            vec3 lightPos = { 1.0f, 1.0f, 1.0f };
+            glUniform3fv(glGetUniformLocation(program_, "lightPos"), 1, (const GLfloat*)&lightPos);
+
+            vec3 viewPos = { 1.0f, 1.0f, 3.0f };
+            glUniform3fv(glGetUniformLocation(program_, "viewPos"), 1, (const GLfloat*)&viewPos);
+
+
+            glBindVertexArray(VAO);
+            glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+
+            glUseProgram(0);
+
+            glDeleteVertexArrays(1, &VAO);
+            glDeleteBuffers(1, &VBO);
+            glDeleteBuffers(1, &EBO);
+        }
+    }
 }
 
 

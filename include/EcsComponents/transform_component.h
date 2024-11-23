@@ -1,8 +1,6 @@
 #ifndef TRNS
 #define TRNS
 
-#include "icomponentdata.h"
-
 struct Vec3 {
     float x, y, z;
 
@@ -11,21 +9,21 @@ struct Vec3 {
     Vec3(const Vec3& other) : x(other.x), y(other.y), z(other.z) {}
 };
 
-struct Transform : IComponentData {
+struct TransformComponent{
     Vec3 position;
     Vec3 rotation;
     Vec3 scale;
     float angle;
 
-    Transform() : position(0.0f, 0.0f, 0.0f), rotation(0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f), angle(0.0f) {}
+    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f), angle(0.0f) {}
 
-    Transform(Vec3 position_, Vec3 rotation_, Vec3 scale_, float angle_)
+    TransformComponent(Vec3 position_, Vec3 rotation_, Vec3 scale_, float angle_)
         : position(position_), rotation(rotation_), scale(scale_), angle(angle_) {}
 
-    Transform(const Transform& other)
+    TransformComponent(const TransformComponent& other)
         : position(other.position), rotation(other.rotation), scale(other.scale), angle(other.angle) {}
 
-    Transform& operator=(const Transform& other) {
+    TransformComponent& operator=(const TransformComponent& other) {
         if (this != &other) {
             position = other.position;
             rotation = other.rotation;

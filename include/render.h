@@ -10,6 +10,9 @@
 #include "triangle.h"
 #include "mesh.h"
 
+#include "..\include\EcsComponents\transform_component.h"
+#include "..\include\EcsComponents\render_component.h"
+
 class Render {
 
 public:
@@ -18,7 +21,6 @@ public:
 	GLint mvp_location_;
 
 	mat4x4 model, view, projection;
-
 	GLuint VAO, VBO, EBO;
 
 	Render();
@@ -28,10 +30,14 @@ public:
 	GLuint GetProgram();
 	GLint GetLocation();
 
+	void SetupShader(const char* vertex_shader_text, const char* fragment_shader_text);
+
 	void RenderDrawTriangle(static const char* vertex_shader_text, static const char* fragment_shader_text,
 		Triangle::PointsTriangle(&vertices)[3]);
 
 	void RenderMesh(static const char* vertex_shader_text, static const char* fragment_shader_text, std::unique_ptr<Mesh>& m);
+
+	void RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
 
 };
 
