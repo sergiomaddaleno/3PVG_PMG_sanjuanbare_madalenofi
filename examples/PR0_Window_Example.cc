@@ -5,18 +5,20 @@
 #include <optional>
 #include <string>
 
+#include <../deps/linmath.h>
+
+vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
 int main(int, char**) {
 
 	//---
 	auto window = Window::make(800, 600, "Window");
 	window->SetWindowActive();
-
-	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 	//---
 
 	bool done = false;
 	while (!done) {
+		window->ColorWindow(color);
 
 		window->UpdateWindow();
 

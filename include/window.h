@@ -7,6 +7,8 @@
 #include <optional>
 #include <string>
 
+#include <../deps/linmath.h>
+
 class WindowSystem {
 
 public:
@@ -31,6 +33,8 @@ public:
 	bool closePressed();
 
 	void SetWindowActive() { glfwMakeContextCurrent(window_); }
+
+	void ColorWindow(const vec4& Color);
 
 	void UpdateWindow();
 
