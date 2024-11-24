@@ -4,6 +4,7 @@
 #include <string>
 #include "..\include\mesh.h"
 #include "..\include\render.h"
+#include "..\include\Components\transform_component.h"
 
 static const char* vertex_shader_text_normals =
 "#version 330 core\n"
@@ -46,21 +47,27 @@ int main(int, char**) {
 		return -1;
 	}
 	
-	glfwInit();
-
+	//---
 	auto window = Window::make(800, 600, "Window");
 	window->SetWindowActive();
-
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//---
 
 	Render r;
 	auto render = r.make();
 
+	TransformComponent tr;
+	tr.position = Vec3{ 0.0f, -1.0f, -5.0f };
+	tr.scale = Vec3{ 2.0f, 2.0f, 2.0f };
+	tr.rotation = Vec3{ 0.0f, 1.0f, 0.0f };
+
 	bool done = false;
 	while (!done) {
 
-		r.RenderMesh(vertex_shader_text_normals,fragment_shader_text_normals,mesh_);
+		float angle = (float)glfwGetTime() * 2;
+		tr.angle = angle;
+
+		r.SetupShader(vertex_shader_text_normals, fragment_shader_text_normals);
+		r.RenderMesh(mesh_, tr);
 
 		window->UpdateWindow();
 

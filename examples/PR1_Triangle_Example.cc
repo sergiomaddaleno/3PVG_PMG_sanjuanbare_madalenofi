@@ -11,6 +11,8 @@
 #include <optional>
 #include <string>
 
+#include "..\include\Components\transform_component.h"
+
 struct Vec2 {
     float x, y;
 };
@@ -63,23 +65,20 @@ void MoveTriangle(GLFWwindow* w, Input &input) {
 int main(int, char**) {
 
     //--- Window
-    glfwInit();
     auto window = Window::make(800, 600, "Window");
     window->SetWindowActive();
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glfwMakeContextCurrent(window->GetWindow());
     //---
 
     //--- Triangle
     auto tri_ = Triangle::make(0.5f, Triangle::Color::Blue);    
-    //auto render = Render::make();
 
     Render r;
     auto render = r.make();
-    r.RenderDrawTriangle(vertex_shader_text,fragment_shader_text,tri_->my_triangle);
 
     //--- Input
     Input input{ window->GetWindow() };
+
+    TransformComponent tr;
 
     bool done = false;
     while (!done) {
@@ -87,23 +86,16 @@ int main(int, char**) {
         glfwGetFramebufferSize(window->GetWindow(), &width, &height);
         float ratio = width / (float)height;
 
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
-
         //Triangle
         MoveTriangle(window->GetWindow(), input);
-
-        mat4x4_identity(m);
-        mat4x4_translate_in_place(m, arrow_dir.x, arrow_dir.y, 0.0f);
-        mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-        mat4x4_mul(mvp, p, m);
         //---
        
-        //Render of triangle
-        glUseProgram(r.GetProgram());
-        glUniformMatrix4fv(r.GetLocation(), 1, GL_FALSE, (GLfloat*)mvp);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        tr.position = Vec3{ arrow_dir.x, arrow_dir.y, 0.0f };
+        tr.scale = Vec3{ 2.0f, 2.0f, 2.0f };
 
+        //Render of triangle
+        r.SetupShader(vertex_shader_text, fragment_shader_text);
+        r.RenderDrawTriangle(tri_->my_triangle, tr);
 
         window->UpdateWindow();
 

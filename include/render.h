@@ -10,8 +10,8 @@
 #include "triangle.h"
 #include "mesh.h"
 
-#include "..\include\EcsComponents\transform_component.h"
-#include "..\include\EcsComponents\render_component.h"
+#include "..\include\Components\transform_component.h"
+#include "..\include\Components\render_component.h"
 
 class Render {
 
@@ -32,10 +32,9 @@ public:
 
 	void SetupShader(const char* vertex_shader_text, const char* fragment_shader_text);
 
-	void RenderDrawTriangle(static const char* vertex_shader_text, static const char* fragment_shader_text,
-		Triangle::PointsTriangle(&vertices)[3]);
+	void RenderDrawTriangle(Triangle::PointsTriangle(&vertices)[3], TransformComponent tr);
 
-	void RenderMesh(static const char* vertex_shader_text, static const char* fragment_shader_text, std::unique_ptr<Mesh>& m);
+	void RenderMesh(std::unique_ptr<Mesh>& mesh, TransformComponent tr);
 
 	void RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
 

@@ -4,8 +4,8 @@
 #include <string>
 #include "..\include\mesh.h"
 #include "..\include\render.h"
-#include "..\include\EcsComponents\transform_component.h"
-#include "..\include\EcsComponents\render_component.h"
+#include "..\include\Components\transform_component.h"
+#include "..\include\Components\render_component.h"
 
 #include "ecs_manager.h"
 #define M_PI 3.14159265358979323846

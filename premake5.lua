@@ -67,7 +67,7 @@ configurations { "Debug", "Release", "RelWithDebInfo" }
 architecture "x64"
 location "build"
 cppdialect "c++20"
-startproject "WindowExample"
+startproject "PR0_Window"
 filter "configurations:Debug"
 defines { "DEBUG" }
 symbols "On"
@@ -105,22 +105,6 @@ files {
 "src/stdafx.cpp", "src/stdafx.hpp",
 }
 -----
-project"WindowExample"
-
-kind "ConsoleApp"
-language "C++"
-targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs "include"
-links "Motor"
-conan_config_exec("Debug")
-conan_config_exec("Release")
-conan_config_exec("RelWithDebInfo")
-debugargs { _MAIN_SCRIPT_DIR .. "/examples/data" }
-files { "src/*.cc",
-		"include/*.h",
-		"include/EcsComponents/*.h",
-		"examples/window.cpp"}
------
 project"PR0_Window"
 
 kind "ConsoleApp"
@@ -134,7 +118,7 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
-		"include/EcsComponents/*.h",
+		"include/Components/*.h",
 		"examples/PR0_Window_Example.cc"
 }
 ------
@@ -152,7 +136,7 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
-		"include/EcsComponents/*.h",
+		"include/Components/*.h",
 		"examples/PR1_Triangle_Example.cc"
 }
 
@@ -169,7 +153,7 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
-		"include/EcsComponents/*.h",
+		"include/Components/*.h",
 		"examples/PR2_MeshLoad_Example.cc"
 }
 
@@ -186,7 +170,7 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
-		"include/EcsComponents/*.h",
+		"include/Components/*.h",
 		"examples/PR3_JobSystem_Example.cc"
 }
 
@@ -203,6 +187,6 @@ conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
-		"include/EcsComponents/*.h",
+		"include/Components/*.h",
 		"examples/PR4_ECSManager_Example.cc"
 }

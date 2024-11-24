@@ -45,130 +45,106 @@ void Render::SetupShader(const char* vertex_shader_text, const char* fragment_sh
     glEnable(GL_DEPTH_TEST);
 }
 
-
-void Render::RenderDrawTriangle(static const char* vertex_shader_text, static const char* fragment_shader_text,
-    Triangle::PointsTriangle(&vertices)[3])
+void Render::RenderDrawTriangle(Triangle::PointsTriangle(&vertices)[3], TransformComponent tr)
 {
-    GLuint vertex_buffer, vertex_shader, fragment_shader, program;
-    GLint vpos_location, vcol_location, mvp_location;
+    GLuint vertex_buffer;
+    GLint vpos_location, vcol_location;
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
-    glCompileShader(vertex_shader);
+    glUseProgram(program_);
 
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
-    glCompileShader(fragment_shader);
+    mat4x4 model, view, projection, mvp;
+    mat4x4_identity(model);
+    mat4x4_translate(model, tr.position.x, tr.position.y, tr.position.z);
+    mat4x4_rotate(model, model, tr.rotation.x, tr.rotation.y, tr.rotation.z, tr.angle);
+    mat4x4_scale_aniso(model, model, tr.scale.x, tr.scale.y, tr.scale.z);
 
-    program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
+    mat4x4_identity(view);
+    mat4x4_translate(view, 0.0f, 0.0f, -5.0f);
 
-    mvp_location = glGetUniformLocation(program, "MVP");
-    vpos_location = glGetAttribLocation(program, "vPos");
-    vcol_location = glGetAttribLocation(program, "vCol");
+    mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), (float)800 / 600, 0.1f, 100.0f);
+
+    mat4x4_mul(mvp, projection, view);
+    mat4x4_mul(mvp, mvp, model);
+    glUniformMatrix4fv(glGetUniformLocation(program_, "MVP"), 1, GL_FALSE, (const GLfloat*)mvp);
+
+    vpos_location = glGetAttribLocation(program_, "vPos");
+    vcol_location = glGetAttribLocation(program_, "vCol");
 
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (void*)0);
+
     glEnableVertexAttribArray(vcol_location);
-    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
-    sizeof(vertices[0]), (void*)(sizeof(float) * 2));
+    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (void*)(sizeof(float) * 2));
 
-    program_ = program;
-    mvp_location_ = mvp_location;
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
+    glDisableVertexAttribArray(vpos_location);
+    glDisableVertexAttribArray(vcol_location);
+    glDeleteBuffers(1, &vertex_buffer);
 }
 
-void Render::RenderMesh(const char* vertex_shader_text, const char* fragment_shader_text, std::unique_ptr<Mesh>& m)
+void Render::RenderMesh(std::unique_ptr<Mesh>& mesh, TransformComponent tr)
 {
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-    // Cambios aquí
-    glShaderSource(vertexShader, 1, &vertex_shader_text, nullptr); // &vertex_shader_text es un puntero a la cadena
-
-    glCompileShader(vertexShader);
-
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // Cambios aquí
-    glShaderSource(fragmentShader, 1, &fragment_shader_text, nullptr); // &fragment_shader_text es un puntero a la cadena
-
-    glCompileShader(fragmentShader);
-
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    // --- Usar el programa de shaders ---
-    glUseProgram(shaderProgram);
-
-    // --- Limpieza de buffers ---
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-
-    // --- Configurar matrices ---
-    mat4x4 model, view, projection;
-    mat4x4_identity(model);
-
-    float angle = (float)glfwGetTime();
-    mat4x4_rotate(model, model, 0.0f, 1.0f, 0.0f, angle);
-    mat4x4_identity(view);
-    mat4x4_translate(view, 0.0f, -3.0f, -10.0f);
-
-    mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
-
-    // Enviar las matrices al shader
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, (const GLfloat*)model);
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, (const GLfloat*)view);
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, (const GLfloat*)projection);
-
-    vec3 lightPos = { 1.0f, 1.0f, 1.0f };
-    glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, (const GLfloat*)&lightPos);
-
-    vec3 viewPos = { 1.0f, 1.0f, 3.0f };
-    glUniform3fv(glGetUniformLocation(shaderProgram, "viewPos"), 1, (const GLfloat*)&viewPos);
-
-    // --- Configurar los buffers (VAO, VBO, EBO) ---
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, m->vertices.size() * sizeof(Vertex), &m->vertices[0], GL_STATIC_DRAW); // Usar m->vertices
+    glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->indices.size() * sizeof(unsigned int), &m->indices[0], GL_STATIC_DRAW); // Usar m->indices
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
 
-    // Posición
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
     glEnableVertexAttribArray(0);
 
-    // Normales
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     glEnableVertexAttribArray(1);
 
-    // Coordenadas de textura 
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
     glEnableVertexAttribArray(2);
 
-    // --- Dibujar la malla ---
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
-    // --- Limpiar el estado ---
+    glUseProgram(program_);
+
+    mat4x4 model, view, projection;
+    mat4x4_identity(model);
+
+    mat4x4_translate(model, tr.position.x, tr.position.y, tr.position.z);
+    mat4x4_rotate(model, model, tr.rotation.x, tr.rotation.y, tr.rotation.z, tr.angle);
+    mat4x4_scale_aniso(model, model, tr.scale.x, tr.scale.y, tr.scale.z);
+
+    mat4x4_identity(view);
+    mat4x4_translate(view, 0.0f, -3.0f, -10.0f);
+
+    mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
+
+    glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, (const GLfloat*)model);
+    glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, (const GLfloat*)view);
+    glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, (const GLfloat*)projection);
+
+    vec3 lightPos = { 1.0f, 1.0f, 1.0f };
+    glUniform3fv(glGetUniformLocation(program_, "lightPos"), 1, (const GLfloat*)&lightPos);
+
+    vec3 viewPos = { 1.0f, 1.0f, 3.0f };
+    glUniform3fv(glGetUniformLocation(program_, "viewPos"), 1, (const GLfloat*)&viewPos);
+
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
     glUseProgram(0);
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
 }
 
 void Render::RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc)
@@ -183,10 +159,10 @@ void Render::RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
 
         if (ri->has_value() && ti->has_value()) {
 
-            auto& renderComponent = *ri;
-            auto& transform_component = *ti;
+            auto& render_comp = *ri;
+            auto& transform_comp = *ti;
 
-            auto& mesh = renderComponent->render_mesh;
+            auto& mesh = render_comp->render_mesh;
 
             glGenVertexArrays(1, &VAO);
             glBindVertexArray(VAO);
@@ -216,9 +192,9 @@ void Render::RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
             mat4x4 model, view, projection;
             mat4x4_identity(model);
 
-            mat4x4_translate(model, transform_component->position.x, transform_component->position.y, transform_component->position.z);
-            mat4x4_rotate(model, model, transform_component->rotation.x, transform_component->rotation.y, transform_component->rotation.z, transform_component->angle);
-            mat4x4_scale_aniso(model, model, transform_component->scale.x, transform_component->scale.y, transform_component->scale.z);
+            mat4x4_translate(model, transform_comp->position.x, transform_comp->position.y, transform_comp->position.z);
+            mat4x4_rotate(model, model, transform_comp->rotation.x, transform_comp->rotation.y, transform_comp->rotation.z, transform_comp->angle);
+            mat4x4_scale_aniso(model, model, transform_comp->scale.x, transform_comp->scale.y, transform_comp->scale.z);
 
             mat4x4_identity(view);
             mat4x4_translate(view, 0.0f, -3.0f, -10.0f);
