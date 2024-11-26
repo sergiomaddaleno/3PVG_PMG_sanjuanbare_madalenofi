@@ -21,7 +21,13 @@ public:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
-	Mesh() {}
+    GLuint textureID; 
+
+
+
+    Mesh() {}
+
+	
 	~Mesh() {}
 
     bool LoadOBj(const std::string& file, const std::string& textureFolder);

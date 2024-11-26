@@ -23,16 +23,16 @@ vec2 arrow_dir = { 0.0f, 0.0f };;
 float move_speed = 0.05;
 
 int main(int, char**) {
-
-    if (!mesh_->LoadOBj("../assets/obj/SM_Teapot.obj", "../assets/assets/obj/Mario.mtl")) {
+    /*
+    if (!mesh_->LoadOBj("../assets/obj/Mario.obj", "C:/Users/pc000/Documents/GitHub/3PVG_PMG_sanjuanbare_madalenofi/assets/obj/")) {
         return -1;
     }
 
-    if (!mesh_2->LoadOBj("../assets/obj/SM_Suzanne.obj", "../assets/assets/obj/")) {
+    if (!mesh_2->LoadOBj("../assets/obj/Mario.obj", "C:/Users/pc000/Documents/GitHub/3PVG_PMG_sanjuanbare_madalenofi/assets/obj/")) {
         return -1;
     }
-
-    if (!mesh_3->LoadOBj("../assets/obj/Mario.obj", "../assets/assets/obj/")) {
+    */
+    if (!mesh_3->LoadOBj("../assets/obj/Mario.obj", "C:/Users/pc000/Documents/GitHub/3PVG_PMG_sanjuanbare_madalenofi/assets/obj/")) {
         return -1;
     }
     // ---
@@ -55,10 +55,11 @@ int main(int, char**) {
     ecs.add_component<RenderComponent>(j);
     ecs.add_component<TransformComponent>(j);
     ecs.get_component<RenderComponent>(j)->render_mesh = mesh_3;
+    ecs.get_component<RenderComponent>(j)->textureID = mesh_3->textureID;
     ecs.get_component<TransformComponent>(j)->position = Vec3{ 0.0f, 1.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->rotation = Vec3{ 0.0f, 1.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = Vec3{ 0.7f, 0.7f, 0.7f };
-
+    /*
     for (int i = 1; i < 50; i++) {
         j++;
         ecs.add_component<RenderComponent>(j);
@@ -67,18 +68,18 @@ int main(int, char**) {
         ecs.get_component<TransformComponent>(j)->rotation = Vec3{ 0.0f, 1.0f, 0.0f };
         ecs.get_component<TransformComponent>(j)->scale = Vec3{ 0.5f, 0.5f, 0.5f };        
     }
-
+    */
     bool done = false;
     while (!done) {
         window->UpdateWindow();
         
         float angle = (float)glfwGetTime();
-
+        /*
         for (int i = 1; i < 50; i++) {
             ecs.get_component<TransformComponent>(i)->angle = angle;
             ecs.get_component<TransformComponent>(i)->position = Vec3{ cos(angle + (float)i) * 10, (sin(angle + (float)i) * 10) + 3.0f, -10.0f };
         }
- 
+ */
         ecs.get_component<TransformComponent>(0)->MoveEntity(input, 0.1f);
 
         render_.SetupShader(shaders);

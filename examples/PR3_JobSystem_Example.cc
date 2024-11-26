@@ -33,7 +33,7 @@ bool loadingNewMesh = false;
 
 int main(int, char**) {
     
-    if (!mesh_->LoadOBj(meshFiles[currentMeshIndex])) {
+    if (!mesh_->LoadOBj(meshFiles[currentMeshIndex],"l")) {
         return -1;
     }
 
@@ -69,7 +69,7 @@ int main(int, char**) {
             monetemesh = jb.Add_Task([nextMeshFile]() {
 
                 std::unique_ptr<Mesh> newMesh = std::make_unique<Mesh>();
-                if (newMesh->LoadOBj(nextMeshFile)) {
+                if (newMesh->LoadOBj(nextMeshFile,"s")) {
                     printf("Malla cargada: %s\n", nextMeshFile.c_str());
                     return newMesh;
                 }

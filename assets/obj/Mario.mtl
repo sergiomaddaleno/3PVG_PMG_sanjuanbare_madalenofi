@@ -1,49 +1,49 @@
 # Este es el archivo de materiales para Mario
 
-newmtl MarioBody
+newmtl submesh_0
 Ka 0.3 0.3 0.3          # Color ambiental
 Kd 0.8 0.3 0.3          # Color difuso (rojo para el cuerpo de Mario)
 Ks 1.0 1.0 1.0          # Color especular (brillo)
 Ns 100.0                # Brillo
 illum 2                 # Tipo de iluminación
-map_Kd mario_0.png      # Textura difusa (rojo para el cuerpo)
+map_Kd mario_0.png
 
-newmtl MarioClothes
+newmtl submesh_2
 Ka 0.3 0.3 0.3          # Color ambiental
 Kd 0.5 0.5 0.5          # Color difuso (camisa, pantalones, etc.)
 Ks 0.8 0.8 0.8          # Color especular (brillo)
 Ns 50.0                 # Brillo
 illum 2                 # Tipo de iluminación
-map_Kd mario_2.png      # Textura para las prendas de Mario
+map_Kd mario_2.png      
 
-newmtl MarioFace
+newmtl submesh_3
 Ka 0.3 0.3 0.3          # Color ambiental
 Kd 0.9 0.8 0.6          # Color difuso (piel de Mario)
 Ks 0.8 0.8 0.8          # Color especular (brillo)
 Ns 50.0                 # Brillo
 illum 2                 # Tipo de iluminación
-map_Kd mario_3.png      # Textura para la cara de Mario
+map_Kd mario_3.png
 
-newmtl MarioEyes
+newmtl submesh_6
 Ka 0.3 0.3 0.3          # Color ambiental
 Kd 0.0 0.0 1.0          # Color difuso (ojos de Mario, azul)
 Ks 0.8 0.8 0.8          # Color especular (brillo)
 Ns 50.0                 # Brillo
 illum 2                 # Tipo de iluminación
-map_Kd mario_6.png      # Textura para los ojos
+map_Kd mario_6.png
 
-newmtl MarioHat
+newmtl submesh_5
 Ka 0.3 0.3 0.3          # Color ambiental
 Kd 1.0 0.0 0.0          # Color difuso (rojo para el gorro)
 Ks 1.0 1.0 1.0          # Color especular (brillo)
 Ns 100.0                # Brillo
 illum 2                 # Tipo de iluminación
-map_Kd mario_5.png      # Textura para el gorro de Mario
+map_Kd mario_5.png
 
-newmtl MarioOther
+newmtl submesh_7
 Ka 0.3 0.3 0.3          # Color ambiental
 Kd 0.5 0.5 0.5          # Color difuso (para otras partes)
 Ks 0.8 0.8 0.8          # Color especular (brillo)
 Ns 50.0                 # Brillo
 illum 2                 # Tipo de iluminación
-map_Kd mario_7.png      # Otra textura, podría ser para detalles adicionales
+map_Kd mario_7.png
