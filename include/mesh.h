@@ -18,23 +18,20 @@ struct Vertex {
 class Mesh {
 
 public:
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
 
-	std::vector<Vertex> vertices;
-	std::vector<unsigned int> indices;
+	Mesh() {}
+	~Mesh() {}
 
-	Mesh() {
+    bool LoadOBj(const std::string& file, const std::string& textureFolder);
 
-	}
-
-	~Mesh() {
-
-	}
+    // ---
 
     Mesh(Mesh&& other) noexcept
         : vertices(std::move(other.vertices)), indices(std::move(other.indices)) {
-        
-    }
 
+    }
     
     Mesh& operator=(Mesh&& other) noexcept {
         if (this != &other) {
@@ -45,12 +42,10 @@ public:
         return *this;
     }
 
-   
     Mesh(const Mesh& other) {
         vertices = other.vertices;
         indices = other.indices;
     }
-
     
     Mesh& operator=(const Mesh& other) {
         if (this != &other) {
@@ -59,11 +54,6 @@ public:
         }
         return *this;
     }
-	
-	bool LoadOBj(const std::string& file);
-
-
-
 };
 
 

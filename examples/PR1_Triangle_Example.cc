@@ -15,7 +15,7 @@
 vec2 arrow_dir = { 0.0f, 0.0f };;
 float move_speed = 0.05;
 
-void MoveTriangle(GLFWwindow* w, Input& input) {
+void MoveTriangle(Input& input) {
 
     if (input.isKeyPressed(Input::LEFT)) {
         arrow_dir[0] -= move_speed;
@@ -57,7 +57,7 @@ int main(int, char**) {
     while (!done) {
 
         //Triangle
-        MoveTriangle(window->GetWindow(), input);
+        MoveTriangle(input);
         //---
        
         tr.position = Vec3{ arrow_dir[0], arrow_dir[1], 0.0f};

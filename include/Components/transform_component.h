@@ -1,6 +1,8 @@
 #ifndef TRNS
 #define TRNS
 
+#include "..\include\input.h"
+
 struct Vec3 {
     float x, y, z;
 
@@ -14,6 +16,7 @@ struct TransformComponent{
     Vec3 rotation;
     Vec3 scale;
     float angle;
+
 
     TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f), angle(0.0f) {}
 
@@ -32,6 +35,26 @@ struct TransformComponent{
         }
         return *this;
     }
+
+    void MoveEntity(Input& input, float value) {
+
+        if (input.isKeyDown(Input::LEFT)) {
+            position.x -= value;
+        }
+
+        if (input.isKeyDown(Input::RIGHT)) {
+            position.x += value;
+        }
+
+        if (input.isKeyDown(Input::UP)) {
+            position.y += value;
+        }
+
+        if (input.isKeyDown(Input::DOWN)) {
+            position.y -= value;
+        }
+    }
+
 };
 
 #endif // TRNS
