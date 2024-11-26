@@ -13,24 +13,25 @@
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
 
+struct ShaderBuffers {
+	char* vs = nullptr;
+	char* fs = nullptr;
+};
+
 class Render {
 
 public:
-	 
-	GLuint program_;
-	GLint mvp_location_;
-
-	mat4x4 model, view, projection;
-	GLuint VAO, VBO, EBO;
-
+	
 	Render();
 
 	static std::optional<Render> make();
 
-	GLuint GetProgram();
-	GLint GetLocation();
+	// ---
+	ShaderBuffers initShader(const char* vertex_shader_path, const char* fragment_shader_path,
+		ShaderBuffers &shaders);
 
-	void SetupShader(const char* vertex_shader_text, const char* fragment_shader_text);
+	void SetupShader(ShaderBuffers &shaders);
+	// ---
 
 	void RenderDrawTriangle(Triangle::PointsTriangle(&vertices)[3], TransformComponent tr);
 
@@ -38,6 +39,16 @@ public:
 
 	void RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
 
+
+
+	GLuint GetProgram();
+
+protected:
+
+	GLuint program_;
+
+	mat4x4 model_, view_, projection_, mvp_;
+	GLuint VAO, VBO, EBO;
 };
 
 #endif // PRT

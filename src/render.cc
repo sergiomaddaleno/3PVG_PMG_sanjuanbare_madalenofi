@@ -19,24 +19,67 @@ GLuint Render::GetProgram()
     return program_;
 }
 
-GLint Render::GetLocation()
-{
-    return mvp_location_;
+ShaderBuffers Render::initShader(const char* vertex_shader_path, const char* fragment_shader_path,
+    ShaderBuffers &shaders) {
+
+    FILE* file = fopen(vertex_shader_path, "rb");
+    long size = 0;
+    if (file) {
+        fseek(file, 0, SEEK_END);
+        size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        shaders.vs = (char*)malloc(size + 1);
+        if (shaders.vs) {
+            fread(shaders.vs, sizeof(char), size, file);
+            shaders.vs[size] = '\0';
+
+            //printf("%s\n", shaders.vs);
+        }
+        fclose(file);
+    }
+    else {
+        printf("Error in loading Vertex Shader\n");
+    }
+
+    file = fopen(fragment_shader_path, "rb");
+    size = 0;
+    if (file) {
+        fseek(file, 0, SEEK_END);
+        size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        shaders.fs = (char*)malloc(size + 1);
+        if (shaders.fs) {
+            fread(shaders.fs, sizeof(char), size, file);
+            shaders.fs[size] = '\0';
+
+            //printf("%s\n", shaders.fs);
+        }
+        fclose(file);
+    }
+    else {
+        printf("Error in loading Fragment Shader\n");
+    }
+
+    return shaders;
 }
 
-void Render::SetupShader(const char* vertex_shader_text, const char* fragment_shader_text) {
+void Render::SetupShader(ShaderBuffers &shaders) {
+
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertex_shader_text, nullptr);
+    glShaderSource(vertexShader, 1, &shaders.vs, nullptr);
     glCompileShader(vertexShader);
 
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragment_shader_text, nullptr);
+    glShaderSource(fragmentShader, 1, &shaders.fs, nullptr);
     glCompileShader(fragmentShader);
 
     program_ = glCreateProgram();
     glAttachShader(program_, vertexShader);
     glAttachShader(program_, fragmentShader);
     glLinkProgram(program_);
+
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -56,20 +99,19 @@ void Render::RenderDrawTriangle(Triangle::PointsTriangle(&vertices)[3], Transfor
 
     glUseProgram(program_);
 
-    mat4x4 model, view, projection, mvp;
-    mat4x4_identity(model);
-    mat4x4_translate(model, tr.position.x, tr.position.y, tr.position.z);
-    mat4x4_rotate(model, model, tr.rotation.x, tr.rotation.y, tr.rotation.z, tr.angle);
-    mat4x4_scale_aniso(model, model, tr.scale.x, tr.scale.y, tr.scale.z);
+    mat4x4_identity(model_);
+    mat4x4_translate(model_, tr.position.x, tr.position.y, tr.position.z);
+    mat4x4_rotate(model_, model_, tr.rotation.x, tr.rotation.y, tr.rotation.z, tr.angle);
+    mat4x4_scale_aniso(model_, model_, tr.scale.x, tr.scale.y, tr.scale.z);
 
-    mat4x4_identity(view);
-    mat4x4_translate(view, 0.0f, 0.0f, -5.0f);
+    mat4x4_identity(view_);
+    mat4x4_translate(view_, 0.0f, 0.0f, -5.0f);
 
-    mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), (float)800 / 600, 0.1f, 100.0f);
+    mat4x4_perspective(projection_, (float)(55.0f * (M_PI / 180.0f)), (float)800 / 600, 0.1f, 100.0f);
 
-    mat4x4_mul(mvp, projection, view);
-    mat4x4_mul(mvp, mvp, model);
-    glUniformMatrix4fv(glGetUniformLocation(program_, "MVP"), 1, GL_FALSE, (const GLfloat*)mvp);
+    mat4x4_mul(mvp_, projection_, view_);
+    mat4x4_mul(mvp_, mvp_, model_);
+    glUniformMatrix4fv(glGetUniformLocation(program_, "MVP"), 1, GL_FALSE, (const GLfloat*)mvp_);
 
     vpos_location = glGetAttribLocation(program_, "vPos");
     vcol_location = glGetAttribLocation(program_, "vCol");
@@ -113,21 +155,20 @@ void Render::RenderMesh(std::unique_ptr<Mesh>& mesh, TransformComponent tr)
 
     glUseProgram(program_);
 
-    mat4x4 model, view, projection;
-    mat4x4_identity(model);
+    mat4x4_identity(model_);
 
-    mat4x4_translate(model, tr.position.x, tr.position.y, tr.position.z);
-    mat4x4_rotate(model, model, tr.rotation.x, tr.rotation.y, tr.rotation.z, tr.angle);
-    mat4x4_scale_aniso(model, model, tr.scale.x, tr.scale.y, tr.scale.z);
+    mat4x4_translate(model_, tr.position.x, tr.position.y, tr.position.z);
+    mat4x4_rotate(model_, model_, tr.rotation.x, tr.rotation.y, tr.rotation.z, tr.angle);
+    mat4x4_scale_aniso(model_, model_, tr.scale.x, tr.scale.y, tr.scale.z);
 
-    mat4x4_identity(view);
-    mat4x4_translate(view, 0.0f, -3.0f, -10.0f);
+    mat4x4_identity(view_);
+    mat4x4_translate(view_, 0.0f, -3.0f, -10.0f);
 
-    mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
+    mat4x4_perspective(projection_, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
 
-    glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, (const GLfloat*)model);
-    glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, (const GLfloat*)view);
-    glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, (const GLfloat*)projection);
+    glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, (const GLfloat*)model_);
+    glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, (const GLfloat*)view_);
+    glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, (const GLfloat*)projection_);
 
     vec3 lightPos = { 1.0f, 1.0f, 1.0f };
     glUniform3fv(glGetUniformLocation(program_, "lightPos"), 1, (const GLfloat*)&lightPos);
@@ -189,21 +230,20 @@ void Render::RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
 
             glUseProgram(program_);
 
-            mat4x4 model, view, projection;
-            mat4x4_identity(model);
+            mat4x4_identity(model_);
 
-            mat4x4_translate(model, transform_comp->position.x, transform_comp->position.y, transform_comp->position.z);
-            mat4x4_rotate(model, model, transform_comp->rotation.x, transform_comp->rotation.y, transform_comp->rotation.z, transform_comp->angle);
-            mat4x4_scale_aniso(model, model, transform_comp->scale.x, transform_comp->scale.y, transform_comp->scale.z);
+            mat4x4_translate(model_, transform_comp->position.x, transform_comp->position.y, transform_comp->position.z);
+            mat4x4_rotate(model_, model_, transform_comp->rotation.x, transform_comp->rotation.y, transform_comp->rotation.z, transform_comp->angle);
+            mat4x4_scale_aniso(model_, model_, transform_comp->scale.x, transform_comp->scale.y, transform_comp->scale.z);
 
-            mat4x4_identity(view);
-            mat4x4_translate(view, 0.0f, -3.0f, -10.0f);
+            mat4x4_identity(view_);
+            mat4x4_translate(view_, 0.0f, -3.0f, -10.0f);
 
-            mat4x4_perspective(projection, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
+            mat4x4_perspective(projection_, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
 
-            glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, (const GLfloat*)model);
-            glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, (const GLfloat*)view);
-            glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, (const GLfloat*)projection);
+            glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, (const GLfloat*)model_);
+            glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, (const GLfloat*)view_);
+            glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, (const GLfloat*)projection_);
 
             vec3 lightPos = { 1.0f, 1.0f, 1.0f };
             glUniform3fv(glGetUniformLocation(program_, "lightPos"), 1, (const GLfloat*)&lightPos);

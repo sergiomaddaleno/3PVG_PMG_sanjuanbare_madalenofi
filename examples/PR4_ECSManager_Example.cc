@@ -10,68 +10,32 @@
 #include "ecs_manager.h"
 #define M_PI 3.14159265358979323846
 
-static const char* vertex_shader_text =
-"#version 330 core\n"
-"layout(location = 0) in vec3 aPos;\n"
-"layout(location = 1) in vec3 aNormal;\n"
-"layout(location = 2) in vec2 aTexCoord;\n"
-"out vec2 TexCoord;\n"
-"out vec3 normal;\n"
-"out vec3 FragPos;\n"
-"out vec3 pos;\n"
-"out vec2 uv;\n"
-"uniform mat4 model;\n"
-"uniform mat4 view;\n"
-"uniform mat4 projection;\n"
-"void main() {\n"
-"    normal = mat3(transpose(inverse(model))) * aNormal;\n"
-"    pos = aPos;\n"
-"    uv = aTexCoord;\n"
-"    FragPos = aPos;\n"
-"    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
-"}\n";
-
-static const char* fragment_shader_text =
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"in vec3 normal;\n"
-"in vec3 FragPos;\n"
-"in vec3 pos;\n"
-"in vec2 uv;\n"
-"void main() {\n"
-"    vec3 norm = normalize(normal);\n"
-"    FragColor = vec4(norm, 1.0);\n"
-"}\n";
-
 std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
 std::unique_ptr<Mesh> mesh_2 = std::make_unique<Mesh>();
 std::unique_ptr<Mesh> mesh_3 = std::make_unique<Mesh>();
 
-Render render_;
 ECSManager ecs;
+Render render_;
+ShaderBuffers shaders = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shaders);
 
 int main(int, char**) {
 
-    if (!mesh_->LoadOBj("../assets/SM_Teapot.obj")) {
+    if (!mesh_->LoadOBj("../assets/obj/SM_Teapot.obj")) {
         return -1;
     }
 
-    if (!mesh_2->LoadOBj("../assets/SM_Suzanne.obj")) {
+    if (!mesh_2->LoadOBj("../assets/obj/SM_Suzanne.obj")) {
         return -1;
     }
 
-    if (!mesh_3->LoadOBj("../assets/Mario.obj")) {
+    if (!mesh_3->LoadOBj("../assets/obj/Mario.obj")) {
         return -1;
     }
     // ---
-    glfwInit();
-
     auto window = Window::make(800, 600, "Window");
     window->SetWindowActive();
-    // ---
 
     auto render = render_.make();
-
     // ---
 
     auto entidad_0 = ecs.create_entity();
@@ -109,10 +73,8 @@ int main(int, char**) {
         ecs.get_component<TransformComponent>(entidad_1)->angle = angle;
         ecs.get_component<TransformComponent>(entidad_2)->angle = angle;
 
-
-        render_.SetupShader(vertex_shader_text, fragment_shader_text);
+        render_.SetupShader(shaders);
         render_.RenderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
-        
 
         if (window->closePressed()) done = true;
     }
