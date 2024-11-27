@@ -175,7 +175,6 @@ void Render::RenderMesh(std::unique_ptr<Mesh>& mesh, TransformComponent tr)
     vec3 viewPos = { 1.0f, 1.0f, 3.0f };
     glUniform3fv(glGetUniformLocation(program_, "viewPos"), 1, (const GLfloat*)&viewPos);
 
-
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -199,73 +198,75 @@ void Render::RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
             auto& render_comp = *ri;
             auto& transform_comp = *ti;
 
-            auto& mesh = render_comp->render_mesh;
+            // Iterar sobre todas las mallas en render_comp->render_mesh->meshes
+            for (auto& mesh : render_comp->render_mesh->meshes) {
+                
+                // Generar el VAO y VBO para cada malla
+                glGenVertexArrays(1, &VAO);
+                glBindVertexArray(VAO);
 
-            glGenVertexArrays(1, &VAO);
-            glBindVertexArray(VAO);
+                glGenBuffers(1, &VBO);
+                glBindBuffer(GL_ARRAY_BUFFER, VBO);
+                glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
 
-            glGenBuffers(1, &VBO);
-            glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
+                glGenBuffers(1, &EBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW);
 
-            glGenBuffers(1, &EBO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+                glEnableVertexAttribArray(0);
 
-            // Configuración de atributos de vértices
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
-            glEnableVertexAttribArray(0);
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+                glEnableVertexAttribArray(1);
 
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-            glEnableVertexAttribArray(1);
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
+                glEnableVertexAttribArray(2);
 
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
-            glEnableVertexAttribArray(2);
+                glBindVertexArray(0);
 
-            glBindVertexArray(0); // Desvincular el VAO
-            
+                // Usar el programa de shader
+                glUseProgram(program_);
 
-            // Usar el programa de shaders
-            glUseProgram(program_);
+                // Configuración de matrices (modelo, vista, proyección)
+                mat4x4_identity(model_);
+                mat4x4_translate(model_, transform_comp->position.x, transform_comp->position.y, transform_comp->position.z);
+                mat4x4_rotate(model_, model_, transform_comp->rotation.x, transform_comp->rotation.y, transform_comp->rotation.z, transform_comp->angle);
+                mat4x4_scale_aniso(model_, model_, transform_comp->scale.x, transform_comp->scale.y, transform_comp->scale.z);
 
-            // Calcular las matrices de transformación
-            mat4x4_identity(model_);
+                mat4x4_identity(view_);
+                mat4x4_translate(view_, 0.0f, -3.0f, -10.0f);
+                mat4x4_perspective(projection_, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
 
-            mat4x4_translate(model_, transform_comp->position.x, transform_comp->position.y, transform_comp->position.z);
-            mat4x4_rotate(model_, model_, transform_comp->rotation.x, transform_comp->rotation.y, transform_comp->rotation.z, transform_comp->angle);
-            mat4x4_scale_aniso(model_, model_, transform_comp->scale.x, transform_comp->scale.y, transform_comp->scale.z);
+                glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, (const GLfloat*)model_);
+                glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, (const GLfloat*)view_);
+                glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, (const GLfloat*)projection_);
 
-            mat4x4_identity(view_);
-            mat4x4_translate(view_, 0.0f, -3.0f, -10.0f);
+                vec3 lightPos = { 1.0f, 1.0f, 1.0f };
+                glUniform3fv(glGetUniformLocation(program_, "lightPos"), 1, (const GLfloat*)&lightPos);
 
-            mat4x4_perspective(projection_, (float)(55.0f * (M_PI / 180.0f)), 800.0f / 600.0f, 0.1f, 100.0f);
+                vec3 viewPos = { 1.0f, 1.0f, 3.0f };
+                glUniform3fv(glGetUniformLocation(program_, "viewPos"), 1, (const GLfloat*)&viewPos);
 
-            // Pasar las matrices al shader
-            glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, (const GLfloat*)model_);
-            glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, (const GLfloat*)view_);
-            glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, (const GLfloat*)projection_);
+                // Cargar la textura
+                glActiveTexture(GL_TEXTURE0);
+                GLuint textureID = mesh.GetTextureID(0);
+                if (textureID != 0) {
+                    glBindTexture(GL_TEXTURE_2D, textureID);
+                    glUniform1i(glGetUniformLocation(program_, "texture1"), 0);
+                }
 
-            // Configurar las luces y la cámara
-            vec3 lightPos = { 1.0f, 1.0f, 1.0f };
-            glUniform3fv(glGetUniformLocation(program_, "lightPos"), 1, (const GLfloat*)&lightPos);
+                // Dibujar la malla
+                glBindVertexArray(VAO);
+                glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+                glBindVertexArray(0);
 
-            vec3 viewPos = { 1.0f, 1.0f, 3.0f };
-            glUniform3fv(glGetUniformLocation(program_, "viewPos"), 1, (const GLfloat*)&viewPos);
-
-            glActiveTexture(GL_TEXTURE0); // Activa la textura 0
-            glBindTexture(GL_TEXTURE_2D, mesh->GetTextureID());  // Vincula la textura cargada
-
-            glUniform1i(glGetUniformLocation(program_, "texture1"), 0);
-
-            // Renderizar la malla
-            glBindVertexArray(VAO);
-            glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0); // Desvincular el VAO
-
-            glUseProgram(0); // Desactivar el programa de shaders
+                // Desactivar el programa de shader
+                glUseProgram(0);
+            }
         }
     }
 }
+
 
 
 
