@@ -80,7 +80,6 @@ void Render::SetupShader(ShaderBuffers &shaders) {
     glAttachShader(program_, fragmentShader);
     glLinkProgram(program_);
 
-
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
@@ -202,31 +201,29 @@ void Render::RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
 
             auto& mesh = render_comp->render_mesh;
 
-            // Crear buffers solo si no están inicializados
-            if (render_comp->VAO == 0) {
-                glGenVertexArrays(1, &render_comp->VAO);
-                glBindVertexArray(render_comp->VAO);
+            glGenVertexArrays(1, &VAO);
+            glBindVertexArray(VAO);
 
-                glGenBuffers(1, &render_comp->VBO);
-                glBindBuffer(GL_ARRAY_BUFFER, render_comp->VBO);
-                glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
+            glGenBuffers(1, &VBO);
+            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
 
-                glGenBuffers(1, &render_comp->EBO);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, render_comp->EBO);
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
+            glGenBuffers(1, &EBO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
 
-                // Configuración de atributos de vértices
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
-                glEnableVertexAttribArray(0);
+            // Configuración de atributos de vértices
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+            glEnableVertexAttribArray(0);
 
-                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-                glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+            glEnableVertexAttribArray(1);
 
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
-                glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
+            glEnableVertexAttribArray(2);
 
-                glBindVertexArray(0); // Desvincular el VAO
-            }
+            glBindVertexArray(0); // Desvincular el VAO
+            
 
             // Usar el programa de shaders
             glUseProgram(program_);
@@ -256,12 +253,12 @@ void Render::RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
             glUniform3fv(glGetUniformLocation(program_, "viewPos"), 1, (const GLfloat*)&viewPos);
 
             glActiveTexture(GL_TEXTURE0); // Activa la textura 0
-            glBindTexture(GL_TEXTURE_2D, render_comp->textureID);  // Vincula la textura cargada
+            glBindTexture(GL_TEXTURE_2D, mesh->GetTextureID());  // Vincula la textura cargada
 
             glUniform1i(glGetUniformLocation(program_, "texture1"), 0);
 
             // Renderizar la malla
-            glBindVertexArray(render_comp->VAO);
+            glBindVertexArray(VAO);
             glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
             glBindVertexArray(0); // Desvincular el VAO
 

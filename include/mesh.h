@@ -1,4 +1,3 @@
-
 #ifndef MSL
 #define MSL
 
@@ -10,58 +9,24 @@
 #include <vector>
 
 struct Vertex {
-	vec3 pos;
-	vec3 normal;
-	vec2 tex_coord;
+    vec3 pos;
+    vec3 normal;
+    vec2 tex_coord;
 };
 
 class Mesh {
-
 public:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
-    GLuint textureID; 
+    GLuint textureID;
 
-
-
-    Mesh() {}
-
-	
-	~Mesh() {}
+    Mesh();
+    ~Mesh();
 
     bool LoadOBj(const std::string& file, const std::string& textureFolder);
 
-    // ---
-
-    Mesh(Mesh&& other) noexcept
-        : vertices(std::move(other.vertices)), indices(std::move(other.indices)) {
-
-    }
-    
-    Mesh& operator=(Mesh&& other) noexcept {
-        if (this != &other) {
-            
-            vertices = std::move(other.vertices);
-            indices = std::move(other.indices);
-        }
-        return *this;
-    }
-
-    Mesh(const Mesh& other) {
-        vertices = other.vertices;
-        indices = other.indices;
-    }
-    
-    Mesh& operator=(const Mesh& other) {
-        if (this != &other) {
-            vertices = other.vertices;
-            indices = other.indices;
-        }
-        return *this;
-    }
+    GLuint GetTextureID();
 };
 
-
-
-#endif // !MSL
+#endif // MSL

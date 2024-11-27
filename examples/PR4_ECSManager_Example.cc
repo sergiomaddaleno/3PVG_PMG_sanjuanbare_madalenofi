@@ -17,7 +17,8 @@ std::shared_ptr<Mesh> mesh_3 = std::make_shared<Mesh>();
 
 ECSManager ecs;
 Render render_;
-ShaderBuffers shaders = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shaders);
+ShaderBuffers shaders = render_.initShader("../assets/shaders/vs_texture.vs", "../assets/shaders/fs_texture.fs", shaders);
+//ShaderBuffers shaders = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shaders);
 
 vec2 arrow_dir = { 0.0f, 0.0f };;
 float move_speed = 0.05;
@@ -32,7 +33,7 @@ int main(int, char**) {
         return -1;
     }
     */
-    if (!mesh_3->LoadOBj("../assets/obj/Mario.obj", "C:/Users/pc000/Documents/GitHub/3PVG_PMG_sanjuanbare_madalenofi/assets/obj/")) {
+    if (!mesh_3->LoadOBj("../assets/obj/Mario.obj", "../assets/textures/mario")) {
         return -1;
     }
     // ---
@@ -55,7 +56,6 @@ int main(int, char**) {
     ecs.add_component<RenderComponent>(j);
     ecs.add_component<TransformComponent>(j);
     ecs.get_component<RenderComponent>(j)->render_mesh = mesh_3;
-    ecs.get_component<RenderComponent>(j)->textureID = mesh_3->textureID;
     ecs.get_component<TransformComponent>(j)->position = Vec3{ 0.0f, 1.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->rotation = Vec3{ 0.0f, 1.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = Vec3{ 0.7f, 0.7f, 0.7f };
