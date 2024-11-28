@@ -119,6 +119,12 @@ debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
 		"include/Components/*.h",
+		"deps/*.h",
+		"assets/shaders/*.vs",
+		"assets/shaders/*.fs",  
+		"assets/textures/*/*.png",
+		"assets/textures/*/*.mtl",
+		"assets/obj/*",
 		"examples/PR0_Window_Example.cc"
 }
 ------
@@ -137,6 +143,12 @@ debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
 		"include/Components/*.h",
+		"deps/*.h",
+		"assets/shaders/*.vs",
+		"assets/shaders/*.fs",  
+		"assets/textures/*/*.png",
+		"assets/textures/*/*.mtl",
+		"assets/obj/*",
 		"examples/PR1_Triangle_Example.cc"
 }
 
@@ -154,6 +166,12 @@ debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
 		"include/Components/*.h",
+		"deps/*.h",
+		"assets/shaders/*.vs",
+		"assets/shaders/*.fs",  
+		"assets/textures/*/*.png",
+		"assets/textures/*/*.mtl",
+		"assets/obj/*",
 		"examples/PR2_MeshLoad_Example.cc"
 }
 
@@ -171,6 +189,12 @@ debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
 		"include/Components/*.h",
+		"deps/*.h",
+		"assets/shaders/*.vs",
+		"assets/shaders/*.fs",  
+		"assets/textures/*/*.png",
+		"assets/textures/*/*.mtl",
+		"assets/obj/*",
 		"examples/PR3_JobSystem_Example.cc"
 }
 
@@ -188,5 +212,11 @@ debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
 		"include/*.h",
 		"include/Components/*.h",
+		"deps/*.h",
+		"assets/shaders/*.vs",
+		"assets/shaders/*.fs",  
+		"assets/textures/*/*.png",
+		"assets/textures/*/*.mtl",
+		"assets/obj/*",
 		"examples/PR4_ECSManager_Example.cc"
 }
