@@ -1,17 +1,18 @@
 #ifndef MSL
 #define MSL
 
-#include "../deps/linmath.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include <string>
 #include <iostream>
 #include <vector>
+#include <../deps/glm/glm.hpp>
 
 struct Vertex {
-    vec3 pos;
-    vec3 normal;
-    vec2 tex_coord;
+    glm::vec3 pos;
+    glm::vec3 normal;
+    glm::vec2 tex_coord;
 
     int materialID;
 };
@@ -26,9 +27,9 @@ public:
     Mesh();
     ~Mesh();
 
-    bool LoadOBj(const std::string& file, const std::string& textureFolder = "");
+    bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
 
-    GLuint GetTextureID(int shape_index);
+    GLuint getTextureID(int shape_index);
 
 private:
     GLuint shapeTextureID = 0;

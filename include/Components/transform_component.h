@@ -2,25 +2,18 @@
 #define TRNS
 
 #include "..\include\input.h"
+#include <../deps/glm/glm.hpp>
 
-struct Vec3 {
-    float x, y, z;
-
-    Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
-    Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
-    Vec3(const Vec3& other) : x(other.x), y(other.y), z(other.z) {}
-};
 
 struct TransformComponent{
-    Vec3 position;
-    Vec3 rotation;
-    Vec3 scale;
+    glm::vec3 position;
+    glm::vec3 rotation;
+    glm::vec3 scale;
     float angle;
 
+    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(0.0f, 0.0f, 1.0f), scale(1.0f, 1.0f, 1.0f), angle(0.0f) {}
 
-    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f), angle(0.0f) {}
-
-    TransformComponent(Vec3 position_, Vec3 rotation_, Vec3 scale_, float angle_)
+    TransformComponent(glm::vec3 position_, glm::vec3 rotation_, glm::vec3 scale_, float angle_)
         : position(position_), rotation(rotation_), scale(scale_), angle(angle_) {}
 
     TransformComponent(const TransformComponent& other)
@@ -36,7 +29,7 @@ struct TransformComponent{
         return *this;
     }
 
-    void MoveEntity(Input& input, float value) {
+    void moveEntity(Input& input, float value) {
 
         if (input.isKeyDown(Input::LEFT)) {
             position.x -= value;

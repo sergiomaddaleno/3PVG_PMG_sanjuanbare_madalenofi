@@ -6,8 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <optional>
 #include <string>
-
-#include <../deps/linmath.h>
+#include <../deps/glm/glm.hpp>
 
 class WindowSystem {
 
@@ -32,13 +31,13 @@ public:
 
 	bool closePressed();
 
-	void SetWindowActive() { glfwMakeContextCurrent(window_); }
+	void setWindowActive() { glfwMakeContextCurrent(window_); }
 
-	void ColorWindow(const vec4& Color);
+	void colorWindow(const glm::vec4& Color);
 
-	void UpdateWindow();
+	void updateWindow();
 
-	GLFWwindow* GetWindow() const { return window_; }
+	GLFWwindow* getWindow() const { return window_; }
 
 	Window(Window&& other) {
 		window_ = other.window_;

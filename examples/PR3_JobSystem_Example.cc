@@ -3,6 +3,10 @@
 #include "..\include\mesh.h"
 #include "..\include\render.h"
 #include "..\include\job_sistem.h"
+#include "..\include\input.h"
+#include "..\include\Components\transform_component.h"
+#include <../deps/glm/glm.hpp>
+
 #include <iostream>
 #include <memory>
 #include <future>
@@ -11,8 +15,6 @@
 #include <thread>
 #include <optional>
 #include <string>
-#include "..\include\input.h"
-#include "..\include\Components\transform_component.h"
 
 std::vector<std::string> meshFiles = {
         "../assets/obj/SM_Suzanne.obj",
@@ -20,7 +22,7 @@ std::vector<std::string> meshFiles = {
         "../assets/obj/Mario.obj",
 };
 
-std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
+std::shared_ptr<Mesh> mesh_ = std::make_shared<Mesh>();
 std::future<std::unique_ptr<Mesh>> monetemesh;
 
 JobSystem jb;
@@ -33,21 +35,21 @@ bool loadingNewMesh = false;
 
 int main(int, char**) {
     
-    if (!mesh_->LoadOBj(meshFiles[currentMeshIndex],"l")) {
+    if (!mesh_->loadOBJ(meshFiles[currentMeshIndex],"l")) {
         return -1;
     }
 
     //---
     auto window = Window::make(800, 600, "Window");
-    window->SetWindowActive();
+    window->setWindowActive();
 
     auto render = render_.make();
     //---
 
-    Input input{ window->GetWindow() };
+    Input input{ window->getWindow() };
 
     TransformComponent tr_;
-    tr_.rotation = Vec3{ 0.0f, 1.0f, 0.0f };   
+    tr_.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };   
 
     //---
 
@@ -69,7 +71,7 @@ int main(int, char**) {
             monetemesh = jb.Add_Task([nextMeshFile]() {
 
                 std::unique_ptr<Mesh> newMesh = std::make_unique<Mesh>();
-                if (newMesh->LoadOBj(nextMeshFile,"s")) {
+                if (newMesh->loadOBJ(nextMeshFile,"s")) {
                     printf("Malla cargada: %s\n", nextMeshFile.c_str());
                     return newMesh;
                 }
@@ -81,7 +83,7 @@ int main(int, char**) {
         }
 
         if (loadingNewMesh) {
-            std::unique_ptr<Mesh> loadedMesh = monetemesh.get();
+            std::shared_ptr<Mesh> loadedMesh = monetemesh.get();
             if (loadedMesh) {
 
                 mesh_ = std::move(loadedMesh);
@@ -93,10 +95,10 @@ int main(int, char**) {
             loadingNewMesh = false;
         }
     
-        render_.SetupShader(shaders);
-        render_.RenderMesh(mesh_, tr_);
+        render_.setupShader(shaders);
+        render_.renderMesh(mesh_, tr_);
 
-        window->UpdateWindow();
+        window->updateWindow();
        
         if (window->closePressed()) done = true;
     }

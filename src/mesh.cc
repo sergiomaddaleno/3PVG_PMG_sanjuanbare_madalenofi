@@ -1,12 +1,11 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "../deps/tiny_obj_loader.h"
 #include "../include/mesh.h"
 #include "..\include\render.h"
-#include "../deps/stb_image.h"
 
-std::vector<Mesh> meshes; // Vector para almacenar las mallas
+#include "../deps/tiny_obj_loader.h"
+#include "../deps/stb_image.h"
 
 Mesh::Mesh()
 {
@@ -16,7 +15,7 @@ Mesh::~Mesh()
 {
 }
 
-bool Mesh::LoadOBj(const std::string& file, const std::string& textureFolder)
+bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
 {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -24,9 +23,15 @@ bool Mesh::LoadOBj(const std::string& file, const std::string& textureFolder)
     std::string warn, err;
 
     bool obj = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file.c_str(), textureFolder.c_str());
+    if (!obj) {
+        std::cerr << "Failed to load OBJ file: " << file << std::endl;
+        std::cerr << "Warning: " << warn << std::endl;
+        std::cerr << "Error: " << err << std::endl;
+        return false;
+    }
 
     for (const auto& shape : shapes) {
-        Mesh currentMesh; // Crear una malla para cada forma
+        Mesh currentMesh;
 
         int materialIndex = shape.mesh.material_ids.empty() ? -1 : shape.mesh.material_ids[0];
 
@@ -87,7 +92,7 @@ bool Mesh::LoadOBj(const std::string& file, const std::string& textureFolder)
     return true;
 }
 
-GLuint Mesh::GetTextureID(int shape_index)
+GLuint Mesh::getTextureID(int shape_index)
 {
     if (shape_index >= 0 && shape_index < shapeTextureIDs.size()) {
         return shapeTextureIDs[shape_index];

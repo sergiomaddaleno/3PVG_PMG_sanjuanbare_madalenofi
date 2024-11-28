@@ -4,9 +4,11 @@
 
 #include <optional>
 #include <string>
+#include <../deps/glm/glm.hpp>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <../deps/linmath.h>
+
 #include "triangle.h"
 #include "mesh.h"
 
@@ -30,24 +32,23 @@ public:
 	ShaderBuffers initShader(const char* vertex_shader_path, const char* fragment_shader_path,
 		ShaderBuffers &shaders);
 
-	void SetupShader(ShaderBuffers &shaders);
+	void setupShader(ShaderBuffers &shaders);
 	// ---
 
-	void RenderDrawTriangle(Triangle::PointsTriangle(&vertices)[3], TransformComponent tr);
+	void renderDrawTriangle(Triangle::PointsTriangle(&vertices)[3], TransformComponent tr);
 
-	void RenderMesh(std::unique_ptr<Mesh>& mesh, TransformComponent tr);
+	void renderMesh(std::shared_ptr<Mesh>& mesh, TransformComponent tr);
 
-	void RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
+	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
 
 
-
-	GLuint GetProgram();
+	GLuint getProgram();
 
 protected:
 
 	GLuint program_;
 
-	mat4x4 model_, view_, projection_, mvp_;
+	glm::mat4x4 model_, view_, projection_, mvp_;
 	GLuint VAO, VBO, EBO;
 };
 

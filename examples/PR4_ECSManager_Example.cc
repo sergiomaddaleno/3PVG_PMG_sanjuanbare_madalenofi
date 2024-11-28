@@ -1,14 +1,19 @@
-#include "window.h"
+
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <optional>
 #include <string>
+#include <../deps/glm/glm.hpp>
+
+#include "window.h"
 #include "..\include\mesh.h"
 #include "..\include\render.h"
+#include "..\include\input.h"
+#include "ecs_manager.h"
+
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
-#include "..\include\input.h"
 
-#include "ecs_manager.h"
 #define M_PI 3.14159265358979323846
 
 std::shared_ptr<Mesh> teapot_mesh = std::make_shared<Mesh>();
@@ -20,30 +25,29 @@ Render render_;
 ShaderBuffers shaders_tex = render_.initShader("../assets/shaders/vs_texture.vs", "../assets/shaders/fs_texture.fs", shaders_tex);
 ShaderBuffers shaders_norm = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shaders_norm);
 
-vec2 arrow_dir = { 0.0f, 0.0f };
+glm::vec2 arrow_dir = { 0.0f, 0.0f };
 float move_speed = 0.05;
 
-vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
-
+glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
 int main(int, char**) {
    
 
     auto window = Window::make(800, 600, "Window");
-    window->SetWindowActive();
+    window->setWindowActive();
 
     auto render = render_.make();
 
     // ---
 
-    Input input{ window->GetWindow() };
+    Input input{ window->getWindow() };
 
     // ---
-    if (!mario_mesh->LoadOBj("../assets/obj/Mario.obj", "../assets/textures/mario")) {
+    if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
         return -1;
     }
     
-   if (!teapot_mesh->LoadOBj("../assets/obj/SM_Teapot.obj")) {
+   if (!teapot_mesh->loadOBJ("../assets/obj/SM_Teapot.obj")) {
        return -1;
    }
 
@@ -55,35 +59,35 @@ int main(int, char**) {
     ecs.add_component<RenderComponent>(j);
     ecs.add_component<TransformComponent>(j);
     ecs.get_component<RenderComponent>(j)->render_mesh = mario_mesh;
-    ecs.get_component<TransformComponent>(j)->position = Vec3{ 0.0f, 1.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->rotation = Vec3{ 0.0f, 1.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->scale = Vec3{ 0.7f, 0.7f, 0.7f };
+    ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
+    ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+    ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
     
     for (int i = 1; i < 50; i++) {
         j++;
         ecs.add_component<RenderComponent>(j);
         ecs.add_component<TransformComponent>(j);
         ecs.get_component<RenderComponent>(j)->render_mesh = teapot_mesh;
-        ecs.get_component<TransformComponent>(j)->rotation = Vec3{ 0.0f, 1.0f, 0.0f };
-        ecs.get_component<TransformComponent>(j)->scale = Vec3{ 0.5f, 0.5f, 0.5f };        
+        ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+        ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.3f, 0.3f, 0.3f };
     }
     
     bool done = false;
     while (!done) {
-        window->UpdateWindow();
-        window->ColorWindow(color);
+        window->updateWindow();
+        window->colorWindow(color);
         
         float angle = (float)glfwGetTime();
         
         for (int i = 1; i < 50; i++) {
             ecs.get_component<TransformComponent>(i)->angle = angle;
-            ecs.get_component<TransformComponent>(i)->position = Vec3{ cos(angle + (float)i) * 10, (sin(angle + (float)i) * 10) + 3.0f, -10.0f };
+            ecs.get_component<TransformComponent>(i)->position = glm::vec3{ cos(angle + (float)i) * 8, (sin(angle + (float)i) * 8), -10.0f };
         }
  
-        ecs.get_component<TransformComponent>(0)->MoveEntity(input, 0.1f);
+        ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.1f);
 
-        render_.SetupShader(shaders_tex);
-        render_.RenderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
+        render_.setupShader(shaders_tex);
+        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
 
         if (window->closePressed()) done = true;
     }

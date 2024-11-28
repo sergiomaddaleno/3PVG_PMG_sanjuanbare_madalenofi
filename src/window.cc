@@ -41,15 +41,15 @@ bool Window::closePressed()
 	return false;
 }
 
-void Window::ColorWindow(const vec4& Color)
+void Window::colorWindow(const glm::vec4& Color)
 {
 	glClearColor(Color[0], Color[1], Color[2], Color[3]);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Window::UpdateWindow()
+void Window::updateWindow()
 {
-	glfwSwapBuffers(GetWindow());
+	glfwSwapBuffers(getWindow());
 	glfwPollEvents();
 }
 

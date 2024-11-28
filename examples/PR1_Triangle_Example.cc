@@ -4,41 +4,22 @@
 #include "..\include\render.h"
 #include "..\include\input.h"
 #include "..\include\Components\transform_component.h"
-#include <../deps/linmath.h>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <optional>
 #include <string>
+#include <../deps/glm/glm.hpp>
 
-vec2 arrow_dir = { 0.0f, 0.0f };;
-float move_speed = 0.05;
-
-void MoveTriangle(Input& input) {
-
-    if (input.isKeyPressed(Input::LEFT)) {
-        arrow_dir[0] -= move_speed;
-    }
-
-    if (input.isKeyPressed(Input::RIGHT)) {
-        arrow_dir[0] += move_speed;
-    }
-
-    if (input.isKeyPressed(Input::UP)) {
-        arrow_dir[1] += move_speed;
-    }
-
-    if (input.isKeyPressed(Input::DOWN)) {
-        arrow_dir[1] -= move_speed;
-    }
-}
+glm::vec2 arrow_dir = { 0.0f, 0.0f };
+float move_speed = 0.04;
 
 int main(int, char**) {
 
     //--- Window
     auto window = Window::make(800, 600, "Window");
-    window->SetWindowActive();
+    window->setWindowActive();
     //---
 
     //--- Triangle
@@ -49,25 +30,22 @@ int main(int, char**) {
     ShaderBuffers shaders = r.initShader("../assets/shaders/vs_triangle.vs", "../assets/shaders/fs_triangle.fs", shaders);
 
     //--- Input
-    Input input{ window->GetWindow() };
+    Input input{ window->getWindow() };
 
     TransformComponent tr;
+    tr.position = glm::vec3{ arrow_dir.x, arrow_dir.y, 0.0f };
+    tr.scale = glm::vec3{ 2.0f, 2.0f, 2.0f };
 
     bool done = false;
     while (!done) {
-
-        //Triangle
-        MoveTriangle(input);
-        //---
        
-        tr.position = Vec3{ arrow_dir[0], arrow_dir[1], 0.0f};
-        tr.scale = Vec3{ 2.0f, 2.0f, 2.0f };
+        tr.moveEntity(input, move_speed);
 
         //Render of triangle
-        r.SetupShader(shaders);
-        r.RenderDrawTriangle(tri_->my_triangle, tr);
+        r.setupShader(shaders);
+        r.renderDrawTriangle(tri_->my_triangle, tr);
 
-        window->UpdateWindow();
+        window->updateWindow();
 
         if (window->closePressed()) done = true;
     }
