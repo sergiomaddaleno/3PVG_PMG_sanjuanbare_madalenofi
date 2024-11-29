@@ -7,6 +7,8 @@
 #include <string>
 
 #include "..\include\Components\transform_component.h"
+#include "..\include\Components\render_component.h"
+
 #include <../deps/glm/glm.hpp>
 
 std::shared_ptr<Mesh> mesh_ = std::make_shared<Mesh>();
@@ -23,14 +25,17 @@ int main(int, char**) {
 
 	auto render = render_.make();
 
-	TransformComponent tr;
-	tr.position = glm::vec3{ 0.0f, -1.0f, -5.0f };
-	tr.scale = glm::vec3{ 6.0f, 6.0f, 6.0f };
-	tr.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
-
 	if (!mesh_->loadOBJ("../assets/obj/SM_Teapot.obj")) {
 		return -1;
 	}
+
+	TransformComponent tr;
+	tr.position = glm::vec3{ 0.0f, -2.0f, -5.0f };
+	tr.scale = glm::vec3{ 3.0f, 3.0f, 3.0f };
+	tr.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+
+	RenderComponent rc;
+	rc.mesh_ = mesh_;
 
 	bool done = false;
 	while (!done) {
@@ -39,7 +44,7 @@ int main(int, char**) {
 		tr.angle = angle;
 
 		render_.setupShader(shaders);
-		render_.renderMesh(mesh_, tr);
+		render_.renderMesh(rc, tr);
 
 		window->updateWindow();
 

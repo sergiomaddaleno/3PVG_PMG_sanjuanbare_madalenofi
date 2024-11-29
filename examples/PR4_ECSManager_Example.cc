@@ -58,7 +58,7 @@ int main(int, char**) {
 
     ecs.add_component<RenderComponent>(j);
     ecs.add_component<TransformComponent>(j);
-    ecs.get_component<RenderComponent>(j)->render_mesh = mario_mesh;
+    ecs.get_component<RenderComponent>(j)->mesh_ = mario_mesh;
     ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
@@ -67,7 +67,7 @@ int main(int, char**) {
         j++;
         ecs.add_component<RenderComponent>(j);
         ecs.add_component<TransformComponent>(j);
-        ecs.get_component<RenderComponent>(j)->render_mesh = teapot_mesh;
+        ecs.get_component<RenderComponent>(j)->mesh_ = teapot_mesh;
         ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
         ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.3f, 0.3f, 0.3f };
     }

@@ -5,6 +5,7 @@
 #include "..\include\job_sistem.h"
 #include "..\include\input.h"
 #include "..\include\Components\transform_component.h"
+#include "..\include\Components\render_component.h"
 #include <../deps/glm/glm.hpp>
 
 #include <iostream>
@@ -49,13 +50,17 @@ int main(int, char**) {
     Input input{ window->getWindow() };
 
     TransformComponent tr_;
-    tr_.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };   
+    tr_.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };  
+    tr_.scale = glm::vec3{ 0.5f, 0.5f, 0.5f };
+    tr_.position = glm::vec3{ 0.0f, -1.5f, 0.0f };
 
+    RenderComponent rc_;
     //---
-
 
     bool done = false;
     while (!done) {
+
+        rc_.mesh_ = mesh_;
 
         float angle = (float)glfwGetTime() * 2;
         tr_.angle = angle;
@@ -96,7 +101,7 @@ int main(int, char**) {
         }
     
         render_.setupShader(shaders);
-        render_.renderMesh(mesh_, tr_);
+        render_.renderMesh(rc_, tr_);
 
         window->updateWindow();
        

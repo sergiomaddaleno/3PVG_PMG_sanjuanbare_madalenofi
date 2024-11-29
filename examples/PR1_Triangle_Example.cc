@@ -4,6 +4,7 @@
 #include "..\include\render.h"
 #include "..\include\input.h"
 #include "..\include\Components\transform_component.h"
+#include "..\include\Components\render_component.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -23,7 +24,7 @@ int main(int, char**) {
     //---
 
     //--- Triangle
-    auto tri_ = Triangle::make(0.5f, Triangle::Color::Yellow);    
+    auto tri_ = Triangle::make(0.5f, Triangle::Color::Blue);    
 
     Render r;
     auto render = r.make();
@@ -36,6 +37,9 @@ int main(int, char**) {
     tr.position = glm::vec3{ arrow_dir.x, arrow_dir.y, 0.0f };
     tr.scale = glm::vec3{ 2.0f, 2.0f, 2.0f };
 
+    RenderComponent rc;
+    rc.triangle_ = std::make_shared<Triangle>(*tri_);;
+
     bool done = false;
     while (!done) {
        
@@ -43,7 +47,7 @@ int main(int, char**) {
 
         //Render of triangle
         r.setupShader(shaders);
-        r.renderDrawTriangle(tri_->my_triangle, tr);
+        r.renderGeometry(rc, tr);
 
         window->updateWindow();
 

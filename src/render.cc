@@ -10,7 +10,7 @@
 
 #define M_PI 3.14159265358979323846
 
-Render::Render() : VAO(0), VBO(0), EBO(0) {}
+Render::Render() {}
 
 std::optional<Render> Render::make()
 {  
@@ -92,72 +92,17 @@ void Render::setupShader(ShaderBuffers &shaders) {
     glEnable(GL_DEPTH_TEST);
 }
 
-void Render::renderDrawTriangle(Triangle::PointsTriangle(&vertices)[3], TransformComponent tr)
+void Render::renderGeometry(RenderComponent& rc, TransformComponent& tr)
 {
     GLuint vertex_buffer;
     GLint vpos_location, vcol_location;
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * 3, vertices, GL_STATIC_DRAW);
-
-    glUseProgram(program_);
-
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(tr.position.x, tr.position.y, tr.position.z)); 
-    model = glm::rotate(model, tr.angle, glm::vec3(tr.rotation.x, tr.rotation.y, tr.rotation.z));
-    model = glm::scale(model, glm::vec3(tr.scale.x, tr.scale.y, tr.scale.z));
-
-    glm::mat4 view = glm::mat4(1.0f);  
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-
-    glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);
-    glm::mat4 mvp = projection * view * model;
-
-    // For vertex shader ---
-    GLint mvp_location = glGetUniformLocation(program_, "MVP");
-    glUniformMatrix4fv(mvp_location, 1, GL_FALSE, glm::value_ptr(mvp));
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rc.triangle_->my_triangle[0]) * 3, rc.triangle_->my_triangle, GL_STATIC_DRAW);
 
     vpos_location = glGetAttribLocation(program_, "vPos");
     vcol_location = glGetAttribLocation(program_, "vCol");
-    // ---
-
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (void*)0);
-
-    glEnableVertexAttribArray(vcol_location);
-    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (void*)(sizeof(float) * 2));
-
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    glDisableVertexAttribArray(vpos_location);
-    glDisableVertexAttribArray(vcol_location);
-    glDeleteBuffers(1, &vertex_buffer);
-}
-
-void Render::renderMesh(std::shared_ptr<Mesh> &mesh, TransformComponent tr)
-{
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
-    
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
-    glEnableVertexAttribArray(2);
-
-    glBindVertexArray(0);
 
     glUseProgram(program_);
 
@@ -167,34 +112,95 @@ void Render::renderMesh(std::shared_ptr<Mesh> &mesh, TransformComponent tr)
     model = glm::scale(model, glm::vec3(tr.scale.x, tr.scale.y, tr.scale.z));
 
     glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f)); 
 
-    glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);  
     glm::mat4 mvp = projection * view * model;
 
-    // For vertex shader ---
-    glUniformMatrix4fv(glGetUniformLocation(program_, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-    glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    GLint mvpLocation = glGetUniformLocation(program_, "MVP");
+    glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(vpos_location);
 
-    glm::vec3 lightPos = { 1.0f, 1.0f, 1.0f };
-    glUniform3fv(glGetUniformLocation(program_, "lightPos"), 1, (const GLfloat*)&lightPos);
+    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(vcol_location);
 
-    glm::vec3 viewPos = { 1.0f, 1.0f, 3.0f };
-    glUniform3fv(glGetUniformLocation(program_, "viewPos"), 1, (const GLfloat*)&viewPos);
-    // ---
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    glDisableVertexAttribArray(vpos_location);
+    glDisableVertexAttribArray(vcol_location);
 
     glUseProgram(0);
+}
 
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+void Render::renderMesh(RenderComponent& rc, TransformComponent& tc)
+{
+    for (auto& mesh : rc.mesh_->meshes) {
+
+        // ---
+        glGenVertexArrays(1, &rc.VAO);
+        glBindVertexArray(rc.VAO);
+
+        glGenBuffers(1, &rc.VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, rc.VBO);
+        glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
+
+        glGenBuffers(1, &rc.EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rc.EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW);
+        
+        // ---
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
+        glEnableVertexAttribArray(2);
+
+        glBindVertexArray(0); 
+        // ---
+
+        glUseProgram(program_);
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(tc.position.x, tc.position.y, tc.position.z));
+        model = glm::rotate(model, tc.angle, glm::vec3(tc.rotation.x, tc.rotation.y, tc.rotation.z));
+        model = glm::scale(model, glm::vec3(tc.scale.x, tc.scale.y, tc.scale.z));
+
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+
+        glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);
+        glm::mat4 mvp = projection * view * model;
+
+        // For shaders ---
+        glUniformMatrix4fv(glGetUniformLocation(program_, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
+        glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+        // Texture
+        glActiveTexture(GL_TEXTURE0);
+        rc.textureID = mesh.getTextureID(0);
+        if (rc.textureID != 0) {
+            glBindTexture(GL_TEXTURE_2D, rc.textureID);
+            glUniform1i(glGetUniformLocation(program_, "texture1"), 0);
+        }
+        // ---
+
+        glBindVertexArray(rc.VAO);
+        glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0); 
+
+        glUseProgram(0);
+        glDeleteVertexArrays(1, &rc.VAO);
+        glDeleteBuffers(1, &rc.VBO);
+        glDeleteBuffers(1, &rc.EBO);
+    }
 }
 
 void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc)
@@ -209,18 +215,18 @@ void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
             auto& render_comp = *ri;
             auto& transform_comp = *ti;
 
-            for (auto& mesh : render_comp->render_mesh->meshes) {
+            for (auto& mesh : render_comp->mesh_->meshes) {
                 
                 // ---
-                glGenVertexArrays(1, &VAO);
-                glBindVertexArray(VAO);
+                glGenVertexArrays(1, &render_comp->VAO);
+                glBindVertexArray(render_comp->VAO);
 
-                glGenBuffers(1, &VBO);
-                glBindBuffer(GL_ARRAY_BUFFER, VBO);
+                glGenBuffers(1, &render_comp->VBO);
+                glBindBuffer(GL_ARRAY_BUFFER, render_comp->VBO);
                 glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
 
-                glGenBuffers(1, &EBO);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+                glGenBuffers(1, &render_comp->EBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, render_comp->EBO);
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW);
 
                 // ---
@@ -249,7 +255,7 @@ void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
                 glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);
                 glm::mat4 mvp = projection * view * model;
 
-                // For vertex shader ---
+                // For shaders ---
                 glUniformMatrix4fv(glGetUniformLocation(program_, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
                 glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, glm::value_ptr(model));
                 glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -257,21 +263,21 @@ void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
 
                 // Texture
                 glActiveTexture(GL_TEXTURE0);
-                GLuint textureID = mesh.getTextureID(0);
-                if (textureID != 0) {
-                    glBindTexture(GL_TEXTURE_2D, textureID);
+                render_comp->textureID = mesh.getTextureID(0);
+                if (render_comp->textureID != 0) {
+                    glBindTexture(GL_TEXTURE_2D, render_comp->textureID);
                     glUniform1i(glGetUniformLocation(program_, "texture1"), 0);
                 }
                 // ---
 
-                glBindVertexArray(VAO);
+                glBindVertexArray(render_comp->VAO);
                 glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
 
                 glUseProgram(0);
-                glDeleteBuffers(1, &VBO);
-                glDeleteBuffers(1, &EBO);
-                glDeleteVertexArrays(1, &VAO);
+                glDeleteVertexArrays(1, &render_comp->VAO);
+                glDeleteBuffers(1, &render_comp->VBO);
+                glDeleteBuffers(1, &render_comp->EBO);
             }
         }
     }

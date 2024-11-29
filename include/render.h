@@ -35,9 +35,9 @@ public:
 	void setupShader(ShaderBuffers &shaders);
 	// ---
 
-	void renderDrawTriangle(Triangle::PointsTriangle(&vertices)[3], TransformComponent tr);
+	void renderGeometry(RenderComponent& rc, TransformComponent& tr);
 
-	void renderMesh(std::shared_ptr<Mesh>& mesh, TransformComponent tr);
+	void renderMesh(RenderComponent& rc, TransformComponent& tc);
 
 	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
 
@@ -49,7 +49,6 @@ protected:
 	GLuint program_;
 
 	glm::mat4x4 model_, view_, projection_, mvp_;
-	GLuint VAO, VBO, EBO;
 };
 
 #endif // PRT
