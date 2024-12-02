@@ -23,9 +23,19 @@ public:
     std::vector<unsigned int> indices;
     std::vector<GLuint> shapeTextureIDs;
     std::vector<Mesh> meshes;
+    GLuint VAO = 0, VBO = 0, EBO = 0;
   
-    Mesh();
-    ~Mesh();
+    Mesh() {
+        VAO = 0;
+        VBO = 0;
+        EBO = 0;
+    };
+
+    ~Mesh() {
+        if (VAO != 0) glDeleteVertexArrays(1, &VAO);
+        if (VBO != 0) glDeleteBuffers(1, &VBO);
+        if (EBO != 0) glDeleteBuffers(1, &EBO);
+    };
 
     bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
 

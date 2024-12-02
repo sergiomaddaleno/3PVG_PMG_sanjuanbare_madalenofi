@@ -39,6 +39,8 @@ public:
 
 	void renderMesh(RenderComponent& rc, TransformComponent& tc);
 
+	void initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
+
 	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
 
 

@@ -1,0 +1,43 @@
+# exported by https://3dviewer.net
+newmtl SpongeBob_Props
+Kd 1 1 1
+d 1
+Ka 0 0 0
+Ks 0 0 0
+Ns 0
+newmtl Spongebob_Props_Mat
+Kd 1 1 1
+d 1
+Ka 0 0 0
+Ks 0 0 0
+Ns 0
+newmtl SpongeBob_Props_Glass_02
+Kd 1 1 1
+d 1
+Ka 0 0 0
+Ks 0 0 0
+Ns 0
+newmtl SpongeBob_Mat
+Kd 1 1 1
+d 1
+Ka 0 0 0
+Ks 0 0 0
+Ns 0
+newmtl SpongeBob_Expressions_Mat
+Kd 1 1 1
+d 1
+Ka 0 0 0
+Ks 0 0 0
+Ns 0
+newmtl SpongeBob_MuscleArms
+Kd 1 1 1
+d 1
+Ka 0 0 0
+Ks 0 0 0
+Ns 0
+newmtl SpongeBob_Props_1
+Kd 1 1 1
+d 1
+Ka 0 0 0
+Ks 0 0 0
+Ns 0
