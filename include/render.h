@@ -35,13 +35,15 @@ public:
 	void setupShader(ShaderBuffers &shaders);
 	// ---
 
+	void initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
+
+
 	void renderGeometry(RenderComponent& rc, TransformComponent& tr);
 
 	void renderMesh(RenderComponent& rc, TransformComponent& tc);
 
-	void initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
-
 	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
+
 
 
 	GLuint getProgram();
