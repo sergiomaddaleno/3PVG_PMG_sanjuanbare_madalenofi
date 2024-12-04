@@ -27,35 +27,9 @@ std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
 ECSManager ecs;
 Render render_;
+Camera cam;
+
 ShaderBuffers shader = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shader);
-
-glm::vec2 arrow_dir = { 0.0f, 0.0f };
-float move_speed = 0.05;
-
-/*void ChangePostprocess()
-{
-    const char* shaders_name[]{ "Default", "Negative", "Blur", "Grey","Waves" };
-    static int curr_item = 0;
-    if (ImGui::Combo("Postprocess", &curr_item, shaders_name, 5)) {
-        switch (curr_item) {
-        case 0:
-            GameState.mat_postprocess->init("./shaders/vertex.vs", "./shaders/fragment.fs");
-            break;
-        case 1:
-            GameState.mat_postprocess->init("./shaders/postprocess/vertex_pp.vs", "./shaders/postprocess/negative.fs");
-            break;
-        case 2:
-            GameState.mat_postprocess->init("./shaders/postprocess/vertex_pp.vs", "./shaders/postprocess/blur.fs");
-            break;
-        case 3:
-            GameState.mat_postprocess->init("./shaders/postprocess/vertex_pp.vs", "./shaders/postprocess/Grey.fs");
-            break;
-        case 4:
-            GameState.mat_postprocess->init("./shaders/postprocess/vertex_pp.vs", "./shaders/postprocess/waves.fs");
-            break;
-        }
-    }
-}*/
 
 void ChangeShader() {
 
@@ -122,7 +96,6 @@ int main(int, char**) {
         return -1;
     }
 
-    Camera c;
 
     auto j = ecs.create_entity();
 
@@ -140,17 +113,17 @@ int main(int, char**) {
 
 
     InitImGui(window->getWindow());
-    bool done = false;
-    double lastTime = glfwGetTime();
 
+    double lastTime = glfwGetTime();
+    bool done = false;
     while (!done) {
         window->updateWindow();
         double currentTime = glfwGetTime();
         float dt = float(currentTime - lastTime);
-        //ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.1f);
-        c.update(input,800,600,dt);
+        
+        cam.update(input,800,600,dt);
         render_.setupShader(shader);
-        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(),c);
+        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), cam);
 
         MyImGui();
 

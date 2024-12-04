@@ -94,6 +94,46 @@ void Render::setupShader(ShaderBuffers &shaders) {
     glEnable(GL_DEPTH_TEST);
 }
 
+void Render::initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc) {
+    auto ri = rc.begin();
+    auto ti = tc.begin();
+    auto riend = rc.end();
+    auto tiend = tc.end();
+
+    for (; ri != riend && ti != tiend; ++ri, ++ti) {
+        if (ri->has_value() && ti->has_value()) {
+            auto& render_comp = *ri;
+            auto& transform_comp = *ti;
+
+            for (auto& mesh : render_comp->mesh_->meshes) {
+                glGenVertexArrays(1, &mesh.VAO);
+                glBindVertexArray(mesh.VAO);
+
+                glGenBuffers(1, &mesh.VBO);
+                glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+                glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
+
+                glGenBuffers(1, &mesh.EBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW);
+
+
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+                glEnableVertexAttribArray(0);
+
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+                glEnableVertexAttribArray(1);
+
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
+                glEnableVertexAttribArray(2);
+
+                glBindVertexArray(0);
+            }
+        }
+    }
+
+}
+
 void Render::renderGeometry(RenderComponent& rc, TransformComponent& tr)
 {
     GLuint vertex_buffer;
@@ -205,56 +245,7 @@ void Render::renderMesh(RenderComponent& rc, TransformComponent& tc)
     }
 }
 
-
-
-
-void Render::initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc) {
-    auto ri = rc.begin();
-    auto ti = tc.begin();
-    auto riend = rc.end();
-    auto tiend = tc.end();
-
-    for (; ri != riend && ti != tiend; ++ri, ++ti) {
-        if (ri->has_value() && ti->has_value()) {
-            auto& render_comp = *ri;
-            auto& transform_comp = *ti;
-
-            for (auto& mesh : render_comp->mesh_->meshes) {
-                glGenVertexArrays(1, &mesh.VAO);
-                glBindVertexArray(mesh.VAO);
-
-                glGenBuffers(1, &mesh.VBO);
-                glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-                glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
-
-                glGenBuffers(1, &mesh.EBO);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW);
-
-               
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
-                glEnableVertexAttribArray(0);
-
-                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-                glEnableVertexAttribArray(1);
-
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
-                glEnableVertexAttribArray(2);
-
-                glBindVertexArray(0);
-            }
-        }
-    }
-
-}
-
-void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc,Camera& c) {
-    c.view = c.initViewTarget();
-    glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);
-
-    glUseProgram(program_); // Activar programa de shaders
-    glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, glm::value_ptr(c.view));
-    glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, Camera& cam) {
 
     auto ri = rc.begin();
     auto ti = tc.begin();
@@ -267,16 +258,22 @@ void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
             auto& transform_comp = *ti;
 
             for (auto& mesh : render_comp->mesh_->meshes) {
+
+                glUseProgram(program_);
+
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::translate(model, transform_comp->position);
                 model = glm::rotate(model, transform_comp->angle, transform_comp->rotation);
                 model = glm::scale(model, transform_comp->scale);
 
-                glm::mat4 mvp = projection * c.view * model;
+                glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);
+                glm::mat4 mvp = projection * cam.getViewMatrix() * model;
 
-                // Enviar matrices a los shaders
+                // For shaders ---
                 glUniformMatrix4fv(glGetUniformLocation(program_, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
                 glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE, glm::value_ptr(model));
+                glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, glm::value_ptr(cam.initViewTarget()));
+                glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
                 // Vincular textura si está disponible
                 glActiveTexture(GL_TEXTURE0);
@@ -295,6 +292,7 @@ void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
     }
     glUseProgram(0);
 }
+
 
 
 

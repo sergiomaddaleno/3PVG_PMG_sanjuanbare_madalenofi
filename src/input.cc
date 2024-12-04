@@ -3,6 +3,33 @@
 std::unordered_map<GLFWwindow*, Input*> Input::input_map;
 std::unordered_map<int, Input::Keys> Input::keyGLFW_map;
 
+Input::Input(GLFWwindow* window) :
+    mouse_x(0.0f),
+    mouse_y(0.0f),
+    scroll_x(0.0f),
+    scroll_y(0.0f),
+    window_{ window }
+{
+    keys.assign(Keys_End, false);
+    mouse_buttons.assign(MouseButton_End, 0);
+    InitKeyMap();
+
+    input_map.emplace(window_, this);
+    glfwSetKeyCallback(window_, global_key_callback);
+    glfwSetMouseButtonCallback(window_, global_mouse_button_callback);
+    glfwSetCursorPosCallback(window_, global_cursor_pos_callback);
+    glfwSetScrollCallback(window_, Input::global_scroll_callback);
+}
+
+Input::~Input()
+{
+    glfwSetKeyCallback(window_, nullptr);
+    glfwSetMouseButtonCallback(window_, nullptr);
+    glfwSetCursorPosCallback(window_, nullptr);
+    glfwSetScrollCallback(window_, nullptr);
+    input_map.erase(window_);
+}
+
 void Input::InitKeyMap() {
     keyGLFW_map[GLFW_KEY_UP] = Keys::UP;
     keyGLFW_map[GLFW_KEY_DOWN] = Keys::DOWN;
@@ -14,6 +41,12 @@ void Input::InitKeyMap() {
     keyGLFW_map[GLFW_KEY_D] = Keys::D;
     keyGLFW_map[GLFW_KEY_Q] = Keys::Q;
     keyGLFW_map[GLFW_KEY_E] = Keys::E;
+
+    keyGLFW_map[GLFW_KEY_LEFT_CONTROL] = Keys::CTRL;
+    keyGLFW_map[GLFW_KEY_RIGHT_CONTROL] = Keys::CTRL;
+
+    keyGLFW_map[GLFW_KEY_LEFT_SHIFT] = Keys::SHIFT;
+    keyGLFW_map[GLFW_KEY_RIGHT_SHIFT] = Keys::SHIFT;
 }
 
 void Input::global_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -26,6 +59,11 @@ void Input::global_mouse_button_callback(GLFWwindow* window, int button, int act
 
 void Input::global_cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     input_map[window]->cursor_pos_callback(xpos, ypos);
+}
+
+void Input::global_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    input_map[window]->scroll_callback(xoffset, yoffset);
 }
 
 void Input::pollEvents() {
@@ -54,6 +92,12 @@ void Input::cursor_pos_callback(double xpos, double ypos) {
     mouse_x = xpos;  
     mouse_y = ypos;  
 }
+
+void Input::scroll_callback(double xoffset, double yoffset) {
+    scroll_x = xoffset;
+    scroll_y = yoffset;
+}
+
 
 bool Input::isKeyDown(Keys key) {
     return keys[static_cast<int>(key)];
