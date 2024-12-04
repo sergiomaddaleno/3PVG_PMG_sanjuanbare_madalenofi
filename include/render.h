@@ -11,7 +11,7 @@
 
 #include "triangle.h"
 #include "mesh.h"
-
+#include "camera.h"
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
 
@@ -42,7 +42,7 @@ public:
 
 	void renderMesh(RenderComponent& rc, TransformComponent& tc);
 
-	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
+	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, Camera& c);
 
 
 

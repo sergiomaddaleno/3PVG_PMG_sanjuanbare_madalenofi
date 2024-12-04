@@ -1,8 +1,10 @@
 
+
 #include "..\include\render.h"
 #include "..\include\mesh.h"
 
 #include <../deps/glm/glm.hpp>
+
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
 #include <memory> 
@@ -246,12 +248,12 @@ void Render::initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, st
 
 }
 
-void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc) {
-    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc,Camera& c) {
+    c.view = c.initViewTarget();
     glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);
 
     glUseProgram(program_); // Activar programa de shaders
-    glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(glGetUniformLocation(program_, "view"), 1, GL_FALSE, glm::value_ptr(c.view));
     glUniformMatrix4fv(glGetUniformLocation(program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     auto ri = rc.begin();
@@ -270,7 +272,7 @@ void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
                 model = glm::rotate(model, transform_comp->angle, transform_comp->rotation);
                 model = glm::scale(model, transform_comp->scale);
 
-                glm::mat4 mvp = projection * view * model;
+                glm::mat4 mvp = projection * c.view * model;
 
                 // Enviar matrices a los shaders
                 glUniformMatrix4fv(glGetUniformLocation(program_, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));

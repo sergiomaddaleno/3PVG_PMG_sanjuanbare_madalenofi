@@ -122,6 +122,8 @@ int main(int, char**) {
         return -1;
     }
 
+    Camera c;
+
     auto j = ecs.create_entity();
 
     ecs.add_component_type<RenderComponent>();
@@ -139,13 +141,16 @@ int main(int, char**) {
 
     InitImGui(window->getWindow());
     bool done = false;
+    double lastTime = glfwGetTime();
+
     while (!done) {
         window->updateWindow();
-
-        ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.1f);
-
+        double currentTime = glfwGetTime();
+        float dt = float(currentTime - lastTime);
+        //ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.1f);
+        c.update(input,800,600,dt);
         render_.setupShader(shader);
-        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
+        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(),c);
 
         MyImGui();
 
