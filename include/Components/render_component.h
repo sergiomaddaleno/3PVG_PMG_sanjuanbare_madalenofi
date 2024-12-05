@@ -12,7 +12,11 @@ struct RenderComponent {
     std::shared_ptr<Mesh> mesh_;
     std::shared_ptr<Triangle> triangle_;
 
-    GLuint textureID;
+    GLuint program_ = 0;
+    GLuint skybox_program_ = 0;
+
+    GLuint textureID = -1;
+    GLuint cubemap_tex = -1;
 
     RenderComponent() = default;
 

@@ -15,6 +15,7 @@
 #include "..\include\render.h"
 #include "..\include\input.h"
 #include "ecs_manager.h"
+#include "utils.h"
 
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
@@ -29,9 +30,17 @@ ECSManager ecs;
 Render render_;
 Camera cam;
 
-ShaderBuffers shader = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shader);
+char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
+char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
+char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
+char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
 
-void ChangeShader() {
+char* vs_source_sky = (char*)ReadFile("../assets/shaders/vs_skybox.vs");
+char* fs_source_sky = (char*)ReadFile("../assets/shaders/fs_skybox.fs");
+
+char* dds_tex = ReadFile("../assets/textures/skybox/evening_field_octahedral.dds");
+
+void ChangeShader(GLuint& program) {
 
     const char* shaders_name[]{ "Normal shader", "Texture Shader" };
     static int curr_item = 0;
@@ -39,10 +48,10 @@ void ChangeShader() {
     if (ImGui::Combo("Shaders", &curr_item, shaders_name, 2)) {
         switch (curr_item) {
         case 0:
-            shader = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shader);
+            render_.setupShader(program, vs_normals, fs_normals);
             break;
         case 1:
-            shader = render_.initShader("../assets/shaders/vs_texture.vs", "../assets/shaders/fs_texture.fs", shader);
+            render_.setupShader(program, vs_texture, fs_texture);
             break;
         }
     }
@@ -61,14 +70,14 @@ void InitImGui(GLFWwindow* w) {
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-void MyImGui() {
+void MyImGui(GLuint& program) {
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
     ImGui::Begin("Menu");
 
-    ChangeShader();
+    ChangeShader(program);
 
     ImGui::End();
 
@@ -96,7 +105,6 @@ int main(int, char**) {
         return -1;
     }
 
-
     auto j = ecs.create_entity();
 
     ecs.add_component_type<RenderComponent>();
@@ -108,9 +116,17 @@ int main(int, char**) {
     ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
+    auto& program = ecs.get_component<RenderComponent>(j)->program_;
 
     render_.initMeshBuffers(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
+    render_.setupShader(program, vs_normals, fs_normals);
 
+    // ---
+    RenderComponent rc;
+    rc.cubemap_tex = UploadTexture(dds_tex);
+
+    render_.setupShader(rc.skybox_program_, vs_source_sky, fs_source_sky);
+    // ---
 
     InitImGui(window->getWindow());
 
@@ -122,10 +138,12 @@ int main(int, char**) {
         float dt = float(currentTime - lastTime);
         
         cam.update(input,800,600,dt);
-        render_.setupShader(shader);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        render_.renderSkyBox(cam, rc);
         render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), cam);
 
-        MyImGui();
+        MyImGui(program);
 
         if (window->closePressed()) done = true;
     }

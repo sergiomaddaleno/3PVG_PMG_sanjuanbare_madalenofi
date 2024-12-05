@@ -5,6 +5,7 @@
 #include "..\include\input.h"
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
+#include "utils.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -15,6 +16,9 @@
 
 glm::vec2 arrow_dir = { 0.0f, 0.0f };
 float move_speed = 0.04;
+
+char* vs_tri = (char*)ReadFile("../assets/shaders/vs_triangle.vs");
+char* fs_tri = (char*)ReadFile("../assets/shaders/fs_triangle.fs");
 
 int main(int, char**) {
 
@@ -28,7 +32,6 @@ int main(int, char**) {
 
     Render r;
     auto render = r.make();
-    ShaderBuffers shaders = r.initShader("../assets/shaders/vs_triangle.vs", "../assets/shaders/fs_triangle.fs", shaders);
 
     //--- Input
     Input input{ window->getWindow() };
@@ -46,7 +49,7 @@ int main(int, char**) {
         tr.moveEntity(input, move_speed);
 
         //Render of triangle
-        r.setupShader(shaders);
+        r.setupShader(rc.program_, vs_tri, fs_tri);
         r.renderGeometry(rc, tr);
 
         window->updateWindow();

@@ -19,7 +19,9 @@ accum_mouse_offset_(0.0f, 0.0f),
 speed_(0.01f),
 sensitivity_(1.0f)
 
-{}
+{
+    view_ = initViewTarget();
+}
 
 glm::mat4 Camera::initViewTarget()
 {

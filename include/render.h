@@ -15,13 +15,8 @@
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
 
-struct ShaderBuffers {
-	char* vs = nullptr;
-	char* fs = nullptr;
-};
-
 struct RenderContext {
-	ShaderBuffers shaderbuffer;
+	
 	Camera cam;
 	RenderComponent rc;
 	TransformComponent tc;
@@ -35,31 +30,29 @@ struct RenderContext {
 class Render {
 
 public:
-	
+
 	Render();
 
 	static std::optional<Render> make();
 
+	void setupShader(GLuint &program, const char* vertex_src, const char* fragment_src);
+	
 	// ---
-	ShaderBuffers initShader(const char* vertex_shader_path, const char* fragment_shader_path,
-		ShaderBuffers &shaders);
-
-	void setupShader(ShaderBuffers &shaders);
-	// ---
-
-	void initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
 
 	void renderGeometry(RenderComponent& rc, TransformComponent& tr);
 
 	void renderMesh(RenderComponent& rc, TransformComponent& tc);
 
+	// ---
+	void initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
+
 	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, Camera& cam);
+	// ---
 
-	GLuint getProgram();
+	void renderSkyBox(Camera& cam, RenderComponent& rc);
 
-protected:
 
-	GLuint program_;
+private:
 
 	glm::mat4x4 model_, projection_, mvp_;
 };

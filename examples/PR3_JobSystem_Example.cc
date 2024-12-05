@@ -7,6 +7,7 @@
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
 #include <../deps/glm/glm.hpp>
+#include "utils.h"
 
 #include <iostream>
 #include <memory>
@@ -29,7 +30,8 @@ std::future<std::unique_ptr<Mesh>> monetemesh;
 JobSystem jb;
 
 Render render_;
-ShaderBuffers shaders = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shaders);
+char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
+char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
 
 int currentMeshIndex = 0;
 bool loadingNewMesh = false;
@@ -55,6 +57,7 @@ int main(int, char**) {
     tr_.position = glm::vec3{ 0.0f, -1.5f, 0.0f };
 
     RenderComponent rc_;
+
     //---
 
     bool done = false;
@@ -100,7 +103,7 @@ int main(int, char**) {
             loadingNewMesh = false;
         }
     
-        render_.setupShader(shaders);
+        render_.setupShader(rc_.program_, vs_normals, fs_normals);
         render_.renderMesh(rc_, tr_);
 
         window->updateWindow();

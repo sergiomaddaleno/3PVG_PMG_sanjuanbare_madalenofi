@@ -31,6 +31,11 @@ public:
 
 	glm::mat4 getViewMatrix();
 
+	//--
+	void setPosition(glm::vec3 position) {position = position_;}
+	void setViewDir(glm::vec3 view_direction) {view_direction = view_direction_;}
+	void setUp(glm::vec3 up) { up = up_; }
+
 private:
 
 	glm::vec3 position_;

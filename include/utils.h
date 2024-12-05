@@ -3,31 +3,65 @@
 
 #include <memory> 
 #include <iostream>
+#include <GL/glew.h> 
+#include <GLFW/glfw3.h>
+#include "../deps/dds.h"
 
-char* ReadFile(const char* file_path=nullptr) {
-    FILE* file = fopen(file_path, "rb");
-    long size = 0;
-    if (file) {
-        fseek(file, 0, SEEK_END);
-        size = ftell(file);
-        fseek(file, 0, SEEK_SET);
+struct SimpleVtx
+{
+	float x, y, z;
+};
 
-        char* my_file = (char*)malloc(size + 1);
-        if (my_file) {
-            fread(my_file, sizeof(char), size, file);
-            my_file[size] = '\0';
+static const SimpleVtx gMesh[] = {
+  {-1.0f, -1.0f, -1.0f},
+  {1.0f, -1.0f, -1.0f},
+  {1.0f,  1.0f, -1.0f},
+  {-1.0f,  1.0f, -1.0f},
 
-            printf("%s\n", my_file);
-        }
-        fclose(file);
+  {-1.0f, -1.0f,  1.0f},
+  {1.0f, -1.0f,  1.0f},
+  {1.0f,  1.0f,  1.0f},
+  {-1.0f,  1.0f,  1.0f},
 
-        return my_file;
-    }
-    else {
-        printf("Error in loading file\n");
-    }
+  {-1.0f,  1.0f,  1.0f},
+  {-1.0f,  1.0f, -1.0f},
+  {-1.0f, -1.0f, -1.0f},
+  {-1.0f, -1.0f,  1.0f},
 
-    return nullptr;
-}
+  {1.0f,  1.0f,  1.0f},
+  {1.0f,  1.0f, -1.0f},
+  {1.0f, -1.0f, -1.0f},
+  {1.0f, -1.0f,  1.0f},
+
+  {-1.0f, -1.0f, -1.0f},
+  {1.0f, -1.0f, -1.0f},
+  {1.0f, -1.0f,  1.0f},
+  {-1.0f, -1.0f,  1.0f},
+
+  {-1.0f,  1.0f, -1.0f},
+  {1.0f,  1.0f, -1.0f},
+  {1.0f,  1.0f,  1.0f},
+  {-1.0f,  1.0f,  1.0f},
+};
+
+#define _CF(A)   A,A+1,A+2,A+2,A+3,A+0
+#define _SF(A)   A,A+2,A+1,A+2,A+0,A+3  
+
+static const unsigned int gIndices[] = {
+  _SF(0),
+  _CF(4),
+  _CF(8),
+  _SF(12),
+  _CF(16),
+  _SF(20)
+};
+
+char* ReadFile(const char* file_path = nullptr);
+
+unsigned int UploadTexture(char* dds_file);
+
+static void CheckGPUErrors(unsigned int code, const char* str, bool link);
+
+
 
 #endif // UTILS

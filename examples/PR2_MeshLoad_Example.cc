@@ -8,13 +8,15 @@
 
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
+#include "utils.h"
 
 #include <../deps/glm/glm.hpp>
 
 std::shared_ptr<Mesh> mesh_ = std::make_shared<Mesh>();
 
 Render render_;
-ShaderBuffers shaders = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shaders);
+char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
+char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
 
 int main(int, char**) {
 	
@@ -43,7 +45,7 @@ int main(int, char**) {
 		float angle = (float)glfwGetTime() * 2;
 		tr.angle = angle;
 
-		render_.setupShader(shaders);
+		render_.setupShader(rc.program_, vs_normals, fs_normals);
 		render_.renderMesh(rc, tr);
 
 		window->updateWindow();
