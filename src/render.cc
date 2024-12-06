@@ -281,21 +281,26 @@ void Render::renderSkyBox(RenderComponent& rc, Camera& cam, float width, float h
     glCullFace(GL_FRONT);
     glEnable(GL_DEPTH_TEST);
 
-    glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix())); // Only rotation, no translation
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+    glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix())); // Only rotation, no translation
+
+    //To fix skybox rotation --
+    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle), glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 model = rotation; 
 
     glUseProgram(rc.skybox_program_);
-
     glBindTexture(GL_TEXTURE_2D, rc.cubemap_tex);
     glActiveTexture(GL_TEXTURE0);
 
-    // For shaders ---
+    // For shader --
     unsigned int viewLoc = glGetUniformLocation(rc.skybox_program_, "view");
     unsigned int projLoc = glGetUniformLocation(rc.skybox_program_, "projection");
+    unsigned int modelLoc = glGetUniformLocation(rc.skybox_program_, "model");
     unsigned int location_ = glGetUniformLocation(rc.skybox_program_, "skybox");
 
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
     glUniform1i(location_, 0);
     // ---
 
