@@ -21,8 +21,8 @@ int main(int, char**) {
 	while (!done) {
 		window->colorWindow(color);
 
-		window->updateWindow();
 
+		window->updateWindow();
 		if (window->closePressed()) done = true;
 	}
 

@@ -161,6 +161,7 @@ void Render::renderMesh(RenderComponent& rc, TransformComponent& tc)
 
 // ---
 void Render::initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc) {
+    
     auto ri = rc.begin();
     auto ti = tc.begin();
     auto riend = rc.end();
@@ -200,7 +201,7 @@ void Render::initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, st
 
 }
 
-void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, Camera& cam) {
+void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, Camera& cam, float width, float height) {
 
     auto ri = rc.begin();
     auto ti = tc.begin();
@@ -223,7 +224,7 @@ void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
                 model = glm::scale(model, transform_comp->scale);
 
                 glm::mat4 view = cam.getViewMatrix();
-                glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);
+                glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)width / height, 0.1f, 100.0f);
                 glm::mat4 mvp = projection * view * model;
 
                 // For shaders ---
@@ -251,7 +252,7 @@ void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
 }
 // ---
 
-void Render::renderSkyBox(Camera& cam, RenderComponent& rc)
+void Render::renderSkyBox(RenderComponent& rc, Camera& cam, float width, float height)
 {
     // ---
     unsigned int skyboxVAO, skyboxVBO, skyboxEBO;
@@ -281,7 +282,7 @@ void Render::renderSkyBox(Camera& cam, RenderComponent& rc)
     glEnable(GL_DEPTH_TEST);
 
     glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix())); // Only rotation, no translation
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)800 / 600, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
 
     glUseProgram(rc.skybox_program_);
 

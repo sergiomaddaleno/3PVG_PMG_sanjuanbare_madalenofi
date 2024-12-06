@@ -29,6 +29,21 @@ std::optional<Window> Window::make(int x, int y, const std::string& name)
 	return std::optional<Window>(w_ );
 }
 
+void Window::setResizeCallback() {
+	glfwSetFramebufferSizeCallback(window_, [](GLFWwindow* window, int width, int height) {
+		glViewport(0, 0, width, height);
+
+		Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
+		if (win) {
+			win->width_ = width;
+			win->height_ = height;
+		}
+	});
+
+	glfwGetFramebufferSize(window_, &width_, &height_);
+	glfwSetWindowUserPointer(window_, this);
+}
+
 bool Window::closePressed()
 {
 	int state = glfwGetKey(window_, GLFW_KEY_ESCAPE);
@@ -44,12 +59,14 @@ bool Window::closePressed()
 void Window::colorWindow(const glm::vec4& Color)
 {
 	glClearColor(Color[0], Color[1], Color[2], Color[3]);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Window::updateWindow()
 {
 	glfwSwapBuffers(getWindow());
 	glfwPollEvents();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 }
 

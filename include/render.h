@@ -15,8 +15,8 @@
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
 
-struct RenderContext {
-	
+struct RenderData {
+
 	Camera cam;
 	RenderComponent rc;
 	TransformComponent tc;
@@ -46,14 +46,13 @@ public:
 	// ---
 	void initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
 
-	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, Camera& cam);
+	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, Camera& cam, float width, float height);
 	// ---
 
-	void renderSkyBox(Camera& cam, RenderComponent& rc);
+	void renderSkyBox(RenderComponent& rc, Camera& cam, float width, float height);
 
 
 private:
-
 	glm::mat4x4 model_, projection_, mvp_;
 };
 

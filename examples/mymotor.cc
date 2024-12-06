@@ -22,8 +22,7 @@
 
 #define M_PI 3.14159265358979323846
 
-std::shared_ptr<Mesh> teapot_mesh = std::make_shared<Mesh>();
-std::shared_ptr<Mesh> toad_mesh = std::make_shared<Mesh>();
+std::shared_ptr<Mesh> car_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
 ECSManager ecs;
@@ -39,6 +38,9 @@ char* vs_source_sky = (char*)ReadFile("../assets/shaders/vs_skybox.vs");
 char* fs_source_sky = (char*)ReadFile("../assets/shaders/fs_skybox.fs");
 
 char* dds_tex = ReadFile("../assets/textures/skybox/evening_field_octahedral.dds");
+
+GLuint normalShaderProgram = 0;
+GLuint textureShaderProgram = 0;
 
 void ChangeShader(GLuint& program) {
 
@@ -89,19 +91,14 @@ int main(int, char**) {
 
     auto window = Window::make(800, 600, "Window");
     window->setWindowActive();
+    window->setResizeCallback();
 
-    auto render = render_.make();
-
-    // ---
+    render_.make();
 
     Input input{ window->getWindow() };
 
     // ---
-    if (!toad_mesh->loadOBJ("../assets/obj/LMcQueen.obj", "../assets/textures/cars")) {
-        return -1;
-    }
-
-    if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
+    if (!car_mesh->loadOBJ("../assets/obj/LMcQueen.obj", "../assets/textures/cars")) {
         return -1;
     }
 
@@ -112,38 +109,36 @@ int main(int, char**) {
 
     ecs.add_component<RenderComponent>(j);
     ecs.add_component<TransformComponent>(j);
-    ecs.get_component<RenderComponent>(j)->mesh_ = mario_mesh;
+    ecs.get_component<RenderComponent>(j)->mesh_ = car_mesh;
     ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
-    auto& program = ecs.get_component<RenderComponent>(j)->program_;
-
-    render_.initMeshBuffers(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
-    render_.setupShader(program, vs_normals, fs_normals);
+    
+    render_.setupShader(ecs.get_component<RenderComponent>(j)->program_, vs_normals, fs_normals);
 
     // ---
     RenderComponent rc;
     rc.cubemap_tex = UploadTexture(dds_tex);
-
     render_.setupShader(rc.skybox_program_, vs_source_sky, fs_source_sky);
     // ---
+
+    render_.initMeshBuffers(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
 
     InitImGui(window->getWindow());
 
     double lastTime = glfwGetTime();
     bool done = false;
     while (!done) {
-        window->updateWindow();
         double currentTime = glfwGetTime();
         float dt = float(currentTime - lastTime);
+        window->updateWindow();
         
-        cam.update(input,800,600,dt);
+        cam.update(input, window->getWidth(), window->getHeight(), dt);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        render_.renderSkyBox(cam, rc);
-        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), cam);
+        render_.renderSkyBox(rc, cam, window->getWidth(), window->getHeight());
+        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), cam, window->getWidth(), window->getHeight());
 
-        MyImGui(program);
+        MyImGui(ecs.get_component<RenderComponent>(j)->program_);
 
         if (window->closePressed()) done = true;
     }

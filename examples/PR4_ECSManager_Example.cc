@@ -33,7 +33,7 @@ char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
 char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
 char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
 
-int num_entities = 50;
+int num_entities = 5000;
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
 int main(int, char**) {
@@ -42,8 +42,6 @@ int main(int, char**) {
     window->setWindowActive();
 
     auto render = render_.make();
-
-    // ---
 
     Input input{ window->getWindow() };
 
@@ -91,39 +89,40 @@ int main(int, char**) {
     }
 
     render_.initMeshBuffers(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
-    render_.setupShader(ecs.get_component<RenderComponent>(0)->program_, vs_texture, fs_texture);
-    render_.setupShader(ecs.get_component<RenderComponent>(1)->program_, vs_texture, fs_texture);
+
+    GLuint program_tex = 0;
+    GLuint program_normals = 0;
+
+    render_.setupShader(program_tex, vs_texture, fs_texture);
+    render_.setupShader(program_normals, vs_normals, fs_normals);
+
+    ecs.get_component<RenderComponent>(0)->program_ = program_tex;
+    ecs.get_component<RenderComponent>(1)->program_ = program_tex;
 
     for (int i = 2; i < num_entities; i++) {
-        render_.setupShader(ecs.get_component<RenderComponent>(i)->program_, vs_normals, fs_normals);
+        ecs.get_component<RenderComponent>(i)->program_ = program_normals;
     }
 
     double lastTime = glfwGetTime();
     bool done = false;
     while (!done) {
-
-        window->colorWindow(color);
         double currentTime = glfwGetTime();
         float dt = float(currentTime - lastTime);
 
+        window->updateWindow();
+        window->colorWindow(color);
+
         float angle = (float)glfwGetTime();
 
-        cam.update(input, 800, 600, dt);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        for (int i = 2; i < 50; i++) {
+        for (int i = 2; i < num_entities; i++) {
             ecs.get_component<TransformComponent>(i)->angle = angle;
             ecs.get_component<TransformComponent>(i)->position = glm::vec3{ cos(angle + (float)i) * 8, (sin(angle + (float)i) * 8), -10.0f };
         }
 
-        ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.1f);
-        ecs.get_component<TransformComponent>(1)->moveEntity(input, 0.1f);
+        ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.01f);
+        ecs.get_component<TransformComponent>(1)->moveEntity(input, 0.01f);
 
-        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), cam);
-
-
-        window->updateWindow();
+        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), cam, 800, 600);
 
         if (window->closePressed()) done = true;
     }

@@ -25,9 +25,11 @@ class Window {
 public:
 	GLFWwindow* window_;
 
-	Window(GLFWwindow* window) { window_ = window; }
+	Window(GLFWwindow* window) : width_(800), height_(600) { window_ = window; }
 
 	static std::optional<Window> make(int x, int y, const std::string& name);
+
+	void setResizeCallback();
 
 	bool closePressed();
 
@@ -38,6 +40,9 @@ public:
 	void updateWindow();
 
 	GLFWwindow* getWindow() const { return window_; }
+
+	int getWidth() const { return width_; }
+	int getHeight() const { return height_; }
 
 	Window(Window&& other) {
 		window_ = other.window_;
@@ -51,6 +56,9 @@ public:
 	}
 
 private:
+
+	int width_;
+	int height_;
 	//Window(GLFWwindow* window) : window_(window) {}
 	//Window(const Window&) = delete;
 	//Window& operator=(const Window&) = delete;

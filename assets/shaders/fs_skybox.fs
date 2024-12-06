@@ -36,10 +36,9 @@ vec3 unpack_normal_octahedron(vec2 packed_nrm) {
 void main(){
   
   vec2 converted_vec = pack_normal_octahedron(normalize(FragPos));
-  converted_vec = converted_vec * 0.5 + 0.5;
-  vec4 tex = texture(skybox, converted_vec);
+  converted_vec = (converted_vec * 0.5) + 0.5;
 
   //FragColor = vec4(0,1,0,0);
-  FragColor = tex;
+  FragColor = texture(skybox, converted_vec);
 }
 
