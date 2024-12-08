@@ -47,24 +47,24 @@ void Render::setupShader(GLuint &program, const char* vertex_src, const char* fr
 
 }
 
-void Render::renderGeometry(RenderComponent& rc, TransformComponent& tr)
+void Render::renderGeometry(RenderData& rd)
 {
     GLuint vertex_buffer;
     GLint vpos_location, vcol_location;
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(rc.triangle_->my_triangle[0]) * 3, rc.triangle_->my_triangle, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rd.render_comp.triangle_->my_triangle[0]) * 3, rd.render_comp.triangle_->my_triangle, GL_STATIC_DRAW);
 
-    vpos_location = glGetAttribLocation(rc.program_, "vPos");
-    vcol_location = glGetAttribLocation(rc.program_, "vCol");
+    vpos_location = glGetAttribLocation(rd.render_comp.program_, "vPos");
+    vcol_location = glGetAttribLocation(rd.render_comp.program_, "vCol");
 
-    glUseProgram(rc.program_);
+    glUseProgram(rd.render_comp.program_);
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(tr.position.x, tr.position.y, tr.position.z));
-    model = glm::rotate(model, tr.angle, glm::vec3(tr.rotation.x, tr.rotation.y, tr.rotation.z));
-    model = glm::scale(model, glm::vec3(tr.scale.x, tr.scale.y, tr.scale.z));
+    model = glm::translate(model, glm::vec3(rd.transf_comp.position.x, rd.transf_comp.position.y, rd.transf_comp.position.z));
+    model = glm::rotate(model, rd.transf_comp.angle, glm::vec3(rd.transf_comp.rotation.x, rd.transf_comp.rotation.y, rd.transf_comp.rotation.z));
+    model = glm::scale(model, glm::vec3(rd.transf_comp.scale.x, rd.transf_comp.scale.y, rd.transf_comp.scale.z));
 
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f)); 
@@ -72,7 +72,7 @@ void Render::renderGeometry(RenderComponent& rc, TransformComponent& tr)
     glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);  
     glm::mat4 mvp = projection * view * model;
 
-    GLint mvpLocation = glGetUniformLocation(rc.program_, "MVP");
+    GLint mvpLocation = glGetUniformLocation(rd.render_comp.program_, "MVP");
     glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -89,20 +89,20 @@ void Render::renderGeometry(RenderComponent& rc, TransformComponent& tr)
     glUseProgram(0);
 }
 
-void Render::renderMesh(RenderComponent& rc, TransformComponent& tc)
+void Render::renderMesh(RenderData &rd)
 {
-    for (auto& mesh : rc.mesh_->meshes) {
+    for (auto& mesh : rd.render_comp.mesh_->meshes) {
 
         // ---
-        glGenVertexArrays(1, &rc.mesh_->VAO);
-        glBindVertexArray(rc.mesh_->VAO);
+        glGenVertexArrays(1, &rd.render_comp.mesh_->VAO);
+        glBindVertexArray(rd.render_comp.mesh_->VAO);
 
-        glGenBuffers(1, &rc.mesh_->VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, rc.mesh_->VBO);
+        glGenBuffers(1, &rd.render_comp.mesh_->VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, rd.render_comp.mesh_->VBO);
         glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
 
-        glGenBuffers(1, &rc.mesh_->EBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rc.mesh_->EBO);
+        glGenBuffers(1, &rd.render_comp.mesh_->EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rd.render_comp.mesh_->EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW);
         
         // ---
@@ -119,49 +119,49 @@ void Render::renderMesh(RenderComponent& rc, TransformComponent& tc)
         glBindVertexArray(0); 
         // ---
 
-        glUseProgram(rc.program_);
+        glUseProgram(rd.render_comp.program_);
         glCullFace(GL_BACK);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(tc.position.x, tc.position.y, tc.position.z));
-        model = glm::rotate(model, tc.angle, glm::vec3(tc.rotation.x, tc.rotation.y, tc.rotation.z));
-        model = glm::scale(model, glm::vec3(tc.scale.x, tc.scale.y, tc.scale.z));
+        model = glm::translate(model, glm::vec3(rd.transf_comp.position.x, rd.transf_comp.position.y, rd.transf_comp.position.z));
+        model = glm::rotate(model, rd.transf_comp.angle, glm::vec3(rd.transf_comp.rotation.x, rd.transf_comp.rotation.y, rd.transf_comp.rotation.z));
+        model = glm::scale(model, glm::vec3(rd.transf_comp.scale.x, rd.transf_comp.scale.y, rd.transf_comp.scale.z));
 
-        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 view = rd.cam.getViewMatrix();
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
 
-        glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);
         glm::mat4 mvp = projection * view * model;
 
         // For shaders ---
-        glUniformMatrix4fv(glGetUniformLocation(rc.program_, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-        glUniformMatrix4fv(glGetUniformLocation(rc.program_, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(rc.program_, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(rc.program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.program_, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
+        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.program_, "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.program_, "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Texture
         glActiveTexture(GL_TEXTURE0);
-        rc.textureID = mesh.getTextureID(0);
-        if (rc.textureID != 0) {
-            glBindTexture(GL_TEXTURE_2D, rc.textureID);
-            glUniform1i(glGetUniformLocation(rc.program_, "texture1"), 0);
+        rd.render_comp.textureID = mesh.getTextureID(0);
+        if (rd.render_comp.textureID != 0) {
+            glBindTexture(GL_TEXTURE_2D, rd.render_comp.textureID);
+            glUniform1i(glGetUniformLocation(rd.render_comp.program_, "texture1"), 0);
         }
         // ---
 
-        glBindVertexArray(rc.mesh_->VAO);
+        glBindVertexArray(rd.render_comp.mesh_->VAO);
         glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0); 
 
         glUseProgram(0);
-        glDeleteVertexArrays(1, &rc.mesh_->VAO);
-        glDeleteBuffers(1, &rc.mesh_->VBO);
-        glDeleteBuffers(1, &rc.mesh_->EBO);
+        glDeleteVertexArrays(1, &rd.render_comp.mesh_->VAO);
+        glDeleteBuffers(1, &rd.render_comp.mesh_->VBO);
+        glDeleteBuffers(1, &rd.render_comp.mesh_->EBO);
     }
 }
 
 // ---
 void Render::initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc) {
-    
+
     auto ri = rc.begin();
     auto ti = tc.begin();
     auto riend = rc.end();
@@ -201,7 +201,7 @@ void Render::initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, st
 
 }
 
-void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, Camera& cam, float width, float height) {
+void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, RenderData& rd) {
 
     auto ri = rc.begin();
     auto ti = tc.begin();
@@ -223,14 +223,14 @@ void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
                 model = glm::rotate(model, transform_comp->angle, transform_comp->rotation);
                 model = glm::scale(model, transform_comp->scale);
 
-                glm::mat4 view = cam.getViewMatrix();
-                glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)width / height, 0.1f, 100.0f);
+                glm::mat4 view = rd.cam.getViewMatrix();
+                glm::mat4 projection = glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);
                 glm::mat4 mvp = projection * view * model;
 
                 // For shaders ---
                 glUniformMatrix4fv(glGetUniformLocation(render_comp->program_, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
                 glUniformMatrix4fv(glGetUniformLocation(render_comp->program_, "model"), 1, GL_FALSE, glm::value_ptr(model));
-                glUniformMatrix4fv(glGetUniformLocation(render_comp->program_, "view"), 1, GL_FALSE, glm::value_ptr(cam.initViewTarget()));
+                glUniformMatrix4fv(glGetUniformLocation(render_comp->program_, "view"), 1, GL_FALSE, glm::value_ptr(view));
                 glUniformMatrix4fv(glGetUniformLocation(render_comp->program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
                 // For Texture
@@ -252,7 +252,7 @@ void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::
 }
 // ---
 
-void Render::renderSkyBox(RenderComponent& rc, Camera& cam, float width, float height)
+void Render::renderSkyBox(RenderData& rd)
 {
     // ---
     unsigned int skyboxVAO, skyboxVBO, skyboxEBO;
@@ -281,22 +281,22 @@ void Render::renderSkyBox(RenderComponent& rc, Camera& cam, float width, float h
     glCullFace(GL_FRONT);
     glEnable(GL_DEPTH_TEST);
 
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
-    glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix())); // Only rotation, no translation
+    glm::mat4 projection = glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);
+    glm::mat4 view = glm::mat4(glm::mat3(rd.cam.getViewMatrix())); // Only rotation, no translation
 
     //To fix skybox rotation --
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::mat4 model = rotation; 
 
-    glUseProgram(rc.skybox_program_);
-    glBindTexture(GL_TEXTURE_2D, rc.cubemap_tex);
+    glUseProgram(rd.render_comp.skybox_program_);
+    glBindTexture(GL_TEXTURE_2D, rd.render_comp.cubemap_tex);
     glActiveTexture(GL_TEXTURE0);
 
     // For shader --
-    unsigned int viewLoc = glGetUniformLocation(rc.skybox_program_, "view");
-    unsigned int projLoc = glGetUniformLocation(rc.skybox_program_, "projection");
-    unsigned int modelLoc = glGetUniformLocation(rc.skybox_program_, "model");
-    unsigned int location_ = glGetUniformLocation(rc.skybox_program_, "skybox");
+    unsigned int viewLoc = glGetUniformLocation(rd.render_comp.skybox_program_, "view");
+    unsigned int projLoc = glGetUniformLocation(rd.render_comp.skybox_program_, "projection");
+    unsigned int modelLoc = glGetUniformLocation(rd.render_comp.skybox_program_, "model");
+    unsigned int location_ = glGetUniformLocation(rd.render_comp.skybox_program_, "skybox");
 
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);

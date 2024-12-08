@@ -70,3 +70,13 @@ void Window::updateWindow()
 
 }
 
+void Window::setWindowActive()
+{
+	glfwMakeContextCurrent(window_);
+}
+
+double Window::getTime()
+{
+	return glfwGetTime();
+}
+

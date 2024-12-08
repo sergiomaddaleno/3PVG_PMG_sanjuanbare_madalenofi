@@ -17,12 +17,18 @@ int main(int, char**) {
 	window->setWindowActive();
 	//---
 
+	double lastTime = window->getTime();
 	bool done = false;
 	while (!done) {
+		double currentTime = window->getTime();
+		float dt = float(currentTime - lastTime);
+
+		window->updateWindow();
 		window->colorWindow(color);
 
 
-		window->updateWindow();
+
+
 		if (window->closePressed()) done = true;
 	}
 

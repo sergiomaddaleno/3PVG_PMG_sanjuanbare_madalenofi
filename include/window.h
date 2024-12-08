@@ -29,20 +29,25 @@ public:
 
 	static std::optional<Window> make(int x, int y, const std::string& name);
 
-	void setResizeCallback();
+	void updateWindow();
 
 	bool closePressed();
 
-	void setWindowActive() { glfwMakeContextCurrent(window_); }
+	void setResizeCallback();
 
 	void colorWindow(const glm::vec4& Color);
 
-	void updateWindow();
+	//---
+	void setWindowActive();
+
+	double getTime();
 
 	GLFWwindow* getWindow() const { return window_; }
 
 	int getWidth() const { return width_; }
 	int getHeight() const { return height_; }
+
+	//---
 
 	Window(Window&& other) {
 		window_ = other.window_;

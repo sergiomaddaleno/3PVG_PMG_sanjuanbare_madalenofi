@@ -25,9 +25,14 @@ int main(int, char**) {
 	ls.add_global(multiply, "multiply");
 	ls.run(lua_file);
 
+	double lastTime = glfwGetTime();
 	bool done = false;
 	while (!done) {
+		double currentTime = glfwGetTime();
+		float dt = float(currentTime - lastTime);
 		window->updateWindow();
+
+
 
 		if (window->closePressed()) done = true;
 	}

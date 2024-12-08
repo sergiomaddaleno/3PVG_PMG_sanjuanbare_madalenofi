@@ -1,15 +1,12 @@
 
-#include "..\include\mesh.h"
-#include "..\include\render.h"
+#include "mesh.h"
+#include "render.h"
 
 #include "window.h"
 #include <optional>
 #include <string>
 
-#include "..\include\Components\transform_component.h"
-#include "..\include\Components\render_component.h"
 #include "utils.h"
-
 #include <../deps/glm/glm.hpp>
 
 std::shared_ptr<Mesh> mesh_ = std::make_shared<Mesh>();
@@ -31,24 +28,25 @@ int main(int, char**) {
 		return -1;
 	}
 
-	TransformComponent tr;
-	tr.position = glm::vec3{ 0.0f, -2.0f, -5.0f };
-	tr.scale = glm::vec3{ 3.0f, 3.0f, 3.0f };
-	tr.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+	RenderData rd;
+	rd.render_comp.mesh_ = mesh_;
+	rd.transf_comp.position = glm::vec3{ 0.0f, -2.0f, -5.0f };
+	rd.transf_comp.scale = glm::vec3{ 5.0f, 5.0f, 5.0f };
+	rd.transf_comp.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
 
-	RenderComponent rc;
-	rc.mesh_ = mesh_;
+	render_.setupShader(rd.render_comp.program_, vs_normals, fs_normals);
 
+	double lastTime = window->getTime();
 	bool done = false;
 	while (!done) {
-
-		float angle = (float)glfwGetTime() * 2;
-		tr.angle = angle;
-
-		render_.setupShader(rc.program_, vs_normals, fs_normals);
-		render_.renderMesh(rc, tr);
-
+		double currentTime = window->getTime();
+		float dt = float(currentTime - lastTime);
 		window->updateWindow();
+
+		float angle = (float)window->getTime() * 2;
+		rd.transf_comp.angle = angle;
+
+		render_.renderMesh(rd);
 
 		if (window->closePressed()) done = true;
 	}

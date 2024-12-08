@@ -18,13 +18,14 @@
 struct RenderData {
 
 	Camera cam;
-	RenderComponent rc;
-	TransformComponent tc;
-	std::vector<std::optional<RenderComponent>> rc_ecs;
-	std::vector<std::optional<TransformComponent>> tc_ecs;
+	RenderComponent render_comp;
+	TransformComponent transf_comp;
+	//std::vector<std::optional<RenderComponent>>& rc
+	//std::vector<std::optional<TransformComponent>>& tc
 
-	int window_width;
-	int window_height;
+	int w_width = 800;
+	int w_height = 600;
+	float fov = 55.0f;
 };
 
 class Render {
@@ -37,20 +38,18 @@ public:
 
 	void setupShader(GLuint &program, const char* vertex_src, const char* fragment_src);
 	
-	// ---
+	// --- Normal Components
+	void renderGeometry(RenderData& rd);
 
-	void renderGeometry(RenderComponent& rc, TransformComponent& tr);
+	void renderMesh(RenderData& rd);
 
-	void renderMesh(RenderComponent& rc, TransformComponent& tc);
+	void renderSkyBox(RenderData& rd);
 
-	// ---
+	// --- For ECS
 	void initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
 
-	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, Camera& cam, float width, float height);
+	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, RenderData& rd);
 	// ---
-
-	void renderSkyBox(RenderComponent& rc, Camera& cam, float width, float height);
-
 
 private:
 	glm::mat4x4 model_, projection_, mvp_;

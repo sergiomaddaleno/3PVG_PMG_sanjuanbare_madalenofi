@@ -11,14 +11,11 @@
 #include <../deps/glm/glm.hpp>
 
 #include "window.h"
-#include "..\include\mesh.h"
-#include "..\include\render.h"
-#include "..\include\input.h"
+#include "mesh.h"
+#include "render.h"
+#include "input.h"
 #include "ecs_manager.h"
 #include "utils.h"
-
-#include "..\include\Components\transform_component.h"
-#include "..\include\Components\render_component.h"
 
 #define M_PI 3.14159265358979323846
 
@@ -27,7 +24,7 @@ std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
 ECSManager ecs;
 Render render_;
-Camera cam;
+RenderData rd;
 
 char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
 char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
@@ -89,7 +86,7 @@ void MyImGui(GLuint& program) {
 
 int main(int, char**) {
 
-    auto window = Window::make(800, 600, "Window");
+    auto window = Window::make(rd.w_width, rd.w_height, "Equipo33");
     window->setWindowActive();
     window->setResizeCallback();
 
@@ -117,9 +114,8 @@ int main(int, char**) {
     render_.setupShader(ecs.get_component<RenderComponent>(j)->program_, vs_normals, fs_normals);
 
     // ---
-    RenderComponent rc;
-    rc.cubemap_tex = UploadTexture(dds_tex);
-    render_.setupShader(rc.skybox_program_, vs_source_sky, fs_source_sky);
+    rd.render_comp.cubemap_tex = UploadTexture(dds_tex);
+    render_.setupShader(rd.render_comp.skybox_program_, vs_source_sky, fs_source_sky);
     // ---
 
     render_.initMeshBuffers(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
@@ -133,10 +129,13 @@ int main(int, char**) {
         float dt = float(currentTime - lastTime);
         window->updateWindow();
         
-        cam.update(input, window->getWidth(), window->getHeight(), dt);
+        rd.w_width = window->getWidth();
+        rd.w_height = window->getHeight();
 
-        render_.renderSkyBox(rc, cam, window->getWidth(), window->getHeight());
-        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), cam, window->getWidth(), window->getHeight());
+        rd.cam.update(input, rd.w_width, rd.w_height, dt);
+
+        render_.renderSkyBox(rd);
+        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), rd);
 
         MyImGui(ecs.get_component<RenderComponent>(j)->program_);
 

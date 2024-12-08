@@ -1,11 +1,10 @@
 
 #include "window.h"
-#include "..\include\mesh.h"
-#include "..\include\render.h"
-#include "..\include\job_sistem.h"
-#include "..\include\input.h"
-#include "..\include\Components\transform_component.h"
-#include "..\include\Components\render_component.h"
+#include "mesh.h"
+#include "render.h"
+#include "job_sistem.h"
+#include "input.h"
+
 #include <../deps/glm/glm.hpp>
 #include "utils.h"
 
@@ -51,24 +50,26 @@ int main(int, char**) {
 
     Input input{ window->getWindow() };
 
-    TransformComponent tr_;
-    tr_.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };  
-    tr_.scale = glm::vec3{ 0.5f, 0.5f, 0.5f };
-    tr_.position = glm::vec3{ 0.0f, -1.5f, 0.0f };
+    RenderData rd;
+    rd.transf_comp.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };  
+    rd.transf_comp.scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
+    rd.transf_comp.position = glm::vec3{ 0.0f, -3.0f, 0.0f };
 
-    RenderComponent rc_;
+    render_.setupShader(rd.render_comp.program_, vs_normals, fs_normals);
 
     //---
 
+    double lastTime = window->getTime();
     bool done = false;
     while (!done) {
+        double currentTime = window->getTime();
+        float dt = float(currentTime - lastTime);
+        window->updateWindow();
 
-        rc_.mesh_ = mesh_;
+        rd.render_comp.mesh_ = mesh_;
 
-        float angle = (float)glfwGetTime() * 2;
-        tr_.angle = angle;
-
-        input.pollEvents();
+        float angle = (float)window->getTime() * 2;
+        rd.transf_comp.angle = angle;
       
         if (input.isKeyPressed(Input::RIGHT) && !loadingNewMesh) {
 
@@ -103,11 +104,8 @@ int main(int, char**) {
             loadingNewMesh = false;
         }
     
-        render_.setupShader(rc_.program_, vs_normals, fs_normals);
-        render_.renderMesh(rc_, tr_);
+        render_.renderMesh(rd);
 
-        window->updateWindow();
-       
         if (window->closePressed()) done = true;
     }
 

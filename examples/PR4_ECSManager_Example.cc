@@ -7,15 +7,11 @@
 #include <../deps/glm/glm.hpp>
 
 #include "window.h"
-#include "..\include\mesh.h"
-#include "..\include\render.h"
-#include "..\include\input.h"
-#include "camera.h"
+#include "mesh.h"
+#include "render.h"
+#include "input.h"
 #include "ecs_manager.h"
 #include "utils.h"
-
-#include "..\include\Components\transform_component.h"
-#include "..\include\Components\render_component.h"
 
 #define M_PI 3.14159265358979323846
 
@@ -25,7 +21,7 @@ std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
 ECSManager ecs;
 Render render_;
-Camera cam;
+RenderData rd;
 
 char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
 char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
@@ -35,6 +31,9 @@ char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
 
 int num_entities = 5000;
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
+
+GLuint program_tex = 0;
+GLuint program_normals = 0;
 
 int main(int, char**) {
    
@@ -88,11 +87,7 @@ int main(int, char**) {
         ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.5f, 0.5, 0.5f };
     }
 
-    render_.initMeshBuffers(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
-
-    GLuint program_tex = 0;
-    GLuint program_normals = 0;
-
+    //---
     render_.setupShader(program_tex, vs_texture, fs_texture);
     render_.setupShader(program_normals, vs_normals, fs_normals);
 
@@ -102,13 +97,15 @@ int main(int, char**) {
     for (int i = 2; i < num_entities; i++) {
         ecs.get_component<RenderComponent>(i)->program_ = program_normals;
     }
+    //---
+
+    render_.initMeshBuffers(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
 
     double lastTime = glfwGetTime();
     bool done = false;
     while (!done) {
         double currentTime = glfwGetTime();
         float dt = float(currentTime - lastTime);
-
         window->updateWindow();
         window->colorWindow(color);
 
@@ -122,7 +119,7 @@ int main(int, char**) {
         ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.01f);
         ecs.get_component<TransformComponent>(1)->moveEntity(input, 0.01f);
 
-        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), cam, 800, 600);
+        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), rd);
 
         if (window->closePressed()) done = true;
     }
