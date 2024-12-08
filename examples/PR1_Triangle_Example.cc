@@ -45,7 +45,7 @@ int main(int, char**) {
         float dt = float(currentTime - lastTime);
         window->updateWindow();
        
-        rd.transf_comp.moveEntity(input, move_speed);
+        rd.transf_comp.moveEntity(input, move_speed, dt);
         r.renderGeometry(rd);
 
         if (window->closePressed()) done = true;

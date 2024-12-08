@@ -116,8 +116,8 @@ int main(int, char**) {
             ecs.get_component<TransformComponent>(i)->position = glm::vec3{ cos(angle + (float)i) * 8, (sin(angle + (float)i) * 8), -10.0f };
         }
 
-        ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.01f);
-        ecs.get_component<TransformComponent>(1)->moveEntity(input, 0.01f);
+        ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.01f, dt);
+        ecs.get_component<TransformComponent>(1)->moveEntity(input, 0.01f, dt);
 
         render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), rd);
 

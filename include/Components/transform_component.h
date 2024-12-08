@@ -29,22 +29,22 @@ struct TransformComponent{
         return *this;
     }
 
-    void moveEntity(Input& input, float value) {
+    void moveEntity(Input& input, float speed, float dt) {
 
         if (input.isKeyDown(Input::LEFT)) {
-            position.x -= value;
+            position.x -= (speed * dt);
         }
 
         if (input.isKeyDown(Input::RIGHT)) {
-            position.x += value;
+            position.x += (speed * dt);
         }
 
         if (input.isKeyDown(Input::UP)) {
-            position.y += value;
+            position.y += (speed * dt);
         }
 
         if (input.isKeyDown(Input::DOWN)) {
-            position.y -= value;
+            position.y -= (speed * dt);
         }
     }
 
