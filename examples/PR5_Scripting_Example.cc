@@ -22,6 +22,7 @@ int main(int, char**) {
 
 	LuaScript ls;
 	auto lua_file = ReadFile("../scripts/test.lua");
+	ls.add_global(multiply, "multiply");
 	ls.run(lua_file);
 
 	bool done = false;

@@ -33,23 +33,22 @@ public:
 		lua_pop(s, lua_gettop(s));
 	}
 
-	/*void add_global(int(*function)(lua_State*)) {
-		check(lua_pushcfunction(L, multiplication));
-		check(lua_setglobal(L, "mul"));
-	}*/
+	void add_global(int(*function)(lua_State*), const std::string& name) {
+		lua_pushcfunction(s, function); 
+		lua_setglobal(s, name.c_str());
+	}
 
 private:
 	std::unique_ptr<lua_State, decltype(&lua_close)> state_;
 	lua_State* s;
 };
 
-int mult(lua_State* s) {
+int multiply(lua_State* s) {
 	int a = luaL_checkinteger(s, 1);
 	int b = luaL_checkinteger(s, 2);
 	lua_Integer c = a * b;
 	lua_pushinteger(s, c);
 	return 1; // Devolver el numero de parametros que devuelve la funcion, en este caso 1
-
 }
 
 #endif // SCR

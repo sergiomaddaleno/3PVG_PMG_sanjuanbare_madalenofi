@@ -67,7 +67,7 @@ configurations { "Debug", "Release", "RelWithDebInfo" }
 architecture "x64"
 location "build"
 cppdialect "c++20"
-startproject "PR0_Window"
+startproject "MyMotor"
 filter "configurations:Debug"
 defines { "DEBUG" }
 symbols "On"
@@ -133,7 +133,8 @@ files { "src/*.cc",
 	"assets/textures/**/*.mtl",
 	"assets/textures/**/*.dds",
 	"assets/obj/**",
-		"examples/PR0_Window_Example.cc"
+	"scripts/*.lua",
+	"examples/PR0_Window_Example.cc"
 }
 ------
 project"MyMotor"
@@ -164,7 +165,8 @@ files { "src/*.cc",
 	"assets/textures/**/*.mtl",
 	"assets/textures/**/*.dds",
 	"assets/obj/**",
-		"examples/mymotor.cc"
+	"scripts/*.lua",
+	"examples/mymotor.cc"
 }
 
 project"PR1_Triangle"
@@ -195,7 +197,8 @@ files { "src/*.cc",
 	"assets/textures/**/*.mtl",
 	"assets/textures/**/*.dds",
 	"assets/obj/**",
-		"examples/PR1_Triangle_Example.cc"
+	"scripts/*.lua",
+	"examples/PR1_Triangle_Example.cc"
 }
 
 project"PR2_MeshLoad"
@@ -226,7 +229,8 @@ files { "src/*.cc",
 	"assets/textures/**/*.mtl",
 	"assets/textures/**/*.dds",
 	"assets/obj/**",
-		"examples/PR2_MeshLoad_Example.cc"
+	"scripts/*.lua",
+	"examples/PR2_MeshLoad_Example.cc"
 }
 
 project"PR3_JobSystem"
@@ -257,7 +261,8 @@ files { "src/*.cc",
 	"assets/textures/**/*.mtl",
 	"assets/textures/**/*.dds",
 	"assets/obj/**",
-		"examples/PR3_JobSystem_Example.cc"
+	"scripts/*.lua",
+	"examples/PR3_JobSystem_Example.cc"
 }
 
 project"PR4_ECSManager"
@@ -288,7 +293,8 @@ files { "src/*.cc",
 	"assets/textures/**/*.mtl",
 	"assets/textures/**/*.dds",
 	"assets/obj/**",
-		"examples/PR4_ECSManager_Example.cc",
+	"scripts/*.lua",
+	"examples/PR4_ECSManager_Example.cc",
 }
 
 project"PR5_Scripting"
@@ -320,5 +326,6 @@ files {
 	"assets/textures/**/*.mtl",
 	"assets/textures/**/*.dds",
 	"assets/obj/**",
+	"scripts/*.lua",
 	"examples/PR5_Scripting_Example.cc",
 }
