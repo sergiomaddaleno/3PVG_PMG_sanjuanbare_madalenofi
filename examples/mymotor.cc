@@ -14,7 +14,6 @@
 #include "mesh.h"
 #include "render.h"
 #include "input.h"
-#include "ecs_manager.h"
 #include "utils.h"
 
 #define M_PI 3.14159265358979323846
@@ -22,7 +21,6 @@
 std::shared_ptr<Mesh> car_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
-ECSManager ecs;
 Render render_;
 RenderData rd;
 
@@ -99,26 +97,27 @@ int main(int, char**) {
         return -1;
     }
 
-    auto j = ecs.create_entity();
+    auto j = rd.ecs.create_entity();
 
-    ecs.add_component_type<RenderComponent>();
-    ecs.add_component_type<TransformComponent>();
+    rd.ecs.add_component_type<RenderComponent>();
+    rd.ecs.add_component_type<TransformComponent>();
 
-    ecs.add_component<RenderComponent>(j);
-    ecs.add_component<TransformComponent>(j);
-    ecs.get_component<RenderComponent>(j)->mesh_ = car_mesh;
-    ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
+    rd.ecs.add_component<RenderComponent>(j);
+    rd.ecs.add_component<TransformComponent>(j);
+
+    rd.ecs.get_component<RenderComponent>(j)->mesh_ = car_mesh;
+    rd.ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
+    rd.ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+    rd.ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
     
-    render_.setupShader(ecs.get_component<RenderComponent>(j)->program_, vs_normals, fs_normals);
+    render_.setupShader(rd.ecs.get_component<RenderComponent>(j)->program_, vs_normals, fs_normals);
 
     // ---
     rd.render_comp.cubemap_tex = UploadTexture(dds_tex);
     render_.setupShader(rd.render_comp.skybox_program_, vs_source_sky, fs_source_sky);
     // ---
 
-    render_.initMeshBuffers(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
+    render_.initMeshBuffers(rd.ecs);
 
     InitImGui(window->getWindow());
 
@@ -135,9 +134,9 @@ int main(int, char**) {
         rd.cam.update(input, rd.w_width, rd.w_height, dt);
 
         render_.renderSkyBox(rd);
-        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), rd);
+        render_.renderSystem(rd);
 
-        MyImGui(ecs.get_component<RenderComponent>(j)->program_);
+        MyImGui(rd.ecs.get_component<RenderComponent>(j)->program_);
 
         if (window->closePressed()) done = true;
     }

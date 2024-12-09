@@ -6,13 +6,9 @@
 #include <GL/glew.h> 
 #include <GLFW/glfw3.h>
 #include "../deps/dds.h"
+#include "../deps/glm/glm.hpp"
 
-struct SimpleVtx
-{
-	float x, y, z;
-};
-
-static const SimpleVtx gMesh[] = {
+static const glm::vec3 gMesh[] = {
   {-1.0f, -1.0f, -1.0f},
   {1.0f, -1.0f, -1.0f},
   {1.0f,  1.0f, -1.0f},

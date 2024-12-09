@@ -160,12 +160,12 @@ void Render::renderMesh(RenderData &rd)
 }
 
 // ---
-void Render::initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc) {
+void Render::initMeshBuffers(ECSManager& ecs) {
 
-    auto ri = rc.begin();
-    auto ti = tc.begin();
-    auto riend = rc.end();
-    auto tiend = tc.end();
+    auto ri = ecs.getComponentList<RenderComponent>().begin();
+    auto ti = ecs.getComponentList<TransformComponent>().begin();
+    auto riend = ecs.getComponentList<RenderComponent>().end();
+    auto tiend = ecs.getComponentList<TransformComponent>().end();
 
     for (; ri != riend && ti != tiend; ++ri, ++ti) {
         if (ri->has_value() && ti->has_value()) {
@@ -201,12 +201,12 @@ void Render::initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, st
 
 }
 
-void Render::renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, RenderData& rd) {
+void Render::renderSystem(RenderData& rd) {
 
-    auto ri = rc.begin();
-    auto ti = tc.begin();
-    auto riend = rc.end();
-    auto tiend = tc.end();
+    auto ri = rd.ecs.getComponentList<RenderComponent>().begin();
+    auto ti = rd.ecs.getComponentList<TransformComponent>().begin();
+    auto riend = rd.ecs.getComponentList<RenderComponent>().end();
+    auto tiend = rd.ecs.getComponentList<TransformComponent>().end();
 
     for (; ri != riend && ti != tiend; ++ri, ++ti) {
         if (ri->has_value() && ti->has_value()) {
@@ -268,7 +268,7 @@ void Render::renderSkyBox(RenderData& rd)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gIndices), gIndices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(SimpleVtx), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);

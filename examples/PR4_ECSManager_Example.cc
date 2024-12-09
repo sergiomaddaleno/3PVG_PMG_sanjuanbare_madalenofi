@@ -19,7 +19,6 @@ std::shared_ptr<Mesh> teapot_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> toad_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
-ECSManager ecs;
 Render render_;
 RenderData rd;
 
@@ -57,49 +56,49 @@ int main(int, char**) {
        return -1;
     }
 
-    auto j = ecs.create_entity();
+    auto j = rd.ecs.create_entity();
 
-    ecs.add_component_type<RenderComponent>();
-    ecs.add_component_type<TransformComponent>();
+    rd.ecs.add_component_type<RenderComponent>();
+    rd.ecs.add_component_type<TransformComponent>();
 
-    ecs.add_component<RenderComponent>(j);
-    ecs.add_component<TransformComponent>(j);
-    ecs.get_component<RenderComponent>(j)->mesh_ = mario_mesh;
-    ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
+    rd.ecs.add_component<RenderComponent>(j);
+    rd.ecs.add_component<TransformComponent>(j);
+    rd.ecs.get_component<RenderComponent>(j)->mesh_ = mario_mesh;
+    rd.ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
+    rd.ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+    rd.ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
 
     j++;
 
-    ecs.add_component<RenderComponent>(j);
-    ecs.add_component<TransformComponent>(j);
-    ecs.get_component<RenderComponent>(j)->mesh_ = toad_mesh;
-    ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 2.0f, 0.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
+    rd.ecs.add_component<RenderComponent>(j);
+    rd.ecs.add_component<TransformComponent>(j);
+    rd.ecs.get_component<RenderComponent>(j)->mesh_ = toad_mesh;
+    rd.ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 2.0f, 0.0f, 0.0f };
+    rd.ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+    rd.ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
 
     for (int i = 2; i < num_entities; i++) {
         j++;
-        ecs.add_component<RenderComponent>(j);
-        ecs.add_component<TransformComponent>(j);
-        ecs.get_component<RenderComponent>(j)->mesh_ = teapot_mesh;
-        ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
-        ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.5f, 0.5, 0.5f };
+        rd.ecs.add_component<RenderComponent>(j);
+        rd.ecs.add_component<TransformComponent>(j);
+        rd.ecs.get_component<RenderComponent>(j)->mesh_ = teapot_mesh;
+        rd.ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+        rd.ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.5f, 0.5, 0.5f };
     }
 
     //---
     render_.setupShader(program_tex, vs_texture, fs_texture);
     render_.setupShader(program_normals, vs_normals, fs_normals);
 
-    ecs.get_component<RenderComponent>(0)->program_ = program_tex;
-    ecs.get_component<RenderComponent>(1)->program_ = program_tex;
+    rd.ecs.get_component<RenderComponent>(0)->program_ = program_tex;
+    rd.ecs.get_component<RenderComponent>(1)->program_ = program_tex;
 
     for (int i = 2; i < num_entities; i++) {
-        ecs.get_component<RenderComponent>(i)->program_ = program_normals;
+        rd.ecs.get_component<RenderComponent>(i)->program_ = program_normals;
     }
     //---
 
-    render_.initMeshBuffers(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
+    render_.initMeshBuffers(rd.ecs);
 
     double lastTime = glfwGetTime();
     bool done = false;
@@ -112,14 +111,14 @@ int main(int, char**) {
         float angle = (float)glfwGetTime();
 
         for (int i = 2; i < num_entities; i++) {
-            ecs.get_component<TransformComponent>(i)->angle = angle;
-            ecs.get_component<TransformComponent>(i)->position = glm::vec3{ cos(angle + (float)i) * 8, (sin(angle + (float)i) * 8), -10.0f };
+            rd.ecs.get_component<TransformComponent>(i)->angle = angle;
+            rd.ecs.get_component<TransformComponent>(i)->position = glm::vec3{ cos(angle + (float)i) * 8, (sin(angle + (float)i) * 8), -10.0f };
         }
 
-        ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.01f, dt);
-        ecs.get_component<TransformComponent>(1)->moveEntity(input, 0.01f, dt);
+        rd.ecs.get_component<TransformComponent>(0)->moveEntity(input, 0.01f, dt);
+        rd.ecs.get_component<TransformComponent>(1)->moveEntity(input, 0.01f, dt);
 
-        render_.renderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>(), rd);
+        render_.renderSystem(rd);
 
         if (window->closePressed()) done = true;
     }

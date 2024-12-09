@@ -12,6 +12,7 @@
 #include "triangle.h"
 #include "mesh.h"
 #include "camera.h"
+#include "ecs_manager.h"
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
 
@@ -20,8 +21,7 @@ struct RenderData {
 	Camera cam;
 	RenderComponent render_comp;
 	TransformComponent transf_comp;
-	//std::vector<std::optional<RenderComponent>>& rc
-	//std::vector<std::optional<TransformComponent>>& tc
+	ECSManager ecs;
 
 	int w_width = 800;
 	int w_height = 600;
@@ -46,9 +46,9 @@ public:
 	void renderSkyBox(RenderData& rd);
 
 	// --- For ECS
-	void initMeshBuffers(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
+	void initMeshBuffers(ECSManager &ecs);
 
-	void renderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc, RenderData& rd);
+	void renderSystem(RenderData& rd);
 	// ---
 
 private:
