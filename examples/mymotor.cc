@@ -32,7 +32,7 @@ char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
 char* vs_source_sky = (char*)ReadFile("../assets/shaders/vs_skybox.vs");
 char* fs_source_sky = (char*)ReadFile("../assets/shaders/fs_skybox.fs");
 
-char* dds_tex = ReadFile("../assets/textures/skybox/evening_field_octahedral.dds");
+char* dds_tex = ReadFile("../assets/textures/skybox/sky.dds");
 
 GLuint normalShaderProgram = 0;
 GLuint textureShaderProgram = 0;
