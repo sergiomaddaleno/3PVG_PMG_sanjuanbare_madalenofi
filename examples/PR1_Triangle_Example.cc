@@ -13,7 +13,6 @@
 #include <../deps/glm/glm.hpp>
 
 glm::vec2 arrow_dir = { 0.0f, 0.0f };
-float move_speed = 0.001;
 
 char* vs_tri = (char*)ReadFile("../assets/shaders/vs_triangle.vs");
 char* fs_tri = (char*)ReadFile("../assets/shaders/fs_triangle.fs");
@@ -28,15 +27,15 @@ int main(int, char**) {
     //--- Triangle
     auto tri_ = Triangle::make(0.5f, Triangle::Color::Blue);    
 
-    Render r;
-    r.make();
+    Render render_;
+    render_.make();
 
     RenderData rd;
     rd.render_comp.triangle_ = std::make_shared<Triangle>(*tri_);
     rd.transf_comp.position = glm::vec3{ arrow_dir.x, arrow_dir.y, 0.0f };
     rd.transf_comp.scale = glm::vec3{ 2.0f, 2.0f, 2.0f };
 
-    r.setupShader(rd.render_comp.program_, vs_tri, fs_tri);
+    render_.setupShader(rd.render_comp.program_, vs_tri, fs_tri);
 
     double lastTime = window->getTime();
     bool done = false;
@@ -45,8 +44,8 @@ int main(int, char**) {
         float dt = float(currentTime - lastTime);
         window->updateWindow();
        
-        rd.transf_comp.moveEntity(input, move_speed, dt);
-        r.renderGeometry(rd);
+        rd.transf_comp.moveEntity(input, dt);
+        render_.renderGeometry(rd);
 
         if (window->closePressed()) done = true;
     }

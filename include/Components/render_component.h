@@ -18,7 +18,9 @@ struct RenderComponent {
     GLuint textureID = -1;
     GLuint cubemap_tex = -1;
 
-    RenderComponent() = default;
+
+    RenderComponent() : mesh_(nullptr), triangle_(nullptr), program_(0), skybox_program_(0), textureID(-1), cubemap_tex(-1){}
+    ~RenderComponent(){}
 
     RenderComponent(const RenderComponent& other)
         : mesh_(other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr),
@@ -28,14 +30,10 @@ struct RenderComponent {
     RenderComponent& operator=(const RenderComponent& other) {
         if (this != &other) {
             mesh_ = other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr;
-           
+
             triangle_ = other.triangle_;
         }
         return *this;
-    }
-
-    ~RenderComponent() {
-        
     }
 };
 

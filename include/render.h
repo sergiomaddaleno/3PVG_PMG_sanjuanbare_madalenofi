@@ -52,10 +52,8 @@ public:
 	// ---
 
 private:
-	glm::mat4x4 model_, projection_, mvp_;
 
-	float skybox_angle = -90.0f;
-
+	float skybox_angle;
 };
 
 #endif // PRT

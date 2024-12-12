@@ -13,7 +13,7 @@
 
 #define M_PI 3.14159265358979323846
 
-Render::Render() {}
+Render::Render() : skybox_angle(-90.0f) {}
 
 std::optional<Render> Render::make()
 {  
@@ -44,7 +44,6 @@ void Render::setupShader(GLuint &program, const char* vertex_src, const char* fr
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
-
 }
 
 void Render::renderGeometry(RenderData& rd)
@@ -66,10 +65,8 @@ void Render::renderGeometry(RenderData& rd)
     model = glm::rotate(model, rd.transf_comp.angle, glm::vec3(rd.transf_comp.rotation.x, rd.transf_comp.rotation.y, rd.transf_comp.rotation.z));
     model = glm::scale(model, glm::vec3(rd.transf_comp.scale.x, rd.transf_comp.scale.y, rd.transf_comp.scale.z));
 
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f)); 
-
-    glm::mat4 projection = glm::perspective(glm::radians(55.0f), (float)800 / 600, 0.1f, 100.0f);  
+    glm::mat4 view = rd.cam.getViewMatrix();
+    glm::mat4 projection = glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);  
     glm::mat4 mvp = projection * view * model;
 
     GLint mvpLocation = glGetUniformLocation(rd.render_comp.program_, "MVP");
@@ -149,7 +146,7 @@ void Render::renderMesh(RenderData &rd)
         // ---
 
         glBindVertexArray(rd.render_comp.mesh_->VAO);
-        glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0); 
 
         glUseProgram(0);
@@ -243,7 +240,7 @@ void Render::renderSystem(RenderData& rd) {
 
                 //--
                 glBindVertexArray(mesh.VAO);
-                glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
             }
         }

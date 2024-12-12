@@ -15,7 +15,7 @@ public:
 
 	glm::mat4 initViewTarget();
 
-	void update(Input& input, const float window_width, const float window_height, const double dt);
+	void update(Input& input, const double dt, const int window_width = 800, const int window_height = 600);
 
 	// ---
 

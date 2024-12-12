@@ -8,7 +8,13 @@
 #include "../deps/dds.h"
 
 char* ReadFile(const char* file_path) {
-    FILE* file = fopen(file_path, "rb");
+
+    FILE* file;
+    if (fopen_s(&file, file_path, "rb") != 0) {
+        printf("Error in loading file\n");
+        return nullptr;
+    }
+        
     long size = 0;
     if (file) {
         fseek(file, 0, SEEK_END);
@@ -17,7 +23,10 @@ char* ReadFile(const char* file_path) {
 
         char* my_file = (char*)malloc(size + 1);
         if (my_file) {
+
+            if (size <= 0) return nullptr;
             fread(my_file, sizeof(char), size, file);
+            
             my_file[size] = '\0';
 
             //printf("%s\n", my_file);
@@ -26,14 +35,9 @@ char* ReadFile(const char* file_path) {
 
         return my_file;
     }
-    else {
-        printf("Error in loading file\n");
-    }
 
     return nullptr;
 }
-
-#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT (0x83F0)
 
 unsigned int UploadTexture(char* dds_file)
 {

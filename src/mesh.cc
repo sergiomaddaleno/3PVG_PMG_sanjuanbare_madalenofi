@@ -3,10 +3,11 @@
 
 #include "../include/mesh.h"
 #include "..\include\render.h"
-
+#pragma warning(push)
+#pragma warning(disable:26495)
 #include "../deps/tiny_obj_loader.h"
+#pragma warning(push)
 #include "../deps/stb_image.h"
-
 
 
 bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)

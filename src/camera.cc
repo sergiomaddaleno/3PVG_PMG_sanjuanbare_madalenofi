@@ -1,9 +1,9 @@
+
 #define GLM_ENABLE_EXPERIMENTAL
-#define PI 3.14159265359
+const float PI = 3.141592653589793f;
+
 #include "camera.h"
 #include <input.h>
-
-
 #include "../deps/glm/gtx/transform.hpp"
 
 Camera::Camera() : 
@@ -28,13 +28,12 @@ glm::mat4 Camera::initViewTarget()
 	return glm::lookAt(position_, position_ + view_direction_, up_);
 }
 
-void Camera::update(Input& input, const float window_width, const float window_height, const double dt)
-{
+void Camera::update(Input& input, const double dt, const int window_width, const int window_height){
 
     // ----------------- Camera Rotation
 
-    curr_mouse.x = input.getMouseX();
-    curr_mouse.y = window_height - input.getMouseY();
+    curr_mouse.x = (float)input.getMouseX();
+    curr_mouse.y = window_height - (float)input.getMouseY();
 
     if (input.isMouseButtonPressed(Input::MouseButton::MOUSE_RIGHT)) {
         last_mouse = curr_mouse;
@@ -54,7 +53,7 @@ void Camera::update(Input& input, const float window_width, const float window_h
     float alpha = accum_mouse_offset_.x * (PI * 2) * sensitivity_;
     float omega = accum_mouse_offset_.y * (PI - 1.57f) * sensitivity_;
 
-    omega = glm::clamp(omega, -1.57f, 1.57f);
+    omega = glm::clamp((float)omega, -1.57f, 1.57f);
 
     view_direction_.x = cosf(alpha) * cosf(omega);
     view_direction_.y = sinf(omega);

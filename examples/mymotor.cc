@@ -34,21 +34,21 @@ char* fs_source_sky = (char*)ReadFile("../assets/shaders/fs_skybox.fs");
 
 char* dds_tex = ReadFile("../assets/textures/skybox/sky.dds");
 
-GLuint normalShaderProgram = 0;
-GLuint textureShaderProgram = 0;
+GLuint normal_progrm = 0;
+GLuint texture_program = 0;
 
 void ChangeShader(GLuint& program) {
 
-    const char* shaders_name[]{ "Normal shader", "Texture Shader" };
+    const char* shaders_name[]{ "Texture Shader", "Normal shader"};
     static int curr_item = 0;
 
     if (ImGui::Combo("Shaders", &curr_item, shaders_name, 2)) {
         switch (curr_item) {
         case 0:
-            render_.setupShader(program, vs_normals, fs_normals);
+            program = texture_program;
             break;
         case 1:
-            render_.setupShader(program, vs_texture, fs_texture);
+            program = normal_progrm;
             break;
         }
     }
@@ -97,46 +97,49 @@ int main(int, char**) {
         return -1;
     }
 
-    auto j = rd.ecs.create_entity();
-
-    rd.ecs.add_component_type<RenderComponent>();
-    rd.ecs.add_component_type<TransformComponent>();
-
-    rd.ecs.add_component<RenderComponent>(j);
-    rd.ecs.add_component<TransformComponent>(j);
-
-    rd.ecs.get_component<RenderComponent>(j)->mesh_ = car_mesh;
-    rd.ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
-    rd.ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
-    rd.ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
-    
-    render_.setupShader(rd.ecs.get_component<RenderComponent>(j)->program_, vs_normals, fs_normals);
+    render_.setupShader(texture_program, vs_texture, fs_texture);
+    render_.setupShader(normal_progrm, vs_normals, fs_normals);
 
     // ---
     rd.render_comp.cubemap_tex = UploadTexture(dds_tex);
     render_.setupShader(rd.render_comp.skybox_program_, vs_source_sky, fs_source_sky);
     // ---
 
+    auto e = rd.ecs.create_entity();
+
+    rd.ecs.add_component_type<RenderComponent>();
+    rd.ecs.add_component_type<TransformComponent>();
+
+    rd.ecs.add_component<RenderComponent>(e);
+    rd.ecs.add_component<TransformComponent>(e);
+
+    rd.ecs.get_component<RenderComponent>(e)->mesh_ = car_mesh;
+    rd.ecs.get_component<TransformComponent>(e)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
+    rd.ecs.get_component<TransformComponent>(e)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+    rd.ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
+    rd.ecs.get_component<RenderComponent>(e)->program_ = texture_program;
+
+
     render_.initMeshBuffers(rd.ecs);
 
     InitImGui(window->getWindow());
 
-    double lastTime = glfwGetTime();
+    double lastTime = window->getTime();
     bool done = false;
     while (!done) {
-        double currentTime = glfwGetTime();
+        double currentTime = window->getTime();
         float dt = float(currentTime - lastTime);
         window->updateWindow();
         
         rd.w_width = window->getWidth();
         rd.w_height = window->getHeight();
 
-        rd.cam.update(input, rd.w_width, rd.w_height, dt);
+        rd.cam.update(input, dt, rd.w_width, rd.w_height);
 
         render_.renderSkyBox(rd);
         render_.renderSystem(rd);
 
-        MyImGui(rd.ecs.get_component<RenderComponent>(j)->program_);
+        MyImGui(rd.ecs.get_component<RenderComponent>(e)->program_);
 
         if (window->closePressed()) done = true;
     }

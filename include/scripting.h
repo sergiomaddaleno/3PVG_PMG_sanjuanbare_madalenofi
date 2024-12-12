@@ -44,8 +44,8 @@ private:
 };
 
 int multiply(lua_State* s) {
-	int a = luaL_checkinteger(s, 1);
-	int b = luaL_checkinteger(s, 2);
+	lua_Integer a = luaL_checkinteger(s, 1);
+	lua_Integer b = luaL_checkinteger(s, 2);
 	lua_Integer c = a * b;
 	lua_pushinteger(s, c);
 	return 1; // Devolver el numero de parametros que devuelve la funcion, en este caso 1

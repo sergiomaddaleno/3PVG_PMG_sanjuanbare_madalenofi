@@ -16,7 +16,6 @@
 // - Getting Started      https://dearimgui.com/getting-started
 // - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
 // - Introduction, links and more at the top of imgui.cpp
-#define IMGUI_IMPL_API __declspec(dllexport)
 
 #pragma once
 #include "imgui.h"      // IMGUI_IMPL_API

@@ -49,7 +49,7 @@ public:
 
 	//---
 
-	Window(Window&& other) {
+	Window(Window&& other) noexcept {
 		window_ = other.window_;
 		other.window_ = nullptr;
 	}
@@ -62,8 +62,8 @@ public:
 
 private:
 
-	int width_;
-	int height_;
+	int width_ = 0;
+	int height_ = 0;
 	//Window(GLFWwindow* window) : window_(window) {}
 	//Window(const Window&) = delete;
 	//Window& operator=(const Window&) = delete;
