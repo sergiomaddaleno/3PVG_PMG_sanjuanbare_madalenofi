@@ -4,5 +4,4 @@ print("The result is:", result)
 
 window_width = 800
 window_height = 600
-fov = 45
-full_screen = false
+full_screen = true

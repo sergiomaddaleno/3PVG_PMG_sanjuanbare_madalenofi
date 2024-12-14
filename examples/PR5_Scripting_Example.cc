@@ -19,10 +19,6 @@ auto lua_file = ReadFile("../scripts/test.lua");
 
 int main(int, char**) {
 
-	auto window = Window::make(800, 600, "Window");
-	window->setWindowActive();
-	//--
-
 	auto e = ecs.create_entity();
 	ecs.add_component_type<ScriptingComponent>();
 
@@ -36,8 +32,11 @@ int main(int, char**) {
 	//Coger variables de lua
 	int w_width = sc->lua_script->get_integer("window_width");
 	int w_height = sc->lua_script->get_integer("window_height");
+	bool full_screen = sc->lua_script->get_bool("full_screen");
 
-
+	//--
+	auto window = Window::make(w_width, w_height, "Window", full_screen);
+	window->setWindowActive();
 
 	double lastTime = window->getTime();
 	bool done = false;

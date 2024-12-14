@@ -38,12 +38,25 @@ public:
 		lua_setglobal(s, name.c_str());
 	}
 	
+	// --
+
 	int get_integer(const std::string& var_name) {
 		lua_getglobal(s, var_name.c_str()); 
-		int value = lua_tointeger(s, -1);
+		int value = (int)lua_tointeger(s, -1);
 		return value;
 	}
 
+	float get_float(const std::string& var_name) {
+		lua_getglobal(s, var_name.c_str());
+		float value = (float)lua_tonumber(s, -1);
+		return value;
+	}
+
+	bool get_bool(const std::string& var_name) {
+		lua_getglobal(s, var_name.c_str());
+		bool value = lua_toboolean(s, -1);
+		return value;
+	}
 
 private:
 	std::unique_ptr<lua_State, decltype(&lua_close)> state_;

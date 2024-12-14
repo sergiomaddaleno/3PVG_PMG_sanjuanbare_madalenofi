@@ -16,6 +16,10 @@
 #include "input.h"
 #include "utils.h"
 
+#include "ecs_manager.h"
+#include "scripting.h"
+#include "Components/scripting_component.h"
+
 #define M_PI 3.14159265358979323846
 
 std::shared_ptr<Mesh> car_mesh = std::make_shared<Mesh>();
@@ -23,6 +27,7 @@ std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
 Render render_;
 RenderData rd;
+LuaScript ls;
 
 char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
 char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
@@ -33,6 +38,7 @@ char* vs_source_sky = (char*)ReadFile("../assets/shaders/vs_skybox.vs");
 char* fs_source_sky = (char*)ReadFile("../assets/shaders/fs_skybox.fs");
 
 char* dds_tex = ReadFile("../assets/textures/skybox/sky.dds");
+char* lua_file = ReadFile("../scripts/settings.lua");
 
 GLuint normal_progrm = 0;
 GLuint texture_program = 0;
@@ -84,13 +90,26 @@ void MyImGui(GLuint& program) {
 
 int main(int, char**) {
 
-    auto window = Window::make(rd.w_width, rd.w_height, "Equipo33");
+    //lua script settings
+    ls.run(lua_file);
+
+    int w_width = ls.get_integer("window_width");
+    int w_height = ls.get_integer("window_height");
+    bool full_screen = ls.get_bool("full_screen");
+    float fov = ls.get_float("fov");
+
+    rd.w_width = w_width;
+    rd.w_height = w_height;
+    rd.fov = fov;
+    // --
+
+    auto window = Window::make(rd.w_width, rd.w_height, "Window", full_screen);
     window->setWindowActive();
     window->setResizeCallback();
 
     render_.make();
 
-    Input input{ window->getWindow() };
+    Input input{ window->getWindow()};
 
     // ---
     if (!car_mesh->loadOBJ("../assets/obj/LMcQueen.obj", "../assets/textures/cars")) {
