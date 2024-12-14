@@ -27,7 +27,7 @@ public:
 
 	Window(GLFWwindow* window) : width_(800), height_(600) { window_ = window; }
 
-	static std::optional<Window> make(int x, int y, const std::string& name);
+	static std::optional<Window> make(int x, int y, const std::string& name, bool full_screen = false);
 
 	void updateWindow();
 

@@ -13,14 +13,24 @@ std::optional<WindowSystem> WindowSystem::make()
 	return std::optional<WindowSystem>( ws_);
 }
 
-std::optional<Window> Window::make(int x, int y, const std::string& name)
+std::optional<Window> Window::make(int x, int y, const std::string& name, bool full_screen)
 {
 
 	if (!glfwInit()) {
 		return std::nullopt;
 	}
 
-	GLFWwindow* w_ = glfwCreateWindow(x, y, name.c_str(), NULL, NULL);
+	GLFWwindow* w_;
+
+	if (!full_screen) {
+		w_ = glfwCreateWindow(x, y, name.c_str(), NULL, NULL);
+	}
+	else {
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+		w_ = glfwCreateWindow(mode->width, mode->height, name.c_str(), NULL, NULL);
+	}
 
 	if (nullptr == w_) {
 		return std::nullopt;

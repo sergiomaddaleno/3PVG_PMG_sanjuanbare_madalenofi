@@ -17,7 +17,7 @@ ECSManager ecs;
 
 auto lua_file = ReadFile("../scripts/test.lua");
 
-/*int main(int, char**) {
+int main(int, char**) {
 
 	auto window = Window::make(800, 600, "Window");
 	window->setWindowActive();
@@ -29,8 +29,15 @@ auto lua_file = ReadFile("../scripts/test.lua");
 	ecs.add_component<ScriptingComponent>(e);
 	auto sc = ecs.get_component<ScriptingComponent>(e);
 
+	//Ejecutar funcion desde lua
 	sc->lua_script->add_global(multiply, "multiply");
 	sc->lua_script->run(lua_file);
+
+	//Coger variables de lua
+	int w_width = sc->lua_script->get_integer("window_width");
+	int w_height = sc->lua_script->get_integer("window_height");
+
+
 
 	double lastTime = window->getTime();
 	bool done = false;
@@ -40,12 +47,13 @@ auto lua_file = ReadFile("../scripts/test.lua");
 		window->updateWindow();
 
 
-
 		if (window->closePressed()) done = true;
 	}
 
 	return 0;
-}*/
+}
+
+/* EJEMPLO DE LUASCRIPT SIN USAR ECS
 
 int main(int, char**) {
 
@@ -72,4 +80,4 @@ int main(int, char**) {
 	}
 
 	return 0;
-}
+}*/

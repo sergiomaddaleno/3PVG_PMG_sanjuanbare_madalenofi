@@ -37,6 +37,13 @@ public:
 		lua_pushcfunction(s, function); 
 		lua_setglobal(s, name.c_str());
 	}
+	
+	int get_integer(const std::string& var_name) {
+		lua_getglobal(s, var_name.c_str()); 
+		int value = lua_tointeger(s, -1);
+		return value;
+	}
+
 
 private:
 	std::unique_ptr<lua_State, decltype(&lua_close)> state_;
@@ -50,6 +57,8 @@ int multiply(lua_State* s) {
 	lua_pushinteger(s, c);
 	return 1; // Devolver el numero de parametros que devuelve la funcion, en este caso 1
 }
+
+
 
 #endif // SCR
 
