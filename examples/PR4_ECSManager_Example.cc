@@ -100,15 +100,15 @@ int main(int, char**) {
 
     render_.initMeshBuffers(rd.ecs);
 
-    double lastTime = glfwGetTime();
+    double lastTime = window->getTime();
     bool done = false;
     while (!done) {
-        double currentTime = glfwGetTime();
+        double currentTime = window->getTime();
         float dt = float(currentTime - lastTime);
         window->updateWindow();
         window->colorWindow(color);
 
-        float angle = (float)glfwGetTime();
+        float angle = (float)window->getTime();
 
         for (int i = 2; i < num_entities; i++) {
             rd.ecs.get_component<TransformComponent>(i)->angle = angle;

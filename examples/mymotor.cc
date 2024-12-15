@@ -93,10 +93,15 @@ int main(int, char**) {
     //lua script settings
     ls.run(lua_file);
 
+    ls.get_table("window");
     int w_width = ls.get_integer("window_width");
     int w_height = ls.get_integer("window_height");
     bool full_screen = ls.get_bool("full_screen");
-    float fov = ls.get_float("fov");
+    ls.pop();
+
+    ls.get_table("graphics");
+    float fov = ls.get_integer("fov");
+    ls.pop();
 
     rd.w_width = w_width;
     rd.w_height = w_height;
@@ -149,6 +154,7 @@ int main(int, char**) {
         double currentTime = window->getTime();
         float dt = float(currentTime - lastTime);
         window->updateWindow();
+        window->toggleFullScreen(input);
         
         rd.w_width = window->getWidth();
         rd.w_height = window->getHeight();

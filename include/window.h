@@ -6,6 +6,8 @@
 #include <GLFW/glfw3.h>
 #include <optional>
 #include <string>
+#include <input.h>
+
 #include <../deps/glm/glm.hpp>
 
 class WindowSystem {
@@ -31,11 +33,13 @@ public:
 
 	void updateWindow();
 
-	bool closePressed();
-
 	void setResizeCallback();
 
+	void toggleFullScreen(Input &input, Input::Keys key = Input::Keys::F11);
+
 	void colorWindow(const glm::vec4& Color);
+
+	bool closePressed();
 
 	//---
 	void setWindowActive();
@@ -64,6 +68,11 @@ private:
 
 	int width_ = 0;
 	int height_ = 0;
+	bool full_screen = false;
+
+	int prev_x = 0, prev_y = 0;
+	int prev_width = 0, prev_height = 0;
+
 	//Window(GLFWwindow* window) : window_(window) {}
 	//Window(const Window&) = delete;
 	//Window& operator=(const Window&) = delete;

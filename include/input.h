@@ -15,23 +15,19 @@ class Input {
 
 public:
     enum Keys {
-        LEFT,
-        RIGHT,
-        UP,
-        DOWN,
+        UP, DOWN, LEFT, RIGHT,
+        W,A,S,D,E,Q,
+
         CTRL,
         SHIFT,
+        F11,
+
         ALT,
         ENTER,
         ESC,
         SPACEBAR,
         BACKSPACE,
-        W,
-        A,
-        S,
-        D,
-        E,
-        Q,
+
         Keys_End
     };
 

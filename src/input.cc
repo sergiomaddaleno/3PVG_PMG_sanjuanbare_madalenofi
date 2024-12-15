@@ -47,6 +47,8 @@ void Input::InitKeyMap() {
 
     keyGLFW_map[GLFW_KEY_LEFT_SHIFT] = Keys::SHIFT;
     keyGLFW_map[GLFW_KEY_RIGHT_SHIFT] = Keys::SHIFT;
+
+    keyGLFW_map[GLFW_KEY_F11] = Keys::F11;
 }
 
 void Input::global_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
