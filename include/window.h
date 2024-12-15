@@ -70,9 +70,6 @@ private:
 	int height_ = 0;
 	bool full_screen = false;
 
-	int prev_x = 0, prev_y = 0;
-	int prev_width = 0, prev_height = 0;
-
 	//Window(GLFWwindow* window) : window_(window) {}
 	//Window(const Window&) = delete;
 	//Window& operator=(const Window&) = delete;

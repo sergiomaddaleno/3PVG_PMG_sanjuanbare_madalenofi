@@ -29,7 +29,7 @@ std::optional<Window> Window::make(int x, int y, const std::string& name, bool f
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
-		w_ = glfwCreateWindow(mode->width, mode->height, name.c_str(), NULL, NULL);
+		w_ = glfwCreateWindow(mode->width, mode->height, name.c_str(), monitor, NULL);
 	}
 
 	if (nullptr == w_) {
@@ -68,7 +68,7 @@ void Window::toggleFullScreen(Input &input, Input::Keys key)
 		}
 		else
 		{
-			glfwSetWindowMonitor(window_, NULL, 0, 40, 800, 600, 0);
+			glfwSetWindowMonitor(window_, NULL, 5, 40, 800, 600, 0);
 			full_screen = false;
 		}
 	}

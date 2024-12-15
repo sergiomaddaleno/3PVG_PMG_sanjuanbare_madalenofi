@@ -100,7 +100,7 @@ int main(int, char**) {
     ls.pop();
 
     ls.get_table("graphics");
-    float fov = ls.get_integer("fov");
+    float fov = ls.get_float("fov");
     ls.pop();
 
     rd.w_width = w_width;
