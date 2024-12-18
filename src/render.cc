@@ -137,11 +137,11 @@ void Render::renderMesh(RenderData &rd)
         glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Texture
-        //glActiveTexture(GL_TEXTURE0);
-        //rd.render_comp.texture = mesh.getTexture(0);
-        //rd.render_comp.texture.bind(0);
-        //glUniform1i(glGetUniformLocation(rd.render_comp.program_, "texture1"), 0);
-        //// ---
+        glActiveTexture(GL_TEXTURE0);
+        rd.render_comp.texture = mesh.getTexture(0);
+        rd.render_comp.texture.bind();
+        glUniform1i(glGetUniformLocation(rd.render_comp.program_, "texture1"), 0);
+        // ---
 
         glBindVertexArray(rd.render_comp.mesh_->VAO);
         glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
