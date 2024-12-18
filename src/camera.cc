@@ -16,7 +16,7 @@ curr_mouse(0.0f, 0.0f),
 last_mouse(0.0f, 0.0f),
 delta_mouse(0.0f, 0.0f),
 accum_mouse_offset_(0.0f, 0.0f),
-speed_(0.01f),
+speed_(0.001f),
 sensitivity_(1.0f)
 
 {
@@ -72,28 +72,30 @@ void Camera::update(Input& input, const double dt, const int window_width, const
 
     // ----------------- Camera Movement
 
-    if (input.isKeyDown(Input::A)) {
-        position_ = {position_.x + (right_vec.x * -1.0f),position_.y + (right_vec.y * -1.0f),position_.z + (right_vec.z * -1.0f) };
-    }
+    if (input.isMouseButtonDown(Input::MouseButton::MOUSE_RIGHT)) {
+        if (input.isKeyDown(Input::A)) {
+            position_ = { position_.x + (right_vec.x * -1.0f),position_.y + (right_vec.y * -1.0f),position_.z + (right_vec.z * -1.0f) };
+        }
 
-    if (input.isKeyDown(Input::D)) {
-        position_ = { position_.x  + right_vec.x,position_.y + right_vec.y,position_.z + right_vec.z };
-    }
+        if (input.isKeyDown(Input::D)) {
+            position_ = { position_.x + right_vec.x,position_.y + right_vec.y,position_.z + right_vec.z };
+        }
 
-    if (input.isKeyDown(Input::W)) {
-        position_ = { position_.x + forward_vec.x ,position_.y  + forward_vec.y,position_.z + forward_vec.z };
-    }
+        if (input.isKeyDown(Input::W)) {
+            position_ = { position_.x + forward_vec.x ,position_.y + forward_vec.y,position_.z + forward_vec.z };
+        }
 
-    if (input.isKeyDown(Input::S)) {
-        position_ = { position_.x + (forward_vec.x * -1.0f) ,position_.y  + (forward_vec.y * -1.0f) ,position_.z + (forward_vec.z * -1.0f) };
-    }
+        if (input.isKeyDown(Input::S)) {
+            position_ = { position_.x + (forward_vec.x * -1.0f) ,position_.y + (forward_vec.y * -1.0f) ,position_.z + (forward_vec.z * -1.0f) };
+        }
 
-    if (input.isKeyDown(Input::E)) {
-        position_ = { position_.x  ,position_.y + (speed_ * dt) ,position_.z  };
-    }
-        
-    if (input.isKeyDown(Input::Q)) {
-        position_ = { position_.x  ,position_.y + +(speed_ * dt*-1.0f) ,position_.z };
+        if (input.isKeyDown(Input::E)) {
+            position_ = { position_.x  ,position_.y + (speed_ * dt) ,position_.z };
+        }
+
+        if (input.isKeyDown(Input::Q)) {
+            position_ = { position_.x  ,position_.y + +(speed_ * dt * -1.0f) ,position_.z };
+        }
     }
     
     // ----------------- Camera speed

@@ -21,7 +21,6 @@ struct RenderData {
 	Camera cam;
 	RenderComponent render_comp;
 	TransformComponent transf_comp;
-	ECSManager ecs;
 
 	int w_width = 800;
 	int w_height = 600;
@@ -48,7 +47,7 @@ public:
 	// --- For ECS
 	void initMeshBuffers(ECSManager &ecs);
 
-	void renderSystem(RenderData& rd);
+	void renderSystem(ECSManager& ecs, RenderData& rd);
 	// ---
 
 private:

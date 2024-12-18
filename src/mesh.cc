@@ -1,8 +1,9 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "../include/mesh.h"
-#include "..\include\render.h"
+#include "mesh.h"
+#include "texture.h"
+
 #pragma warning(push)
 #pragma warning(disable:26495)
 #include "../deps/tiny_obj_loader.h"
@@ -20,68 +21,14 @@ bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
 
     bool obj = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file.c_str(), textureFolder.c_str());
     if (!obj) {
-        std::cerr << "Failed to load OBJ file: " << file << std::endl;
-        std::cerr << "Warning: " << warn << std::endl;
-        std::cerr << "Error: " << err << std::endl;
+        printf("Failed to load OBJ file: ");
+        printf("Warning: %s", warn.c_str());
+        printf("Error: %s", err.c_str());
         return false;
     }
 
     for (const auto& shape : shapes) {
-        Mesh currentMesh;
-        if (textureFolder != "") {
-            materialIndex = shape.mesh.material_ids.empty() ? -1 : shape.mesh.material_ids[0];
-
-            if (materialIndex >= 0 && materialIndex < materials.size()) {
-                const auto& material = materials[materialIndex];
-
-                if (!material.diffuse_texname.empty()) {
-                    std::string texturePath = textureFolder + "/" + material.diffuse_texname;
-
-                    int width, height, channels;
-                    unsigned char* data = stbi_load(texturePath.c_str(), &width, &height, &channels, 0);
-
-                    glGenTextures(1, &currentMesh.shapeTextureID);
-                    glBindTexture(GL_TEXTURE_2D, currentMesh.shapeTextureID);
-
-                    currentMesh.shapeTextureIDs.push_back(currentMesh.shapeTextureID);
-
-                    GLenum format = (channels == 4) ? GL_RGBA : GL_RGB;
-                    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                    stbi_image_free(data);
-                }
-            }
-        }
-        else {
-
-            std::string texturePath = "";
-
-            int width, height, channels;
-            unsigned char* data = stbi_load(texturePath.c_str(), &width, &height, &channels, 0);
-
-            glGenTextures(1, &currentMesh.shapeTextureID);
-            glBindTexture(GL_TEXTURE_2D, currentMesh.shapeTextureID);
-
-            currentMesh.shapeTextureIDs.push_back(currentMesh.shapeTextureID);
-
-            GLenum format = (channels == 4) ? GL_RGBA : GL_RGB;
-            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            glBindTexture(GL_TEXTURE_2D, 0);
-            stbi_image_free(data);
-        }
-    
+        Mesh curr_mesh;
 
         for (const auto& index : shape.mesh.indices) {
             Vertex vertex = {};
@@ -98,25 +45,42 @@ bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
 
             if (!attrib.texcoords.empty()) {
                 vertex.tex_coord[0] = attrib.texcoords[2 * index.texcoord_index + 0];
-                vertex.tex_coord[1] = 1.0f - attrib.texcoords[2 * index.texcoord_index + 1]; //uvs invertidos
+                vertex.tex_coord[1] = attrib.texcoords[2 * index.texcoord_index + 1];
             }
 
             vertex.materialID = materialIndex;
 
-            currentMesh.vertices.push_back(vertex);
-            currentMesh.indices.push_back(static_cast<unsigned int>(currentMesh.indices.size()));
+            curr_mesh.vertices.push_back(vertex);
+            curr_mesh.indices.push_back(static_cast<unsigned int>(curr_mesh.indices.size()));
         }
 
-        meshes.push_back(currentMesh);
+        if (textureFolder != "") {
+            materialIndex = shape.mesh.material_ids.empty() ? -1 : shape.mesh.material_ids[0];
+
+            if (materialIndex >= 0 && materialIndex < materials.size()) {
+                const auto& material = materials[materialIndex];
+
+                if (!material.diffuse_texname.empty()) {
+                    std::string texturePath = textureFolder + "/" + material.diffuse_texname;
+
+                    Texture tex;
+                    if (tex.loadTexture(texturePath)) {
+                        curr_mesh.textures.push_back(tex);
+                    }
+                }
+            }
+        }
+        meshes.push_back(curr_mesh);
     }
 
     return true;
 }
 
-GLuint Mesh::getTextureID(int shape_index)
+Texture Mesh::getTexture(int index)
 {
-    if (shape_index >= 0 && shape_index < shapeTextureIDs.size()) {
-        return shapeTextureIDs[shape_index];
+    if (index >= 0 && index < textures.size()) {
+        return textures[index];
     }
-    return 0;
+
+    return Texture();
 }

@@ -137,13 +137,11 @@ void Render::renderMesh(RenderData &rd)
         glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Texture
-        glActiveTexture(GL_TEXTURE0);
-        rd.render_comp.textureID = mesh.getTextureID(0);
-        if (rd.render_comp.textureID != 0) {
-            glBindTexture(GL_TEXTURE_2D, rd.render_comp.textureID);
-            glUniform1i(glGetUniformLocation(rd.render_comp.program_, "texture1"), 0);
-        }
-        // ---
+        //glActiveTexture(GL_TEXTURE0);
+        //rd.render_comp.texture = mesh.getTexture(0);
+        //rd.render_comp.texture.bind(0);
+        //glUniform1i(glGetUniformLocation(rd.render_comp.program_, "texture1"), 0);
+        //// ---
 
         glBindVertexArray(rd.render_comp.mesh_->VAO);
         glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
@@ -198,12 +196,12 @@ void Render::initMeshBuffers(ECSManager& ecs) {
 
 }
 
-void Render::renderSystem(RenderData& rd) {
+void Render::renderSystem(ECSManager& ecs, RenderData& rd) {
 
-    auto ri = rd.ecs.getComponentList<RenderComponent>().begin();
-    auto ti = rd.ecs.getComponentList<TransformComponent>().begin();
-    auto riend = rd.ecs.getComponentList<RenderComponent>().end();
-    auto tiend = rd.ecs.getComponentList<TransformComponent>().end();
+    auto ri = ecs.getComponentList<RenderComponent>().begin();
+    auto ti = ecs.getComponentList<TransformComponent>().begin();
+    auto riend = ecs.getComponentList<RenderComponent>().end();
+    auto tiend = ecs.getComponentList<TransformComponent>().end();
 
     for (; ri != riend && ti != tiend; ++ri, ++ti) {
         if (ri->has_value() && ti->has_value()) {
@@ -232,11 +230,9 @@ void Render::renderSystem(RenderData& rd) {
 
                 // For Texture
                 glActiveTexture(GL_TEXTURE0);
-                render_comp->textureID = mesh.getTextureID(0);
-                if (render_comp->textureID != 0) {
-                    glBindTexture(GL_TEXTURE_2D, render_comp->textureID);
-                    glUniform1i(glGetUniformLocation(render_comp->program_, "texture1"), 0);
-                }
+                render_comp->texture = mesh.getTexture(0);
+                render_comp->texture.bind();
+                glUniform1i(glGetUniformLocation(render_comp->program_, "texture1"), 0);
 
                 //--
                 glBindVertexArray(mesh.VAO);
@@ -286,7 +282,8 @@ void Render::renderSkyBox(RenderData& rd)
     glm::mat4 model = rotation; 
 
     glUseProgram(rd.render_comp.skybox_program_);
-    glBindTexture(GL_TEXTURE_2D, rd.render_comp.cubemap_tex);
+    rd.render_comp.cubemap_tex.bind();
+    glUniform1i(glGetUniformLocation(rd.render_comp.skybox_program_, "skybox"), 0);
     glActiveTexture(GL_TEXTURE0);
 
     // For shader --

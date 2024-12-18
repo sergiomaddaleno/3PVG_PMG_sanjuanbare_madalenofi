@@ -8,6 +8,8 @@
 #include <iostream>
 #include <vector>
 #include <../deps/glm/glm.hpp>
+#include "texture.h"
+
 
 struct Vertex {
     glm::vec3 pos;
@@ -20,11 +22,18 @@ struct Vertex {
 class Mesh {
 public:
     std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    std::vector<GLuint> shapeTextureIDs;
     std::vector<Mesh> meshes;
+    std::vector<Texture> textures;
+
+    std::vector<unsigned int> indices;
     GLuint VAO = 0, VBO = 0, EBO = 0;
-  
+
+    bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
+
+    Texture getTexture(int shape_index);
+
+    //--
+
     Mesh() {
         VAO = 0;
         VBO = 0;
@@ -36,14 +45,6 @@ public:
         if (VBO != 0) glDeleteBuffers(1, &VBO);
         if (EBO != 0) glDeleteBuffers(1, &EBO);
     };
-
-    bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
-
-    GLuint getTextureID(int shape_index);
-
-private:
-    GLuint shapeTextureID = 0;
-
 };
 
 #endif // MSL

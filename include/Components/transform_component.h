@@ -12,7 +12,7 @@ struct TransformComponent{
     glm::vec3 scale;
     float angle;
 
-    void moveEntity(Input& input, float dt, float speed = 0.01f) {
+    void moveEntity(Input& input, float dt, float speed = 0.001f) {
 
         if (input.isKeyDown(Input::LEFT)) {
             position.x -= (speed * dt);

@@ -28,6 +28,8 @@ std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 Render render_;
 RenderData rd;
 LuaScript ls;
+Texture skyboxTex;
+ECSManager ecs;
 
 char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
 char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
@@ -37,7 +39,7 @@ char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
 char* vs_source_sky = (char*)ReadFile("../assets/shaders/vs_skybox.vs");
 char* fs_source_sky = (char*)ReadFile("../assets/shaders/fs_skybox.fs");
 
-char* dds_tex = ReadFile("../assets/textures/skybox/sky.dds");
+char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
 char* lua_file = ReadFile("../scripts/settings.lua");
 
 GLuint normal_progrm = 0;
@@ -93,14 +95,14 @@ int main(int, char**) {
     //lua script settings
     ls.run(lua_file);
 
+    ls.get_table("graphics");
+    float fov = ls.get_float("fov");
+    ls.pop();
+
     ls.get_table("window");
     int w_width = ls.get_integer("window_width");
     int w_height = ls.get_integer("window_height");
     bool full_screen = ls.get_bool("full_screen");
-    ls.pop();
-
-    ls.get_table("graphics");
-    float fov = ls.get_float("fov");
     ls.pop();
 
     rd.w_width = w_width;
@@ -125,26 +127,28 @@ int main(int, char**) {
     render_.setupShader(normal_progrm, vs_normals, fs_normals);
 
     // ---
-    rd.render_comp.cubemap_tex = UploadTexture(dds_tex);
+    if (skyboxTex.loadSkybox(dds_file)) {
+        rd.render_comp.cubemap_tex = skyboxTex.getTexture();
+    }
     render_.setupShader(rd.render_comp.skybox_program_, vs_source_sky, fs_source_sky);
     // ---
 
-    auto e = rd.ecs.create_entity();
+    auto e = ecs.create_entity();
 
-    rd.ecs.add_component_type<RenderComponent>();
-    rd.ecs.add_component_type<TransformComponent>();
+    ecs.add_component_type<RenderComponent>();
+    ecs.add_component_type<TransformComponent>();
 
-    rd.ecs.add_component<RenderComponent>(e);
-    rd.ecs.add_component<TransformComponent>(e);
+    ecs.add_component<RenderComponent>(e);
+    ecs.add_component<TransformComponent>(e);
 
-    rd.ecs.get_component<RenderComponent>(e)->mesh_ = car_mesh;
-    rd.ecs.get_component<TransformComponent>(e)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
-    rd.ecs.get_component<TransformComponent>(e)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
-    rd.ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
-    rd.ecs.get_component<RenderComponent>(e)->program_ = texture_program;
+    ecs.get_component<RenderComponent>(e)->mesh_ = car_mesh;
+    ecs.get_component<TransformComponent>(e)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
+    ecs.get_component<TransformComponent>(e)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+    ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
+    ecs.get_component<RenderComponent>(e)->program_ = texture_program;
 
 
-    render_.initMeshBuffers(rd.ecs);
+    render_.initMeshBuffers(ecs);
 
     InitImGui(window->getWindow());
 
@@ -162,9 +166,9 @@ int main(int, char**) {
         rd.cam.update(input, dt, rd.w_width, rd.w_height);
 
         render_.renderSkyBox(rd);
-        render_.renderSystem(rd);
+        render_.renderSystem(ecs, rd);
 
-        MyImGui(rd.ecs.get_component<RenderComponent>(e)->program_);
+        MyImGui(ecs.get_component<RenderComponent>(e)->program_);
 
         if (window->closePressed()) done = true;
     }
