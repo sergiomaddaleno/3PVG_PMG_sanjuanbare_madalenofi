@@ -1,44 +1,52 @@
 
+#include "mesh.h"
+#include "render.h"
+
 #include "window.h"
 #include <optional>
 #include <string>
-#include "..\include\mesh.h"
-#include "..\include\render.h"
-#include "..\include\Components\transform_component.h"
 
-std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
+#include "utils.h"
+#include <../deps/glm/glm.hpp>
+
+std::shared_ptr<Mesh> mesh_ = std::make_shared<Mesh>();
 
 Render render_;
-ShaderBuffers shaders = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shaders);
+char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
+char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
 
 int main(int, char**) {
-
-	if (!mesh_->LoadOBj("../assets/obj/SM_Teapot.obj")) {
-		return -1;
-	}
 	
 	//---
 	auto window = Window::make(800, 600, "Window");
-	window->SetWindowActive();
+	window->setWindowActive();
 	//---
 
 	auto render = render_.make();
 
-	TransformComponent tr;
-	tr.position = Vec3{ 0.0f, -1.0f, -5.0f };
-	tr.scale = Vec3{ 6.0f, 6.0f, 6.0f };
-	tr.rotation = Vec3{ 0.0f, 1.0f, 0.0f };
+	if (!mesh_->loadOBJ("../assets/obj/SM_Teapot.obj")) {
+		return -1;
+	}
 
+	RenderData rd;
+	rd.render_comp.mesh_ = mesh_;
+	rd.transf_comp.position = glm::vec3{ 0.0f, -2.0f, -5.0f };
+	rd.transf_comp.scale = glm::vec3{ 5.0f, 5.0f, 5.0f };
+	rd.transf_comp.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+
+	render_.setupShader(rd.render_comp.program_, vs_normals, fs_normals);
+
+	double lastTime = window->getTime();
 	bool done = false;
 	while (!done) {
+		double currentTime = window->getTime();
+		float dt = float(currentTime - lastTime);
+		window->updateWindow();
 
-		float angle = (float)glfwGetTime() * 2;
-		tr.angle = angle;
+		float angle = (float)window->getTime() * 2;
+		rd.transf_comp.angle = angle;
 
-		render_.SetupShader(shaders);
-		render_.RenderMesh(mesh_, tr);
-
-		window->UpdateWindow();
+		render_.renderMesh(rd);
 
 		if (window->closePressed()) done = true;
 	}

@@ -1,73 +1,51 @@
 
-#include "../include/triangle.h"
-#include "../include/window.h"
-#include "..\include\render.h"
-#include "..\include\input.h"
-#include "..\include\Components\transform_component.h"
-#include <../deps/linmath.h>
+#include "window.h"
+#include "triangle.h"
+#include "render.h"
+#include "input.h"
+#include "utils.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <optional>
 #include <string>
+#include <../deps/glm/glm.hpp>
 
-vec2 arrow_dir = { 0.0f, 0.0f };;
-float move_speed = 0.05;
+glm::vec2 arrow_dir = { 0.0f, 0.0f };
 
-void MoveTriangle(Input& input) {
-
-    if (input.isKeyPressed(Input::LEFT)) {
-        arrow_dir[0] -= move_speed;
-    }
-
-    if (input.isKeyPressed(Input::RIGHT)) {
-        arrow_dir[0] += move_speed;
-    }
-
-    if (input.isKeyPressed(Input::UP)) {
-        arrow_dir[1] += move_speed;
-    }
-
-    if (input.isKeyPressed(Input::DOWN)) {
-        arrow_dir[1] -= move_speed;
-    }
-}
+char* vs_tri = (char*)ReadFile("../assets/shaders/vs_triangle.vs");
+char* fs_tri = (char*)ReadFile("../assets/shaders/fs_triangle.fs");
 
 int main(int, char**) {
 
-    //--- Window
     auto window = Window::make(800, 600, "Window");
-    window->SetWindowActive();
-    //---
+    window->setWindowActive();
+
+    Input input{ window->getWindow() };
 
     //--- Triangle
-    auto tri_ = Triangle::make(0.5f, Triangle::Color::Yellow);    
+    auto tri_ = Triangle::make(0.5f, Triangle::Color::Blue);    
 
-    Render r;
-    auto render = r.make();
-    ShaderBuffers shaders = r.initShader("../assets/shaders/vs_triangle.vs", "../assets/shaders/fs_triangle.fs", shaders);
+    Render render_;
+    render_.make();
 
-    //--- Input
-    Input input{ window->GetWindow() };
+    RenderData rd;
+    rd.render_comp.triangle_ = std::make_shared<Triangle>(*tri_);
+    rd.transf_comp.position = glm::vec3{ arrow_dir.x, arrow_dir.y, 0.0f };
+    rd.transf_comp.scale = glm::vec3{ 2.0f, 2.0f, 2.0f };
 
-    TransformComponent tr;
+    render_.setupShader(rd.render_comp.program_, vs_tri, fs_tri);
 
+    double lastTime = window->getTime();
     bool done = false;
     while (!done) {
-
-        //Triangle
-        MoveTriangle(input);
-        //---
+        double currentTime = window->getTime();
+        float dt = float(currentTime - lastTime);
+        window->updateWindow();
        
-        tr.position = Vec3{ arrow_dir[0], arrow_dir[1], 0.0f};
-        tr.scale = Vec3{ 2.0f, 2.0f, 2.0f };
-
-        //Render of triangle
-        r.SetupShader(shaders);
-        r.RenderDrawTriangle(tri_->my_triangle, tr);
-
-        window->UpdateWindow();
+        rd.transf_comp.moveEntity(input, dt);
+        render_.renderGeometry(rd);
 
         if (window->closePressed()) done = true;
     }

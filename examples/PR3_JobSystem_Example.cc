@@ -1,8 +1,13 @@
 
 #include "window.h"
-#include "..\include\mesh.h"
-#include "..\include\render.h"
-#include "..\include\job_sistem.h"
+#include "mesh.h"
+#include "render.h"
+#include "job_sistem.h"
+#include "input.h"
+
+#include <../deps/glm/glm.hpp>
+#include "utils.h"
+
 #include <iostream>
 #include <memory>
 #include <future>
@@ -11,8 +16,6 @@
 #include <thread>
 #include <optional>
 #include <string>
-#include "..\include\input.h"
-#include "..\include\Components\transform_component.h"
 
 std::vector<std::string> meshFiles = {
         "../assets/obj/SM_Suzanne.obj",
@@ -20,45 +23,53 @@ std::vector<std::string> meshFiles = {
         "../assets/obj/Mario.obj",
 };
 
-std::unique_ptr<Mesh> mesh_ = std::make_unique<Mesh>();
+std::shared_ptr<Mesh> mesh_ = std::make_shared<Mesh>();
 std::future<std::unique_ptr<Mesh>> monetemesh;
 
 JobSystem jb;
 
 Render render_;
-ShaderBuffers shaders = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shaders);
+char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
+char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
 
 int currentMeshIndex = 0;
 bool loadingNewMesh = false;
 
 int main(int, char**) {
     
-    if (!mesh_->LoadOBj(meshFiles[currentMeshIndex],"l")) {
+    if (!mesh_->loadOBJ(meshFiles[currentMeshIndex],"l")) {
         return -1;
     }
 
     //---
     auto window = Window::make(800, 600, "Window");
-    window->SetWindowActive();
+    window->setWindowActive();
 
     auto render = render_.make();
     //---
 
-    Input input{ window->GetWindow() };
+    Input input{ window->getWindow() };
 
-    TransformComponent tr_;
-    tr_.rotation = Vec3{ 0.0f, 1.0f, 0.0f };   
+    RenderData rd;
+    rd.transf_comp.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };  
+    rd.transf_comp.scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
+    rd.transf_comp.position = glm::vec3{ 0.0f, -3.0f, 0.0f };
+
+    render_.setupShader(rd.render_comp.program_, vs_normals, fs_normals);
 
     //---
 
-
+    double lastTime = window->getTime();
     bool done = false;
     while (!done) {
+        double currentTime = window->getTime();
+        float dt = float(currentTime - lastTime);
+        window->updateWindow();
 
-        float angle = (float)glfwGetTime() * 2;
-        tr_.angle = angle;
+        rd.render_comp.mesh_ = mesh_;
 
-        input.pollEvents();
+        float angle = (float)window->getTime() * 2;
+        rd.transf_comp.angle = angle;
       
         if (input.isKeyPressed(Input::RIGHT) && !loadingNewMesh) {
 
@@ -69,7 +80,7 @@ int main(int, char**) {
             monetemesh = jb.Add_Task([nextMeshFile]() {
 
                 std::unique_ptr<Mesh> newMesh = std::make_unique<Mesh>();
-                if (newMesh->LoadOBj(nextMeshFile,"s")) {
+                if (newMesh->loadOBJ(nextMeshFile,"s")) {
                     printf("Malla cargada: %s\n", nextMeshFile.c_str());
                     return newMesh;
                 }
@@ -81,7 +92,7 @@ int main(int, char**) {
         }
 
         if (loadingNewMesh) {
-            std::unique_ptr<Mesh> loadedMesh = monetemesh.get();
+            std::shared_ptr<Mesh> loadedMesh = monetemesh.get();
             if (loadedMesh) {
 
                 mesh_ = std::move(loadedMesh);
@@ -93,11 +104,8 @@ int main(int, char**) {
             loadingNewMesh = false;
         }
     
-        render_.SetupShader(shaders);
-        render_.RenderMesh(mesh_, tr_);
+        render_.renderMesh(rd);
 
-        window->UpdateWindow();
-       
         if (window->closePressed()) done = true;
     }
 

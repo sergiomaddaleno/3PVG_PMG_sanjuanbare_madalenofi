@@ -67,7 +67,7 @@ configurations { "Debug", "Release", "RelWithDebInfo" }
 architecture "x64"
 location "build"
 cppdialect "c++20"
-startproject "PR0_Window"
+startproject "MyMotor"
 filter "configurations:Debug"
 defines { "DEBUG" }
 symbols "On"
@@ -110,34 +110,95 @@ project"PR0_Window"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs "include"
+includedirs { "include", "deps/imgui" } 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
-		"include/*.h",
-		"include/Components/*.h",
-		"examples/PR0_Window_Example.cc"
+	"include/*.h",
+	"src/**/*.cc",
+	"include/**/*.h",
+	"deps/**/*.h",
+	"deps/**/*.hpp",
+	"deps/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/*.h",
+	"assets/shaders/**/*.vs",
+	"assets/shaders/**/*.fs",
+	"assets/shaders/*.vs",
+	"assets/shaders/*.fs",
+	"assets/textures/**/*.png",
+	"assets/textures/**/*.mtl",
+	"assets/textures/**/*.dds",
+	"assets/obj/**",
+	"scripts/*.lua",
+	"examples/PR0_Window_Example.cc"
 }
 ------
+project"MyMotor"
+
+kind "ConsoleApp"
+language "C++"
+targetdir "build/%{prj.name}/%{cfg.buildcfg}"
+includedirs { "include", "deps/imgui" } 
+links "Motor"
+conan_config_exec("Debug")
+conan_config_exec("Release")
+conan_config_exec("RelWithDebInfo")
+debugargs { _MAIN_SCRIPT_DIR .. "/src" }
+files { "src/*.cc",
+	"include/*.h",
+	"src/**/*.cc",
+	"include/**/*.h",
+	"deps/**/*.h",
+	"deps/**/*.hpp",
+	"deps/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/*.h",
+	"assets/shaders/**/*.vs",
+	"assets/shaders/**/*.fs",
+	"assets/shaders/*.vs",
+	"assets/shaders/*.fs",
+	"assets/textures/**/*.png",
+	"assets/textures/**/*.mtl",
+	"assets/textures/**/*.dds",
+	"assets/obj/**",
+	"scripts/*.lua",
+	"examples/mymotor.cc"
+}
 
 project"PR1_Triangle"
 
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs "include"
+includedirs { "include", "deps/imgui" } 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
-		"include/*.h",
-		"include/Components/*.h",
-		"examples/PR1_Triangle_Example.cc"
+	"include/*.h",
+	"src/**/*.cc",
+	"include/**/*.h",
+	"deps/**/*.h",
+	"deps/**/*.hpp",
+	"deps/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/*.h",
+	"assets/shaders/**/*.vs",
+	"assets/shaders/**/*.fs",
+	"assets/shaders/*.vs",
+	"assets/shaders/*.fs",
+	"assets/textures/**/*.png",
+	"assets/textures/**/*.mtl",
+	"assets/textures/**/*.dds",
+	"assets/obj/**",
+	"scripts/*.lua",
+	"examples/PR1_Triangle_Example.cc"
 }
 
 project"PR2_MeshLoad"
@@ -145,16 +206,31 @@ project"PR2_MeshLoad"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs "include"
+includedirs { "include", "deps/imgui" } 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
-		"include/*.h",
-		"include/Components/*.h",
-		"examples/PR2_MeshLoad_Example.cc"
+	"include/*.h",
+	"src/**/*.cc",
+	"include/**/*.h",
+	"deps/**/*.h",
+	"deps/**/*.hpp",
+	"deps/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/*.h",
+	"assets/shaders/**/*.vs",
+	"assets/shaders/**/*.fs",
+	"assets/shaders/*.vs",
+	"assets/shaders/*.fs",
+	"assets/textures/**/*.png",
+	"assets/textures/**/*.mtl",
+	"assets/textures/**/*.dds",
+	"assets/obj/**",
+	"scripts/*.lua",
+	"examples/PR2_MeshLoad_Example.cc"
 }
 
 project"PR3_JobSystem"
@@ -162,16 +238,31 @@ project"PR3_JobSystem"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs "include"
+includedirs { "include", "deps/imgui" } 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
-		"include/*.h",
-		"include/Components/*.h",
-		"examples/PR3_JobSystem_Example.cc"
+	"include/*.h",
+	"src/**/*.cc",
+	"include/**/*.h",
+	"deps/**/*.h",
+	"deps/**/*.hpp",
+	"deps/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/*.h",
+	"assets/shaders/**/*.vs",
+	"assets/shaders/**/*.fs",
+	"assets/shaders/*.vs",
+	"assets/shaders/*.fs",
+	"assets/textures/**/*.png",
+	"assets/textures/**/*.mtl",
+	"assets/textures/**/*.dds",
+	"assets/obj/**",
+	"scripts/*.lua",
+	"examples/PR3_JobSystem_Example.cc"
 }
 
 project"PR4_ECSManager"
@@ -179,14 +270,62 @@ project"PR4_ECSManager"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs "include"
+includedirs { "include", "deps/imgui" } 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { "src/*.cc",
-		"include/*.h",
-		"include/Components/*.h",
-		"examples/PR4_ECSManager_Example.cc"
+	"include/*.h",
+	"src/**/*.cc",
+	"include/**/*.h",
+	"deps/**/*.h",
+	"deps/**/*.hpp",
+	"deps/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/*.h",
+	"assets/shaders/**/*.vs",
+	"assets/shaders/**/*.fs",
+	"assets/shaders/*.vs",
+	"assets/shaders/*.fs",
+	"assets/textures/**/*.png",
+	"assets/textures/**/*.mtl",
+	"assets/textures/**/*.dds",
+	"assets/obj/**",
+	"scripts/*.lua",
+	"examples/PR4_ECSManager_Example.cc",
+}
+
+project"PR5_Scripting"
+
+kind "ConsoleApp"
+language "C++"
+targetdir "build/%{prj.name}/%{cfg.buildcfg}"
+includedirs { "include", "deps/imgui" } 
+links "Motor"
+conan_config_exec("Debug")
+conan_config_exec("Release")
+conan_config_exec("RelWithDebInfo")
+debugargs { _MAIN_SCRIPT_DIR .. "/src" }
+files { 
+	"src/*.cc",
+	"include/*.h",
+	"src/**/*.cc",
+	"include/**/*.h",
+	"deps/**/*.h",
+	"deps/**/*.hpp",
+	"deps/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/*.h",
+	"assets/shaders/**/*.vs",
+	"assets/shaders/**/*.fs",
+	"assets/shaders/*.vs",
+	"assets/shaders/*.fs",
+	"assets/textures/**/*.png",
+	"assets/textures/**/*.mtl",
+	"assets/textures/**/*.dds",
+	"assets/obj/**",
+	"scripts/*.lua",
+	"examples/PR5_Scripting_Example.cc",
 }

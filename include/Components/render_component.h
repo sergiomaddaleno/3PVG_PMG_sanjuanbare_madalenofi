@@ -2,41 +2,40 @@
 #define RNC
 
 #include <memory>
+#include "..\include\render.h"
+#include "triangle.h"
+#include "texture.h"
 
 class Mesh;
 
 struct RenderComponent {
-    std::shared_ptr<Mesh> render_mesh;
 
-    //GLuint textureID;
-    //// Puntero a la malla que se va a renderizar
-    //GLuint VAO = 0; // Inicializar VAO a 0
-    //GLuint VBO = 0; // Inicializar VBO a 0
-    //GLuint EBO = 0; // Inicializar EBO a 0
+    std::shared_ptr<Mesh> mesh_;
+    std::shared_ptr<Triangle> triangle_;
 
-    RenderComponent() = default;
+    GLuint program_ = 0;
+    GLuint skybox_program_ = 0;
+
+    Texture texture;
+    Texture cubemap_tex;
+
+    RenderComponent() : mesh_(nullptr), triangle_(nullptr), program_(0), skybox_program_(0) {}
+
+    ~RenderComponent() {}
 
     RenderComponent(const RenderComponent& other)
-        : render_mesh(other.render_mesh ? std::make_shared<Mesh>(*other.render_mesh) : nullptr)
-        //VAO(0), VBO(0), EBO(0) 
-        {} 
+        : mesh_(other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr),
+        triangle_(other.triangle_), texture(other.texture), cubemap_tex(other.cubemap_tex) {}
 
     RenderComponent& operator=(const RenderComponent& other) {
         if (this != &other) {
-            render_mesh = other.render_mesh ? std::make_shared<Mesh>(*other.render_mesh) : nullptr;
-
-            /*VAO = 0;
-            VBO = 0;
-            EBO = 0;*/
+            mesh_ = other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr;
+            triangle_ = other.triangle_;
+            texture = other.texture;
+            cubemap_tex = other.cubemap_tex;
         }
         return *this;
     }
-
-    ~RenderComponent(){
-        /*if (VAO != 0) glDeleteVertexArrays(1, &VAO);
-        if (VBO != 0) glDeleteBuffers(1, &VBO);
-        if (EBO != 0) glDeleteBuffers(1, &EBO);*/
-    }
-        };
+};
 
 #endif

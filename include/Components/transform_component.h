@@ -2,25 +2,39 @@
 #define TRNS
 
 #include "..\include\input.h"
+#include <../deps/glm/glm.hpp>
 
-struct Vec3 {
-    float x, y, z;
-
-    Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
-    Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
-    Vec3(const Vec3& other) : x(other.x), y(other.y), z(other.z) {}
-};
 
 struct TransformComponent{
-    Vec3 position;
-    Vec3 rotation;
-    Vec3 scale;
+
+    glm::vec3 position;
+    glm::vec3 rotation;
+    glm::vec3 scale;
     float angle;
 
+    void moveEntity(Input& input, float dt, float speed = 0.001f) {
 
-    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f), angle(0.0f) {}
+        if (input.isKeyDown(Input::LEFT)) {
+            position.x -= (speed * dt);
+        }
 
-    TransformComponent(Vec3 position_, Vec3 rotation_, Vec3 scale_, float angle_)
+        if (input.isKeyDown(Input::RIGHT)) {
+            position.x += (speed * dt);
+        }
+
+        if (input.isKeyDown(Input::UP)) {
+            position.y += (speed * dt);
+        }
+
+        if (input.isKeyDown(Input::DOWN)) {
+            position.y -= (speed * dt);
+        }
+    }
+
+    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(0.0f, 0.0f, 1.0f), scale(1.0f, 1.0f, 1.0f), angle(0.0f) {}
+    ~TransformComponent() {}
+
+    TransformComponent(glm::vec3 position_, glm::vec3 rotation_, glm::vec3 scale_, float angle_)
         : position(position_), rotation(rotation_), scale(scale_), angle(angle_) {}
 
     TransformComponent(const TransformComponent& other)
@@ -36,25 +50,6 @@ struct TransformComponent{
         return *this;
     }
 
-    void MoveEntity(Input& input, float value) {
-
-        if (input.isKeyDown(Input::LEFT)) {
-            position.x -= value;
-        }
-
-        if (input.isKeyDown(Input::RIGHT)) {
-            position.x += value;
-        }
-
-        if (input.isKeyDown(Input::UP)) {
-            position.y += value;
-        }
-
-        if (input.isKeyDown(Input::DOWN)) {
-            position.y -= value;
-        }
-    }
-
 };
 
-#endif // TRNS
+#endif

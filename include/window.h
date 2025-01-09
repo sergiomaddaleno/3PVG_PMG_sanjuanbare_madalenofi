@@ -6,8 +6,9 @@
 #include <GLFW/glfw3.h>
 #include <optional>
 #include <string>
+#include <input.h>
 
-#include <../deps/linmath.h>
+#include <../deps/glm/glm.hpp>
 
 class WindowSystem {
 
@@ -26,21 +27,33 @@ class Window {
 public:
 	GLFWwindow* window_;
 
-	Window(GLFWwindow* window) { window_ = window; }
+	Window(GLFWwindow* window) : width_(800), height_(600) { window_ = window; }
 
-	static std::optional<Window> make(int x, int y, const std::string& name);
+	static std::optional<Window> make(int x, int y, const std::string& name, bool full_screen = false);
+
+	void updateWindow();
+
+	void setResizeCallback();
+
+	bool toggleFullScreen(Input &input, Input::Keys key = Input::Keys::F11);
+
+	void colorWindow(const glm::vec4& Color);
 
 	bool closePressed();
 
-	void SetWindowActive() { glfwMakeContextCurrent(window_); }
+	//---
+	void setWindowActive();
 
-	void ColorWindow(const vec4& Color);
+	double getTime();
 
-	void UpdateWindow();
+	GLFWwindow* getWindow() const { return window_; }
 
-	GLFWwindow* GetWindow() const { return window_; }
+	int getWidth() const { return width_; }
+	int getHeight() const { return height_; }
 
-	Window(Window&& other) {
+	//---
+
+	Window(Window&& other) noexcept {
 		window_ = other.window_;
 		other.window_ = nullptr;
 	}
@@ -52,6 +65,11 @@ public:
 	}
 
 private:
+
+	int width_ = 0;
+	int height_ = 0;
+	bool full_screen = false;
+
 	//Window(GLFWwindow* window) : window_(window) {}
 	//Window(const Window&) = delete;
 	//Window& operator=(const Window&) = delete;

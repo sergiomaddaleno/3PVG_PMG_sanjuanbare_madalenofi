@@ -1,52 +1,61 @@
-#include "window.h"
+
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include <optional>
 #include <string>
-#include "..\include\mesh.h"
-#include "..\include\render.h"
-#include "..\include\Components\transform_component.h"
-#include "..\include\Components\render_component.h"
-#include "..\include\input.h"
+#include <../deps/glm/glm.hpp>
 
+#include "window.h"
+#include "mesh.h"
+#include "render.h"
+#include "input.h"
 #include "ecs_manager.h"
+#include "utils.h"
+
 #define M_PI 3.14159265358979323846
 
-std::shared_ptr<Mesh> mesh_ = std::make_shared<Mesh>();
-std::shared_ptr<Mesh> mesh_2 = std::make_shared<Mesh>();
-std::shared_ptr<Mesh> mesh_3 = std::make_shared<Mesh>();
+std::shared_ptr<Mesh> teapot_mesh = std::make_shared<Mesh>();
+std::shared_ptr<Mesh> toad_mesh = std::make_shared<Mesh>();
+std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
-ECSManager ecs;
 Render render_;
-ShaderBuffers shaders = render_.initShader("../assets/shaders/vs_texture.vs", "../assets/shaders/fs_texture.fs", shaders);
-//ShaderBuffers shaders = render_.initShader("../assets/shaders/vertex_normals.vs", "../assets/shaders/fragment_normals.fs", shaders);
+RenderData rd;
+ECSManager ecs;
 
-vec2 arrow_dir = { 0.0f, 0.0f };;
-float move_speed = 0.05;
+char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
+char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
+
+char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
+char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
+
+int num_entities = 5000;
+glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
+
+GLuint program_tex = 0;
+GLuint program_normals = 0;
 
 int main(int, char**) {
-    /*
-    if (!mesh_->LoadOBj("../assets/obj/Mario.obj", "C:/Users/pc000/Documents/GitHub/3PVG_PMG_sanjuanbare_madalenofi/assets/obj/")) {
-        return -1;
-    }
-
-    if (!mesh_2->LoadOBj("../assets/obj/Mario.obj", "C:/Users/pc000/Documents/GitHub/3PVG_PMG_sanjuanbare_madalenofi/assets/obj/")) {
-        return -1;
-    }
-    */
-    if (!mesh_3->LoadOBj("../assets/obj/Mario.obj", "../assets/textures/mario")) {
-        return -1;
-    }
-    // ---
+   
     auto window = Window::make(800, 600, "Window");
-    window->SetWindowActive();
+    window->setWindowActive();
 
     auto render = render_.make();
 
-    // ---
-
-    Input input{ window->GetWindow() };
+    Input input{ window->getWindow() };
 
     // ---
+    if (!toad_mesh->loadOBJ("../assets/obj/toad.obj", "../assets/textures/toad")) {
+        return -1;
+    }
+
+    if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
+        return -1;
+    }
+
+    if (!teapot_mesh->loadOBJ("../assets/obj/SM_Teapot.obj", "../assets/textures/toad")) {
+       return -1;
+    }
 
     auto j = ecs.create_entity();
 
@@ -55,35 +64,62 @@ int main(int, char**) {
 
     ecs.add_component<RenderComponent>(j);
     ecs.add_component<TransformComponent>(j);
-    ecs.get_component<RenderComponent>(j)->render_mesh = mesh_3;
-    ecs.get_component<TransformComponent>(j)->position = Vec3{ 0.0f, 1.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->rotation = Vec3{ 0.0f, 1.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->scale = Vec3{ 0.7f, 0.7f, 0.7f };
-    /*
-    for (int i = 1; i < 50; i++) {
+    ecs.get_component<RenderComponent>(j)->mesh_ = mario_mesh;
+    ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
+    ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+    ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
+
+    j++;
+
+    ecs.add_component<RenderComponent>(j);
+    ecs.add_component<TransformComponent>(j);
+    ecs.get_component<RenderComponent>(j)->mesh_ = toad_mesh;
+    ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 2.0f, 0.0f, 0.0f };
+    ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+    ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
+
+    for (int i = 2; i < num_entities; i++) {
         j++;
         ecs.add_component<RenderComponent>(j);
         ecs.add_component<TransformComponent>(j);
-        ecs.get_component<RenderComponent>(j)->render_mesh = mesh_;
-        ecs.get_component<TransformComponent>(j)->rotation = Vec3{ 0.0f, 1.0f, 0.0f };
-        ecs.get_component<TransformComponent>(j)->scale = Vec3{ 0.5f, 0.5f, 0.5f };        
+        ecs.get_component<RenderComponent>(j)->mesh_ = teapot_mesh;
+        ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+        ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.5f, 0.5, 0.5f };
     }
-    */
+
+    //---
+    render_.setupShader(program_tex, vs_texture, fs_texture);
+    render_.setupShader(program_normals, vs_normals, fs_normals);
+
+    ecs.get_component<RenderComponent>(0)->program_ = program_tex;
+    ecs.get_component<RenderComponent>(1)->program_ = program_tex;
+
+    for (int i = 2; i < num_entities; i++) {
+        ecs.get_component<RenderComponent>(i)->program_ = program_normals;
+    }
+    //---
+
+    render_.initMeshBuffers(ecs);
+
+    double lastTime = window->getTime();
     bool done = false;
     while (!done) {
-        window->UpdateWindow();
-        
-        float angle = (float)glfwGetTime();
-        /*
-        for (int i = 1; i < 50; i++) {
-            ecs.get_component<TransformComponent>(i)->angle = angle;
-            ecs.get_component<TransformComponent>(i)->position = Vec3{ cos(angle + (float)i) * 10, (sin(angle + (float)i) * 10) + 3.0f, -10.0f };
-        }
- */
-        ecs.get_component<TransformComponent>(0)->MoveEntity(input, 0.1f);
+        double currentTime = window->getTime();
+        float dt = float(currentTime - lastTime);
+        window->updateWindow();
+        window->colorWindow(color);
 
-        render_.SetupShader(shaders);
-        render_.RenderSystem(ecs.getComponentList<RenderComponent>(), ecs.getComponentList<TransformComponent>());
+        float angle = (float)window->getTime();
+
+        for (int i = 2; i < num_entities; i++) {
+            ecs.get_component<TransformComponent>(i)->angle = angle;
+            ecs.get_component<TransformComponent>(i)->position = glm::vec3{ cos(angle + (float)i) * 8, (sin(angle + (float)i) * 8), -10.0f };
+        }
+
+        ecs.get_component<TransformComponent>(0)->moveEntity(input, dt);
+        ecs.get_component<TransformComponent>(1)->moveEntity(input, dt);
+
+        render_.renderSystem(ecs, rd);
 
         if (window->closePressed()) done = true;
     }

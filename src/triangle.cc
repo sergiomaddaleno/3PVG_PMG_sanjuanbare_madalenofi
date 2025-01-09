@@ -1,10 +1,8 @@
 
 #include "..\include\triangle.h"
-#include <../deps/linmath.h>
 
 std::optional<Triangle> Triangle::make(float size_, Color color)
 {
-
 	PointsTriangle t[3];
 
     switch (color) {

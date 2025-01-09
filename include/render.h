@@ -4,51 +4,55 @@
 
 #include <optional>
 #include <string>
+#include <../deps/glm/glm.hpp>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <../deps/linmath.h>
+
 #include "triangle.h"
 #include "mesh.h"
-
+#include "camera.h"
+#include "ecs_manager.h"
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
 
-struct ShaderBuffers {
-	char* vs = nullptr;
-	char* fs = nullptr;
+struct RenderData {
+
+	Camera cam;
+	RenderComponent render_comp;
+	TransformComponent transf_comp;
+
+	int w_width = 800;
+	int w_height = 600;
+	float fov = 55.0f;
 };
 
 class Render {
 
 public:
-	
+
 	Render();
 
 	static std::optional<Render> make();
 
+	void setupShader(GLuint &program, const char* vertex_src, const char* fragment_src);
+	
+	// --- Normal Components
+	void renderGeometry(RenderData& rd);
+
+	void renderMesh(RenderData& rd);
+
+	void renderSkyBox(RenderData& rd);
+
+	// --- For ECS
+	void initMeshBuffers(ECSManager &ecs);
+
+	void renderSystem(ECSManager& ecs, RenderData& rd);
 	// ---
-	ShaderBuffers initShader(const char* vertex_shader_path, const char* fragment_shader_path,
-		ShaderBuffers &shaders);
 
-	void SetupShader(ShaderBuffers &shaders);
-	// ---
+private:
 
-	void RenderDrawTriangle(Triangle::PointsTriangle(&vertices)[3], TransformComponent tr);
-
-	void RenderMesh(std::unique_ptr<Mesh>& mesh, TransformComponent tr);
-
-	void RenderSystem(std::vector<std::optional<RenderComponent>>& rc, std::vector<std::optional<TransformComponent>>& tc);
-
-
-
-	GLuint GetProgram();
-
-protected:
-
-	GLuint program_;
-
-	mat4x4 model_, view_, projection_, mvp_;
-	GLuint VAO, VBO, EBO;
+	float skybox_angle;
 };
 
 #endif // PRT

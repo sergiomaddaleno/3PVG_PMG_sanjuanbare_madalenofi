@@ -4,7 +4,6 @@
 
 #include <optional>
 #include <string>
-#include <../deps/linmath.h>
 
 class Triangle {
 
@@ -25,15 +24,21 @@ public:
 
 	PointsTriangle my_triangle[3];   
 
-	Triangle(PointsTriangle t[3]) {
-		my_triangle[0] = t[0];
-		my_triangle[1] = t[1];
-		my_triangle[2] = t[2];
-	}
-
 	static std::optional<Triangle> make(float size_, Color color);
 
-	//PointsTriangle GetVertices() { }
+	// ---
+
+	Triangle(PointsTriangle t[3]) {
+		for (int i = 0; i < 3; ++i) {
+			my_triangle[i] = t[i];
+		}
+	}
+
+	Triangle(const Triangle& other) {
+        for (int i = 0; i < 3; ++i) {
+            my_triangle[i] = other.my_triangle[i];
+        }
+    }
 };
 
 #endif // PRT
