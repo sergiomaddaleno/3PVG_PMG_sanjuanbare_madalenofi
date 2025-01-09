@@ -53,7 +53,7 @@ int main(int, char**) {
         return -1;
     }
 
-    if (!teapot_mesh->loadOBJ("../assets/obj/SM_Teapot.obj")) {
+    if (!teapot_mesh->loadOBJ("../assets/obj/SM_Teapot.obj", "../assets/textures/toad")) {
        return -1;
     }
 

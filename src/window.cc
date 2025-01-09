@@ -54,7 +54,7 @@ void Window::setResizeCallback() {
 	glfwSetWindowUserPointer(window_, this);
 }
 
-void Window::toggleFullScreen(Input &input, Input::Keys key)
+bool Window::toggleFullScreen(Input& input, Input::Keys key)
 {
 	if (input.isKeyPressed(key))
 	{
@@ -63,16 +63,22 @@ void Window::toggleFullScreen(Input &input, Input::Keys key)
 			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
+			// fullscreen
 			glfwSetWindowMonitor(window_, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 			full_screen = true;
 		}
 		else
 		{
+			// windowed mode
 			glfwSetWindowMonitor(window_, NULL, 5, 40, 800, 600, 0);
 			full_screen = false;
 		}
+		return true;
 	}
+
+	return false;
 }
+
 
 bool Window::closePressed()
 {

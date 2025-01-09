@@ -15,8 +15,6 @@ struct Vertex {
     glm::vec3 pos;
     glm::vec3 normal;
     glm::vec2 tex_coord;
-
-    int materialID;
 };
 
 class Mesh {
@@ -26,6 +24,8 @@ public:
     std::vector<Texture> textures;
 
     std::vector<unsigned int> indices;
+    int materialID;
+
     GLuint VAO = 0, VBO = 0, EBO = 0;
 
     bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
@@ -34,11 +34,7 @@ public:
 
     //--
 
-    Mesh() {
-        VAO = 0;
-        VBO = 0;
-        EBO = 0;
-    };
+    Mesh() : VAO(0), VBO(0), EBO(0), materialID(0){};
 
     ~Mesh() {
         if (VAO != 0) glDeleteVertexArrays(1, &VAO);

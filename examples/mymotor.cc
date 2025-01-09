@@ -14,6 +14,7 @@
 #include "mesh.h"
 #include "render.h"
 #include "input.h"
+#include "post_processing.h"
 #include "utils.h"
 
 #include "ecs_manager.h"
@@ -30,6 +31,7 @@ RenderData rd;
 LuaScript ls;
 Texture skyboxTex;
 ECSManager ecs;
+PostProcessing postProcc;
 
 char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
 char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
@@ -38,6 +40,9 @@ char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
 
 char* vs_source_sky = (char*)ReadFile("../assets/shaders/vs_skybox.vs");
 char* fs_source_sky = (char*)ReadFile("../assets/shaders/fs_skybox.fs");
+
+char* vertex_pp = (char*)ReadFile("../assets/shaders/postprocess/vertex_pp.vs");
+char* grey_fs = (char*)ReadFile("../assets/shaders/postprocess/Grey.fs");
 
 char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
 char* lua_file = ReadFile("../scripts/settings.lua");
@@ -84,6 +89,8 @@ void MyImGui(GLuint& program) {
 
     ChangeShader(program);
 
+    ImGui::DragFloat("grey value", &postProcc.grey_value_, 0.01f, 0.0f, 1.0f, "%.3f");
+
     ImGui::End();
 
     ImGui::Render();
@@ -110,7 +117,7 @@ int main(int, char**) {
     rd.fov = fov;
     // --
 
-    auto window = Window::make(rd.w_width, rd.w_height, "Window", full_screen);
+    auto window = Window::make(rd.w_width, rd.w_height, "Window ", full_screen);
     window->setWindowActive();
     window->setResizeCallback();
 
@@ -152,23 +159,33 @@ int main(int, char**) {
 
     InitImGui(window->getWindow());
 
+    postProcc.setupShader(vertex_pp, grey_fs);
+    postProcc.initData();
+
     double lastTime = window->getTime();
     bool done = false;
     while (!done) {
         double currentTime = window->getTime();
         float dt = float(currentTime - lastTime);
         window->updateWindow();
-        window->toggleFullScreen(input);
-        
-        rd.w_width = window->getWidth();
-        rd.w_height = window->getHeight();
+        if (window->toggleFullScreen(input)) {
 
+            rd.w_width = window->getWidth();
+            rd.w_height = window->getHeight();
+
+            postProcc.resize(window->getWidth(), window->getHeight());
+        }
+
+        postProcc.BeginRender();
         rd.cam.update(input, dt, rd.w_width, rd.w_height);
 
         render_.renderSkyBox(rd);
         render_.renderSystem(ecs, rd);
 
         MyImGui(ecs.get_component<RenderComponent>(e)->program_);
+
+        postProcc.EndRender();
+        postProcc.Render();
 
         if (window->closePressed()) done = true;
     }

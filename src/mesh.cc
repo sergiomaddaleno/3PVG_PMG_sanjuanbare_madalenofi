@@ -17,7 +17,6 @@ bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
-    int materialIndex=0;
 
     bool obj = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file.c_str(), textureFolder.c_str());
     if (!obj) {
@@ -30,35 +29,35 @@ bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
     for (const auto& shape : shapes) {
         Mesh curr_mesh;
 
+        //For mesh
         for (const auto& index : shape.mesh.indices) {
             Vertex vertex = {};
 
-            vertex.pos[0] = attrib.vertices[3 * index.vertex_index + 0];
-            vertex.pos[1] = attrib.vertices[3 * index.vertex_index + 1];
-            vertex.pos[2] = attrib.vertices[3 * index.vertex_index + 2];
+            vertex.pos.x = attrib.vertices[3 * index.vertex_index + 0];
+            vertex.pos.y = attrib.vertices[3 * index.vertex_index + 1];
+            vertex.pos.z = attrib.vertices[3 * index.vertex_index + 2];
 
             if (!attrib.normals.empty()) {
-                vertex.normal[0] = attrib.normals[3 * index.normal_index + 0];
-                vertex.normal[1] = attrib.normals[3 * index.normal_index + 1];
-                vertex.normal[2] = attrib.normals[3 * index.normal_index + 2];
+                vertex.normal.x = attrib.normals[3 * index.normal_index + 0];
+                vertex.normal.y = attrib.normals[3 * index.normal_index + 1];
+                vertex.normal.z = attrib.normals[3 * index.normal_index + 2];
             }
 
             if (!attrib.texcoords.empty()) {
-                vertex.tex_coord[0] = attrib.texcoords[2 * index.texcoord_index + 0];
-                vertex.tex_coord[1] = attrib.texcoords[2 * index.texcoord_index + 1];
+                vertex.tex_coord.x = attrib.texcoords[2 * index.texcoord_index + 0];
+                vertex.tex_coord.y = attrib.texcoords[2 * index.texcoord_index + 1];
             }
-
-            vertex.materialID = materialIndex;
 
             curr_mesh.vertices.push_back(vertex);
             curr_mesh.indices.push_back(static_cast<unsigned int>(curr_mesh.indices.size()));
         }
 
+        //For textures ---
         if (textureFolder != "") {
-            materialIndex = shape.mesh.material_ids.empty() ? -1 : shape.mesh.material_ids[0];
+            materialID = shape.mesh.material_ids.empty() ? -1 : shape.mesh.material_ids[0];
 
-            if (materialIndex >= 0 && materialIndex < materials.size()) {
-                const auto& material = materials[materialIndex];
+            if (materialID >= 0 && materialID < materials.size()) {
+                const auto& material = materials[materialID];
 
                 if (!material.diffuse_texname.empty()) {
                     std::string texturePath = textureFolder + "/" + material.diffuse_texname;

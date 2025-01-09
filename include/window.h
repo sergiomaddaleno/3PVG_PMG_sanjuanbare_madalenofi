@@ -35,7 +35,7 @@ public:
 
 	void setResizeCallback();
 
-	void toggleFullScreen(Input &input, Input::Keys key = Input::Keys::F11);
+	bool toggleFullScreen(Input &input, Input::Keys key = Input::Keys::F11);
 
 	void colorWindow(const glm::vec4& Color);
 
