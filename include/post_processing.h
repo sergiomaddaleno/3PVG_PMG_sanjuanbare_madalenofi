@@ -20,6 +20,13 @@ static float rect_screen_vertices[] = {
 	-1.0f,  1.0f,  0.0f, 1.0f
 };
 
+enum Effect{
+	Grey,
+	Negative,
+	Waves,
+	Blur,
+};
+
 class PostProcessing {
 public:
 
@@ -29,24 +36,25 @@ public:
 	
 	void EndRender();
 
-	void Render();
+	void Render(GLuint& program, Effect effect);
 
 	// --
 	void resize(unsigned int width, unsigned int height);
 
-	void setupShader(const char* vertex_src, const char* fragment_src);
+	void setupShader(GLuint& program, const char* vertex_src, const char* fragment_src);
 
 	// --
 
-
-	GLuint FBO=0, RBO=0, FBTexture=0;
-
-	float grey_value_ = 0.0f;
+	float grey_ = 0.0f;
+	float negative_ = 1.0f;
+	float waves_ = 0.0f;
+	float blur_ = 0.0f;
 
 private:
 
 	unsigned int width_=800, height_=600;
 
+	GLuint FBO=0, RBO=0, FBTexture=0;
 	GLuint rectVAO=0, rectVBO=0;
 
 	GLuint program_=0;

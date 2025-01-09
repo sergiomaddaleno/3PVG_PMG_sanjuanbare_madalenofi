@@ -1,16 +1,14 @@
 #version 330
 
-uniform sampler2D u_texture;
+uniform sampler2D u_screen_tex;
+uniform float u_negative;
+
 in vec2 uv;
 out vec4 fragColor;
 
 void main() {
-	vec2 texCoord = uv;
-	// Aquí comienza el efecto de postprocesamiento
+	
+	vec4 color = texture(u_screen_tex, uv);
 
-	// Ejemplo de inversión de colores (negativo)
-	vec4 color = texture(u_texture, texCoord);
-	fragColor = vec4(1.0 - color.rgb, color.a);
-
-	// Fin del efecto de postprocesamiento
+	fragColor = vec4(u_negative - color.rgb, color.a);
 }

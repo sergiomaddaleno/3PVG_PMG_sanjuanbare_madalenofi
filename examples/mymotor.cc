@@ -33,6 +33,8 @@ Texture skyboxTex;
 ECSManager ecs;
 PostProcessing postProcc;
 
+auto e = ecs.create_entity();
+
 char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
 char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
 char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
@@ -42,15 +44,18 @@ char* vs_source_sky = (char*)ReadFile("../assets/shaders/vs_skybox.vs");
 char* fs_source_sky = (char*)ReadFile("../assets/shaders/fs_skybox.fs");
 
 char* vertex_pp = (char*)ReadFile("../assets/shaders/postprocess/vertex_pp.vs");
-char* grey_fs = (char*)ReadFile("../assets/shaders/postprocess/Grey.fs");
+char* grey_fs = (char*)ReadFile("../assets/shaders/postprocess/grey.fs");
+char* negative_fs = (char*)ReadFile("../assets/shaders/postprocess/negative.fs");
+char* waves_fs = (char*)ReadFile("../assets/shaders/postprocess/waves.fs");
+char* blur_fs = (char*)ReadFile("../assets/shaders/postprocess/blur.fs");
 
 char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
 char* lua_file = ReadFile("../scripts/settings.lua");
 
-GLuint normal_progrm = 0;
-GLuint texture_program = 0;
+GLuint normal_progrm = 0, texture_program = 0;
+GLuint pp_grey_program = 0, pp_negative_program = 0, pp_waves_program = 0, pp_blur_program = 0;
 
-void ChangeShader(GLuint& program) {
+void ChangeShader() {
 
     const char* shaders_name[]{ "Texture Shader", "Normal shader"};
     static int curr_item = 0;
@@ -58,12 +63,42 @@ void ChangeShader(GLuint& program) {
     if (ImGui::Combo("Shaders", &curr_item, shaders_name, 2)) {
         switch (curr_item) {
         case 0:
-            program = texture_program;
+            ecs.get_component<RenderComponent>(e)->program_ = texture_program;
             break;
         case 1:
-            program = normal_progrm;
+            ecs.get_component<RenderComponent>(e)->program_ = normal_progrm;
             break;
         }
+    }
+}
+
+void ChangePostProcess() {
+
+    const char* pp_name[]{ "None", "Grey", "Negative", "Waves", "Blur"};
+    static int curr_item = 0;
+
+    if (ImGui::Combo("Post Process", &curr_item, pp_name, 5)) {
+    }
+
+    switch (curr_item) {
+    case 0: break;
+
+    case 1: 
+        postProcc.Render(pp_grey_program, Effect::Grey);
+        ImGui::DragFloat("grey", &postProcc.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
+        break;
+    case 2: 
+        postProcc.Render(pp_negative_program, Effect::Negative);
+        ImGui::DragFloat("negative", &postProcc.negative_, 0.01f, 0.5f, 1.0f, "%.3f"); 
+        break;
+    case 3:
+        postProcc.Render(pp_waves_program, Effect::Waves);
+        ImGui::DragFloat("waves", &postProcc.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
+        break;
+    case 4:
+        postProcc.Render(pp_blur_program, Effect::Blur);
+        ImGui::DragFloat("blur", &postProcc.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
+        break;
     }
 }
 
@@ -80,17 +115,16 @@ void InitImGui(GLFWwindow* w) {
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-void MyImGui(GLuint& program) {
+void MyImGui() {
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
     ImGui::Begin("Menu");
 
-    ChangeShader(program);
-
-    ImGui::DragFloat("grey value", &postProcc.grey_value_, 0.01f, 0.0f, 1.0f, "%.3f");
-
+    ChangeShader();
+    ChangePostProcess();
+    
     ImGui::End();
 
     ImGui::Render();
@@ -140,8 +174,6 @@ int main(int, char**) {
     render_.setupShader(rd.render_comp.skybox_program_, vs_source_sky, fs_source_sky);
     // ---
 
-    auto e = ecs.create_entity();
-
     ecs.add_component_type<RenderComponent>();
     ecs.add_component_type<TransformComponent>();
 
@@ -154,13 +186,18 @@ int main(int, char**) {
     ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
     ecs.get_component<RenderComponent>(e)->program_ = texture_program;
 
-
     render_.initMeshBuffers(ecs);
 
-    InitImGui(window->getWindow());
+    //Post proccess
+    postProcc.setupShader(pp_grey_program, vertex_pp, grey_fs);
+    postProcc.setupShader(pp_negative_program, vertex_pp, negative_fs);
+    postProcc.setupShader(pp_waves_program, vertex_pp, waves_fs);
+    postProcc.setupShader(pp_blur_program, vertex_pp, blur_fs);
 
-    postProcc.setupShader(vertex_pp, grey_fs);
     postProcc.initData();
+    //--
+
+    InitImGui(window->getWindow());
 
     double lastTime = window->getTime();
     bool done = false;
@@ -168,13 +205,11 @@ int main(int, char**) {
         double currentTime = window->getTime();
         float dt = float(currentTime - lastTime);
         window->updateWindow();
-        if (window->toggleFullScreen(input)) {
+        window->toggleFullScreen(input);
 
-            rd.w_width = window->getWidth();
-            rd.w_height = window->getHeight();
-
-            postProcc.resize(window->getWidth(), window->getHeight());
-        }
+        rd.w_width = window->getWidth();
+        rd.w_height = window->getHeight();
+        postProcc.resize(window->getWidth(), window->getHeight());
 
         postProcc.BeginRender();
         rd.cam.update(input, dt, rd.w_width, rd.w_height);
@@ -182,10 +217,9 @@ int main(int, char**) {
         render_.renderSkyBox(rd);
         render_.renderSystem(ecs, rd);
 
-        MyImGui(ecs.get_component<RenderComponent>(e)->program_);
-
         postProcc.EndRender();
-        postProcc.Render();
+
+        MyImGui();
 
         if (window->closePressed()) done = true;
     }
