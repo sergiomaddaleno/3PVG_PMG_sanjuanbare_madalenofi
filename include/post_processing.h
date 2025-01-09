@@ -39,7 +39,7 @@ public:
 	// --
 
 
-	GLuint FBO, RBO, FBTexture;
+	GLuint FBO=0, RBO=0, FBTexture=0;
 
 	float grey_value_ = 0.0f;
 
@@ -47,9 +47,9 @@ private:
 
 	unsigned int width_=800, height_=600;
 
-	GLuint rectVAO, rectVBO;
+	GLuint rectVAO=0, rectVBO=0;
 
-	GLuint program_;
+	GLuint program_=0;
 
 };
 
