@@ -56,37 +56,36 @@ void PostProcessing::EndRender()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void PostProcessing::Render(GLuint& program, Effect effect)
+void PostProcessing::Render(Shader& shader, Effect effect)
 {
-    glUseProgram(program);
+    shader.useProgram();
 
     // -- 
-    GLuint screen_tex_loc = glGetUniformLocation(program, "u_screen_tex");
+    GLuint screen_tex_loc = glGetUniformLocation(shader.getProgram(), "u_screen_tex");
     glUniform1i(screen_tex_loc, 0);
 
     switch (effect) {
     case Effect::Grey: {
-            GLuint grey_loc = glGetUniformLocation(program, "u_grey");
+            GLuint grey_loc = glGetUniformLocation(shader.getProgram(), "u_grey");
             glUniform1f(grey_loc, grey_);
             break;
         }
     case Effect::Negative: {
-            GLuint neg_loc = glGetUniformLocation(program, "u_negative");
+            GLuint neg_loc = glGetUniformLocation(shader.getProgram(), "u_negative");
             glUniform1f(neg_loc, negative_);
             break;
         }
     case Effect::Waves: {
-            GLuint waves_loc = glGetUniformLocation(program, "u_waves");
+            GLuint waves_loc = glGetUniformLocation(shader.getProgram(), "u_waves");
             glUniform1f(waves_loc, waves_);
             break;
         }
     case Effect::Blur: {
-            GLuint blur_loc = glGetUniformLocation(program, "u_blur");
+            GLuint blur_loc = glGetUniformLocation(shader.getProgram(), "u_blur");
             glUniform1f(blur_loc, blur_);
             break;
         }
     }
-
     
     // -- 
 
@@ -110,25 +109,4 @@ void PostProcessing::resize(unsigned int width, unsigned int height)
 
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
-}
-
-void PostProcessing::setupShader(GLuint& program, const char* vertex_src, const char* fragment_src)
-{
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertex_src, nullptr);
-	glCompileShader(vertexShader);
-
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragment_src, nullptr);
-	glCompileShader(fragmentShader);
-
-	program = glCreateProgram();
-	glAttachShader(program, vertexShader);
-	glAttachShader(program, fragmentShader);
-	glLinkProgram(program);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

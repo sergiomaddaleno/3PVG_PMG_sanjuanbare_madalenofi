@@ -34,7 +34,7 @@ int main(int, char**) {
 	rd.transf_comp.scale = glm::vec3{ 5.0f, 5.0f, 5.0f };
 	rd.transf_comp.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
 
-	render_.setupShader(rd.render_comp.program_, vs_normals, fs_normals);
+	rd.render_comp.shader.compile(vs_normals, fs_normals);
 
 	double lastTime = window->getTime();
 	bool done = false;

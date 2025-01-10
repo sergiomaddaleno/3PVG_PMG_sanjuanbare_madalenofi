@@ -32,8 +32,7 @@ char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
 int num_entities = 5000;
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
-GLuint program_tex = 0;
-GLuint program_normals = 0;
+Shader shader_tex, shader_normals;
 
 int main(int, char**) {
    
@@ -88,14 +87,14 @@ int main(int, char**) {
     }
 
     //---
-    render_.setupShader(program_tex, vs_texture, fs_texture);
-    render_.setupShader(program_normals, vs_normals, fs_normals);
+    shader_tex.compile(vs_texture, fs_texture);
+    shader_normals.compile(vs_normals, fs_normals);
 
-    ecs.get_component<RenderComponent>(0)->program_ = program_tex;
-    ecs.get_component<RenderComponent>(1)->program_ = program_tex;
+    ecs.get_component<RenderComponent>(0)->shader = shader_tex;
+    ecs.get_component<RenderComponent>(1)->shader = shader_tex;
 
     for (int i = 2; i < num_entities; i++) {
-        ecs.get_component<RenderComponent>(i)->program_ = program_normals;
+        ecs.get_component<RenderComponent>(i)->shader = shader_normals;
     }
     //---
 

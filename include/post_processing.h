@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "shader.h"
 
 #include <string>
 #include <iostream>
@@ -36,14 +37,11 @@ public:
 	
 	void EndRender();
 
-	void Render(GLuint& program, Effect effect);
+	void Render(Shader& shader, Effect effect);
 
 	// --
+
 	void resize(unsigned int width, unsigned int height);
-
-	void setupShader(GLuint& program, const char* vertex_src, const char* fragment_src);
-
-	// --
 
 	float grey_ = 0.0f;
 	float negative_ = 1.0f;
@@ -56,8 +54,6 @@ private:
 
 	GLuint FBO=0, RBO=0, FBTexture=0;
 	GLuint rectVAO=0, rectVBO=0;
-
-	GLuint program_=0;
 
 };
 

@@ -22,30 +22,6 @@ std::optional<Render> Render::make()
     return std::optional<Render>();
 }
 
-void Render::setupShader(GLuint &program, const char* vertex_src, const char* fragment_src) {
-
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertex_src, nullptr);
-    glCompileShader(vertexShader);
-
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragment_src, nullptr);
-    glCompileShader(fragmentShader);
-
-    program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glCullFace(GL_BACK);
-}
-
 void Render::renderGeometry(RenderData& rd)
 {
     GLuint vertex_buffer;
@@ -55,10 +31,10 @@ void Render::renderGeometry(RenderData& rd)
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(rd.render_comp.triangle_->my_triangle[0]) * 3, rd.render_comp.triangle_->my_triangle, GL_STATIC_DRAW);
 
-    vpos_location = glGetAttribLocation(rd.render_comp.program_, "vPos");
-    vcol_location = glGetAttribLocation(rd.render_comp.program_, "vCol");
+    vpos_location = glGetAttribLocation(rd.render_comp.shader.getProgram(), "vPos");
+    vcol_location = glGetAttribLocation(rd.render_comp.shader.getProgram(), "vCol");
 
-    glUseProgram(rd.render_comp.program_);
+    rd.render_comp.shader.useProgram();
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(rd.transf_comp.position.x, rd.transf_comp.position.y, rd.transf_comp.position.z));
@@ -69,7 +45,7 @@ void Render::renderGeometry(RenderData& rd)
     glm::mat4 projection = glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);  
     glm::mat4 mvp = projection * view * model;
 
-    GLint mvpLocation = glGetUniformLocation(rd.render_comp.program_, "MVP");
+    GLint mvpLocation = glGetUniformLocation(rd.render_comp.shader.getProgram(), "MVP");
     glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -116,7 +92,8 @@ void Render::renderMesh(RenderData &rd)
         glBindVertexArray(0); 
         // ---
 
-        glUseProgram(rd.render_comp.program_);
+        rd.render_comp.shader.useProgram();
+
         glCullFace(GL_BACK);
 
         glm::mat4 model = glm::mat4(1.0f);
@@ -131,16 +108,16 @@ void Render::renderMesh(RenderData &rd)
         glm::mat4 mvp = projection * view * model;
 
         // For shaders ---
-        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.program_, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.program_, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.program_, "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.shader.getProgram(), "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
+        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.shader.getProgram(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.shader.getProgram(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.shader.getProgram(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         // Texture
         glActiveTexture(GL_TEXTURE0);
         rd.render_comp.texture = mesh.getTexture(0);
         rd.render_comp.texture.bind();
-        glUniform1i(glGetUniformLocation(rd.render_comp.program_, "texture1"), 0);
+        glUniform1i(glGetUniformLocation(rd.render_comp.shader.getProgram(), "texture1"), 0);
         // ---
 
         glBindVertexArray(rd.render_comp.mesh_->VAO);
@@ -210,7 +187,7 @@ void Render::renderSystem(ECSManager& ecs, RenderData& rd) {
 
             for (auto& mesh : render_comp->mesh_->meshes) {
 
-                glUseProgram(render_comp->program_);
+                render_comp->shader.useProgram();
                 glCullFace(GL_BACK);
 
                 glm::mat4 model = glm::mat4(1.0f);
@@ -223,16 +200,16 @@ void Render::renderSystem(ECSManager& ecs, RenderData& rd) {
                 glm::mat4 mvp = projection * view * model;
 
                 // For shaders ---
-                glUniformMatrix4fv(glGetUniformLocation(render_comp->program_, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-                glUniformMatrix4fv(glGetUniformLocation(render_comp->program_, "model"), 1, GL_FALSE, glm::value_ptr(model));
-                glUniformMatrix4fv(glGetUniformLocation(render_comp->program_, "view"), 1, GL_FALSE, glm::value_ptr(view));
-                glUniformMatrix4fv(glGetUniformLocation(render_comp->program_, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+                glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
+                glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+                glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+                glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
                 // For Texture
                 glActiveTexture(GL_TEXTURE0);
                 render_comp->texture = mesh.getTexture(0);
                 render_comp->texture.bind();
-                glUniform1i(glGetUniformLocation(render_comp->program_, "texture1"), 0);
+                glUniform1i(glGetUniformLocation(render_comp->shader.getProgram(), "texture1"), 0);
 
                 //--
                 glBindVertexArray(mesh.VAO);
@@ -281,16 +258,16 @@ void Render::renderSkyBox(RenderData& rd)
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::mat4 model = rotation; 
 
-    glUseProgram(rd.render_comp.skybox_program_);
+    rd.render_comp.skybox_shader.useProgram();
     rd.render_comp.cubemap_tex.bind();
-    glUniform1i(glGetUniformLocation(rd.render_comp.skybox_program_, "skybox"), 0);
+    glUniform1i(glGetUniformLocation(rd.render_comp.skybox_shader.getProgram(), "skybox"), 0);
     glActiveTexture(GL_TEXTURE0);
 
     // For shader --
-    unsigned int viewLoc = glGetUniformLocation(rd.render_comp.skybox_program_, "view");
-    unsigned int projLoc = glGetUniformLocation(rd.render_comp.skybox_program_, "projection");
-    unsigned int modelLoc = glGetUniformLocation(rd.render_comp.skybox_program_, "model");
-    unsigned int location_ = glGetUniformLocation(rd.render_comp.skybox_program_, "skybox");
+    unsigned int viewLoc = glGetUniformLocation(rd.render_comp.skybox_shader.getProgram(), "view");
+    unsigned int projLoc = glGetUniformLocation(rd.render_comp.skybox_shader.getProgram(), "projection");
+    unsigned int modelLoc = glGetUniformLocation(rd.render_comp.skybox_shader.getProgram(), "model");
+    unsigned int location_ = glGetUniformLocation(rd.render_comp.skybox_shader.getProgram(), "skybox");
 
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);

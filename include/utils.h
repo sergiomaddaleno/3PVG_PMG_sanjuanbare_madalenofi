@@ -54,7 +54,7 @@ static const unsigned int gIndices[] = {
 
 char* ReadFile(const char* file_path = nullptr);
 
-static void CheckGPUErrors(unsigned int code, const char* str, bool link);
+void CheckGPUErrors(unsigned int code, const char* str, bool link);
 
 
 

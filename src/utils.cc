@@ -39,7 +39,7 @@ char* ReadFile(const char* file_path) {
 }
 
 static char infoLog[512];
-static void CheckGPUErrors(unsigned int code, const char* str, bool link)
+void CheckGPUErrors(unsigned int code, const char* str, bool link)
 {
     int success = 0;
     if (link) {

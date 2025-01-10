@@ -35,8 +35,6 @@ public:
 
 	static std::optional<Render> make();
 
-	void setupShader(GLuint &program, const char* vertex_src, const char* fragment_src);
-	
 	// --- Normal Components
 	void renderGeometry(RenderData& rd);
 

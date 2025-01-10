@@ -3,6 +3,7 @@
 #include "triangle.h"
 #include "render.h"
 #include "input.h"
+#include "shader.h"
 #include "utils.h"
 
 #include <GL/glew.h>
@@ -35,7 +36,7 @@ int main(int, char**) {
     rd.transf_comp.position = glm::vec3{ arrow_dir.x, arrow_dir.y, 0.0f };
     rd.transf_comp.scale = glm::vec3{ 2.0f, 2.0f, 2.0f };
 
-    render_.setupShader(rd.render_comp.program_, vs_tri, fs_tri);
+    rd.render_comp.shader.compile(vs_tri, fs_tri);
 
     double lastTime = window->getTime();
     bool done = false;
