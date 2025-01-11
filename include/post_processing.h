@@ -26,6 +26,7 @@ enum Effect{
 	Negative,
 	Waves,
 	Blur,
+	Kernel,
 };
 
 class PostProcessing {
@@ -47,6 +48,7 @@ public:
 	float negative_ = 1.0f;
 	float waves_ = 0.0f;
 	float blur_ = 0.0f;
+	int kernel_types_ = 0;
 
 private:
 

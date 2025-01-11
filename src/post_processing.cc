@@ -85,6 +85,11 @@ void PostProcessing::Render(Shader& shader, Effect effect)
             glUniform1f(blur_loc, blur_);
             break;
         }
+    case Effect::Kernel: {
+            GLuint cl_loc = glGetUniformLocation(shader.getProgram(), "u_kernel_types");
+            glUniform1i(cl_loc, kernel_types_);
+            break;
+        }
     }
     
     // -- 

@@ -49,12 +49,13 @@ char* grey_fs = (char*)ReadFile("../assets/shaders/postprocess/grey.fs");
 char* negative_fs = (char*)ReadFile("../assets/shaders/postprocess/negative.fs");
 char* waves_fs = (char*)ReadFile("../assets/shaders/postprocess/waves.fs");
 char* blur_fs = (char*)ReadFile("../assets/shaders/postprocess/blur.fs");
+char* kernel_fs = (char*)ReadFile("../assets/shaders/postprocess/kernel.fs");
 
 char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
 char* lua_file = ReadFile("../scripts/settings.lua");
 
 Shader normal_shader, texture_shader;
-Shader grey_shader, negative_shader, waves_shader, blur_shader;
+Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
 
 void ChangeShader() {
 
@@ -75,30 +76,34 @@ void ChangeShader() {
 
 void ChangePostProcess() {
 
-    const char* pp_name[]{ "None", "Grey", "Negative", "Waves", "Blur"};
+    const char* pp_name[]{ "None", "Grey", "Negative", "Waves", "Blur", "Kernel types"};
     static int curr_item = 0;
 
-    if (ImGui::Combo("Post Process", &curr_item, pp_name, 5)) {
+    if (ImGui::Combo("Post Process", &curr_item, pp_name, 6)) {
     }
 
     switch (curr_item) {
     case 0: break;
 
     case 1: 
-        postProcc.Render(grey_shader, Effect::Grey);
-        ImGui::DragFloat("grey", &postProcc.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
+        postProcc.Render(grey_sh, Effect::Grey);
+        ImGui::DragFloat("Grey", &postProcc.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
         break;
     case 2: 
-        postProcc.Render(negative_shader, Effect::Negative);
-        ImGui::DragFloat("negative", &postProcc.negative_, 0.01f, 0.5f, 1.0f, "%.3f"); 
+        postProcc.Render(negative_sh, Effect::Negative);
+        ImGui::DragFloat("Negative", &postProcc.negative_, 0.01f, 0.5f, 1.0f, "%.3f"); 
         break;
     case 3:
-        postProcc.Render(waves_shader, Effect::Waves);
-        ImGui::DragFloat("waves", &postProcc.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
+        postProcc.Render(waves_sh, Effect::Waves);
+        ImGui::DragFloat("Waves", &postProcc.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
         break;
     case 4:
-        postProcc.Render(blur_shader, Effect::Blur);
-        ImGui::DragFloat("blur", &postProcc.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
+        postProcc.Render(blur_sh, Effect::Blur);
+        ImGui::DragFloat("Blur", &postProcc.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
+        break;
+    case 5:
+        postProcc.Render(kernel_sh, Effect::Kernel);
+        ImGui::DragInt("Kernel types", &postProcc.kernel_types_, 0.01f, 0, 2, "%d");
         break;
     }
 }
@@ -191,10 +196,11 @@ int main(int, char**) {
     render_.initMeshBuffers(ecs);
 
     //Post proccess
-    grey_shader.compile(vertex_pp, grey_fs);
-    negative_shader.compile(vertex_pp, negative_fs);
-    waves_shader.compile(vertex_pp, waves_fs);
-    blur_shader.compile(vertex_pp, blur_fs);
+    grey_sh.compile(vertex_pp, grey_fs);
+    negative_sh.compile(vertex_pp, negative_fs);
+    waves_sh.compile(vertex_pp, waves_fs);
+    blur_sh.compile(vertex_pp, blur_fs);
+    kernel_sh.compile(vertex_pp, kernel_fs);
 
     postProcc.initData();
     //--
