@@ -31,18 +31,20 @@ public:
 
 	static std::optional<Window> make(int x, int y, const std::string& name, bool full_screen = false);
 
+	void setWindowActive();
+
+	bool initGLEW();
+
 	void updateWindow();
+
+	//---
+	void colorWindow(const glm::vec4& Color);
 
 	void setResizeCallback();
 
 	bool toggleFullScreen(Input &input, Input::Keys key = Input::Keys::F11);
 
-	void colorWindow(const glm::vec4& Color);
-
 	bool closePressed();
-
-	//---
-	void setWindowActive();
 
 	double getTime();
 

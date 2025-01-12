@@ -18,18 +18,18 @@ glm::vec2 arrow_dir = { 0.0f, 0.0f };
 char* vs_tri = (char*)ReadFile("../assets/shaders/vs_triangle.vs");
 char* fs_tri = (char*)ReadFile("../assets/shaders/fs_triangle.fs");
 
+Render render_;
+
 int main(int, char**) {
 
     auto window = Window::make(800, 600, "Window");
     window->setWindowActive();
+    window->initGLEW();
 
     Input input{ window->getWindow() };
 
     //--- Triangle
     auto tri_ = Triangle::make(0.5f, Triangle::Color::Blue);    
-
-    Render render_;
-    render_.make();
 
     RenderData rd;
     rd.render_comp.triangle_ = std::make_shared<Triangle>(*tri_);

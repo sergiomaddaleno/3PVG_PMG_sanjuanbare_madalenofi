@@ -38,8 +38,7 @@ int main(int, char**) {
    
     auto window = Window::make(800, 600, "Window");
     window->setWindowActive();
-
-    auto render = render_.make();
+    window->initGLEW();
 
     Input input{ window->getWindow() };
 

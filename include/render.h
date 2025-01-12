@@ -13,19 +13,11 @@
 #include "mesh.h"
 #include "camera.h"
 #include "ecs_manager.h"
+
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
 
-struct RenderData {
-
-	Camera cam;
-	RenderComponent render_comp;
-	TransformComponent transf_comp;
-
-	int w_width = 800;
-	int w_height = 600;
-	float fov = 55.0f;
-};
+struct RenderData;
 
 class Render {
 
@@ -33,14 +25,10 @@ public:
 
 	Render();
 
-	static std::optional<Render> make();
-
 	// --- Normal Components
 	void renderGeometry(RenderData& rd);
 
 	void renderMesh(RenderData& rd);
-
-	void renderSkyBox(RenderData& rd);
 
 	// --- For ECS
 	void initMeshBuffers(ECSManager &ecs);
@@ -48,9 +36,6 @@ public:
 	void renderSystem(ECSManager& ecs, RenderData& rd);
 	// ---
 
-private:
-
-	float skybox_angle;
 };
 
 #endif // PRT

@@ -6,8 +6,7 @@
 #include "triangle.h"
 #include "texture.h"
 #include "shader.h"
-
-class Mesh;
+#include "mesh.h"
 
 struct RenderComponent {
 
@@ -18,7 +17,7 @@ struct RenderComponent {
     Shader skybox_shader;
 
     Texture texture;
-    Texture cubemap_tex;
+    Texture skybox_tex;
 
     RenderComponent() : mesh_(nullptr), triangle_(nullptr) {}
 
@@ -26,7 +25,7 @@ struct RenderComponent {
 
     RenderComponent(const RenderComponent& other)
         : mesh_(other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr),
-        triangle_(other.triangle_), texture(other.texture), cubemap_tex(other.cubemap_tex),
+        triangle_(other.triangle_), texture(other.texture), skybox_tex(other.skybox_tex),
         shader(other.shader), skybox_shader(other.skybox_shader)
     {}
 
@@ -35,7 +34,7 @@ struct RenderComponent {
             mesh_ = other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr;
             triangle_ = other.triangle_;
             texture = other.texture;
-            cubemap_tex = other.cubemap_tex;
+            skybox_tex = other.skybox_tex;
             shader = other.shader;
             skybox_shader = other.skybox_shader;
         }

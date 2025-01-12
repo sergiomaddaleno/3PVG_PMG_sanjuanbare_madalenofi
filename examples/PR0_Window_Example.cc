@@ -15,6 +15,7 @@ int main(int, char**) {
 	//---
 	auto window = Window::make(800, 600, "Window");
 	window->setWindowActive();
+	//window->initGLEW();
 	//---
 
 	double lastTime = window->getTime();

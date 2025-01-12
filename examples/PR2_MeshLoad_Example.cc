@@ -20,9 +20,8 @@ int main(int, char**) {
 	//---
 	auto window = Window::make(800, 600, "Window");
 	window->setWindowActive();
+	window->initGLEW();
 	//---
-
-	auto render = render_.make();
 
 	if (!mesh_->loadOBJ("../assets/obj/SM_Teapot.obj")) {
 		return -1;

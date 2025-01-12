@@ -111,6 +111,17 @@ void Window::setWindowActive()
 	glfwMakeContextCurrent(window_);
 }
 
+bool Window::initGLEW()
+{
+	if (glewInit() != GLEW_OK) {
+		return false;
+	}
+
+	return true;
+}
+
+
+
 double Window::getTime()
 {
 	return glfwGetTime();

@@ -17,6 +17,7 @@
 #include "input.h"
 #include "post_processing.h"
 #include "utils.h"
+#include "skybox.h"
 
 #include "ecs_manager.h"
 #include "scripting.h"
@@ -30,6 +31,7 @@ std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 Render render_;
 RenderData rd;
 LuaScript ls;
+Skybox skybox;
 Texture skyboxTex;
 ECSManager ecs;
 PostProcessing postProcc;
@@ -54,12 +56,12 @@ char* kernel_fs = (char*)ReadFile("../assets/shaders/postprocess/kernel.fs");
 char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
 char* lua_file = ReadFile("../scripts/settings.lua");
 
-Shader normal_shader, texture_shader;
+Shader normals_shader, texture_shader;
 Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
 
 void ChangeShader() {
 
-    const char* shaders_name[]{ "Texture Shader", "Normal shader"};
+    const char* shaders_name[]{ "Texture Shader", "Normals shader"};
     static int curr_item = 0;
 
     if (ImGui::Combo("Shaders", &curr_item, shaders_name, 2)) {
@@ -68,7 +70,7 @@ void ChangeShader() {
             ecs.get_component<RenderComponent>(e)->shader = texture_shader;
             break;
         case 1:
-            ecs.get_component<RenderComponent>(e)->shader = normal_shader;
+            ecs.get_component<RenderComponent>(e)->shader = normals_shader;
             break;
         }
     }
@@ -159,9 +161,8 @@ int main(int, char**) {
 
     auto window = Window::make(rd.w_width, rd.w_height, "Window ", full_screen);
     window->setWindowActive();
+    window->initGLEW();
     window->setResizeCallback();
-
-    render_.make();
 
     Input input{ window->getWindow()};
 
@@ -171,16 +172,19 @@ int main(int, char**) {
     }
 
     texture_shader.compile(vs_texture, fs_texture);
-    normal_shader.compile(vs_normals, fs_normals);
+    normals_shader.compile(vs_normals, fs_normals);
 
-    // ---
-    if (skyboxTex.loadSkybox(dds_file)) {
-        rd.render_comp.cubemap_tex = skyboxTex.getTexture();
+    //Skybox
+    if (skyboxTex.loadSkyboxTex(dds_file)) {
+        rd.render_comp.skybox_tex = skyboxTex.getTexture();
     }
 
     rd.render_comp.skybox_shader.compile(vs_source_sky, fs_source_sky);
+
+    skybox.init();
     // ---
 
+    //ECS
     ecs.add_component_type<RenderComponent>();
     ecs.add_component_type<TransformComponent>();
 
@@ -194,6 +198,7 @@ int main(int, char**) {
     ecs.get_component<RenderComponent>(e)->shader = texture_shader;
 
     render_.initMeshBuffers(ecs);
+    // ---
 
     //Post proccess
     grey_sh.compile(vertex_pp, grey_fs);
@@ -222,7 +227,7 @@ int main(int, char**) {
         postProcc.BeginRender();
         rd.cam.update(input, dt, rd.w_width, rd.w_height);
 
-        render_.renderSkyBox(rd);
+        skybox.render(rd);
         render_.renderSystem(ecs, rd);
 
         postProcc.EndRender();

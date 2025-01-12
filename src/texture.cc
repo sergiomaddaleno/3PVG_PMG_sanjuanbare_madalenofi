@@ -30,7 +30,7 @@ bool Texture::loadTexture(const std::string& file_path) {
     return true;
 }
 
-bool Texture::loadSkybox(char* dds_file)
+bool Texture::loadSkyboxTex(char* dds_file)
 {
     assert(dds_file[0] == 'D' && dds_file[1] == 'D' && dds_file[2] == 'S' && dds_file[3] == ' ');
     DDSHeader* head = (DDSHeader*)&dds_file[4];

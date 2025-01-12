@@ -18,7 +18,7 @@ public:
 
     bool loadTexture(const std::string& file_path);
 
-    bool loadSkybox(char* dds_file);
+    bool loadSkyboxTex(char* dds_file);
 
     void bind() const;
 
