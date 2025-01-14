@@ -21,6 +21,8 @@ struct RenderData {
 	int w_width = 800;
 	int w_height = 600;
 	float fov = 55.0f;
+
+	bool b_fog_ = true;
 };
 
 char* ReadFile(const char* file_path = nullptr);

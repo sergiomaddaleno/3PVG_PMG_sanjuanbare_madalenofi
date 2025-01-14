@@ -329,3 +329,36 @@ files {
 	"scripts/*.lua",
 	"examples/PR5_Scripting_Example.cc",
 }
+
+project"PR6_Lights"
+
+kind "ConsoleApp"
+language "C++"
+targetdir "build/%{prj.name}/%{cfg.buildcfg}"
+includedirs { "include", "deps/imgui" } 
+links "Motor"
+conan_config_exec("Debug")
+conan_config_exec("Release")
+conan_config_exec("RelWithDebInfo")
+debugargs { _MAIN_SCRIPT_DIR .. "/src" }
+files { 
+	"src/*.cc",
+	"include/*.h",
+	"src/**/*.cc",
+	"include/**/*.h",
+	"deps/**/*.h",
+	"deps/**/*.hpp",
+	"deps/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/*.h",
+	"assets/shaders/**/*.vs",
+	"assets/shaders/**/*.fs",
+	"assets/shaders/*.vs",
+	"assets/shaders/*.fs",
+	"assets/textures/**/*.png",
+	"assets/textures/**/*.mtl",
+	"assets/textures/**/*.dds",
+	"assets/obj/**",
+	"scripts/*.lua",
+	"examples/PR6_Lights_Example.cc",
+}

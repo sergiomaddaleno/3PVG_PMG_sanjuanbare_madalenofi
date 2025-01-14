@@ -16,6 +16,8 @@
 
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
+#include "..\include\Components\light_component.h"
+
 
 struct RenderData;
 
@@ -34,6 +36,8 @@ public:
 	void initMeshBuffers(ECSManager &ecs);
 
 	void renderSystem(ECSManager& ecs, RenderData& rd);
+
+	void renderLightSystem(ECSManager& ecs);
 	// ---
 
 };

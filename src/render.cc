@@ -205,6 +205,10 @@ void Render::renderSystem(ECSManager& ecs, RenderData& rd) {
                 render_comp->texture.bind();
                 glUniform1i(glGetUniformLocation(render_comp->shader.getProgram(), "texture1"), 0);
 
+                //For Fog
+                GLuint fog_log = glGetUniformLocation(render_comp->shader.getProgram(), "u_fog");
+                glUniform1i(fog_log, rd.b_fog_);
+
                 //--
                 glBindVertexArray(mesh.VAO);
                 glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
@@ -214,6 +218,24 @@ void Render::renderSystem(ECSManager& ecs, RenderData& rd) {
     }
     glUseProgram(0);
 }
+
+void Render::renderLightSystem(ECSManager& ecs)
+{
+    auto li = ecs.getComponentList<LightComponent>().begin();
+    auto liend = ecs.getComponentList<LightComponent>().end();
+
+    for (; li != liend; ++li) {
+        if (li->has_value()) {
+            auto& light_comp = *li;
+
+            for (auto& lights : light_comp->light_->lights) {
+
+               
+            }
+        }
+    }
+}
+
 
 
 
