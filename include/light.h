@@ -19,7 +19,7 @@ public:
 
     Light();
 
-    std::vector<Light> lights;
+    //std::vector<Light> lights;
     int type_; //0=dir, 1=spot, 2=point
     int enabled_; //false by default
     glm::vec3 pos_;

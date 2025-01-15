@@ -34,11 +34,11 @@ public:
 
 	void initData();
 
-	void BeginRender();
+	void beginRender();
 	
-	void EndRender();
+	void endRender();
 
-	void Render(Shader& shader, Effect effect);
+	void render(Shader& shader, Effect effect);
 
 	// --
 

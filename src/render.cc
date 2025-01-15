@@ -228,10 +228,10 @@ void Render::renderLightSystem(ECSManager& ecs)
         if (li->has_value()) {
             auto& light_comp = *li;
 
-            for (auto& lights : light_comp->light_->lights) {
+            /*for (auto& lights : light_comp->light_->lights) {
 
                
-            }
+            }*/
         }
     }
 }

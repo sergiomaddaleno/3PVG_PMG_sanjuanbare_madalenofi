@@ -12,6 +12,7 @@
 #include "input.h"
 #include "ecs_manager.h"
 #include "utils.h"
+#include "shader.h"
 #include "Components/light_component.h"
 
 #define M_PI 3.14159265358979323846
@@ -23,7 +24,7 @@ std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 Render render_;
 RenderData rd;
 ECSManager ecs;
-LightComponent lc_;
+Shader light_shader;
 
 char* vs_light = (char*)ReadFile("../assets/shaders/vs_texture.vs");
 char* fs_light = (char*)ReadFile("../assets/shaders/fs_texture.fs");
@@ -45,7 +46,7 @@ int main(int, char**) {
         return -1;
     }
 
-    lc_.shader.compile(vs_light, fs_light);
+    light_shader.compile(vs_light, fs_light);
 
     auto light_e = ecs.create_entity();
 
@@ -55,7 +56,7 @@ int main(int, char**) {
 
     ecs.add_component<LightComponent>(light_e);
     ecs.add_component<TransformComponent>(light_e);
-    ecs.get_component<LightComponent>(light_e)->shader = lc_.shader;
+    ecs.get_component<LightComponent>(light_e)->shader = light_shader;
 
 
     auto e = ecs.create_entity();

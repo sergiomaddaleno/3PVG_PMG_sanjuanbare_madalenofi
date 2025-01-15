@@ -26,6 +26,7 @@ public:
 
 	static std::optional<Triangle> make(float size_, Color color);
 
+
 	// ---
 
 	Triangle(PointsTriangle t[3]) {

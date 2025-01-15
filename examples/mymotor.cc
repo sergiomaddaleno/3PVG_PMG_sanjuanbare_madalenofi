@@ -88,23 +88,23 @@ void ChangePostProcess() {
     case 0: break;
 
     case 1: 
-        postProcc.Render(grey_sh, Effect::Grey);
+        postProcc.render(grey_sh, Effect::Grey);
         ImGui::DragFloat("Grey", &postProcc.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
         break;
     case 2: 
-        postProcc.Render(negative_sh, Effect::Negative);
+        postProcc.render(negative_sh, Effect::Negative);
         ImGui::DragFloat("Negative", &postProcc.negative_, 0.01f, 0.5f, 1.0f, "%.3f"); 
         break;
     case 3:
-        postProcc.Render(waves_sh, Effect::Waves);
+        postProcc.render(waves_sh, Effect::Waves);
         ImGui::DragFloat("Waves", &postProcc.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
         break;
     case 4:
-        postProcc.Render(blur_sh, Effect::Blur);
+        postProcc.render(blur_sh, Effect::Blur);
         ImGui::DragFloat("Blur", &postProcc.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
         break;
     case 5:
-        postProcc.Render(kernel_sh, Effect::Kernel);
+        postProcc.render(kernel_sh, Effect::Kernel);
         ImGui::DragInt("Kernel types", &postProcc.kernel_types_, 0.01f, 0, 2, "%d");
         break;
     }
@@ -224,13 +224,13 @@ int main(int, char**) {
         rd.w_height = window->getHeight();
         postProcc.resize(window->getWidth(), window->getHeight());
 
-        postProcc.BeginRender();
+        postProcc.beginRender();
         rd.cam.update(input, dt, rd.w_width, rd.w_height);
 
         skybox.render(rd);
         render_.renderSystem(ecs, rd);
 
-        postProcc.EndRender();
+        postProcc.endRender();
 
         MyImGui();
 

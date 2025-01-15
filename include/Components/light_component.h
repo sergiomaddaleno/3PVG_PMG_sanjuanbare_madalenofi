@@ -1,8 +1,10 @@
 #ifndef LCP
 #define LCP
 
-#include "light.h"
-#include "Components/transform_component.h" 
+#include <memory>
+#include "shader.h"
+
+class Light;
 
 struct LightComponent {
 

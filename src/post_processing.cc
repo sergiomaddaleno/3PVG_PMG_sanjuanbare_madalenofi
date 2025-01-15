@@ -41,14 +41,14 @@ void PostProcessing::initData()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
-void PostProcessing::BeginRender()
+void PostProcessing::beginRender()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void PostProcessing::EndRender()
+void PostProcessing::endRender()
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -56,7 +56,7 @@ void PostProcessing::EndRender()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void PostProcessing::Render(Shader& shader, Effect effect)
+void PostProcessing::render(Shader& shader, Effect effect)
 {
     shader.useProgram();
 
