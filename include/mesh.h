@@ -19,7 +19,17 @@ struct Vertex {
 };
 
 class Mesh {
+
 public:
+    
+    bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
+
+    void render(RenderData& rd);
+
+    Texture getTexture(int shape_index);
+
+    //--
+
     std::vector<Vertex> vertices;
     std::vector<Mesh> meshes;
     std::vector<Texture> textures;
@@ -29,21 +39,13 @@ public:
 
     GLuint VAO = 0, VBO = 0, EBO = 0;
 
-    bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
-
-    void render(RenderData& rd);
-
-    Texture getTexture(int shape_index);
-
-    //--
-
     Mesh() : VAO(0), VBO(0), EBO(0), materialID(0){};
 
     ~Mesh() {
         if (VAO != 0) glDeleteVertexArrays(1, &VAO);
         if (VBO != 0) glDeleteBuffers(1, &VBO);
         if (EBO != 0) glDeleteBuffers(1, &EBO);
-    };
+    };   
 };
 
 #endif // MSL

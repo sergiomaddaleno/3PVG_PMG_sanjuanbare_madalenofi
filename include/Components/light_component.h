@@ -3,13 +3,12 @@
 
 #include <memory>
 #include "shader.h"
+#include "light.h"
 
-class Light;
 
 struct LightComponent {
 
-	std::shared_ptr<Light> light_;
-
+	Light light_;
 	Shader shader;
 };
 

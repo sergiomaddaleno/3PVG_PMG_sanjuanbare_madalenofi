@@ -30,7 +30,7 @@ public:
 	// Light
 	void initLight(ECSManager& ecs);
 
-	void renderLight(ECSManager& ecs);
+	void renderLight(ECSManager& ecs, RenderData& rd);
 
 };
 

@@ -117,22 +117,69 @@ void RenderSystem::initLight(ECSManager& ecs)
 {
 }
 
-void RenderSystem::renderLight(ECSManager& ecs)
-{
+void RenderSystem::renderLight(ECSManager& ecs,RenderData& rd) {
+
     auto li = ecs.getComponentList<LightComponent>().begin();
+    auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto liend = ecs.getComponentList<LightComponent>().end();
+    auto tiend = ecs.getComponentList<TransformComponent>().end();
 
-    for (; li != liend; ++li) {
-        if (li->has_value()) {
-            auto& light_comp = *li;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ZERO); 
+    int counter = 0;
+    for (; li != liend && ti != tiend; ++li, ++ti) {
 
-            /*for (auto& lights : light_comp->light_->lights) {
+        if (li->has_value() && ti->has_value()) {
 
-               
-            }*/
+            
+            auto& light_comp = li->value();
+            auto& transform = ti->value();
+           
+            light_comp.shader.useProgram();
+           
+            char name[60] = { '\0' };
+
+            sprintf(name, "u_light[%d].type_\0", counter);
+            glUniform1i(glGetUniformLocation(light_comp.shader.getProgram(), name), light_comp.light_.type_); // 0=Directional, 1=Spot, 2=Point
+            
+            sprintf(name, "u_light[%d].pos_\0", counter);
+            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(transform.position));
+            
+            sprintf(name, "u_light[%d].dir_\0", counter);
+            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(light_comp.light_.dir_));
+           
+            sprintf(name, "u_light[%d].diff_color_\0", counter);
+            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(light_comp.light_.diff_color_));
+            
+            sprintf(name, "u_light[%d].spec_color_\0", counter);
+            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(light_comp.light_.spec_color_));
+
+            sprintf(name, "u_light[%d].light_color_\0", counter);
+            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(light_comp.light_.light_color_));
+
+            
+            sprintf(name, "u_light[%d].ambient_color\0", counter);
+            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(light_comp.light_.ambient_color));
+            
+            sprintf(name, "u_light[%d].light_linear_\0", counter);
+            glUniform1f(glGetUniformLocation(light_comp.shader.getProgram(), name), light_comp.light_.light_linear_);
+            
+            sprintf(name, "u_light[%d].light_quadratic_\0", counter);
+            glUniform1f(glGetUniformLocation(light_comp.shader.getProgram(), name), light_comp.light_.light_quadratic_);
+
+            counter++;
+
+            
+            renderMesh(ecs, rd);
+            glBlendFunc(GL_ONE, GL_ONE);
+           
         }
     }
+   
+    glDisable(GL_BLEND);
 }
+
 
 
 
