@@ -8,7 +8,7 @@
 
 #include "window.h"
 #include "mesh.h"
-#include "render.h"
+#include "render_system.h"
 #include "input.h"
 #include "ecs_manager.h"
 #include "utils.h"
@@ -21,16 +21,15 @@ std::shared_ptr<Mesh> teapot_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> toad_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
-Render render_;
+RenderSystem render_system;
 RenderData rd;
 ECSManager ecs;
-Shader light_shader;
+Shader texture_shader, light_shader;
 
-char* vs_light = (char*)ReadFile("../assets/shaders/vs_texture.vs");
-char* fs_light = (char*)ReadFile("../assets/shaders/fs_texture.fs");
+char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
+char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
 
 int num_entities = 5000;
-glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
 int main(int, char**) {
    
@@ -46,28 +45,33 @@ int main(int, char**) {
         return -1;
     }
 
-    light_shader.compile(vs_light, fs_light);
+    texture_shader.compile(vs_texture, fs_texture);
+    //light_shader.compile();
 
     auto light_e = ecs.create_entity();
+    auto e = ecs.create_entity();
 
     ecs.add_component_type<RenderComponent>();
     ecs.add_component_type<TransformComponent>();
     ecs.add_component_type<LightComponent>();
 
+    // Light
     ecs.add_component<LightComponent>(light_e);
     ecs.add_component<TransformComponent>(light_e);
     ecs.get_component<LightComponent>(light_e)->shader = light_shader;
 
-
-    auto e = ecs.create_entity();
-
+    // Mesh
     ecs.add_component<RenderComponent>(e);
     ecs.add_component<TransformComponent>(e);
+
+    ecs.get_component<RenderComponent>(e)->shader = texture_shader;
     ecs.get_component<RenderComponent>(e)->mesh_ = mario_mesh;
+    ecs.get_component<TransformComponent>(e)->scale = { 0.4f, 0.4f, 0.4f };
+    ecs.get_component<TransformComponent>(e)->position = {0.0f, -2.0f, 0.0f};
 
     //---
     
-    render_.initMeshBuffers(ecs);
+    render_system.initMesh(ecs);
 
     double lastTime = window->getTime();
     bool done = false;
@@ -75,13 +79,9 @@ int main(int, char**) {
         double currentTime = window->getTime();
         float dt = float(currentTime - lastTime);
         window->updateWindow();
-        window->colorWindow(color);
 
-        float angle = (float)window->getTime();
-
-        ecs.get_component<TransformComponent>(j)->moveEntity(input, dt);
-
-        render_.renderSystem(ecs, rd);
+        ecs.get_component<TransformComponent>(e)->moveEntity(input, dt);
+        render_system.renderMesh(ecs, rd);
 
         if (window->closePressed()) done = true;
     }

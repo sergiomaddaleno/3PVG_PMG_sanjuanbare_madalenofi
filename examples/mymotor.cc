@@ -12,7 +12,7 @@
 
 #include "window.h"
 #include "mesh.h"
-#include "render.h"
+#include "render_system.h"
 #include "shader.h"
 #include "input.h"
 #include "post_processing.h"
@@ -28,7 +28,7 @@
 std::shared_ptr<Mesh> car_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
-Render render_;
+RenderSystem render_system;
 RenderData rd;
 LuaScript ls;
 Skybox skybox;
@@ -197,7 +197,7 @@ int main(int, char**) {
     ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
     ecs.get_component<RenderComponent>(e)->shader = texture_shader;
 
-    render_.initMeshBuffers(ecs);
+    render_system.initMesh(ecs);
     // ---
 
     //Post proccess
@@ -228,7 +228,7 @@ int main(int, char**) {
         rd.cam.update(input, dt, rd.w_width, rd.w_height);
 
         skybox.render(rd);
-        render_.renderSystem(ecs, rd);
+        render_system.renderMesh(ecs, rd);
 
         postProcc.endRender();
 

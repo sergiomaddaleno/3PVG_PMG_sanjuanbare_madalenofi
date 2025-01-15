@@ -1,13 +1,12 @@
 
 #include "skybox.h"
-#include "..\include\render.h"
-#include "..\include\mesh.h"
+#include "mesh.h"
+#include "utils.h"
 
 #include <../deps/glm/glm.hpp>
-
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
-#include "utils.h"
+
 #include <memory> 
 #include <iostream>
 

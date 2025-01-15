@@ -1,7 +1,6 @@
 
 #include "window.h"
 #include "mesh.h"
-#include "render.h"
 #include "job_sistem.h"
 #include "input.h"
 
@@ -28,7 +27,6 @@ std::future<std::unique_ptr<Mesh>> monetemesh;
 
 JobSystem jb;
 
-Render render_;
 char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
 char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
 
@@ -102,7 +100,7 @@ int main(int, char**) {
             loadingNewMesh = false;
         }
     
-        render_.renderMesh(rd);
+        rd.render_comp.mesh_->render(rd);
 
         if (window->closePressed()) done = true;
     }

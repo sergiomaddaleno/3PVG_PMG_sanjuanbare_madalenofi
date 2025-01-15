@@ -10,6 +10,7 @@
 #include <../deps/glm/glm.hpp>
 #include "texture.h"
 
+struct RenderData;
 
 struct Vertex {
     glm::vec3 pos;
@@ -29,6 +30,8 @@ public:
     GLuint VAO = 0, VBO = 0, EBO = 0;
 
     bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
+
+    void render(RenderData& rd);
 
     Texture getTexture(int shape_index);
 

@@ -2,7 +2,6 @@
 #define RNC
 
 #include <memory>
-#include "..\include\render.h"
 #include "triangle.h"
 #include "texture.h"
 #include "shader.h"
@@ -11,7 +10,7 @@
 struct RenderComponent {
 
     std::shared_ptr<Mesh> mesh_;
-    std::shared_ptr<Triangle> triangle_;
+    Triangle triangle_;
 
     Shader shader;
     Shader skybox_shader;
@@ -19,7 +18,7 @@ struct RenderComponent {
     Texture texture;
     Texture skybox_tex;
 
-    RenderComponent() : mesh_(nullptr), triangle_(nullptr) {}
+    RenderComponent() : mesh_(nullptr), triangle_(triangle_.my_triangle) {}
 
     ~RenderComponent() {}
 

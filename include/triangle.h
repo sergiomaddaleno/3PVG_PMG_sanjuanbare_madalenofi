@@ -5,6 +5,11 @@
 #include <optional>
 #include <string>
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
+struct RenderData;
+
 class Triangle {
 
 public:
@@ -26,6 +31,7 @@ public:
 
 	static std::optional<Triangle> make(float size_, Color color);
 
+	void render(RenderData& rd);
 
 	// ---
 
@@ -40,6 +46,8 @@ public:
             my_triangle[i] = other.my_triangle[i];
         }
     }
+
+	~Triangle() {};
 };
 
 #endif // PRT

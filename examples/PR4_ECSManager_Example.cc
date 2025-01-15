@@ -8,7 +8,7 @@
 
 #include "window.h"
 #include "mesh.h"
-#include "render.h"
+#include "render_system.h"
 #include "input.h"
 #include "ecs_manager.h"
 #include "utils.h"
@@ -19,7 +19,7 @@ std::shared_ptr<Mesh> teapot_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> toad_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
-Render render_;
+RenderSystem render_system;
 RenderData rd;
 ECSManager ecs;
 
@@ -82,7 +82,7 @@ int main(int, char**) {
         ecs.add_component<TransformComponent>(j);
         ecs.get_component<RenderComponent>(j)->mesh_ = teapot_mesh;
         ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
-        ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.5f, 0.5, 0.5f };
+        ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.5f, 0.5f, 0.5f };
     }
 
     //---
@@ -97,7 +97,7 @@ int main(int, char**) {
     }
     //---
 
-    render_.initMeshBuffers(ecs);
+    render_system.initMesh(ecs);
 
     double lastTime = window->getTime();
     bool done = false;
@@ -117,7 +117,7 @@ int main(int, char**) {
         ecs.get_component<TransformComponent>(0)->moveEntity(input, dt);
         ecs.get_component<TransformComponent>(1)->moveEntity(input, dt);
 
-        render_.renderSystem(ecs, rd);
+        render_system.renderMesh(ecs, rd);
 
         if (window->closePressed()) done = true;
     }
