@@ -22,6 +22,7 @@ struct LightInfo {
     float shininess_;
     float strength_;
     float spot_angle;
+   
 };
 
 const int kMaxLights = 8;
@@ -29,6 +30,9 @@ uniform LightInfo u_light[kMaxLights];
 uniform int u_number_lights;
 uniform vec3 u_camera_position;
 uniform vec3 u_ambient;
+
+
+uniform sampler2D texture1;
 
 vec3 PointLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
@@ -72,13 +76,20 @@ vec3 SpotLight(LightInfo lc) {
 void main() {
     vec3 final_color = u_ambient;
 
-    for (int i = 0; i < u_number_lights; ++i) {
-        if (u_light[i].type_ == 0) {
-            final_color += SpotLight(u_light[i]);
-        } else if (u_light[i].type_ == 1) {
-            final_color += PointLight(u_light[i]);
-        }
-    }
+    
 
-    fragColor = vec4(final_color, 1.0);
+   // for (int i = 0; i < 2; ++i) {
+        if (u_light[0].type_ == 0) {
+            final_color += SpotLight(u_light[0]);
+        } else if (u_light[0].type_ == 1) {
+            final_color += PointLight(u_light[0]);
+        }
+    //}
+
+     vec4 textureColor = texture(texture1, uv);
+
+    
+    vec3 combinedColor = textureColor.rgb * final_color;
+    
+    fragColor = vec4(combinedColor, 1.0);
 }

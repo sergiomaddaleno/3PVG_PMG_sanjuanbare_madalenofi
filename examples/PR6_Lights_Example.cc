@@ -2,6 +2,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include <optional>
 #include <string>
 #include <../deps/glm/glm.hpp>
@@ -35,6 +39,70 @@ char* vs_light = (char*)ReadFile("../assets/shaders/vertex.vs");
 int num_entities = 5000;
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
+
+
+void ChangeLight(ECSManager& ecs) {
+
+    auto li = ecs.getComponentList<LightComponent>().begin();
+    auto ti = ecs.getComponentList<TransformComponent>().begin();
+    auto liend = ecs.getComponentList<LightComponent>().end();
+    auto tiend = ecs.getComponentList<TransformComponent>().end();
+
+    int counter = 0;
+    for (; li != liend && ti != tiend; ++li, ++ti) {
+
+        if (li->has_value() && ti->has_value()) {
+
+
+            auto& light_comp = li->value();
+            auto& tr_comp = ti->value();
+
+            ImGui::Text("Especular");
+            ImGui::DragFloat("X", &light_comp.light_.spec_color_.x, 1.0f, 0.0f, 1.0f, "%.3f");
+            ImGui::DragFloat("Y", &light_comp.light_.spec_color_.y, 1.0f, 0.0f, 1.0f, "%.3f");
+            ImGui::DragFloat("Z", &light_comp.light_.spec_color_.z, 1.0f, 0.0f, 1.0f, "%.3f");
+
+            ImGui::Text("Direction");
+            ImGui::DragFloat("Xp", &tr_comp.position.x, 1.0f, -1000.0f, 100.0f, "%.3f");
+            ImGui::DragFloat("Yp", &tr_comp.position.y, 1.0f, -100.0f, 100.0f, "%.3f");
+            ImGui::DragFloat("Zp", &tr_comp.position.z, 1.0f, -100.0f, 100.0f, "%.3f");
+
+            ImGui::Text("Type");
+            ImGui::DragInt("type", &light_comp.light_.type_, 1, 0, 1, "%d");
+        }
+    }
+
+
+}
+
+void InitImGui(GLFWwindow* w) {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    int width, height;
+    glfwGetFramebufferSize(w, &width, &height);
+    io.DisplaySize = ImVec2((float)width, (float)height);
+
+    ImGui_ImplGlfw_InitForOpenGL(w, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+}
+
+void MyImGui(ECSManager& ecs) {
+    ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("Menu");
+
+    ChangeLight(ecs);
+
+    ImGui::End();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 int main(int, char**) {
    
     auto window = Window::make(800, 600, "Window");
@@ -64,7 +132,7 @@ int main(int, char**) {
     ecs.add_component<LightComponent>(e);
     ecs.add_component<TransformComponent>(e);
     ecs.get_component<LightComponent>(e)->shader = light_shader;
-    ecs.get_component<TransformComponent>(e)->position = { 1.0f, -2.2f, 0.0f };
+    ecs.get_component<TransformComponent>(e)->position = { 1.0f, -4.2f, 2.0f };
     //ecs.get_component<LightComponent>(e)->light_.dir_ = ;
     e++;
     // Mesh
@@ -79,7 +147,7 @@ int main(int, char**) {
     //---
     
     render_system.initMesh(ecs);
-
+    InitImGui(window->getWindow());
     double lastTime = window->getTime();
     bool done = false;
     while (!done) {
@@ -92,7 +160,7 @@ int main(int, char**) {
 
         ecs.get_component<TransformComponent>(e)->moveEntity(input, dt);
         render_system.renderLight(ecs, rd);
-
+        MyImGui(ecs);
         if (window->closePressed()) done = true;
     }
 

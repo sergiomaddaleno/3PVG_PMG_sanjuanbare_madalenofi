@@ -2,11 +2,11 @@
 #include "light.h"
 
 Light::Light()
-    : type_(0),                         // Inicializamos type_ a 0
+    : type_(1),                         // Inicializamos type_ a 0
     enabled_(0),                        // false por defecto
-    dir_(0.0f, 1.0f, 0.0f),            // Dirección por defecto hacia abajo
-    diff_color_(1.0f, 1.0f, 1.0f),      // Color difuso blanco
-    spec_color_(1.0f, 1.0f, 1.0f),      // Color especular blanco
+    dir_(-1.0f, -1.0f, -1.0f),            // Dirección por defecto hacia abajo
+    diff_color_(1.0f, 0.0f, 0.0f),      // Color difuso blanco
+    spec_color_(1.0f, 0.0f, 0.0f),      // Color especular blanco
     light_color_(1.0f, 0.0f, 0.0f),     // Color de luz blanco
     ambient_color(0.1f, 0.1f, 0.1f),    // Color ambiental tenue
     linear_att(0.7f),                   // Atenuación lineal por defecto
