@@ -142,7 +142,7 @@ project"MyMotor"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui" } 
+includedirs { "include", "deps/imgui" , "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")

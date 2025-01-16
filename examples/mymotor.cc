@@ -2,9 +2,23 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+
+#include "imgui_internal.h"
+
+#include "ImGuizmo.h"
+#include "ImGuizmo.cpp"
+
+#include "ImSequencer.h"
+#include "ImZoomSlider.h"
+#include "ImCurveEdit.h"
+#include "GraphEditor.h"
+#include <cmath>
+#include <vector>
+#include <algorithm>
 
 #include <optional>
 #include <string>
@@ -18,6 +32,10 @@
 #include "post_processing.h"
 #include "utils.h"
 #include "skybox.h"
+
+#include <../deps/glm/glm.hpp>
+#include <../deps/glm/gtc/matrix_transform.hpp>
+#include <../deps/glm/gtc/type_ptr.hpp>
 
 #include "ecs_manager.h"
 #include "scripting.h"
@@ -58,6 +76,22 @@ char* lua_file = ReadFile("../scripts/settings.lua");
 
 Shader normals_shader, texture_shader;
 Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
+
+//Guizmo
+bool useWindow = true;
+int gizmoCount = 1;
+float camDistance = 8.f;
+static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
+static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+static bool useSnap(false);
+static float snap[3] = { 1.f, 1.f, 1.f };
+int lastUsing = 0;
+float objectMatrix[1][16] = {
+  { 1.f, 0.f, 0.f, 0.f,
+    0.f, 1.f, 0.f, 0.f,     
+    0.f, 0.f, 1.f, 0.f,     //scale
+    10.f, 0.f, 0.f, 1.f }, //translate
+};
 
 void ChangeShader() {
 
@@ -110,30 +144,46 @@ void ChangePostProcess() {
     }
 }
 
+//Guizmo
+void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display_w, int display_h) {
+    ImGuizmo::BeginFrame();
+    ImGuizmo::SetRect(0, 0, (float)display_w, (float)display_h);
+
+    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
+        mCurrentGizmoOperation, mCurrentGizmoMode,
+        objectMatrix[0], nullptr,
+        useSnap ? snap : nullptr);
+}
+
 void InitImGui(GLFWwindow* w) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-    int width, height;
-    glfwGetFramebufferSize(w, &width, &height);
-    io.DisplaySize = ImVec2((float)width, (float)height);
-
     ImGui_ImplGlfw_InitForOpenGL(w, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-void MyImGui() {
+void MyImGui(GLFWwindow* w) {
+
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
+
+    glfwGetFramebufferSize(w, &rd.w_width, &rd.w_height);
+
+    glm::mat4 projection = glm::perspective(glm::radians(rd.fov),
+        (float)rd.w_width / (float)rd.w_height,
+        0.1f, 100.0f);
 
     ImGui::Begin("Menu");
 
     ChangeShader();
     ChangePostProcess();
-    
+
     ImGui::End();
+
+    RenderScene(rd.cam.getViewMatrix(), projection, rd.w_width ,rd.w_height);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -232,7 +282,7 @@ int main(int, char**) {
 
         postProcc.endRender();
 
-        MyImGui();
+        MyImGui(window->getWindow());
 
         if (window->closePressed()) done = true;
     }
