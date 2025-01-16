@@ -86,12 +86,6 @@ static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
 static bool useSnap(false);
 static float snap[3] = { 1.f, 1.f, 1.f };
 int lastUsing = 0;
-float objectMatrix[1][16] = {
-  { 1.f, 0.f, 0.f, 0.f,
-    0.f, 1.f, 0.f, 0.f,     
-    0.f, 0.f, 1.f, 0.f,     //scale
-    10.f, 0.f, 0.f, 1.f }, //translate
-};
 
 void ChangeShader() {
 
@@ -149,10 +143,31 @@ void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display
     ImGuizmo::BeginFrame();
     ImGuizmo::SetRect(0, 0, (float)display_w, (float)display_h);
 
+    auto& transform = ecs.get_component<TransformComponent>(e);
+
+    glm::vec3 position = transform->position;
+    glm::vec3 rotation = transform->rotation;
+    glm::vec3 scale = transform->scale;
+
+    glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position);
+    modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    modelMatrix = glm::scale(modelMatrix, scale);
+
+    float objectMatrix[16] = {
+    modelMatrix[0][0], modelMatrix[0][1], modelMatrix[0][2], modelMatrix[0][3],
+    modelMatrix[1][0], modelMatrix[1][1], modelMatrix[1][2], modelMatrix[1][3],
+    modelMatrix[2][0], modelMatrix[2][1], modelMatrix[2][2], modelMatrix[2][3],
+    modelMatrix[3][0], modelMatrix[3][1], modelMatrix[3][2], modelMatrix[3][3]
+    };
+
     ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
         mCurrentGizmoOperation, mCurrentGizmoMode,
-        objectMatrix[0], nullptr,
+        objectMatrix, nullptr,
         useSnap ? snap : nullptr);
+
+    transform->position = glm::vec3(objectMatrix[12], objectMatrix[13], objectMatrix[14]);
 }
 
 void InitImGui(GLFWwindow* w) {
