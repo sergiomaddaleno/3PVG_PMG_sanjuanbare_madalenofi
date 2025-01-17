@@ -35,7 +35,13 @@
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <../deps/glm/gtx/matrix_decompose.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
+
+
+
+
 
 #include "ecs_manager.h"
 #include "scripting.h"
@@ -138,37 +144,94 @@ void ChangePostProcess() {
     }
 }
 
+
+
 //Guizmo
 void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display_w, int display_h) {
+    static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    static bool useSnap = false;
+    static float snap[3] = { 1.0f, 1.0f, 1.0f };
+
     ImGuizmo::BeginFrame();
     ImGuizmo::SetRect(0, 0, (float)display_w, (float)display_h);
 
     auto& transform = ecs.get_component<TransformComponent>(e);
 
     glm::vec3 position = transform->position;
-    glm::vec3 rotation = transform->rotation;
+    glm::quat rotation = transform->rotation; 
     glm::vec3 scale = transform->scale;
 
     glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position);
-    modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    modelMatrix = glm::scale(modelMatrix, scale);
 
     float objectMatrix[16] = {
-    modelMatrix[0][0], modelMatrix[0][1], modelMatrix[0][2], modelMatrix[0][3],
-    modelMatrix[1][0], modelMatrix[1][1], modelMatrix[1][2], modelMatrix[1][3],
-    modelMatrix[2][0], modelMatrix[2][1], modelMatrix[2][2], modelMatrix[2][3],
-    modelMatrix[3][0], modelMatrix[3][1], modelMatrix[3][2], modelMatrix[3][3]
+        modelMatrix[0][0], modelMatrix[0][1], modelMatrix[0][2], modelMatrix[0][3],
+        modelMatrix[1][0], modelMatrix[1][1], modelMatrix[1][2], modelMatrix[1][3],
+        modelMatrix[2][0], modelMatrix[2][1], modelMatrix[2][2], modelMatrix[2][3],
+        modelMatrix[3][0], modelMatrix[3][1], modelMatrix[3][2], modelMatrix[3][3]
     };
 
+    ImGui::Begin("Gizmo Controls");
+    if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
+        mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
+        mCurrentGizmoOperation = ImGuizmo::ROTATE;
+    if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
+        mCurrentGizmoOperation = ImGuizmo::SCALE;
+
+    ImGui::Checkbox("Use Snap", &useSnap);
+    if (useSnap) {
+        if (mCurrentGizmoOperation == ImGuizmo::TRANSLATE)
+            ImGui::InputFloat3("Snap (Translate)", snap);
+        else if (mCurrentGizmoOperation == ImGuizmo::ROTATE)
+            ImGui::InputFloat("Snap (Rotate)", &snap[0]);
+        else if (mCurrentGizmoOperation == ImGuizmo::SCALE)
+            ImGui::InputFloat3("Snap (Scale)", snap);
+    }
+    ImGui::End();
+
     ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-        mCurrentGizmoOperation, mCurrentGizmoMode,
+        mCurrentGizmoOperation, ImGuizmo::LOCAL,
         objectMatrix, nullptr,
         useSnap ? snap : nullptr);
 
-    transform->position = glm::vec3(objectMatrix[12], objectMatrix[13], objectMatrix[14]);
+    glm::mat4 newModelMatrix = glm::make_mat4(objectMatrix);
+
+    if (mCurrentGizmoOperation == ImGuizmo::TRANSLATE) {
+        transform->position = glm::vec3(newModelMatrix[3]);
+    }
+    else if (mCurrentGizmoOperation == ImGuizmo::ROTATE) {
+        glm::mat3 rotationMatrix = glm::mat3(newModelMatrix);
+
+       
+        glm::quat newRotationQuat = glm::quat_cast(rotationMatrix);
+
+     
+        transform->rotation = newRotationQuat * rotation; 
+
+        
+    }
+    else if (mCurrentGizmoOperation == ImGuizmo::SCALE) {
+        glm::mat3 rotationMatrix = glm::mat3(newModelMatrix);  
+        glm::vec3 scaleVec = glm::vec3(
+            glm::length(newModelMatrix[0]),  
+            glm::length(newModelMatrix[1]),
+            glm::length(newModelMatrix[2])
+        );
+
+        transform->scale = scaleVec; 
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
 
 void InitImGui(GLFWwindow* w) {
     IMGUI_CHECKVERSION();
@@ -258,7 +321,7 @@ int main(int, char**) {
 
     ecs.get_component<RenderComponent>(e)->mesh_ = car_mesh;
     ecs.get_component<TransformComponent>(e)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
-    ecs.get_component<TransformComponent>(e)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
+    ecs.get_component<TransformComponent>(e)->rotation = glm::vec3{ 2.0f, 1.0f, 0.0f };
     ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
     ecs.get_component<RenderComponent>(e)->shader = texture_shader;
 
