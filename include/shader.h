@@ -17,7 +17,7 @@ public:
 
 	int getUniformLocation(const char* name) const;
 
-	void setUniformValue(const int uniform_loc, const Type uniform_type, const float* number) const;
+	void setUniformValue(const int uniform_loc, const Type uniform_type, const void* data) const;
 
 	void useProgram();
 

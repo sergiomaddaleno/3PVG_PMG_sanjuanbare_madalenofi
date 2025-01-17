@@ -82,37 +82,30 @@ void RenderSystem::renderMesh(ECSManager& ecs, RenderData& rd) {
                 render_comp->shader.useProgram();
                 glCullFace(GL_BACK);
 
-                glm::mat4 model = glm::mat4(1.0f);  
-
-
-                
-
-                glm::mat4 rotationMatrix = glm::mat4_cast(transform_comp->rotation);
-                
-                
-
-                model = glm::translate(model, transform_comp->position) * rotationMatrix;
-
-                
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, transform_comp->position);
+                model = glm::rotate(model, rd.transf_comp.angle, glm::vec3(rd.transf_comp.rotation.x, rd.transf_comp.rotation.y, rd.transf_comp.rotation.z));
                 model = glm::scale(model, transform_comp->scale);
 
-
                 glm::mat4 view = rd.cam.getViewMatrix();
-                glm::mat4 projection = glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);
+                glm::mat4 projection = rd.cam.getProjectionMatrix();
                 glm::mat4 mvp = projection * view * model;
 
-                glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-                glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "model"), 1, GL_FALSE, glm::value_ptr(model));
-                glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "view"), 1, GL_FALSE, glm::value_ptr(view));
-                glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
 
-                glActiveTexture(GL_TEXTURE0);
+                // Texture
+                float tex_id = 0.0f;
                 render_comp->texture = mesh.getTexture(0);
                 render_comp->texture.bind();
-                glUniform1i(glGetUniformLocation(render_comp->shader.getProgram(), "texture1"), 0);
+                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture1"), Type::T_INT_1, &tex_id);
+                // ---
 
-                GLuint fog_log = glGetUniformLocation(render_comp->shader.getProgram(), "u_fog");
-                glUniform1i(fog_log, rd.b_fog_);
+                //Fog
+                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &rd.b_fog_);
+
                 glBindVertexArray(mesh.VAO);
                 glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
@@ -122,10 +115,6 @@ void RenderSystem::renderMesh(ECSManager& ecs, RenderData& rd) {
 
     glUseProgram(0);
 }
-
-
-
-
 
 void RenderSystem::initLight(ECSManager& ecs)
 {
@@ -153,35 +142,37 @@ void RenderSystem::renderLight(ECSManager& ecs, RenderData& rd) {
             // Enviar datos de luz al shader
             char name[60];
             sprintf(name, "u_light[%d].type_", counter);
-            glUniform1i(glGetUniformLocation(light_comp.shader.getProgram(), name), light_comp.light_.type_); // Tipo de luz
+            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation(name), Type::T_INT_1, &light_comp.light_.type_);
 
             sprintf(name, "u_light[%d].pos_", counter);
-            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(transform.position)); // Posición
+            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation(name), Type::T_FLOAT_3, glm::value_ptr(transform.position));
 
             sprintf(name, "u_light[%d].dir_", counter);
-            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(glm::normalize(light_comp.light_.dir_))); // Dirección normalizada
+            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation(name), Type::T_FLOAT_3, glm::value_ptr(glm::normalize(light_comp.light_.dir_)));
 
             sprintf(name, "u_light[%d].diff_color_", counter);
-            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(light_comp.light_.diff_color_)); // Difusa
+            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation(name), Type::T_FLOAT_3, glm::value_ptr(light_comp.light_.diff_color_));
 
             sprintf(name, "u_light[%d].spec_color_", counter);
-            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(light_comp.light_.spec_color_)); // Especular
+            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation(name), Type::T_FLOAT_3, glm::value_ptr(light_comp.light_.spec_color_));
 
             sprintf(name, "u_light[%d].ambient_color", counter);
-            glUniform3fv(glGetUniformLocation(light_comp.shader.getProgram(), name), 1, glm::value_ptr(light_comp.light_.ambient_color)); // Ambiental
+            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation(name), Type::T_FLOAT_3, glm::value_ptr(light_comp.light_.ambient_color));
 
             sprintf(name, "u_light[%d].constant_att_", counter);
-            glUniform1f(glGetUniformLocation(light_comp.shader.getProgram(), name), light_comp.light_.constant_att_); // Atenuación constante
+            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation(name), Type::T_FLOAT_1, &light_comp.light_.constant_att_);
 
             sprintf(name, "u_light[%d].light_linear_", counter);
-            glUniform1f(glGetUniformLocation(light_comp.shader.getProgram(), name), light_comp.light_.light_linear_); // Atenuación lineal
+            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation(name), Type::T_FLOAT_1, &light_comp.light_.light_linear_);
 
             sprintf(name, "u_light[%d].light_quadratic_", counter);
-            glUniform1f(glGetUniformLocation(light_comp.shader.getProgram(), name), light_comp.light_.light_quadratic_); // Atenuación cuadrática
+            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation(name), Type::T_FLOAT_1, &light_comp.light_.light_quadratic_);
 
             counter++;
 
-            // Renderizar objetos
+            // -------------------------------------------------------------
+            //Mesh
+
             auto ri = ecs.getComponentList<RenderComponent>().begin();
             auto ti = ecs.getComponentList<TransformComponent>().begin();
             auto riend = ecs.getComponentList<RenderComponent>().end();
@@ -195,34 +186,31 @@ void RenderSystem::renderLight(ECSManager& ecs, RenderData& rd) {
                     for (auto& mesh : render_comp->mesh_->meshes) {
                         render_comp->shader.useProgram();
                         glCullFace(GL_BACK);
-                        
+
                         glm::mat4 model = glm::mat4(1.0f);
-
                         model = glm::translate(model, transform_comp->position);
-                        model = glm::rotate(model, glm::radians(transform_comp->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-                        model = glm::rotate(model, glm::radians(transform_comp->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-                        model = glm::rotate(model, glm::radians(transform_comp->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-
+                        model = glm::rotate(model, rd.transf_comp.angle, glm::vec3(rd.transf_comp.rotation.x, rd.transf_comp.rotation.y, rd.transf_comp.rotation.z));
                         model = glm::scale(model, transform_comp->scale);
+
                         glm::mat4 view = rd.cam.getViewMatrix();
-                        glm::mat4 projection = glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);
+                        glm::mat4 projection = rd.cam.getProjectionMatrix();
                         glm::mat4 mvp = projection * view * model;
 
-                       
-                        glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-                        glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "model"), 1, GL_FALSE, glm::value_ptr(model));
-                        glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "view"), 1, GL_FALSE, glm::value_ptr(view));
-                        glUniformMatrix4fv(glGetUniformLocation(render_comp->shader.getProgram(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
 
-                       
-                        glActiveTexture(GL_TEXTURE0);
+                        // Texture
+                        float tex_id = 0.0f;
                         render_comp->texture = mesh.getTexture(0);
                         render_comp->texture.bind();
-                        glUniform1i(glGetUniformLocation(render_comp->shader.getProgram(), "texture1"), 0);
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture1"), Type::T_INT_1, &tex_id);
+                        // ---
 
-                        
-                        GLuint fog_log = glGetUniformLocation(render_comp->shader.getProgram(), "u_fog");
-                        glUniform1i(fog_log, rd.b_fog_);
+                        //Fog
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &rd.b_fog_);
+
                         glBindVertexArray(mesh.VAO);
                         glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
                         glBindVertexArray(0);
@@ -231,11 +219,11 @@ void RenderSystem::renderLight(ECSManager& ecs, RenderData& rd) {
             }
 
             glUseProgram(0);
-            glBlendFunc(GL_ONE, GL_ONE); // Configurar mezcla aditiva para luces
+            glBlendFunc(GL_ONE, GL_ONE);
         }
     }
 
-    glDisable(GL_BLEND); // Desactivar blending
+    glDisable(GL_BLEND);
 }
 
 

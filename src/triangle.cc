@@ -64,11 +64,11 @@ void Triangle::render(RenderData& rd)
     model = glm::scale(model, glm::vec3(rd.transf_comp.scale.x, rd.transf_comp.scale.y, rd.transf_comp.scale.z));
 
     glm::mat4 view = rd.cam.getViewMatrix();
-    glm::mat4 projection = glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);
+    glm::mat4 projection = rd.cam.getProjectionMatrix();
     glm::mat4 mvp = projection * view * model;
 
-    GLint mvpLocation = glGetUniformLocation(rd.render_comp.shader.getProgram(), "MVP");
-    glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
+    GLint mvpLocation = rd.render_comp.shader.getUniformLocation("MVP");
+    rd.render_comp.shader.setUniformValue(mvpLocation, Type::T_MAT_4x4, glm::value_ptr(mvp));
 
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(vpos_location);

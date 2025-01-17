@@ -119,22 +119,20 @@ void Mesh::render(RenderData& rd)
         model = glm::scale(model, glm::vec3(rd.transf_comp.scale.x, rd.transf_comp.scale.y, rd.transf_comp.scale.z));
 
         glm::mat4 view = rd.cam.getViewMatrix();
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-
-        glm::mat4 projection = glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);
+        glm::mat4 projection = rd.cam.getProjectionMatrix();
         glm::mat4 mvp = projection * view * model;
 
         // For shaders ---
-        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.shader.getProgram(), "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.shader.getProgram(), "model"), 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.shader.getProgram(), "view"), 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(glGetUniformLocation(rd.render_comp.shader.getProgram(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        rd.render_comp.shader.setUniformValue(rd.render_comp.shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+        rd.render_comp.shader.setUniformValue(rd.render_comp.shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+        rd.render_comp.shader.setUniformValue(rd.render_comp.shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+        rd.render_comp.shader.setUniformValue(rd.render_comp.shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
 
         // Texture
-        glActiveTexture(GL_TEXTURE0);
+        float tex_id = 0.0f;
         rd.render_comp.texture = mesh.getTexture(0);
         rd.render_comp.texture.bind();
-        glUniform1i(glGetUniformLocation(rd.render_comp.shader.getProgram(), "texture1"), 0);
+        rd.render_comp.shader.setUniformValue(rd.render_comp.shader.getUniformLocation("texture1"), Type::T_INT_1, &tex_id);
         // ---
 
         glBindVertexArray(rd.render_comp.mesh_->VAO);

@@ -5,6 +5,9 @@ const float PI = 3.141592653589793f;
 #include "camera.h"
 #include <input.h>
 #include "../deps/glm/gtx/transform.hpp"
+#include "utils.h"
+
+static RenderData rd;
 
 Camera::Camera() : 
 
@@ -133,6 +136,11 @@ const float Camera::getSensitivity() const {
     return sensitivity_;
 }
 
-glm::mat4 Camera::getViewMatrix(){
+glm::mat4 Camera::getViewMatrix() const {
     return view_;
+}
+
+glm::mat4 Camera::getProjectionMatrix() const
+{
+    return glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);
 }

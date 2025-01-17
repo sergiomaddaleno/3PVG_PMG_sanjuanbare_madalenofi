@@ -1,5 +1,9 @@
 
 #include "post_processing.h"
+#include "utils.h"
+
+#include <../deps/glm/gtc/matrix_transform.hpp>
+#include <../deps/glm/gtc/type_ptr.hpp>
 
 void PostProcessing::initData()
 {
@@ -65,33 +69,17 @@ void PostProcessing::render(Shader& shader, Effect effect)
     glUniform1i(screen_tex_loc, 0);
 
     switch (effect) {
-    case Effect::Grey: {
-            GLuint grey_loc = glGetUniformLocation(shader.getProgram(), "u_grey");
-            glUniform1f(grey_loc, grey_);
-            break;
-        }
-    case Effect::Negative: {
-            GLuint neg_loc = glGetUniformLocation(shader.getProgram(), "u_negative");
-            glUniform1f(neg_loc, negative_);
-            break;
-        }
-    case Effect::Waves: {
-            GLuint waves_loc = glGetUniformLocation(shader.getProgram(), "u_waves");
-            glUniform1f(waves_loc, waves_);
-            break;
-        }
-    case Effect::Blur: {
-            GLuint blur_loc = glGetUniformLocation(shader.getProgram(), "u_blur");
-            glUniform1f(blur_loc, blur_);
-            break;
-        }
-    case Effect::Kernel: {
-            GLuint cl_loc = glGetUniformLocation(shader.getProgram(), "u_kernel_types");
-            glUniform1i(cl_loc, kernel_types_);
-            break;
-        }
-    }
+    case Effect::Grey: shader.setUniformValue(shader.getUniformLocation("u_grey"), Type::T_FLOAT_1, &grey_); break;
+
+    case Effect::Negative: shader.setUniformValue(shader.getUniformLocation("u_negative"), Type::T_FLOAT_1, &negative_); break;
+
+    case Effect::Waves: shader.setUniformValue(shader.getUniformLocation("u_waves"), Type::T_FLOAT_1, &waves_); break;
+
+    case Effect::Blur: shader.setUniformValue(shader.getUniformLocation("u_blur"), Type::T_FLOAT_1, &blur_); break;
+
+    case Effect::Kernel: shader.setUniformValue(shader.getUniformLocation("u_kernel_types"), Type::T_INT_1, &kernel_types_); break;
     
+    }
     // -- 
 
     glActiveTexture(GL_TEXTURE0);

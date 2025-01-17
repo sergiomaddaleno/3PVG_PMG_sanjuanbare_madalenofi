@@ -110,19 +110,30 @@ project"PR0_Window"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui" } 
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
+	"examples/PR0_Window_Example.cc",
 	"src/**",
 	"include/**",
 	"scripts/**",
-	"deps/**",
 	"assets/**",
-	"examples/PR0_Window_Example.cc"
+
+	"deps/*.h",
+	"deps/imgui/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/backends/imgui_impl_glfw.h",
+	"deps/imgui/backends/imgui_impl_glfw.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3.h",
+	"deps/imgui/backends/imgui_impl_opengl3.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
+	"deps/imgui/*.cpp",
+	"deps/imGuizmo/*.h",
+	"deps/imGuizmo/*.cpp",
 }
 ------
 project"MyMotor"
@@ -137,11 +148,11 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
+	"examples/mymotor.cc",
 	"src/**",
 	"include/**",
 	"scripts/**",
 	"assets/**",
-	"examples/mymotor.cc",
 
 	"deps/*.h",
 	"deps/imgui/*.h",
@@ -161,19 +172,30 @@ project"PR1_Triangle"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui" } 
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files {
+	"examples/PR1_Triangle_Example.cc",
 	"src/**",
 	"include/**",
 	"scripts/**",
-	"deps/**",
 	"assets/**",
-	"examples/PR1_Triangle_Example.cc"
+
+	"deps/*.h",
+	"deps/imgui/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/backends/imgui_impl_glfw.h",
+	"deps/imgui/backends/imgui_impl_glfw.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3.h",
+	"deps/imgui/backends/imgui_impl_opengl3.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
+	"deps/imgui/*.cpp",
+	"deps/imGuizmo/*.h",
+	"deps/imGuizmo/*.cpp",
 }
 
 project"PR2_MeshLoad"
@@ -181,19 +203,30 @@ project"PR2_MeshLoad"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui" } 
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files {
+	"examples/PR2_MeshLoad_Example.cc",
 	"src/**",
 	"include/**",
 	"scripts/**",
-	"deps/**",
 	"assets/**",
-	"examples/PR2_MeshLoad_Example.cc"
+
+	"deps/*.h",
+	"deps/imgui/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/backends/imgui_impl_glfw.h",
+	"deps/imgui/backends/imgui_impl_glfw.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3.h",
+	"deps/imgui/backends/imgui_impl_opengl3.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
+	"deps/imgui/*.cpp",
+	"deps/imGuizmo/*.h",
+	"deps/imGuizmo/*.cpp",
 }
 
 project"PR3_JobSystem"
@@ -201,19 +234,30 @@ project"PR3_JobSystem"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui" } 
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files {
+	"examples/PR3_JobSystem_Example.cc",
 	"src/**",
 	"include/**",
 	"scripts/**",
-	"deps/**",
 	"assets/**",
-	"examples/PR3_JobSystem_Example.cc"
+
+	"deps/*.h",
+	"deps/imgui/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/backends/imgui_impl_glfw.h",
+	"deps/imgui/backends/imgui_impl_glfw.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3.h",
+	"deps/imgui/backends/imgui_impl_opengl3.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
+	"deps/imgui/*.cpp",
+	"deps/imGuizmo/*.h",
+	"deps/imGuizmo/*.cpp",
 }
 
 project"PR4_ECSManager"
@@ -221,19 +265,30 @@ project"PR4_ECSManager"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui" } 
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files {
+	"examples/PR4_ECSManager_Example.cc",
 	"src/**",
 	"include/**",
 	"scripts/**",
-	"deps/**",
 	"assets/**",
-	"examples/PR4_ECSManager_Example.cc",
+
+	"deps/*.h",
+	"deps/imgui/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/backends/imgui_impl_glfw.h",
+	"deps/imgui/backends/imgui_impl_glfw.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3.h",
+	"deps/imgui/backends/imgui_impl_opengl3.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
+	"deps/imgui/*.cpp",
+	"deps/imGuizmo/*.h",
+	"deps/imGuizmo/*.cpp",
 }
 
 project"PR5_Scripting"
@@ -241,19 +296,30 @@ project"PR5_Scripting"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui" } 
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
+	"examples/PR5_Scripting_Example.cc",
 	"src/**",
 	"include/**",
 	"scripts/**",
-	"deps/**",
 	"assets/**",
-	"examples/PR5_Scripting_Example.cc",
+
+	"deps/*.h",
+	"deps/imgui/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/backends/imgui_impl_glfw.h",
+	"deps/imgui/backends/imgui_impl_glfw.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3.h",
+	"deps/imgui/backends/imgui_impl_opengl3.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
+	"deps/imgui/*.cpp",
+	"deps/imGuizmo/*.h",
+	"deps/imGuizmo/*.cpp",
 }
 
 project"PR6_Lights"
@@ -261,17 +327,28 @@ project"PR6_Lights"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui" } 
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
+	"examples/PR6_Lights_Example.cc",
 	"src/**",
 	"include/**",
 	"scripts/**",
-	"deps/**",
 	"assets/**",
-	"examples/PR6_Lights_Example.cc",
+
+	"deps/*.h",
+	"deps/imgui/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/backends/imgui_impl_glfw.h",
+	"deps/imgui/backends/imgui_impl_glfw.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3.h",
+	"deps/imgui/backends/imgui_impl_opengl3.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
+	"deps/imgui/*.cpp",
+	"deps/imGuizmo/*.h",
+	"deps/imGuizmo/*.cpp",
 }

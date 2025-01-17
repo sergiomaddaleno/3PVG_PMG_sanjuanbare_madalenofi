@@ -29,7 +29,9 @@ public:
 
 	const float getSensitivity() const;
 
-	glm::mat4 getViewMatrix();
+	glm::mat4 getViewMatrix() const;
+
+	glm::mat4 getProjectionMatrix() const;
 
 	//--
 	void setPosition(glm::vec3 position) {position = position_;}

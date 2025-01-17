@@ -34,18 +34,23 @@ int Shader::getUniformLocation(const char* name) const {
 	return glGetUniformLocation(program_, name);
 }
 
-void Shader::setUniformValue(const int uniform_loc, const Type uniform_type, const float* number) const
+void Shader::setUniformValue(const int uniform_loc, const Type uniform_type, const void* data) const
 {
 	switch (uniform_type) {
 
-	case T_FLOAT_1: glUniform1f(uniform_loc, number[0]); break;
-	case T_FLOAT_2: glUniform2f(uniform_loc, number[0], number[1]); break;
-	case T_FLOAT_3: glUniform3f(uniform_loc, number[0], number[1], number[2]); break;
-	case T_FLOAT_4: glUniform4f(uniform_loc, number[0], number[1], number[2], number[3]); break;
+	case T_FLOAT_1: glUniform1f(uniform_loc, *((float*)data)); break;
+	case T_FLOAT_2: glUniform2f(uniform_loc, ((float*)data)[0], ((float*)data)[1]); break;
+	case T_FLOAT_3: glUniform3f(uniform_loc, ((float*)data)[0], ((float*)data)[1], ((float*)data)[2]); break;
+	case T_FLOAT_4: glUniform4f(uniform_loc, ((float*)data)[0], ((float*)data)[1], ((float*)data)[2], ((float*)data)[3]); break;
 
-	case T_MAT_2x2: glUniformMatrix2fv(uniform_loc, 1, GL_FALSE, number); break;
-	case T_MAT_3x3: glUniformMatrix3fv(uniform_loc, 1, GL_FALSE, number); break;
-	case T_MAT_4x4: glUniformMatrix4fv(uniform_loc, 1, GL_FALSE, number); break;
+	case T_INT_1: glUniform1i(uniform_loc, *((int*)data)); break;
+	case T_INT_2: glUniform2i(uniform_loc, ((int*)data)[0], ((int*)data)[1]); break;
+	case T_INT_3: glUniform3i(uniform_loc, ((int*)data)[0], ((int*)data)[1], ((int*)data)[2]); break;
+	case T_INT_4: glUniform4i(uniform_loc, ((int*)data)[0], ((int*)data)[1], ((int*)data)[2], ((int*)data)[3]); break;
+
+	case T_MAT_2x2: glUniformMatrix2fv(uniform_loc, 1, GL_FALSE, (float*)data); break;
+	case T_MAT_3x3: glUniformMatrix3fv(uniform_loc, 1, GL_FALSE, (float*)data); break;
+	case T_MAT_4x4: glUniformMatrix4fv(uniform_loc, 1, GL_FALSE, (float*)data); break;
 
 	}
 }
