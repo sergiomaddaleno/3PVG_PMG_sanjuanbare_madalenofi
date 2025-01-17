@@ -29,12 +29,12 @@ void Shader::compile(const char* vertex_src, const char* fragment_src)
 	glCullFace(GL_BACK);
 }
 
-int Shader::get_uniform_location(const char* name) const {
+int Shader::getUniformLocation(const char* name) const {
 
 	return glGetUniformLocation(program_, name);
 }
 
-void Shader::set_uniform_value(const int uniform_loc, const Type uniform_type, const float* number) const
+void Shader::setUniformValue(const int uniform_loc, const Type uniform_type, const float* number) const
 {
 	switch (uniform_type) {
 

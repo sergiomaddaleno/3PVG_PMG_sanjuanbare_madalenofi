@@ -1,3 +1,8 @@
+#include <cmath>
+#include <vector>
+#include <algorithm>
+#include <optional>
+#include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -6,25 +11,16 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
 #include "imgui_internal.h"
 
 #include "ImGuizmo.h"
-#include "ImGuizmo.cpp"
-
 #include "ImSequencer.h"
 #include "ImZoomSlider.h"
 #include "ImCurveEdit.h"
 #include "GraphEditor.h"
-#include <cmath>
-#include <vector>
-#include <algorithm>
-
-#include <optional>
-#include <string>
-#include <../deps/glm/glm.hpp>
 
 #include "window.h"
+#include "imgui_manager.h"
 #include "mesh.h"
 #include "render_system.h"
 #include "shader.h"
@@ -32,6 +28,9 @@
 #include "post_processing.h"
 #include "utils.h"
 #include "skybox.h"
+#include "ecs_manager.h"
+#include "scripting.h"
+#include "Components/scripting_component.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -39,19 +38,12 @@
 #include <../deps/glm/gtx/matrix_decompose.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
 
-
-
-
-
-#include "ecs_manager.h"
-#include "scripting.h"
-#include "Components/scripting_component.h"
-
 #define M_PI 3.14159265358979323846
 
 std::shared_ptr<Mesh> car_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
+ImGuiManager imgui_manager;
 RenderSystem render_system;
 RenderData rd;
 LuaScript ls;
@@ -144,8 +136,6 @@ void ChangePostProcess() {
     }
 }
 
-
-
 //Guizmo
 void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display_w, int display_h) {
     static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
@@ -223,16 +213,6 @@ void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display
 
 }
 
-
-
-
-
-
-
-
-
-
-
 void InitImGui(GLFWwindow* w) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -261,7 +241,7 @@ void MyImGui(GLFWwindow* w) {
 
     ImGui::End();
 
-    RenderScene(rd.cam.getViewMatrix(), projection, rd.w_width ,rd.w_height);
+    RenderScene(rd.cam.getViewMatrix(), projection, rd.w_width, rd.w_height);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -339,6 +319,7 @@ int main(int, char**) {
     //--
 
     InitImGui(window->getWindow());
+    //imgui_manager.Init(window->getWindow());
 
     double lastTime = window->getTime();
     bool done = false;
@@ -361,6 +342,7 @@ int main(int, char**) {
         postProcc.endRender();
 
         MyImGui(window->getWindow());
+        //imgui_manager.Render(window->getWindow(), rd, postProcc);
 
         if (window->closePressed()) done = true;
     }

@@ -116,24 +116,12 @@ conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
-files { "src/*.cc",
-	"include/*.h",
-	"src/**/*.cc",
-	"include/**/*.h",
-	"deps/**/*.h",
-	"deps/**/*.hpp",
-	"deps/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/*.h",
-	"assets/shaders/**/*.vs",
-	"assets/shaders/**/*.fs",
-	"assets/shaders/*.vs",
-	"assets/shaders/*.fs",
-	"assets/textures/**/*.png",
-	"assets/textures/**/*.mtl",
-	"assets/textures/**/*.dds",
-	"assets/obj/**",
-	"scripts/*.lua",
+files { 
+	"src/**",
+	"include/**",
+	"scripts/**",
+	"deps/**",
+	"assets/**",
 	"examples/PR0_Window_Example.cc"
 }
 ------
@@ -142,31 +130,30 @@ project"MyMotor"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui" , "deps/imGuizmo"} 
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
-files { "src/*.cc",
-	"include/*.h",
-	"src/**/*.cc",
-	"include/**/*.h",
-	"deps/**/*.h",
-	"deps/**/*.hpp",
+files { 
+	"src/**",
+	"include/**",
+	"scripts/**",
+	"assets/**",
+	"examples/mymotor.cc",
+
 	"deps/*.h",
-	"deps/imgui/*.cpp",
 	"deps/imgui/*.h",
-	"assets/shaders/**/*.vs",
-	"assets/shaders/**/*.fs",
-	"assets/shaders/*.vs",
-	"assets/shaders/*.fs",
-	"assets/textures/**/*.png",
-	"assets/textures/**/*.mtl",
-	"assets/textures/**/*.dds",
-	"assets/obj/**",
-	"scripts/*.lua",
-	"examples/mymotor.cc"
+	"deps/imgui/*.cpp",
+	"deps/imgui/backends/imgui_impl_glfw.h",
+	"deps/imgui/backends/imgui_impl_glfw.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3.h",
+	"deps/imgui/backends/imgui_impl_opengl3.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
+	"deps/imgui/*.cpp",
+	"deps/imGuizmo/*.h",
+	"deps/imGuizmo/*.cpp",
 }
 
 project"PR1_Triangle"
@@ -180,24 +167,12 @@ conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
-files { "src/*.cc",
-	"include/*.h",
-	"src/**/*.cc",
-	"include/**/*.h",
-	"deps/**/*.h",
-	"deps/**/*.hpp",
-	"deps/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/*.h",
-	"assets/shaders/**/*.vs",
-	"assets/shaders/**/*.fs",
-	"assets/shaders/*.vs",
-	"assets/shaders/*.fs",
-	"assets/textures/**/*.png",
-	"assets/textures/**/*.mtl",
-	"assets/textures/**/*.dds",
-	"assets/obj/**",
-	"scripts/*.lua",
+files {
+	"src/**",
+	"include/**",
+	"scripts/**",
+	"deps/**",
+	"assets/**",
 	"examples/PR1_Triangle_Example.cc"
 }
 
@@ -212,24 +187,12 @@ conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
-files { "src/*.cc",
-	"include/*.h",
-	"src/**/*.cc",
-	"include/**/*.h",
-	"deps/**/*.h",
-	"deps/**/*.hpp",
-	"deps/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/*.h",
-	"assets/shaders/**/*.vs",
-	"assets/shaders/**/*.fs",
-	"assets/shaders/*.vs",
-	"assets/shaders/*.fs",
-	"assets/textures/**/*.png",
-	"assets/textures/**/*.mtl",
-	"assets/textures/**/*.dds",
-	"assets/obj/**",
-	"scripts/*.lua",
+files {
+	"src/**",
+	"include/**",
+	"scripts/**",
+	"deps/**",
+	"assets/**",
 	"examples/PR2_MeshLoad_Example.cc"
 }
 
@@ -244,24 +207,12 @@ conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
-files { "src/*.cc",
-	"include/*.h",
-	"src/**/*.cc",
-	"include/**/*.h",
-	"deps/**/*.h",
-	"deps/**/*.hpp",
-	"deps/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/*.h",
-	"assets/shaders/**/*.vs",
-	"assets/shaders/**/*.fs",
-	"assets/shaders/*.vs",
-	"assets/shaders/*.fs",
-	"assets/textures/**/*.png",
-	"assets/textures/**/*.mtl",
-	"assets/textures/**/*.dds",
-	"assets/obj/**",
-	"scripts/*.lua",
+files {
+	"src/**",
+	"include/**",
+	"scripts/**",
+	"deps/**",
+	"assets/**",
 	"examples/PR3_JobSystem_Example.cc"
 }
 
@@ -276,24 +227,12 @@ conan_config_exec("Debug")
 conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
-files { "src/*.cc",
-	"include/*.h",
-	"src/**/*.cc",
-	"include/**/*.h",
-	"deps/**/*.h",
-	"deps/**/*.hpp",
-	"deps/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/*.h",
-	"assets/shaders/**/*.vs",
-	"assets/shaders/**/*.fs",
-	"assets/shaders/*.vs",
-	"assets/shaders/*.fs",
-	"assets/textures/**/*.png",
-	"assets/textures/**/*.mtl",
-	"assets/textures/**/*.dds",
-	"assets/obj/**",
-	"scripts/*.lua",
+files {
+	"src/**",
+	"include/**",
+	"scripts/**",
+	"deps/**",
+	"assets/**",
 	"examples/PR4_ECSManager_Example.cc",
 }
 
@@ -309,24 +248,11 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
-	"src/*.cc",
-	"include/*.h",
-	"src/**/*.cc",
-	"include/**/*.h",
-	"deps/**/*.h",
-	"deps/**/*.hpp",
-	"deps/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/*.h",
-	"assets/shaders/**/*.vs",
-	"assets/shaders/**/*.fs",
-	"assets/shaders/*.vs",
-	"assets/shaders/*.fs",
-	"assets/textures/**/*.png",
-	"assets/textures/**/*.mtl",
-	"assets/textures/**/*.dds",
-	"assets/obj/**",
-	"scripts/*.lua",
+	"src/**",
+	"include/**",
+	"scripts/**",
+	"deps/**",
+	"assets/**",
 	"examples/PR5_Scripting_Example.cc",
 }
 
@@ -342,23 +268,10 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
-	"src/*.cc",
-	"include/*.h",
-	"src/**/*.cc",
-	"include/**/*.h",
-	"deps/**/*.h",
-	"deps/**/*.hpp",
-	"deps/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/*.h",
-	"assets/shaders/**/*.vs",
-	"assets/shaders/**/*.fs",
-	"assets/shaders/*.vs",
-	"assets/shaders/*.fs",
-	"assets/textures/**/*.png",
-	"assets/textures/**/*.mtl",
-	"assets/textures/**/*.dds",
-	"assets/obj/**",
-	"scripts/*.lua",
+	"src/**",
+	"include/**",
+	"scripts/**",
+	"deps/**",
+	"assets/**",
 	"examples/PR6_Lights_Example.cc",
 }

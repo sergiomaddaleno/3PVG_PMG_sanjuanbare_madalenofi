@@ -44,6 +44,10 @@ public:
 
 	void resize(unsigned int width, unsigned int height);
 
+	GLuint getGamefBO() const {
+		return FBTexture;
+	}
+
 	float grey_ = 0.0f;
 	float negative_ = 1.0f;
 	float waves_ = 0.0f;
