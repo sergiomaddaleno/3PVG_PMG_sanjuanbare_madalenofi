@@ -53,7 +53,7 @@ ECSManager ecs;
 PostProcessing postProcc;
 
 auto e = ecs.create_entity();
-
+int selected_entity = -1;
 char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
 char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
 char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
@@ -80,7 +80,7 @@ bool useWindow = true;
 int gizmoCount = 1;
 float camDistance = 8.f;
 static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
-static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::LOCAL);
 static bool useSnap(false);
 static float snap[3] = { 1.f, 1.f, 1.f };
 int lastUsing = 0;
@@ -136,8 +136,7 @@ void ChangePostProcess() {
     }
 }
 
-//Guizmo
-void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display_w, int display_h) {
+void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display_w, int display_h, int selected_entity) {
     static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     static bool useSnap = false;
     static float snap[3] = { 1.0f, 1.0f, 1.0f };
@@ -145,81 +144,99 @@ void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display
     ImGuizmo::BeginFrame();
     ImGuizmo::SetRect(0, 0, (float)display_w, (float)display_h);
 
-    auto& transform = ecs.get_component<TransformComponent>(e);
+    auto ri = ecs.getComponentList<RenderComponent>().begin();
+    auto ti = ecs.getComponentList<TransformComponent>().begin();
 
-    glm::vec3 position = transform->position;
-    glm::quat rotation = transform->rotation; 
-    glm::vec3 scale = transform->scale;
+    int entity_id = 0;
 
-    glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), position);
+    for (; ri != ecs.getComponentList<RenderComponent>().end() &&
+        ti != ecs.getComponentList<TransformComponent>().end();
+        ++ri, ++ti, ++entity_id) {
+        if (entity_id == selected_entity && ri->has_value() && ti->has_value()) {
+            
+            auto& transform = ecs.get_component<TransformComponent>(selected_entity);
 
-    float objectMatrix[16] = {
-        modelMatrix[0][0], modelMatrix[0][1], modelMatrix[0][2], modelMatrix[0][3],
-        modelMatrix[1][0], modelMatrix[1][1], modelMatrix[1][2], modelMatrix[1][3],
-        modelMatrix[2][0], modelMatrix[2][1], modelMatrix[2][2], modelMatrix[2][3],
-        modelMatrix[3][0], modelMatrix[3][1], modelMatrix[3][2], modelMatrix[3][3]
-    };
+            glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), transform->position) *
+                glm::mat4_cast(transform->rotation) *
+                glm::scale(glm::mat4(1.0f), transform->scale);
 
-    ImGui::Begin("Gizmo Controls");
-    if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
-        mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-    if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
-        mCurrentGizmoOperation = ImGuizmo::ROTATE;
-    if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
-        mCurrentGizmoOperation = ImGuizmo::SCALE;
+            float objectMatrix[16];
+            std::memcpy(objectMatrix, glm::value_ptr(modelMatrix), sizeof(objectMatrix));
 
-    ImGui::Checkbox("Use Snap", &useSnap);
-    if (useSnap) {
-        if (mCurrentGizmoOperation == ImGuizmo::TRANSLATE)
-            ImGui::InputFloat3("Snap (Translate)", snap);
-        else if (mCurrentGizmoOperation == ImGuizmo::ROTATE)
-            ImGui::InputFloat("Snap (Rotate)", &snap[0]);
-        else if (mCurrentGizmoOperation == ImGuizmo::SCALE)
-            ImGui::InputFloat3("Snap (Scale)", snap);
+            ImGuizmo::SetRect(0, 0, (float)display_w, (float)display_h);
+
+            ImGui::Begin("Gizmo Controls", nullptr,
+                ImGuiWindowFlags_NoMove |
+                ImGuiWindowFlags_NoResize |
+                ImGuiWindowFlags_NoCollapse |
+                ImGuiWindowFlags_NoTitleBar);
+            if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
+                mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+            if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
+                mCurrentGizmoOperation = ImGuizmo::ROTATE;
+            if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
+                mCurrentGizmoOperation = ImGuizmo::SCALE;
+
+            ImGui::End();
+
+            ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
+                mCurrentGizmoOperation, ImGuizmo::LOCAL,
+                objectMatrix, nullptr);
+
+            if (ImGuizmo::IsUsing()) {
+                glm::mat4 newModelMatrix = glm::make_mat4(objectMatrix);
+                glm::vec3 scale, translation, skew;
+                glm::vec4 perspective;
+                glm::quat rotation;
+
+                glm::decompose(newModelMatrix, scale, rotation, translation, skew, perspective);
+
+                transform->position = translation;
+                transform->rotation = rotation;
+                transform->scale = scale;
+            }
+
+            break; 
+        }
     }
-    ImGui::End();
-
-    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-        mCurrentGizmoOperation, ImGuizmo::LOCAL,
-        objectMatrix, nullptr,
-        useSnap ? snap : nullptr);
-
-    glm::mat4 newModelMatrix = glm::make_mat4(objectMatrix);
-
-    if (mCurrentGizmoOperation == ImGuizmo::TRANSLATE) {
-        transform->position = glm::vec3(newModelMatrix[3]);
-    }
-    else if (mCurrentGizmoOperation == ImGuizmo::ROTATE) {
-        glm::mat3 rotationMatrix = glm::mat3(newModelMatrix);
-
-       
-        glm::quat newRotationQuat = glm::quat_cast(rotationMatrix);
-
-     
-        transform->rotation = newRotationQuat * rotation; 
-
-        
-    }
-    else if (mCurrentGizmoOperation == ImGuizmo::SCALE) {
-        glm::mat3 rotationMatrix = glm::mat3(newModelMatrix);  
-        glm::vec3 scaleVec = glm::vec3(
-            glm::length(newModelMatrix[0]),  
-            glm::length(newModelMatrix[1]),
-            glm::length(newModelMatrix[2])
-        );
-
-        transform->scale = scaleVec; 
-    }
-
 }
 
+
 void InitImGui(GLFWwindow* w) {
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
     ImGui_ImplGlfw_InitForOpenGL(w, true);
     ImGui_ImplOpenGL3_Init("#version 330");
+}
+
+void SelectorEntitys(GLFWwindow* w) {
+    ImGui::Begin("Entity Selector");
+
+    auto ri = ecs.getComponentList<RenderComponent>().begin();
+    auto ti = ecs.getComponentList<TransformComponent>().begin();
+    auto riend = ecs.getComponentList<RenderComponent>().end();
+    auto tiend = ecs.getComponentList<TransformComponent>().end();
+
+    int entity_id = 0;
+
+    for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
+        if (ri->has_value() && ti->has_value()) {
+            if (ImGui::Selectable(("Entity " + std::to_string(entity_id)).c_str(), selected_entity == entity_id)) {
+                selected_entity = entity_id;
+            }
+        }
+    }
+
+    glm::mat4 projection = glm::perspective(glm::radians(rd.fov),
+        (float)rd.w_width / (float)rd.w_height,
+        0.1f, 100.0f);
+
+    RenderScene(rd.cam.getViewMatrix(), projection, rd.w_width, rd.w_height, selected_entity);
+
+    ImGui::End();
 }
 
 void MyImGui(GLFWwindow* w) {
@@ -230,22 +247,22 @@ void MyImGui(GLFWwindow* w) {
 
     glfwGetFramebufferSize(w, &rd.w_width, &rd.w_height);
 
-    glm::mat4 projection = glm::perspective(glm::radians(rd.fov),
-        (float)rd.w_width / (float)rd.w_height,
-        0.1f, 100.0f);
 
     ImGui::Begin("Menu");
 
     ChangeShader();
     ChangePostProcess();
-
+    SelectorEntitys(w);
     ImGui::End();
 
-    RenderScene(rd.cam.getViewMatrix(), projection, rd.w_width, rd.w_height);
+   
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
+
+
 
 int main(int, char**) {
 
@@ -279,6 +296,12 @@ int main(int, char**) {
         return -1;
     }
 
+    if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
+        return -1;
+    }
+
+    
+
     texture_shader.compile(vs_texture, fs_texture);
     normals_shader.compile(vs_normals, fs_normals);
 
@@ -299,16 +322,30 @@ int main(int, char**) {
     ecs.add_component<RenderComponent>(e);
     ecs.add_component<TransformComponent>(e);
 
-    ecs.get_component<RenderComponent>(e)->mesh_ = car_mesh;
+    ecs.get_component<RenderComponent>(e)->mesh_ = mario_mesh;
     ecs.get_component<TransformComponent>(e)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
-    ecs.get_component<TransformComponent>(e)->rotation = glm::vec3{ 2.0f, 1.0f, 0.0f };
+    ecs.get_component<TransformComponent>(e)->rotation = glm::vec3{ 120.0f, 100.0f, 130.0f };
     ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
     ecs.get_component<RenderComponent>(e)->shader = texture_shader;
 
-    render_system.initMesh(ecs);
-    // ---
+    
 
-    //Post proccess
+    e++;
+    ecs.add_component_type<RenderComponent>();
+    ecs.add_component_type<TransformComponent>();
+
+    ecs.add_component<RenderComponent>(e);
+    ecs.add_component<TransformComponent>(e);
+
+    ecs.get_component<RenderComponent>(e)->mesh_ = car_mesh;
+    ecs.get_component<TransformComponent>(e)->position = glm::vec3{ 10.0f, 0.0f, 0.0f };
+    ecs.get_component<TransformComponent>(e)->rotation = glm::vec3{ 120.0f, 100.0f, 130.0f };
+    ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
+    ecs.get_component<RenderComponent>(e)->shader = texture_shader;
+
+    // ---
+    render_system.initMesh(ecs);
+        //Post proccess
     grey_sh.compile(vertex_pp, grey_fs);
     negative_sh.compile(vertex_pp, negative_fs);
     waves_sh.compile(vertex_pp, waves_fs);

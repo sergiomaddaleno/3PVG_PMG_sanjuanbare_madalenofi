@@ -68,6 +68,7 @@ void RenderSystem::initMesh(ECSManager& ecs) {
 
 
 void RenderSystem::renderMesh(ECSManager& ecs, RenderData& rd) {
+   
     auto ri = ecs.getComponentList<RenderComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto riend = ecs.getComponentList<RenderComponent>().end();
@@ -82,10 +83,9 @@ void RenderSystem::renderMesh(ECSManager& ecs, RenderData& rd) {
                 render_comp->shader.useProgram();
                 glCullFace(GL_BACK);
 
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, transform_comp->position);
-                model = glm::rotate(model, rd.transf_comp.angle, glm::vec3(rd.transf_comp.rotation.x, rd.transf_comp.rotation.y, rd.transf_comp.rotation.z));
-                model = glm::scale(model, transform_comp->scale);
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), transform_comp->position) *
+                    glm::mat4_cast(transform_comp->rotation) *
+                    glm::scale(glm::mat4(1.0f), transform_comp->scale);
 
                 glm::mat4 view = rd.cam.getViewMatrix();
                 glm::mat4 projection = rd.cam.getProjectionMatrix();
@@ -101,9 +101,8 @@ void RenderSystem::renderMesh(ECSManager& ecs, RenderData& rd) {
                 render_comp->texture = mesh.getTexture(0);
                 render_comp->texture.bind();
                 render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture1"), Type::T_INT_1, &tex_id);
-                // ---
 
-                //Fog
+                // Fog
                 render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &rd.b_fog_);
 
                 glBindVertexArray(mesh.VAO);
@@ -115,6 +114,7 @@ void RenderSystem::renderMesh(ECSManager& ecs, RenderData& rd) {
 
     glUseProgram(0);
 }
+
 
 void RenderSystem::initLight(ECSManager& ecs)
 {
