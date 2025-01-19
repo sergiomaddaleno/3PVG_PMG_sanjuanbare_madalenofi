@@ -34,29 +34,29 @@ void Skybox::init() {
 }
 
 void Skybox::render(RenderData& rd) {
-    // Deshabilitar escritura en el buffer de profundidad para que el skybox no lo sobrescriba
+   
     glDepthMask(GL_FALSE);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
-    glEnable(GL_DEPTH_TEST); // Mantener la prueba de profundidad habilitada
+    glEnable(GL_DEPTH_TEST);
 
-    // Obtener la vista (sin translación) y la proyección
-    glm::mat4 view = glm::mat4(glm::mat3(rd.cam.getViewMatrix())); // Solo rotación, sin translación
+   
+    glm::mat4 view = glm::mat4(glm::mat3(rd.cam.getViewMatrix())); 
     glm::mat4 projection = rd.cam.getProjectionMatrix();
 
-    // Rotación del skybox
+    
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle), glm::vec3(1.0f, 0.0f, 0.0f));
 
     glm::mat4 model = rotation;
 
-    // Cargar texturas
+    
     float tex_id = 0.0f;
     rd.render_comp.skybox_shader.useProgram();
     rd.render_comp.skybox_tex.bind();
     rd.render_comp.skybox_shader.setUniformValue(rd.render_comp.skybox_shader.getUniformLocation("skybox"), Type::T_INT_1, &tex_id);
 
-    // Establecer matrices de vista, proyección y modelo
+    
     unsigned int viewLoc = rd.render_comp.skybox_shader.getUniformLocation("view");
     unsigned int projLoc = rd.render_comp.skybox_shader.getUniformLocation("projection");
     unsigned int modelLoc = rd.render_comp.skybox_shader.getUniformLocation("model");
@@ -65,11 +65,11 @@ void Skybox::render(RenderData& rd) {
     rd.render_comp.skybox_shader.setUniformValue(projLoc, Type::T_MAT_4x4, &projection[0][0]);
     rd.render_comp.skybox_shader.setUniformValue(modelLoc, Type::T_MAT_4x4, &model[0][0]);
 
-    // Dibujar el skybox
+    
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, sizeof(gIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
-    // Restaurar la escritura en el buffer de profundidad después del skybox
+    
     glDepthMask(GL_TRUE);
 
     assert(glGetError() == GL_NO_ERROR);
