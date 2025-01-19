@@ -16,6 +16,8 @@
 #include "mesh.h"
 #include "shader.h"
 
+#include "skybox.h"
+
 struct RenderData;
 struct LightInfo;
 
@@ -29,7 +31,7 @@ public:
 
 	void initEntities(ECSManager &ecs);
 
-	void renderEntities(ECSManager &ecs, RenderData& rd);
+	void renderEntities(ECSManager &ecs, RenderData& rd, Skybox& sk);
 
 	void renderMesh(ECSManager& ecs, RenderData& rd);
 

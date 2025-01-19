@@ -37,11 +37,13 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <../deps/glm/gtx/matrix_decompose.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
+#include "Components/light_component.h"
 
 #define M_PI 3.14159265358979323846
 
 std::shared_ptr<Mesh> car_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
+std::shared_ptr<Mesh> light_bulb_mesh = std::make_shared<Mesh>();
 
 ImGuiManager imgui_manager;
 RenderSystem render_system;
@@ -59,6 +61,9 @@ char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
 char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
 char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
 
+char* fs_light = (char*)ReadFile("../assets/shaders/fs_light.fs");
+char* vs_light = (char*)ReadFile("../assets/shaders/vertex.vs");
+
 char* vs_source_sky = (char*)ReadFile("../assets/shaders/vs_skybox.vs");
 char* fs_source_sky = (char*)ReadFile("../assets/shaders/fs_skybox.fs");
 
@@ -72,7 +77,7 @@ char* kernel_fs = (char*)ReadFile("../assets/shaders/postprocess/kernel.fs");
 char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
 char* lua_file = ReadFile("../scripts/settings.lua");
 
-Shader normals_shader, texture_shader;
+Shader normals_shader, texture_shader, light_shader;
 Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
 
 //Guizmo
@@ -222,7 +227,7 @@ void SelectorEntitys(GLFWwindow* w) {
     int entity_id = 0;
 
     for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
-        if (ri->has_value() && ti->has_value()) {
+        if (ti->has_value()) {
             if (ImGui::Selectable(("Entity " + std::to_string(entity_id)).c_str(), selected_entity == entity_id)) {
                 selected_entity = entity_id;
             }
@@ -293,9 +298,13 @@ int main(int, char**) {
         return -1;
     }
 
+    if (!light_bulb_mesh->loadOBJ("../assets/obj/light_bulb.obj")) {
+        return -1;
+    }
+
     texture_shader.compile(vs_texture, fs_texture);
     normals_shader.compile(vs_normals, fs_normals);
-
+    light_shader.compile(vs_light, fs_light);
     //Skybox
     if (skyboxTex.loadSkyboxTex(dds_file)) {
         rd.render_comp.skybox_tex = skyboxTex.getTexture();
@@ -307,30 +316,12 @@ int main(int, char**) {
     // ---
 
     //ECS
-    ecs.add_component_type<RenderComponent>();
-    ecs.add_component_type<TransformComponent>();
+    render_system.setupEntities(ecs);
+    render_system.createMesh(ecs, mario_mesh, light_shader);
 
-    ecs.add_component<RenderComponent>(e);
-    ecs.add_component<TransformComponent>(e);
 
-    ecs.get_component<RenderComponent>(e)->mesh_ = mario_mesh;
-    ecs.get_component<TransformComponent>(e)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
-    ecs.get_component<TransformComponent>(e)->rotation = glm::vec3{ 120.0f, 100.0f, 130.0f };
-    ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
-    ecs.get_component<RenderComponent>(e)->shader = texture_shader;
-
-    e++;
-    ecs.add_component_type<RenderComponent>();
-    ecs.add_component_type<TransformComponent>();
-
-    ecs.add_component<RenderComponent>(e);
-    ecs.add_component<TransformComponent>(e);
-
-    ecs.get_component<RenderComponent>(e)->mesh_ = car_mesh;
-    ecs.get_component<TransformComponent>(e)->position = glm::vec3{ 10.0f, 0.0f, 0.0f };
-    ecs.get_component<TransformComponent>(e)->rotation = glm::vec3{ 120.0f, 100.0f, 130.0f };
-    ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
-    ecs.get_component<RenderComponent>(e)->shader = texture_shader;
+    render_system.createPointLight(ecs, light_bulb_mesh, light_shader, light_shader);
+    render_system.createPointLight(ecs, light_bulb_mesh, light_shader, light_shader);
 
     render_system.initEntities(ecs);
 
@@ -350,9 +341,13 @@ int main(int, char**) {
 
     double lastTime = window->getTime();
     bool done = false;
+    
     while (!done) {
         double currentTime = window->getTime();
         float dt = float(currentTime - lastTime);
+
+       
+
         window->updateWindow();
         window->toggleFullScreen(input);
 
@@ -363,8 +358,11 @@ int main(int, char**) {
         postProcc.beginRender();
         rd.cam.update(input, dt, rd.w_width, rd.w_height);
 
-        skybox.render(rd);
-        render_system.renderMesh(ecs, rd);
+        
+        
+        render_system.renderEntities(ecs, rd,skybox);
+       
+
 
         postProcc.endRender();
 

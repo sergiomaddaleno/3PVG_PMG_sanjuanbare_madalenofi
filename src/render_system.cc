@@ -113,7 +113,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
     }
 }
 
-void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
+void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd,Skybox& sk) {
 
     // -------------------------------------------------------------
     //Light
@@ -127,6 +127,8 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ZERO);
 
+    sk.render(rd);
+
     int counter = 0;
     for (; li != liend && ti != tiend; ++li, ++ti) {
         if (li->has_value() && ti->has_value()) {
@@ -139,17 +141,17 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
             light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation("u_camera_position"), Type::T_FLOAT_3, glm::value_ptr(rd.cam.getPosition()));
             light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation("u_ambient"), Type::T_FLOAT_3, &global_ambient_color_);
 
-            for (int i = 0; i < number_lights; ++i) {
+            
 
-                int loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].type_").c_str());
+                int loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].type_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_INT_1, &light_comp.light_info.type_);
 
                 // ---
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].pos_").c_str());
+                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].pos_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(transform.position));
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].dir_").c_str());
+                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].dir_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.dir_));
 
                 //loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].diff_color_").c_str());
@@ -158,33 +160,33 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
                 //loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].spec_color_").c_str());
                 //light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.spec_color_));
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].light_color_").c_str());
+                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].light_color_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.light_color_));
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].ambient_color_").c_str());
+                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].ambient_color_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.ambient_color_));
 
                 // ---
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].linear_att_").c_str());
+                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].linear_att_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.linear_att);
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].quad_att_").c_str());
+                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].quad_att_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.quad_att_);
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].constant_att_").c_str());
+                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].constant_att_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.constant_att_);
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].shininess_").c_str());
+                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].shininess_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.shininess_);
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].strength_").c_str());
+                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].strength_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.strength_);
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].spot_angle_").c_str());
+                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].spot_angle_").c_str());
                 light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.spot_angle_);
 
-            }
+            
 
             // -------------------------------------------------------------
             //Mesh
@@ -234,6 +236,8 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
             }
             glBlendFunc(GL_ONE, GL_ONE);
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+            counter++;
         }
     }
     glUseProgram(0);

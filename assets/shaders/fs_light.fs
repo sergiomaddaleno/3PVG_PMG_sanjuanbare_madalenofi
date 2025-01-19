@@ -1,6 +1,6 @@
 #version 330
 
-uniform sampler2D texture;
+uniform sampler2D texture_;
 
 uniform int u_number_lights;
 uniform vec3 u_camera_position;
@@ -110,7 +110,7 @@ void main() {
         }
    }
 
-   vec4 texture_color = texture(texture, uv);
+   vec4 texture_color = texture(texture_, uv);
    vec3 texture_and_light = texture_color.rgb * final_light;
     
    FragColor = vec4(texture_and_light, 1.0);
