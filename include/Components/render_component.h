@@ -7,6 +7,15 @@
 #include "shader.h"
 #include "mesh.h"
 
+enum RenderType {
+    RT_Default,
+    RT_Mesh,
+    RT_Light,
+    RT_Skybox,
+    RT_PostProcess,
+    RT_Transparent,
+};
+
 struct RenderComponent {
 
     std::shared_ptr<Mesh> mesh_;
@@ -18,14 +27,17 @@ struct RenderComponent {
     Texture texture;
     Texture skybox_tex;
 
-    RenderComponent() : mesh_(nullptr), triangle_(triangle_.my_triangle) {}
+    RenderType type_;
+    //----
+
+    RenderComponent() : mesh_(nullptr), triangle_(triangle_.my_triangle) , type_(RenderType::RT_Default) {}
 
     ~RenderComponent() {}
 
     RenderComponent(const RenderComponent& other)
         : mesh_(other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr),
         triangle_(other.triangle_), texture(other.texture), skybox_tex(other.skybox_tex),
-        shader(other.shader), skybox_shader(other.skybox_shader)
+        shader(other.shader), skybox_shader(other.skybox_shader), type_(other.type_)
     {}
 
     RenderComponent& operator=(const RenderComponent& other) {
@@ -36,6 +48,7 @@ struct RenderComponent {
             skybox_tex = other.skybox_tex;
             shader = other.shader;
             skybox_shader = other.skybox_shader;
+            type_ = other.type_;
         }
         return *this;
     }

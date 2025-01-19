@@ -12,31 +12,55 @@
 #include "..\include\Components\transform_component.h"
 #include "..\include\Components\render_component.h"
 
+enum LightType {
+    LT_Directional,
+    LT_Spot,
+    LT_Point,
+};
 
-class Light {
+struct LightInfo {
 
-public:
+    LightType type_;
+    int id_;
 
-    Light();
+    // --
 
-    int type_; //0=dir, 1=spot, 2=point
-    int enabled_; //false by default
-    
+    glm::vec3 pos_;
     glm::vec3 dir_;
     glm::vec3 diff_color_;
     glm::vec3 spec_color_;
     glm::vec3 light_color_;
-    glm::vec3 ambient_color;
+    glm::vec3 ambient_color_;
 
     float linear_att;
     float quad_att_;
     float constant_att_;
     float shininess_;
     float strength_;
-    float spot_angle;
-    float camera_pos_[3];
-    float light_linear_;
-    float light_quadratic_;
+    float spot_angle_;
+
+    // --
+
+    LightInfo()
+        : type_(LightType::LT_Spot),
+        id_(0),
+        dir_(0.0f, 0.0f, 0.0f),
+        diff_color_(0.0f, 0.0f, 0.0f),
+        spec_color_(0.0f, 0.0f, 0.0f),
+        light_color_(0.0f, 0.0f, 0.0f),
+        ambient_color_(0.0f, 0.0f, 0.0f),
+        linear_att(0.0f),
+        quad_att_(0.0f),
+        constant_att_(0.0f),
+        shininess_(0.0f),
+        strength_(0.0f),
+        spot_angle_(0.0f)
+    {}
+
+    ~LightInfo(){}
 };
+
+static glm::vec3 global_ambient_color_{ 0.0f, 0.0, 0.0f };
+
 
 #endif // LIT

@@ -21,25 +21,24 @@
 
 #define M_PI 3.14159265358979323846
 
-std::shared_ptr<Mesh> teapot_mesh = std::make_shared<Mesh>();
-std::shared_ptr<Mesh> toad_mesh = std::make_shared<Mesh>();
+std::shared_ptr<Mesh> light_bulb_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
 RenderSystem render_system;
 RenderData rd;
 ECSManager ecs;
-Shader texture_shader, light_shader;
+Shader texture_shader, light_shader, mesh_shader;
 
 char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
 char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
+char* vs = (char*)ReadFile("../assets/shaders/vertex.vs");
+char* fs = (char*)ReadFile("../assets/shaders/fragment.fs");
 
 char* fs_light = (char*)ReadFile("../assets/shaders/fs_light.fs");
 char* vs_light = (char*)ReadFile("../assets/shaders/vertex.vs");
 
 int num_entities = 5000;
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
-
-
 
 void ChangeLight(ECSManager& ecs) {
 
@@ -48,31 +47,47 @@ void ChangeLight(ECSManager& ecs) {
     auto liend = ecs.getComponentList<LightComponent>().end();
     auto tiend = ecs.getComponentList<TransformComponent>().end();
 
-    int counter = 0;
     for (; li != liend && ti != tiend; ++li, ++ti) {
 
         if (li->has_value() && ti->has_value()) {
 
-
             auto& light_comp = li->value();
             auto& tr_comp = ti->value();
 
-            ImGui::Text("Especular");
-            ImGui::DragFloat("X", &light_comp.light_.spec_color_.x, 1.0f, 0.0f, 1.0f, "%.3f");
-            ImGui::DragFloat("Y", &light_comp.light_.spec_color_.y, 1.0f, 0.0f, 1.0f, "%.3f");
-            ImGui::DragFloat("Z", &light_comp.light_.spec_color_.z, 1.0f, 0.0f, 1.0f, "%.3f");
 
-            ImGui::Text("Direction");
-            ImGui::DragFloat("Xp", &tr_comp.position.x, 1.0f, -1000.0f, 100.0f, "%.3f");
-            ImGui::DragFloat("Yp", &tr_comp.position.y, 1.0f, -100.0f, 100.0f, "%.3f");
-            ImGui::DragFloat("Zp", &tr_comp.position.z, 1.0f, -100.0f, 100.0f, "%.3f");
+            if (light_comp.light_info.type_ == LightType::LT_Spot) {
+                ImGui::Text("Position");
+                ImGui::DragFloat("Xp", &tr_comp.position.x, 0.2f, -1000.0f, 100.0f, "%.3f");
+                ImGui::DragFloat("Yp", &tr_comp.position.y, 0.2f, -100.0f, 100.0f, "%.3f");
+                ImGui::DragFloat("Zp", &tr_comp.position.z, 0.2f, -100.0f, 100.0f, "%.3f");
 
-            ImGui::Text("Type");
-            ImGui::DragInt("type", &light_comp.light_.type_, 1, 0, 1, "%d");
+                ImGui::Text("Angle");
+                ImGui::DragFloat("angle", &light_comp.light_info.spot_angle_, 0.2f, -1000.0f, 100.0f, "%.3f");
+
+                ImGui::Text("Direction");
+                ImGui::DragFloat("Xd", &light_comp.light_info.dir_.x, 0.2f, -1000.0f, 100.0f, "%.3f");
+                ImGui::DragFloat("Yd", &light_comp.light_info.dir_.y, 0.2f, -100.0f, 100.0f, "%.3f");
+                ImGui::DragFloat("Zd", &light_comp.light_info.dir_.z, 0.2f, -100.0f, 100.0f, "%.3f");
+
+                ImGui::Text("Light Color");
+                ImGui::DragFloat("Xc", &light_comp.light_info.light_color_.x, 0.2f, 0.0f, 255.0f, "%.3f");
+                ImGui::DragFloat("Yc", &light_comp.light_info.light_color_.y, 0.2f, 0.0f, 255.0f, "%.3f");
+                ImGui::DragFloat("Zc", &light_comp.light_info.light_color_.z, 0.2f, 0.0f, 255.0f, "%.3f");
+            }
+
+            if (light_comp.light_info.type_ == LightType::LT_Point) {
+                ImGui::Text("Position2");
+                ImGui::DragFloat("Xp2", &tr_comp.position.x, 0.2f, -1000.0f, 100.0f, "%.3f");
+                ImGui::DragFloat("Yp2", &tr_comp.position.y, 0.2f, -100.0f, 100.0f, "%.3f");
+                ImGui::DragFloat("Zp2", &tr_comp.position.z, 0.2f, -100.0f, 100.0f, "%.3f");
+
+                ImGui::Text("Light Color2");
+                ImGui::DragFloat("Xc2", &light_comp.light_info.light_color_.x, 0.2f, 0.0f, 255.0f, "%.3f");
+                ImGui::DragFloat("Yc2", &light_comp.light_info.light_color_.y, 0.2f, 0.0f, 255.0f, "%.3f");
+                ImGui::DragFloat("Zc2", &light_comp.light_info.light_color_.z, 0.2f, 0.0f, 255.0f, "%.3f");
+            }
         }
     }
-
-
 }
 
 void InitImGui(GLFWwindow* w) {
@@ -116,37 +131,26 @@ int main(int, char**) {
     if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
         return -1;
     }
+    
+    if (!light_bulb_mesh->loadOBJ("../assets/obj/light_bulb.obj")) {
+        return -1;
+    }
 
     texture_shader.compile(vs_texture, fs_texture);
     light_shader.compile(vs_light, fs_light);
+    mesh_shader.compile(vs, fs);
+    
+    render_system.setupEntities(ecs);
+    render_system.createMesh(ecs, mario_mesh, light_shader);
 
-    auto e = ecs.create_entity();
-
-    // ---
-
-    ecs.add_component_type<RenderComponent>();
-    ecs.add_component_type<TransformComponent>();
-    ecs.add_component_type<LightComponent>();
-
-    // Light
-    ecs.add_component<LightComponent>(e);
-    ecs.add_component<TransformComponent>(e);
-    ecs.get_component<LightComponent>(e)->shader = light_shader;
-    ecs.get_component<TransformComponent>(e)->position = { 1.0f, -4.2f, 2.0f };
-    //ecs.get_component<LightComponent>(e)->light_.dir_ = ;
-    e++;
-    // Mesh
-    ecs.add_component<RenderComponent>(e);
-    ecs.add_component<TransformComponent>(e);
-
-    ecs.get_component<RenderComponent>(e)->shader = light_shader;
-    ecs.get_component<RenderComponent>(e)->mesh_ = mario_mesh;
-    ecs.get_component<TransformComponent>(e)->scale = { 0.4f, 0.4f, 0.4f };
-    ecs.get_component<TransformComponent>(e)->position = {0.0f, -2.0f, 0.0f};
+    render_system.createPointLight(ecs, light_bulb_mesh, mesh_shader, light_shader);
+    //render_system.createSpotLight(ecs, light_bulb_mesh, mesh_shader, light_shader);
+    //render_system.createDirectionalLight(ecs, light_bulb_mesh, mesh_shader, light_shader);
 
     //---
     
-    render_system.initMesh(ecs);
+    render_system.initEntities(ecs);
+
     InitImGui(window->getWindow());
     double lastTime = window->getTime();
     bool done = false;
@@ -158,9 +162,10 @@ int main(int, char**) {
 
         rd.cam.update(input, dt, rd.w_width, rd.w_height);
 
-        ecs.get_component<TransformComponent>(e)->moveEntity(input, dt);
-        render_system.renderLight(ecs, rd);
+        render_system.renderEntities(ecs, rd);
+
         MyImGui(ecs);
+
         if (window->closePressed()) done = true;
     }
 

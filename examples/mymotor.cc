@@ -201,7 +201,6 @@ void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display
     }
 }
 
-
 void InitImGui(GLFWwindow* w) {
 
     IMGUI_CHECKVERSION();
@@ -247,7 +246,6 @@ void MyImGui(GLFWwindow* w) {
 
     glfwGetFramebufferSize(w, &rd.w_width, &rd.w_height);
 
-
     ImGui::Begin("Menu");
 
     ChangeShader();
@@ -255,14 +253,9 @@ void MyImGui(GLFWwindow* w) {
     SelectorEntitys(w);
     ImGui::End();
 
-   
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
-
-
-
 
 int main(int, char**) {
 
@@ -300,8 +293,6 @@ int main(int, char**) {
         return -1;
     }
 
-    
-
     texture_shader.compile(vs_texture, fs_texture);
     normals_shader.compile(vs_normals, fs_normals);
 
@@ -328,8 +319,6 @@ int main(int, char**) {
     ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
     ecs.get_component<RenderComponent>(e)->shader = texture_shader;
 
-    
-
     e++;
     ecs.add_component_type<RenderComponent>();
     ecs.add_component_type<TransformComponent>();
@@ -343,9 +332,10 @@ int main(int, char**) {
     ecs.get_component<TransformComponent>(e)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
     ecs.get_component<RenderComponent>(e)->shader = texture_shader;
 
+    render_system.initEntities(ecs);
+
     // ---
-    render_system.initMesh(ecs);
-        //Post proccess
+    //Post proccess
     grey_sh.compile(vertex_pp, grey_fs);
     negative_sh.compile(vertex_pp, negative_fs);
     waves_sh.compile(vertex_pp, waves_fs);

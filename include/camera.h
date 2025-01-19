@@ -27,6 +27,8 @@ public:
 
 	const float getSpeed() const;
 
+	const glm::vec3 getPosition() const;
+
 	const float getSensitivity() const;
 
 	glm::mat4 getViewMatrix() const;

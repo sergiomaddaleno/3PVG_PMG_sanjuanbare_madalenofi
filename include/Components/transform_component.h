@@ -17,7 +17,7 @@ struct TransformComponent {
     float angle; 
 
 
-    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(glm::quat(0.02f, 0.01f, 0.001f, 0.99f)), scale(1.0f, 1.0f, 1.0f), angle(0.0f) {}
+    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(glm::quat(0.0f, 0.0f, 0.0f, 0.0f)), scale(1.0f, 1.0f, 1.0f), angle(0.0f) {}
 
     TransformComponent(glm::vec3 position_, glm::vec3 scale_, float angle_)
         : position(position_), scale(scale_), angle(angle_) {

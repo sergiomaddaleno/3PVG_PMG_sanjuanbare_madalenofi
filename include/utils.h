@@ -22,7 +22,7 @@ struct RenderData {
 	int w_height = 600;
 	float fov = 55.0f;
 
-	bool b_fog_ = false;
+	bool b_fog_ = true;
 };
 
 enum Type {

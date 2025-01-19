@@ -64,7 +64,6 @@ int main(int, char**) {
     ecs.add_component<TransformComponent>(j);
     ecs.get_component<RenderComponent>(j)->mesh_ = mario_mesh;
     ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
 
     j++;
@@ -73,7 +72,6 @@ int main(int, char**) {
     ecs.add_component<TransformComponent>(j);
     ecs.get_component<RenderComponent>(j)->mesh_ = toad_mesh;
     ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 2.0f, 0.0f, 0.0f };
-    ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
 
     for (int i = 2; i < num_entities; i++) {
@@ -81,7 +79,6 @@ int main(int, char**) {
         ecs.add_component<RenderComponent>(j);
         ecs.add_component<TransformComponent>(j);
         ecs.get_component<RenderComponent>(j)->mesh_ = teapot_mesh;
-        ecs.get_component<TransformComponent>(j)->rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
         ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.5f, 0.5f, 0.5f };
     }
 
@@ -97,7 +94,7 @@ int main(int, char**) {
     }
     //---
 
-    render_system.initMesh(ecs);
+    render_system.initEntities(ecs);
 
     double lastTime = window->getTime();
     bool done = false;

@@ -132,6 +132,11 @@ const float Camera::getSpeed() const {
     return speed_;
 }
 
+const glm::vec3 Camera::getPosition() const
+{
+    return position_;
+}
+
 const float Camera::getSensitivity() const {
     return sensitivity_;
 }

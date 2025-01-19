@@ -8,8 +8,9 @@
 
 struct LightComponent {
 
-	Light light_;
+	LightInfo light_info;
 	Shader shader;
+
 };
 
 #endif //LCP
