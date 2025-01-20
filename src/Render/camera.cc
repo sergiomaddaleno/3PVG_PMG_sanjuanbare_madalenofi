@@ -21,7 +21,8 @@ last_mouse(0.0f, 0.0f),
 delta_mouse(0.0f, 0.0f),
 accum_mouse_offset_(0.0f, 0.0f),
 speed_(0.001f),
-sensitivity_(1.0f)
+sensitivity_(1.0f),
+scroll_speed_(0.5f)
 
 {
     view_ = initViewTarget();
@@ -32,10 +33,9 @@ glm::mat4 Camera::initViewTarget()
 	return glm::lookAt(position_, position_ + view_direction_, up_);
 }
 
-void Camera::update(Input& input, const double dt, const int window_width, const int window_height){
-
+void Camera::update(Input& input, const double dt, const int window_width, const int window_height) {
+    
     // ----------------- Camera Rotation
-
     curr_mouse.x = (float)input.getMouseX();
     curr_mouse.y = window_height - (float)input.getMouseY();
 
@@ -44,7 +44,6 @@ void Camera::update(Input& input, const double dt, const int window_width, const
     }
 
     if (input.isMouseButtonDown(Input::MouseButton::MOUSE_RIGHT)) {
-
         delta_mouse = curr_mouse - last_mouse;
         delta_mouse.x = delta_mouse.x / window_width;
         delta_mouse.y = delta_mouse.y / window_height;
@@ -63,58 +62,49 @@ void Camera::update(Input& input, const double dt, const int window_width, const
     view_direction_.y = sinf(omega);
     view_direction_.z = sinf(alpha) * cosf(omega);
 
-    if (input.isMouseButtonDown(Input::MouseButton::MOUSE_RIGHT)) {
-        view_ = initViewTarget();
-    }
+    view_ = initViewTarget();
 
-    glm::vec3 forward_vec = { view_direction_.x, view_direction_.y, view_direction_.z };
-
-    glm::normalize(forward_vec);
+    glm::vec3 forward_vec = glm::normalize(glm::vec3(view_direction_.x, view_direction_.y, view_direction_.z));
     forward_vec *= speed_ * dt;
-  
+
     glm::vec3 right_vec = glm::cross(forward_vec, up_);
 
     // ----------------- Camera Movement
-
     if (input.isMouseButtonDown(Input::MouseButton::MOUSE_RIGHT)) {
         if (input.isKeyDown(Input::A)) {
-            position_ = { position_.x + (right_vec.x * -1.0f),position_.y + (right_vec.y * -1.0f),position_.z + (right_vec.z * -1.0f) };
+            position_ -= right_vec;
         }
-
         if (input.isKeyDown(Input::D)) {
-            position_ = { position_.x + right_vec.x,position_.y + right_vec.y,position_.z + right_vec.z };
+            position_ += right_vec;
         }
-
         if (input.isKeyDown(Input::W)) {
-            position_ = { position_.x + forward_vec.x ,position_.y + forward_vec.y,position_.z + forward_vec.z };
+            position_ += forward_vec;
         }
-
         if (input.isKeyDown(Input::S)) {
-            position_ = { position_.x + (forward_vec.x * -1.0f) ,position_.y + (forward_vec.y * -1.0f) ,position_.z + (forward_vec.z * -1.0f) };
+            position_ -= forward_vec;
         }
-
         if (input.isKeyDown(Input::E)) {
-            position_ = { position_.x  ,position_.y + (speed_ * dt) ,position_.z };
+            position_.y += speed_ * dt;
         }
-
         if (input.isKeyDown(Input::Q)) {
-            position_ = { position_.x  ,position_.y + +(speed_ * dt * -1.0f) ,position_.z };
+            position_.y -= speed_ * dt;
         }
     }
-    
-    // ----------------- Camera speed
 
-    if (input.getScrollY() > 0.00f && input.isKeyDown(Input::SHIFT)) {
-        speed_ += 0.001f;
+    // ----------------------------------------
+
+    float scroll_delta = input.getScrollY();
+
+    if (scroll_delta > 0.0f) {
+        position_ += view_direction_ * scroll_speed_;
+    }
+    if (scroll_delta < 0.0f) {
+        position_ -= view_direction_ * scroll_speed_;
     }
 
-    if (input.getScrollY() < 0.00f && input.isKeyDown(Input::SHIFT)) {
-        speed_ -= 0.001f;
-    }
-
-    if (speed_ <= 0.001f) speed_ = 0.001f;
-    if (speed_ >= 0.15f) speed_ = 0.15f;
+    input.resetScroll();
 }
+
 
 void Camera::setSpeed(const float speed) {
     speed_ = speed;

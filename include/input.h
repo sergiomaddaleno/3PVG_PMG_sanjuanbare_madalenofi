@@ -70,6 +70,7 @@ public:
     void cursor_pos_callback(double xpos, double ypos);
     void scroll_callback(double xpos, double ypos);
 
+
     // ---
 
     bool isKeyDown(Keys key);
@@ -85,6 +86,7 @@ public:
 
     double getScrollX() const { return scroll_x; }
     double getScrollY() const { return scroll_y; }
+    void resetScroll();
 };
 
 #endif

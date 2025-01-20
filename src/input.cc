@@ -100,6 +100,10 @@ void Input::scroll_callback(double xoffset, double yoffset) {
     scroll_y = yoffset;
 }
 
+void Input::resetScroll() {
+    scroll_x = 0.0f;
+    scroll_y = 0.0f;
+}
 
 bool Input::isKeyDown(Keys key) {
     return keys[static_cast<int>(key)];

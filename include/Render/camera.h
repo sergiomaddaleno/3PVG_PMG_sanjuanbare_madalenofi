@@ -37,6 +37,7 @@ public:
 
 	//--
 	void setPosition(glm::vec3 position) {position = position_;}
+	void setScrollSpeed(float scroll_speed) { scroll_speed = scroll_speed_; }
 	void setViewDir(glm::vec3 view_direction) {view_direction = view_direction_;}
 	void setUp(glm::vec3 up) { up = up_; }
 
@@ -56,6 +57,7 @@ private:
 
 	float speed_;
 	float sensitivity_;
+	float scroll_speed_;
 };
 
 
