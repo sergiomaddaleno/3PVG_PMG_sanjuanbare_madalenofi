@@ -29,6 +29,13 @@ void Shader::compile(const char* vertex_src, const char* fragment_src)
 	glCullFace(GL_BACK);
 }
 
+bool Shader::isCompiled() const
+{
+	GLint success;
+	glGetProgramiv(program_, GL_LINK_STATUS, &success);
+	return success == GL_TRUE;
+}
+
 int Shader::getUniformLocation(const char* name) const {
 
 	return glGetUniformLocation(program_, name);

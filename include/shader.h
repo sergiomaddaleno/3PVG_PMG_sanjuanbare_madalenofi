@@ -15,6 +15,8 @@ public:
 
 	void compile(const char* vertex_src, const char* fragment_src);
 
+	bool isCompiled() const;
+
 	int getUniformLocation(const char* name) const;
 
 	void setUniformValue(const int uniform_loc, const Type uniform_type, const void* data) const;

@@ -31,7 +31,7 @@ public:
 
 	void initEntities(ECSManager &ecs);
 
-	void renderEntities(ECSManager &ecs, RenderData& rd, Skybox& sk);
+	void renderEntities(ECSManager &ecs, RenderData& rd);
 
 	void renderMesh(ECSManager& ecs, RenderData& rd);
 
@@ -41,14 +41,14 @@ public:
 	void setupEntities(ECSManager& ecs);
 	//--
 
-	size_t createMesh(ECSManager &ecs, const std::shared_ptr<Mesh>& entity_mesh, const Shader& mesh_shader);
+	size_t createMesh(ECSManager &ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader);
 	
 	//Lights
-	size_t createSpotLight(ECSManager &ecs, const std::shared_ptr<Mesh> &light_bulb_mesh, const Shader& mesh_shader, const Shader& light_shader);
+	size_t createSpotLight(ECSManager& ecs, const Shader& light_shader);
 
-	size_t createPointLight(ECSManager& ecs, const std::shared_ptr<Mesh>& light_bulb_mesh, const Shader& mesh_shader, const Shader& light_shader);
+	size_t createPointLight(ECSManager& ecs, const Shader& light_shader);
 
-	size_t createDirectionalLight(ECSManager& ecs, const std::shared_ptr<Mesh>& light_bulb_mesh, const Shader& mesh_shader, const Shader& light_shader);
+	size_t createDirectionalLight(ECSManager& ecs, const Shader& light_shader);
 
 private:
 

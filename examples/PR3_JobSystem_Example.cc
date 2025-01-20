@@ -27,8 +27,8 @@ std::future<std::unique_ptr<Mesh>> monetemesh;
 
 JobSystem jb;
 
-char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
-char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
+char* vs_normals = (char*)ReadFile("../assets/shaders/normals.vs");
+char* fs_normals = (char*)ReadFile("../assets/shaders/normals.fs");
 
 int currentMeshIndex = 0;
 bool loadingNewMesh = false;
@@ -49,8 +49,8 @@ int main(int, char**) {
 
     RenderData rd;
     rd.transf_comp.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };  
-    rd.transf_comp.scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
-    rd.transf_comp.position = glm::vec3{ 0.0f, -3.0f, 0.0f };
+    rd.transf_comp.scale = glm::vec3{ 0.8f, 0.8f, 0.8f };
+    rd.transf_comp.position = glm::vec3{ 0.0f, -2.0f, 0.0f };
 
     rd.render_comp.shader.compile(vs_normals, fs_normals);
     //---
@@ -64,8 +64,8 @@ int main(int, char**) {
 
         rd.render_comp.mesh_ = mesh_;
 
-        float angle = (float)window->getTime() * 2;
-        rd.transf_comp.angle = angle;
+        float time = (float)window->getTime() * 2;
+        rd.transf_comp.rotation = glm::vec3{ 0.0f, time, 0.0f };
       
         if (input.isKeyPressed(Input::RIGHT) && !loadingNewMesh) {
 

@@ -29,13 +29,13 @@ RenderData rd;
 ECSManager ecs;
 Shader texture_shader, light_shader, mesh_shader;
 
-char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
-char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
-char* vs = (char*)ReadFile("../assets/shaders/vertex.vs");
-char* fs = (char*)ReadFile("../assets/shaders/fragment.fs");
+char* vs_texture = (char*)ReadFile("../assets/shaders/texture.vs");
+char* fs_texture = (char*)ReadFile("../assets/shaders/texture.fs");
 
-char* fs_light = (char*)ReadFile("../assets/shaders/fs_light.fs");
-char* vs_light = (char*)ReadFile("../assets/shaders/vertex.vs");
+char* fs_light = (char*)ReadFile("../assets/shaders/light.fs");
+
+char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
+char* fs_simple = (char*)ReadFile("../assets/shaders/simple_fragment.fs");
 
 int num_entities = 5000;
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
@@ -47,7 +47,7 @@ void ChangeLight(ECSManager& ecs) {
     auto liend = ecs.getComponentList<LightComponent>().end();
     auto tiend = ecs.getComponentList<TransformComponent>().end();
 
-    int index = 0; // Índice para identificar cada componente
+    int index = 0; 
 
     for (; li != liend && ti != tiend; ++li, ++ti, ++index) {
 
@@ -135,22 +135,16 @@ int main(int, char**) {
     if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
         return -1;
     }
-    
-    if (!light_bulb_mesh->loadOBJ("../assets/obj/light_bulb.obj")) {
-        return -1;
-    }
 
     texture_shader.compile(vs_texture, fs_texture);
-    light_shader.compile(vs_light, fs_light);
-    mesh_shader.compile(vs, fs);
+    light_shader.compile(vs_simple, fs_light);
     
     render_system.setupEntities(ecs);
     render_system.createMesh(ecs, mario_mesh, light_shader);
 
-    render_system.createPointLight(ecs, light_bulb_mesh, light_shader, light_shader);
-    render_system.createPointLight(ecs, light_bulb_mesh, light_shader, light_shader);
-    //render_system.createSpotLight(ecs, light_bulb_mesh, mesh_shader, light_shader);
-    //render_system.createDirectionalLight(ecs, light_bulb_mesh, mesh_shader, light_shader);
+    render_system.createPointLight(ecs, light_shader);
+    render_system.createSpotLight(ecs, light_shader);
+    //render_system.createDirectionalLight(ecs, light_shader);
 
     //---
     

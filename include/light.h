@@ -25,7 +25,6 @@ struct LightInfo {
 
     // --
 
-    glm::vec3 pos_;
     glm::vec3 dir_;
     glm::vec3 diff_color_;
     glm::vec3 spec_color_;
@@ -60,7 +59,7 @@ struct LightInfo {
     ~LightInfo(){}
 };
 
-static glm::vec3 global_ambient_color_{ 0.0f, 0.0, 0.0f };
+static glm::vec3 global_ambient_color_{ 0.2f, 0.2, 0.2f };
 
 
 #endif // LIT

@@ -8,6 +8,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <../deps/glm/glm.hpp>
+
 struct RenderData;
 
 class Triangle {
@@ -15,8 +17,8 @@ class Triangle {
 public:
 	 
 	struct PointsTriangle {
-		float x, y;
-		float r, g, b;
+		glm::vec2 pos_;
+		glm::vec3 rgb;
 	};
 
 	enum Color {

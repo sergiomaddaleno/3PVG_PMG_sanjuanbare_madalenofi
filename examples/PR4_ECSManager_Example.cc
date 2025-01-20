@@ -23,11 +23,11 @@ RenderSystem render_system;
 RenderData rd;
 ECSManager ecs;
 
-char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
-char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
+char* vs_normals = (char*)ReadFile("../assets/shaders/normals.vs");
+char* fs_normals = (char*)ReadFile("../assets/shaders/normals.fs");
 
-char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
-char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
+char* vs_texture = (char*)ReadFile("../assets/shaders/texture.vs");
+char* fs_texture = (char*)ReadFile("../assets/shaders/texture.fs");
 
 int num_entities = 5000;
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
@@ -107,7 +107,6 @@ int main(int, char**) {
         float angle = (float)window->getTime();
 
         for (int i = 2; i < num_entities; i++) {
-            ecs.get_component<TransformComponent>(i)->angle = angle;
             ecs.get_component<TransformComponent>(i)->position = glm::vec3{ cos(angle + (float)i) * 8, (sin(angle + (float)i) * 8), -10.0f };
         }
 

@@ -45,11 +45,8 @@ void Skybox::render(RenderData& rd) {
     glm::mat4 view = glm::mat4(glm::mat3(rd.cam.getViewMatrix())); 
     glm::mat4 projection = rd.cam.getProjectionMatrix();
 
-    
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle), glm::vec3(1.0f, 0.0f, 0.0f));
-
     glm::mat4 model = rotation;
-
     
     float tex_id = 0.0f;
     rd.render_comp.skybox_shader.useProgram();
@@ -65,12 +62,14 @@ void Skybox::render(RenderData& rd) {
     rd.render_comp.skybox_shader.setUniformValue(projLoc, Type::T_MAT_4x4, &projection[0][0]);
     rd.render_comp.skybox_shader.setUniformValue(modelLoc, Type::T_MAT_4x4, &model[0][0]);
 
-    
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, sizeof(gIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
-
     
+    glBindVertexArray(0);
     glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
+    glCullFace(GL_BACK);
+    glDisable(GL_CULL_FACE);
 
     assert(glGetError() == GL_NO_ERROR);
 }

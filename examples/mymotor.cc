@@ -56,16 +56,18 @@ PostProcessing postProcc;
 
 auto e = ecs.create_entity();
 int selected_entity = -1;
-char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
-char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
-char* vs_texture = (char*)ReadFile("../assets/shaders/vs_texture.vs");
-char* fs_texture = (char*)ReadFile("../assets/shaders/fs_texture.fs");
 
-char* fs_light = (char*)ReadFile("../assets/shaders/fs_light.fs");
-char* vs_light = (char*)ReadFile("../assets/shaders/vertex.vs");
+char* vs_normals = (char*)ReadFile("../assets/shaders/normals.vs");
+char* fs_normals = (char*)ReadFile("../assets/shaders/normals.fs");
 
-char* vs_source_sky = (char*)ReadFile("../assets/shaders/vs_skybox.vs");
-char* fs_source_sky = (char*)ReadFile("../assets/shaders/fs_skybox.fs");
+char* vs_texture = (char*)ReadFile("../assets/shaders/texture.vs");
+char* fs_texture = (char*)ReadFile("../assets/shaders/texture.fs");
+
+char* fs_light = (char*)ReadFile("../assets/shaders/light.fs");
+char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
+
+char* vs_sky_box = (char*)ReadFile("../assets/shaders/skybox.vs");
+char* fs_sky_box = (char*)ReadFile("../assets/shaders/skybox.fs");
 
 char* vertex_pp = (char*)ReadFile("../assets/shaders/postprocess/vertex_pp.vs");
 char* grey_fs = (char*)ReadFile("../assets/shaders/postprocess/grey.fs");
@@ -158,15 +160,16 @@ void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display
         ti != ecs.getComponentList<TransformComponent>().end();
         ++ri, ++ti, ++entity_id) {
         if (entity_id == selected_entity && ri->has_value() && ti->has_value()) {
-            
+
             auto& transform = ecs.get_component<TransformComponent>(selected_entity);
 
-            glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), transform->position) *
-                glm::mat4_cast(transform->rotation) *
-                glm::scale(glm::mat4(1.0f), transform->scale);
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, transform->position);
+            model = model * glm::mat4_cast(transform->rotation);
+            model = glm::scale(model, transform->scale);
 
             float objectMatrix[16];
-            std::memcpy(objectMatrix, glm::value_ptr(modelMatrix), sizeof(objectMatrix));
+            std::memcpy(objectMatrix, glm::value_ptr(model), sizeof(objectMatrix));
 
             ImGuizmo::SetRect(0, 0, (float)display_w, (float)display_h);
 
@@ -194,6 +197,7 @@ void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display
                 glm::vec4 perspective;
                 glm::quat rotation;
 
+                // Decompose the matrix back into position, rotation, and scale
                 glm::decompose(newModelMatrix, scale, rotation, translation, skew, perspective);
 
                 transform->position = translation;
@@ -201,7 +205,7 @@ void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display
                 transform->scale = scale;
             }
 
-            break; 
+            break;
         }
     }
 }
@@ -298,30 +302,27 @@ int main(int, char**) {
         return -1;
     }
 
-    if (!light_bulb_mesh->loadOBJ("../assets/obj/light_bulb.obj")) {
-        return -1;
-    }
-
     texture_shader.compile(vs_texture, fs_texture);
     normals_shader.compile(vs_normals, fs_normals);
-    light_shader.compile(vs_light, fs_light);
+    light_shader.compile(vs_simple, fs_light);
+
     //Skybox
     if (skyboxTex.loadSkyboxTex(dds_file)) {
         rd.render_comp.skybox_tex = skyboxTex.getTexture();
     }
 
-    rd.render_comp.skybox_shader.compile(vs_source_sky, fs_source_sky);
+    rd.render_comp.skybox_shader.compile(vs_sky_box, fs_sky_box);
 
     skybox.init();
     // ---
 
     //ECS
     render_system.setupEntities(ecs);
+
     render_system.createMesh(ecs, mario_mesh, light_shader);
 
-
-    render_system.createPointLight(ecs, light_bulb_mesh, light_shader, light_shader);
-    render_system.createPointLight(ecs, light_bulb_mesh, light_shader, light_shader);
+    render_system.createSpotLight(ecs, light_shader);
+    render_system.createPointLight(ecs, light_shader);
 
     render_system.initEntities(ecs);
 
@@ -345,9 +346,6 @@ int main(int, char**) {
     while (!done) {
         double currentTime = window->getTime();
         float dt = float(currentTime - lastTime);
-
-       
-
         window->updateWindow();
         window->toggleFullScreen(input);
 
@@ -358,12 +356,10 @@ int main(int, char**) {
         postProcc.beginRender();
         rd.cam.update(input, dt, rd.w_width, rd.w_height);
 
-        
-        
-        render_system.renderEntities(ecs, rd,skybox);
+        skybox.render(rd);
+
+        render_system.renderEntities(ecs, rd);
        
-
-
         postProcc.endRender();
 
         MyImGui(window->getWindow());

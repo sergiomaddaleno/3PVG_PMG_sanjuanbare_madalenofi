@@ -14,8 +14,8 @@
 
 glm::vec2 arrow_dir = { 0.0f, 0.0f };
 
-char* vs_tri = (char*)ReadFile("../assets/shaders/vs_triangle.vs");
-char* fs_tri = (char*)ReadFile("../assets/shaders/fs_triangle.fs");
+char* vs_tri = (char*)ReadFile("../assets/shaders/triangle.vs");
+char* fs_tri = (char*)ReadFile("../assets/shaders/triangle.fs");
 
 Shader triangle_shader;
 RenderData rd;

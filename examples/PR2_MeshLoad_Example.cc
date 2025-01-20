@@ -10,8 +10,8 @@
 
 std::shared_ptr<Mesh> mesh_ = std::make_shared<Mesh>();
 
-char* vs_normals = (char*)ReadFile("../assets/shaders/vs_normals.vs");
-char* fs_normals = (char*)ReadFile("../assets/shaders/fs_normals.fs");
+char* vs_normals = (char*)ReadFile("../assets/shaders/normals.vs");
+char* fs_normals = (char*)ReadFile("../assets/shaders/normals.fs");
 
 int main(int, char**) {
 	
@@ -31,7 +31,6 @@ int main(int, char**) {
 	
 	rd.transf_comp.position = glm::vec3{ 0.0f, -2.0f, -5.0f };
 	rd.transf_comp.scale = glm::vec3{ 5.0f, 5.0f, 5.0f };
-	rd.transf_comp.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };
 
 	double lastTime = window->getTime();
 	bool done = false;
@@ -40,8 +39,8 @@ int main(int, char**) {
 		float dt = float(currentTime - lastTime);
 		window->updateWindow();
 
-		float angle = (float)window->getTime() * 2;
-		rd.transf_comp.angle = angle;
+		float time = (float)window->getTime() * 2;
+		rd.transf_comp.rotation = glm::vec3{ 0.0f, time, 0.0f };
 
 		rd.render_comp.mesh_->render(rd);
 

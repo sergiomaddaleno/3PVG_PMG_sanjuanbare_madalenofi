@@ -40,9 +40,10 @@ void RenderSystem::renderMesh(ECSManager& ecs, RenderData& rd) {
                 render_comp->shader.useProgram();
                 glCullFace(GL_BACK);
 
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), transform_comp->position) *
-                    glm::mat4_cast(transform_comp->rotation) *
-                    glm::scale(glm::mat4(1.0f), transform_comp->scale);
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, transform_comp->position);
+                model = model * glm::mat4_cast(transform_comp->rotation);
+                model = glm::scale(model, transform_comp->scale);
 
                 glm::mat4 view = rd.cam.getViewMatrix();
                 glm::mat4 projection = rd.cam.getProjectionMatrix();
@@ -113,7 +114,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
     }
 }
 
-void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd,Skybox& sk) {
+void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
 
     // -------------------------------------------------------------
     //Light
@@ -123,13 +124,10 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd,Skybox& sk) {
     auto liend = ecs.getComponentList<LightComponent>().end();
     auto tiend = ecs.getComponentList<TransformComponent>().end();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ZERO);
 
-    sk.render(rd);
-
-    int counter = 0;
+    int k = 0;
     for (; li != liend && ti != tiend; ++li, ++ti) {
         if (li->has_value() && ti->has_value()) {
             auto& light_comp = li->value();
@@ -141,52 +139,42 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd,Skybox& sk) {
             light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation("u_camera_position"), Type::T_FLOAT_3, glm::value_ptr(rd.cam.getPosition()));
             light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation("u_ambient"), Type::T_FLOAT_3, &global_ambient_color_);
 
-            
+            int loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].type_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_INT_1, &light_comp.light_info.type_);
 
-                int loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].type_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_INT_1, &light_comp.light_info.type_);
+            // ---
 
-                // ---
+            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].pos_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(transform.position));
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].pos_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(transform.position));
+            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].dir_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.dir_));
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].dir_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.dir_));
+            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].light_color_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.light_color_));
 
-                //loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].diff_color_").c_str());
-                //light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.diff_color_));
+            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].ambient_color_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.ambient_color_));
 
-                //loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(i) + "].spec_color_").c_str());
-                //light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.spec_color_));
+            // ---
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].light_color_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.light_color_));
+            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].linear_att_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.linear_att);
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].ambient_color_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.ambient_color_));
+            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].quad_att_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.quad_att_);
 
-                // ---
+            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].constant_att_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.constant_att_);
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].linear_att_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.linear_att);
+            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].shininess_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.shininess_);
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].quad_att_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.quad_att_);
+            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].strength_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.strength_);
 
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].constant_att_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.constant_att_);
-
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].shininess_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.shininess_);
-
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].strength_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.strength_);
-
-                loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(counter) + "].spot_angle_").c_str());
-                light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.spot_angle_);
-
-            
+            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].spot_angle_").c_str());
+            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.spot_angle_);
 
             // -------------------------------------------------------------
             //Mesh
@@ -205,9 +193,10 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd,Skybox& sk) {
                         render_comp->shader.useProgram();
                         glCullFace(GL_BACK);
 
-                        glm::mat4 model = glm::translate(glm::mat4(1.0f), transform_comp->position) *
-                            glm::mat4_cast(transform_comp->rotation) *
-                            glm::scale(glm::mat4(1.0f), transform_comp->scale);
+                        glm::mat4 model = glm::mat4(1.0f);
+                        model = glm::translate(model, transform_comp->position);
+                        model = model * glm::mat4_cast(transform_comp->rotation);
+                        model = glm::scale(model, transform_comp->scale);
 
                         glm::mat4 view = rd.cam.getViewMatrix();
                         glm::mat4 projection = rd.cam.getProjectionMatrix();
@@ -235,9 +224,8 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd,Skybox& sk) {
                 }
             }
             glBlendFunc(GL_ONE, GL_ONE);
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-            counter++;
+            k++;
         }
     }
     glUseProgram(0);
@@ -251,8 +239,7 @@ void RenderSystem::setupEntities(ECSManager& ecs)
     ecs.add_component_type<LightComponent>();
 }
 
-size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& entity_mesh,
-    const Shader& mesh_shader
+size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader
 )
 {
     ecs.add_component<RenderComponent>(entity_);
@@ -267,9 +254,21 @@ size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& en
     return entity_;
 }
 
-size_t RenderSystem::createSpotLight(ECSManager& ecs, const std::shared_ptr<Mesh>& light_bulb_mesh,
-    const Shader& mesh_shader, const Shader& light_shader)
+size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader)
 {
+    std::shared_ptr<Mesh> lb_mesh = std::make_shared<Mesh>();
+    if (!lb_mesh->loadOBJ("../assets/obj/light_bulb.obj")) {
+        return printf("Light bulb mesh not found\n");
+    }
+
+    char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
+    char* fs_simple = (char*)ReadFile("../assets/shaders/simple_fragment.fs");
+
+    Shader lb_sh;
+    lb_sh.compile(vs_simple, fs_simple);
+
+    // -------------------------------------------
+
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
@@ -278,9 +277,9 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const std::shared_ptr<Mesh
     auto& transform_comp = ecs.get_component<TransformComponent>(entity_);
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
 
-    render_comp->shader = mesh_shader;
+    render_comp->shader = lb_sh;
     render_comp->type_ = RenderType::RT_Light;
-    render_comp->mesh_ = light_bulb_mesh;
+    render_comp->mesh_ = lb_mesh;
 
     // ----
 
@@ -295,7 +294,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const std::shared_ptr<Mesh
     light_comp->light_info.constant_att_ = 1.0f;
     light_comp->light_info.shininess_ = 32.0f;
     light_comp->light_info.strength_ = 1.0f;
-    light_comp->light_info.spot_angle_ = 45.0f;
+    light_comp->light_info.spot_angle_ = 20.0f;
 
     number_lights++;
     entity_++;
@@ -303,9 +302,21 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const std::shared_ptr<Mesh
     return entity_;
 }
 
-size_t RenderSystem::createPointLight(ECSManager& ecs, const std::shared_ptr<Mesh>& light_bulb_mesh,
-    const Shader& mesh_shader, const Shader& light_shader)
+size_t RenderSystem::createPointLight(ECSManager& ecs, const Shader& light_shader)
 {
+    std::shared_ptr<Mesh> lb_mesh = std::make_shared<Mesh>();
+    if (!lb_mesh->loadOBJ("../assets/obj/light_bulb.obj")) {
+        return printf("Light bulb mesh not found\n");
+    }
+
+    char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
+    char* fs_simple = (char*)ReadFile("../assets/shaders/simple_fragment.fs");
+
+    Shader lb_sh;
+    lb_sh.compile(vs_simple, fs_simple);
+
+    // -------------------------------------------
+
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
@@ -314,16 +325,15 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, const std::shared_ptr<Mes
     auto& transform_comp = ecs.get_component<TransformComponent>(entity_);
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
 
-    render_comp->shader = mesh_shader;
+    render_comp->shader = lb_sh;
     render_comp->type_ = RenderType::RT_Light;
-    render_comp->mesh_ = light_bulb_mesh;
+    render_comp->mesh_ = lb_mesh;
 
     // ----
 
     light_comp->shader = light_shader;
     light_comp->light_info.type_ = LightType::LT_Point;
 
-    light_comp->light_info.pos_ = transform_comp->position;
     light_comp->light_info.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
     light_comp->light_info.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
     light_comp->light_info.linear_att = 0.7f;
@@ -338,9 +348,7 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, const std::shared_ptr<Mes
     return entity_;
 }
 
-size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const std::shared_ptr<Mesh>& light_bulb_mesh,
-    const Shader& mesh_shader,
-    const Shader& light_shader)
+size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light_shader)
 {
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);

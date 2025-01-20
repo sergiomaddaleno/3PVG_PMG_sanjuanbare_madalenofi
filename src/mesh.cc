@@ -114,9 +114,9 @@ void Mesh::render(RenderData& rd)
         glCullFace(GL_BACK);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(rd.transf_comp.position.x, rd.transf_comp.position.y, rd.transf_comp.position.z));
-        model = glm::rotate(model, rd.transf_comp.angle, glm::vec3(rd.transf_comp.rotation.x, rd.transf_comp.rotation.y, rd.transf_comp.rotation.z));
-        model = glm::scale(model, glm::vec3(rd.transf_comp.scale.x, rd.transf_comp.scale.y, rd.transf_comp.scale.z));
+        model = glm::translate(model, rd.transf_comp.position);
+        model = model * glm::mat4_cast(rd.transf_comp.rotation);
+        model = glm::scale(model, rd.transf_comp.scale);
 
         glm::mat4 view = rd.cam.getViewMatrix();
         glm::mat4 projection = rd.cam.getProjectionMatrix();

@@ -14,17 +14,8 @@ struct TransformComponent {
     glm::vec3 position;
     glm::quat rotation;  
     glm::vec3 scale;
-    float angle; 
 
-
-    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(glm::quat(0.0f, 0.0f, 0.0f, 0.0f)), scale(1.0f, 1.0f, 1.0f), angle(0.0f) {}
-
-    TransformComponent(glm::vec3 position_, glm::vec3 scale_, float angle_)
-        : position(position_), scale(scale_), angle(angle_) {
-        rotation = glm::quat(glm::vec3(glm::radians(angle_), 0.0f, 0.0f)); 
-    }
-
-    // move entity witj input
+    // move entity with input
     void moveEntity(Input& input, float dt, float speed = 0.001f) {
 
         if (input.isKeyDown(Input::LEFT)) {
@@ -44,23 +35,16 @@ struct TransformComponent {
         }
     }
 
-    glm::mat4 getRotationMatrix() const {
-        return glm::mat4_cast(rotation);  
-    }
+    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(1.0f, 0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f){}
 
-    glm::mat4 getTransformMatrix() const {
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), position);  
-        model *= getRotationMatrix(); 
-        model = glm::scale(model, scale); 
-        return model;
-    }
+    TransformComponent(glm::vec3 position_, glm::vec3 rotation_, glm::vec3 scale_, float angle_)
+        : position(position_), rotation(rotation_), scale(scale_){}
 
     TransformComponent& operator=(const TransformComponent& other) {
         if (this != &other) {
             position = other.position;
             rotation = other.rotation;
             scale = other.scale;
-            angle = other.angle;
         }
         return *this;
     }
