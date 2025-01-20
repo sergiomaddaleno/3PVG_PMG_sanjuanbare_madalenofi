@@ -12,7 +12,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "ecs_manager.h"
+#include "../Systems/ecs_manager.h"
 #include "mesh.h"
 #include "shader.h"
 

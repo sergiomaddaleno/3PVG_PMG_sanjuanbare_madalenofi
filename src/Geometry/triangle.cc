@@ -1,5 +1,5 @@
 
-#include "..\include\triangle.h"
+#include "../include/Geometry/triangle.h"
 #include "utils.h"
 
 #include <../deps/glm/gtc/matrix_transform.hpp>

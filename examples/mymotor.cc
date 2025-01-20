@@ -21,15 +21,15 @@
 
 #include "window.h"
 #include "imgui_manager.h"
-#include "mesh.h"
-#include "render_system.h"
-#include "shader.h"
+#include "Render/mesh.h"
+#include "Render/render_system.h"
+#include "Render/shader.h"
 #include "input.h"
-#include "post_processing.h"
+#include "Render/post_processing.h"
 #include "utils.h"
-#include "skybox.h"
-#include "ecs_manager.h"
-#include "scripting.h"
+#include "Render/skybox.h"
+#include "Systems/ecs_manager.h"
+#include "Systems/scripting.h"
 #include "Components/scripting_component.h"
 
 #include <../deps/glm/glm.hpp>

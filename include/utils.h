@@ -8,7 +8,7 @@
 #include "../deps/dds.h"
 #include "../deps/glm/glm.hpp"
 
-#include "camera.h"
+#include "Render/camera.h"
 #include "Components/render_component.h"
 #include "Components/transform_component.h"
 

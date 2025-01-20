@@ -2,7 +2,7 @@
 #define SRC
 
 #include <memory>
-#include "scripting.h"
+#include "Systems/scripting.h"
 
 struct ScriptingComponent {
 

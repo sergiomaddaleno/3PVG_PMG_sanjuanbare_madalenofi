@@ -1,7 +1,7 @@
 
 #include "window.h"
-#include "mesh.h"
-#include "job_sistem.h"
+#include "Render/mesh.h"
+#include "Systems/job_sistem.h"
 #include "input.h"
 
 #include <../deps/glm/glm.hpp>

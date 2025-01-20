@@ -1,8 +1,8 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "mesh.h"
-#include "texture.h"
+#include "Render/mesh.h"
+#include "Render/texture.h"
 #include "utils.h"
 
 #include <../deps/glm/gtc/matrix_transform.hpp>

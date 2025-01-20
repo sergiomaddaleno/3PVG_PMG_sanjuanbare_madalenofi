@@ -1,22 +1,18 @@
 
 
-#include "..\include\render_system.h"
-#include "..\include\mesh.h"
+#include "Render/render_system.h"
+#include "Render/mesh.h"
 #include "utils.h"
-#include "..\include\Components\transform_component.h"
-#include "..\include\Components\render_component.h"
-#include "..\include\Components\light_component.h"
+#include "Components\transform_component.h"
+#include "Components\render_component.h"
+#include "Components\light_component.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
-
-
 #include <../deps/glm/gtc/quaternion.hpp>
 
-
 #include <memory> 
-
 #include <iostream>
 
 #define M_PI 3.14159265358979323846

@@ -1,5 +1,5 @@
 
-#include "scripting.h"
+#include "Systems/scripting.h"
 
 
 void LuaScript::run(const std::string& str) {

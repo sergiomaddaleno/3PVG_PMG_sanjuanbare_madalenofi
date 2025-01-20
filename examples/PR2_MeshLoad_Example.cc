@@ -3,8 +3,8 @@
 #include <string>
 
 #include "window.h"
-#include "mesh.h"
-#include "shader.h"
+#include "Render/mesh.h"
+#include "Render/shader.h"
 #include "utils.h"
 #include <../deps/glm/glm.hpp>
 

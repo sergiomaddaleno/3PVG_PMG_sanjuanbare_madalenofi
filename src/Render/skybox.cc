@@ -1,6 +1,6 @@
 
-#include "skybox.h"
-#include "mesh.h"
+#include "Render/skybox.h"
+#include "Render/mesh.h"
 #include "utils.h"
 
 #include <../deps/glm/glm.hpp>

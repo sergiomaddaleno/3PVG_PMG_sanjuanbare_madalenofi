@@ -2,9 +2,8 @@
 #define LCP
 
 #include <memory>
-#include "shader.h"
-#include "light.h"
-
+#include "../Render/shader.h"
+#include "../Render/light.h"
 
 struct LightComponent {
 

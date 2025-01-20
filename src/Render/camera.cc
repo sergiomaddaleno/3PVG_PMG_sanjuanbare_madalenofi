@@ -2,10 +2,11 @@
 #define GLM_ENABLE_EXPERIMENTAL
 const float PI = 3.141592653589793f;
 
-#include "camera.h"
-#include <input.h>
-#include "../deps/glm/gtx/transform.hpp"
+#include "Render/camera.h"
 #include "utils.h"
+#include "input.h"
+
+#include "../deps/glm/gtx/transform.hpp"
 
 static RenderData rd;
 

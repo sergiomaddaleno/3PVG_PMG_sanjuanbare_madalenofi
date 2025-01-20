@@ -1,8 +1,8 @@
 
 #include "window.h"
-#include "triangle.h"
+#include "Geometry/triangle.h"
 #include "input.h"
-#include "shader.h"
+#include "Render/shader.h"
 #include "utils.h"
 
 #include <GL/glew.h>

@@ -7,10 +7,10 @@
 #include <../deps/glm/glm.hpp>
 
 #include "window.h"
-#include "mesh.h"
-#include "render_system.h"
+#include "Render/mesh.h"
+#include "Render/render_system.h"
 #include "input.h"
-#include "ecs_manager.h"
+#include "Systems/ecs_manager.h"
 #include "utils.h"
 
 #define M_PI 3.14159265358979323846

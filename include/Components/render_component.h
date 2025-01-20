@@ -2,10 +2,10 @@
 #define RNC
 
 #include <memory>
-#include "triangle.h"
-#include "texture.h"
-#include "shader.h"
-#include "mesh.h"
+#include "../Geometry/triangle.h"
+#include "../Render/texture.h"
+#include "../Render/shader.h"
+#include "../Render/mesh.h"
 
 enum RenderType {
     RT_Default,

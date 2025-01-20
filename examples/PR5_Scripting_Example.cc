@@ -9,7 +9,7 @@
 #include <optional>
 #include <string>
 
-#include "ecs_manager.h"
+#include "Systems/ecs_manager.h"
 #include "Components/scripting_component.h"
 #include "utils.h"
 
