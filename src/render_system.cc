@@ -179,6 +179,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
             // -------------------------------------------------------------
             //Mesh
 
+
             auto ri = ecs.getComponentList<RenderComponent>().begin();
             auto ti = ecs.getComponentList<TransformComponent>().begin();
             auto riend = ecs.getComponentList<RenderComponent>().end();
@@ -223,11 +224,10 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
                     }
                 }
             }
-            glBlendFunc(GL_ONE, GL_ONE);
-
             k++;
         }
     }
+    glDisable(GL_BLEND);  
     glUseProgram(0);
 }
 

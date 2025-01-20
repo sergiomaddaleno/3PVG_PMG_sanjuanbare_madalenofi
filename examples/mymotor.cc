@@ -63,6 +63,9 @@ char* fs_normals = (char*)ReadFile("../assets/shaders/normals.fs");
 char* vs_texture = (char*)ReadFile("../assets/shaders/texture.vs");
 char* fs_texture = (char*)ReadFile("../assets/shaders/texture.fs");
 
+char* vs_entities = (char*)ReadFile("../assets/shaders/entities.vs");
+char* fs_entities = (char*)ReadFile("../assets/shaders/entities.fs");
+
 char* fs_light = (char*)ReadFile("../assets/shaders/light.fs");
 char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
 
@@ -79,7 +82,7 @@ char* kernel_fs = (char*)ReadFile("../assets/shaders/postprocess/kernel.fs");
 char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
 char* lua_file = ReadFile("../scripts/settings.lua");
 
-Shader normals_shader, texture_shader, light_shader;
+Shader normals_shader, texture_shader, light_shader, entities_shader; //entities shader has all
 Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
 
 //Guizmo
@@ -305,6 +308,7 @@ int main(int, char**) {
     texture_shader.compile(vs_texture, fs_texture);
     normals_shader.compile(vs_normals, fs_normals);
     light_shader.compile(vs_simple, fs_light);
+    entities_shader.compile(vs_entities, fs_entities);
 
     //Skybox
     if (skyboxTex.loadSkyboxTex(dds_file)) {
@@ -319,10 +323,10 @@ int main(int, char**) {
     //ECS
     render_system.setupEntities(ecs);
 
-    render_system.createMesh(ecs, mario_mesh, light_shader);
+    render_system.createMesh(ecs, mario_mesh, entities_shader);
 
-    render_system.createSpotLight(ecs, light_shader);
-    render_system.createPointLight(ecs, light_shader);
+    render_system.createSpotLight(ecs, entities_shader);
+    render_system.createPointLight(ecs, entities_shader);
 
     render_system.initEntities(ecs);
 
