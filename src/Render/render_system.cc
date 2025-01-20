@@ -2,6 +2,9 @@
 
 #include "Render/render_system.h"
 #include "Render/mesh.h"
+#include "Render/shader.h"
+#include "Geometry/terrain.h"
+
 #include "utils.h"
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
@@ -173,8 +176,6 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
             light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.spot_angle_);
 
             // -------------------------------------------------------------
-            //Mesh
-
 
             auto ri = ecs.getComponentList<RenderComponent>().begin();
             auto ti = ecs.getComponentList<TransformComponent>().begin();
@@ -185,6 +186,8 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
                 if (ri->has_value() && ti->has_value()) {
                     auto& render_comp = *ri;
                     auto& transform_comp = *ti;
+
+                    //Mesh -------------------------------------------------
 
                     for (auto& mesh : render_comp->mesh_->meshes) {
                         render_comp->shader.useProgram();
@@ -218,6 +221,36 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
                         glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
                         glBindVertexArray(0);
                     }
+
+                    //Terrain -------------------------------------------------
+
+                    if (render_comp->terrain_) {
+                    
+                        auto& terrain = render_comp->terrain_;
+
+                        render_comp->shader.useProgram();
+                        glCullFace(GL_BACK);
+
+                        // Matrices de transformación para el terreno
+                        glm::mat4 model = glm::mat4(1.0f);
+                        model = glm::translate(model, transform_comp->position);  // Posición del terreno
+                        model = model * glm::mat4_cast(transform_comp->rotation);  // Rotación
+                        model = glm::scale(model, transform_comp->scale);  // Escala
+
+                        glm::mat4 view = rd.cam.getViewMatrix();
+                        glm::mat4 projection = rd.cam.getProjectionMatrix();
+                        glm::mat4 mvp = projection * view * model;
+
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
+
+                     
+                        glBindVertexArray(terrain->VAO);
+                        glDrawElements(GL_TRIANGLES, (terrain->num_cols_ * terrain->num_rows_) * 6, GL_UNSIGNED_INT, 0);
+                        glBindVertexArray(0);
+                    }
                 }
             }
             k++;
@@ -244,6 +277,22 @@ size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& en
     ecs.get_component<RenderComponent>(entity_)->shader = mesh_shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Mesh;
     ecs.get_component<RenderComponent>(entity_)->mesh_ = entity_mesh;
+
+    entity_++;
+
+    return entity_;
+}
+
+size_t RenderSystem::createTerrain(ECSManager& ecs,Terrain t, Shader& shader
+)
+{
+    
+    ecs.add_component<RenderComponent>(entity_);
+    ecs.add_component<TransformComponent>(entity_);
+
+    ecs.get_component<RenderComponent>(entity_)->shader = shader;
+    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Mesh;
+    ecs.get_component<RenderComponent>(entity_)->terrain_ = &t;
 
     entity_++;
 

@@ -126,6 +126,7 @@ files {
 	"deps/*.h",
 	"deps/imgui/*.h",
 	"deps/imgui/*.cpp",
+	"deps/Perlin/**",
 	"deps/imgui/backends/imgui_impl_glfw.h",
 	"deps/imgui/backends/imgui_impl_glfw.cpp",
 	"deps/imgui/backends/imgui_impl_opengl3.h",
@@ -141,7 +142,7 @@ project"MyMotor"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo", "deps/Perlin"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
@@ -157,6 +158,7 @@ files {
 	"deps/*.h",
 	"deps/imgui/*.h",
 	"deps/imgui/*.cpp",
+	"deps/Perlin/**",
 	"deps/imgui/backends/imgui_impl_glfw.h",
 	"deps/imgui/backends/imgui_impl_glfw.cpp",
 	"deps/imgui/backends/imgui_impl_opengl3.h",
@@ -188,6 +190,7 @@ files {
 	"deps/*.h",
 	"deps/imgui/*.h",
 	"deps/imgui/*.cpp",
+	"deps/Perlin/**",
 	"deps/imgui/backends/imgui_impl_glfw.h",
 	"deps/imgui/backends/imgui_impl_glfw.cpp",
 	"deps/imgui/backends/imgui_impl_opengl3.h",
@@ -219,6 +222,7 @@ files {
 	"deps/*.h",
 	"deps/imgui/*.h",
 	"deps/imgui/*.cpp",
+	"deps/Perlin/**",
 	"deps/imgui/backends/imgui_impl_glfw.h",
 	"deps/imgui/backends/imgui_impl_glfw.cpp",
 	"deps/imgui/backends/imgui_impl_opengl3.h",
@@ -250,6 +254,7 @@ files {
 	"deps/*.h",
 	"deps/imgui/*.h",
 	"deps/imgui/*.cpp",
+	"deps/Perlin/**",
 	"deps/imgui/backends/imgui_impl_glfw.h",
 	"deps/imgui/backends/imgui_impl_glfw.cpp",
 	"deps/imgui/backends/imgui_impl_opengl3.h",
@@ -281,6 +286,7 @@ files {
 	"deps/*.h",
 	"deps/imgui/*.h",
 	"deps/imgui/*.cpp",
+	"deps/Perlin/**",
 	"deps/imgui/backends/imgui_impl_glfw.h",
 	"deps/imgui/backends/imgui_impl_glfw.cpp",
 	"deps/imgui/backends/imgui_impl_opengl3.h",
@@ -312,6 +318,7 @@ files {
 	"deps/*.h",
 	"deps/imgui/*.h",
 	"deps/imgui/*.cpp",
+	"deps/Perlin/**",
 	"deps/imgui/backends/imgui_impl_glfw.h",
 	"deps/imgui/backends/imgui_impl_glfw.cpp",
 	"deps/imgui/backends/imgui_impl_opengl3.h",
@@ -343,6 +350,7 @@ files {
 	"deps/*.h",
 	"deps/imgui/*.h",
 	"deps/imgui/*.cpp",
+	"deps/Perlin/**",
 	"deps/imgui/backends/imgui_impl_glfw.h",
 	"deps/imgui/backends/imgui_impl_glfw.cpp",
 	"deps/imgui/backends/imgui_impl_opengl3.h",

@@ -6,6 +6,7 @@
 #include "../Render/texture.h"
 #include "../Render/shader.h"
 #include "../Render/mesh.h"
+#include "../Geometry/terrain.h"
 
 enum RenderType {
     RT_Default,
@@ -20,6 +21,7 @@ struct RenderComponent {
 
     std::shared_ptr<Mesh> mesh_;
     Triangle triangle_;
+    Terrain *terrain_;
 
     Shader shader;
     Shader skybox_shader;
@@ -30,7 +32,7 @@ struct RenderComponent {
     RenderType type_;
     //----
 
-    RenderComponent() : mesh_(nullptr), triangle_(triangle_.my_triangle) , type_(RenderType::RT_Default) {}
+    RenderComponent() : mesh_(nullptr), terrain_(nullptr), triangle_(triangle_.my_triangle) , type_(RenderType::RT_Default) {}
 
     ~RenderComponent() {}
 

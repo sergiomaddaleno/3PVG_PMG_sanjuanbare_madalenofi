@@ -13,13 +13,13 @@
 #include <GLFW/glfw3.h>
 
 #include "../Systems/ecs_manager.h"
-#include "mesh.h"
-#include "shader.h"
-
-#include "skybox.h"
 
 struct RenderData;
 struct LightInfo;
+
+class Mesh;
+class Shader;
+class Terrain;
 
 class RenderSystem {
 
@@ -42,6 +42,8 @@ public:
 	//--
 
 	size_t createMesh(ECSManager &ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader);
+
+	size_t createTerrain(ECSManager& ecs, const Terrain t, Shader& shader);
 	
 	//Lights
 	size_t createSpotLight(ECSManager& ecs, const Shader& light_shader);
@@ -54,6 +56,7 @@ private:
 
 	size_t entity_ = 0;
 	int number_lights = 0;
+
 };
 
 #endif // RST

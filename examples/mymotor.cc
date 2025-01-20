@@ -31,6 +31,7 @@
 #include "Systems/ecs_manager.h"
 #include "Systems/scripting.h"
 #include "Components/scripting_component.h"
+#include "Geometry/terrain.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -51,6 +52,7 @@ RenderData rd;
 LuaScript ls;
 Skybox skybox;
 Texture skyboxTex;
+Terrain terrain;
 ECSManager ecs;
 PostProcessing postProcc;
 
@@ -327,8 +329,12 @@ int main(int, char**) {
 
     render_system.createSpotLight(ecs, entities_shader);
     render_system.createPointLight(ecs, entities_shader);
+    //render_system.createTerrain(ecs, terrain, entities_shader);
 
     render_system.initEntities(ecs);
+
+    //Terrain
+    //terrain.init();
 
     // ---
     //Post proccess
