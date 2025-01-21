@@ -5,6 +5,14 @@
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
 
+PostProcessing::PostProcessing()
+{
+}
+
+PostProcessing::~PostProcessing()
+{
+}
+
 void PostProcessing::initData()
 {
     glGenFramebuffers(1, &FBO);

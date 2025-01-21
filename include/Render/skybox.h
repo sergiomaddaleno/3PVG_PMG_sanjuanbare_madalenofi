@@ -56,6 +56,7 @@ class Skybox {
 
 public:
 	Skybox();
+	~Skybox();
 
 	void init();
 
