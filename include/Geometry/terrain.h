@@ -22,8 +22,8 @@ class Terrain {
 
   GLuint VAO = 0, VBO = 0, EBO = 0;
 
-  int num_rows_;
-  int num_cols_;
+  int num_rows_=0;
+  int num_cols_=0;
 
   std::vector<int> elements_buffer;
   std::vector<int> order_buffer;
