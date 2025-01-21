@@ -16,7 +16,7 @@ class Terrain {
  
   void init(const int num_cols = 2, const int num_rows = 2, 
             const float height_mult = 1.0f, const float size = 1.0f,
-            const bool is_centered = true, const bool use_perlin_noise = false);  //false for heightmap
+            const bool is_centered = true, const bool use_perlin_noise = true);  //false for heightmap
 
   float* GetVertexTerrain();
 

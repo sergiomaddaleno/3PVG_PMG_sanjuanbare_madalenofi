@@ -12,6 +12,10 @@
 
 Skybox::Skybox() : skybox_angle(-90.0f), VAO(0), VBO(0), EBO(0) {}
 
+Skybox::~Skybox()
+{
+}
+
 void Skybox::init() {
 
     glGenVertexArrays(1, &VAO);

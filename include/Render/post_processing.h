@@ -32,6 +32,9 @@ enum Effect{
 class PostProcessing {
 public:
 
+	PostProcessing();
+	~PostProcessing();
+
 	void initData();
 
 	void beginRender();
