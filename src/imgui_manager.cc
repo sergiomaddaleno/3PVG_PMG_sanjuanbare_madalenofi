@@ -4,6 +4,9 @@
 #include "Render/post_processing.h"
 #include "window.h"
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <cmath>
 #include <vector>
@@ -111,13 +114,13 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
         ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->WorkSize);
 
         ImGuiID dock_main = dockspace_id;
-        ImGuiID dock_top = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Up, 0.1f, nullptr, &dock_main);
+        ImGuiID dock_top = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Up, 0.07f, nullptr, &dock_main);
         ImGuiID dock_left = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Left, 0.2f, nullptr, &dock_main);
         ImGuiID dock_right = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Right, 0.3f, nullptr, &dock_main);
         ImGuiID dock_bottom = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Down, 0.2f, nullptr, &dock_main);
 
 
-        ImGui::DockBuilderDockWindow("TopBar", dock_top);
+        ImGui::DockBuilderDockWindow("##TopBar", dock_top);
         ImGui::DockBuilderDockWindow("Hierarchy", dock_left);
         ImGui::DockBuilderDockWindow("Inspector", dock_right);
         ImGui::DockBuilderDockWindow("ContentBrowser", dock_bottom);
@@ -139,9 +142,6 @@ void ImGuiManager::GameWindow(DataImgui& di) {
         ImVec2 uv1(1.0f, 0.0f);
 
         ImGui::Image((ImTextureID)(intptr_t)gameTex, content_avail, uv0, uv1);
-    }
-    else {
-        ImGui::Text("Invalid game texture.");
     }
 
     ImGui::End();
@@ -187,11 +187,36 @@ void ImGuiManager::ContentBrowser(DataImgui& di) {
 }
 
 void ImGuiManager::TopBar(DataImgui& di) {
-    ImGui::Begin("TopBar");
+    ImGui::Begin("##TopBar", nullptr,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
+    static int curr_type_draw = 0;
+
+        if (ImGui::BeginMenu("Edit")) {
+
+            if (ImGui::BeginMenu("Drawing Type")) {
+                if (ImGui::MenuItem("Triangles", nullptr, curr_type_draw == 0)) {
+                    curr_type_draw = 0;
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                }
+                if (ImGui::MenuItem("Lines", nullptr, curr_type_draw == 1)) {
+                    curr_type_draw = 1;
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                }
+                if (ImGui::MenuItem("Points", nullptr, curr_type_draw == 2)) {
+                    curr_type_draw = 2;
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+                }
+
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenu();
+        }
+    
 
     ImGui::End();
 }
+
 
 void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int display_w, int display_h, int selected_entity, DataImgui& di)
 {
