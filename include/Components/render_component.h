@@ -22,7 +22,7 @@ struct RenderComponent {
 
     std::shared_ptr<Mesh> mesh_;
     Triangle triangle_;
-    Terrain *terrain_;
+    std::shared_ptr<Terrain> terrain_;
 
     Shader shader;
     Shader skybox_shader;
@@ -38,7 +38,7 @@ struct RenderComponent {
     ~RenderComponent() {}
 
     RenderComponent(const RenderComponent& other)
-        : mesh_(other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr),
+        : mesh_(other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr), terrain_(other.terrain_),
         triangle_(other.triangle_), texture(other.texture), skybox_tex(other.skybox_tex),
         shader(other.shader), skybox_shader(other.skybox_shader), type_(other.type_)
     {}
@@ -47,6 +47,7 @@ struct RenderComponent {
         if (this != &other) {
             mesh_ = other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr;
             triangle_ = other.triangle_;
+            terrain_ = other.terrain_;
             texture = other.texture;
             skybox_tex = other.skybox_tex;
             shader = other.shader;

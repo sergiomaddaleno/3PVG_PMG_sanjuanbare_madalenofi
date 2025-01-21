@@ -25,6 +25,9 @@ class Terrain {
   int num_rows_=0;
   int num_cols_=0;
 
+  std::vector<int> order_;
+  std::vector<float> data_;
+
   std::vector<int> elements_buffer;
   std::vector<int> order_buffer;
 
