@@ -326,23 +326,11 @@ int main(int, char**) {
     render_system.setupEntities(ecs);
 
     render_system.createMesh(ecs, mario_mesh, entities_shader);
-
-   // render_system.createSpotLight(ecs, entities_shader);
     render_system.createPointLight(ecs, entities_shader);
-
-
-    
-
     render_system.createTerrain(ecs, terrain, entities_shader);
     
-
-    
-
-  
-
     render_system.initEntities(ecs);
    
-
     // ---
     //Post proccess
     grey_sh.compile(vertex_pp, grey_fs);

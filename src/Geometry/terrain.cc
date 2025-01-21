@@ -28,30 +28,43 @@ void Terrain::init(const int num_cols, const int num_rows,
         std::vector<float> uv_terrain(num_vertex * 2); // u, v
 
         int index = 0;
-        int width, height, nChannels;
-        unsigned char* data = stbi_load("./textures/heightmap.png", &width, &height, &nChannels, 0);
-        float yScale = 32.0f / 256.0f, yShift = 10.0f;
+        unsigned char* heightmap_data = nullptr;
+        int width = 0, height = 0, nChannels = 0;
 
-        // Centro del terreno
+        if (!use_perlin_noise) {
+            heightmap_data = stbi_load("../assets/textures/heightmaps/heightmap.png", &width, &height, &nChannels, 0);
+            if (!heightmap_data) printf("Heightmap not found\n");
+        }
+
         glm::vec3 center = { 0.0f, 0.0f, 0.0f };
         if (is_centered) {
             center.x = num_cols * size / 2.0f;
             center.z = num_rows * size / 2.0f;
         }
 
-        // Generación de vértices
+        // Vértices
         for (int i = 0; i <= num_cols; i++) {
             for (int j = 0; j <= num_rows; j++) {
                 float height_value = 0.0f;
+
                 if (use_perlin_noise) {
                     float perlin_x = (float)j;
                     float perlin_z = (float)i;
                     height_value = SimplexNoise::noise(perlin_x, perlin_z);
                 }
                 else {
-                    unsigned char* texel = data + ((i + num_cols) + 200 + width * (j + num_rows * 2)) * nChannels;
-                    unsigned char y = texel[0];
-                    height_value = ((int)y * yScale - yShift) * height_mult;
+                    if (i < height && j < width) {
+                        int mapped_i = (int)(i / (float)num_cols * height);
+                        int mapped_j = (int)(j / (float)num_rows * width);
+
+                        unsigned char* texel = heightmap_data + (mapped_j + width * mapped_i) * nChannels;
+                        unsigned char y = texel[0];
+
+                        float yScale = 32.0f / 256.0f;
+                        float yShift = 10.0f;
+
+                        height_value = ((int)y * yScale - yShift) * height_mult;
+                    }
                 }
 
                 float x = is_centered ? (j * size) - center.x : j * size;
@@ -65,11 +78,12 @@ void Terrain::init(const int num_cols, const int num_rows,
             }
         }
 
-        if (!use_perlin_noise) {
-            stbi_image_free(data);
+        if (heightmap_data) {
+            stbi_image_free(heightmap_data);
         }
+
         index = 0;
-        // Calcular normales
+        //Normales
         for (int i = 0; i <= num_cols; i++) {
             for (int j = 0; j <= num_rows; j++) {
                 glm::vec3 vertex = { vertex_terrain[index * 3], vertex_terrain[index * 3 + 1], vertex_terrain[index * 3 + 2] };

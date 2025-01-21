@@ -353,8 +353,6 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, Terrain& t, Shader& shader)
     return entity_;
 }
 
-
-
 size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader)
 {
     std::shared_ptr<Mesh> lb_mesh = std::make_shared<Mesh>();
