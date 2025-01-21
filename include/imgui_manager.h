@@ -6,6 +6,7 @@
 #include "Render/post_processing.h" 
 
 struct RenderData;
+class Window;
 
 class ImGuiManager {
 public:
@@ -13,18 +14,19 @@ public:
     ~ImGuiManager();
 
     void Init(GLFWwindow* window);
-    void Render(GLFWwindow* window, RenderData& rd, PostProcessing& postProcc);
+    void Render(GLFWwindow* window, PostProcessing& postProcc);
     void Cleanup();
 
     // ---
 
+    void ImguiWindow(GLFWwindow* window);
+    void GameWindow(PostProcessing& postProcc);
     void Hierarchy();
     void Inspector();
     void ContentBrowser();
     void TopBar();
-    void GameWindow(RenderData& rd, PostProcessing& postProcc);
 
-    void SetupDocking();
+    //void SetupDocking();
 };
 
 #endif // IGM
