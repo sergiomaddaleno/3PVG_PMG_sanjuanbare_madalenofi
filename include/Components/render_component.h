@@ -15,6 +15,7 @@ enum RenderType {
     RT_Skybox,
     RT_PostProcess,
     RT_Transparent,
+    RT_Terrain,
 };
 
 struct RenderComponent {

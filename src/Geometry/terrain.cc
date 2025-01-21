@@ -11,6 +11,7 @@
 Terrain::Terrain() {
         num_rows_ = 0;
         num_cols_ = 0;
+
 }
 Terrain::~Terrain() {}
 
@@ -149,9 +150,7 @@ void Terrain::init(const int num_cols, const int num_rows,
             data_.push_back(uv_terrain[i * 2 + 1]);
         }
 
-        glGenBuffers(1, &VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, data_.size() * sizeof(float), data_.data(), GL_STATIC_DRAW);
+        
 
         std::vector<int> order_;
         order_.reserve((num_cols * num_rows) * 6);
@@ -167,6 +166,10 @@ void Terrain::init(const int num_cols, const int num_rows,
                 order_.push_back(base_index + num_rows + 2);
             }
         }
+        
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, data_.size() * sizeof(float), data_.data(), GL_STATIC_DRAW);
 
         glGenBuffers(1, &EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -176,6 +179,20 @@ void Terrain::init(const int num_cols, const int num_rows,
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+        
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); 
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))); 
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); 
+        glEnableVertexAttribArray(2);
+
+        
+        glBindVertexArray(0);
+        
     }
 
 
