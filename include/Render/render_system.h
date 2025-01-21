@@ -33,7 +33,7 @@ public:
 
 	void renderEntities(ECSManager &ecs, RenderData& rd);
 
-	void renderMesh(ECSManager& ecs, RenderData& rd);
+
 
 	//---------------------------------------------------------------
 	
@@ -43,7 +43,7 @@ public:
 
 	size_t createMesh(ECSManager &ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader);
 
-	size_t createTerrain(ECSManager& ecs, Terrain& t, Shader& shader);
+	size_t createTerrain(ECSManager& ecs, Shader& shader,int cols ,int rows);
 	
 	//Lights
 	size_t createSpotLight(ECSManager& ecs, const Shader& light_shader);

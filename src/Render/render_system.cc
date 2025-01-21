@@ -23,58 +23,10 @@
 RenderSystem::RenderSystem(){}
 RenderSystem::~RenderSystem(){}
 
-void RenderSystem::renderMesh(ECSManager& ecs, RenderData& rd) {
 
-    auto ri = ecs.getComponentList<RenderComponent>().begin();
-    auto ti = ecs.getComponentList<TransformComponent>().begin();
-    auto riend = ecs.getComponentList<RenderComponent>().end();
-    auto tiend = ecs.getComponentList<TransformComponent>().end();
-
-    for (; ri != riend && ti != tiend; ++ri, ++ti) {
-        if (ri->has_value() && ti->has_value()) {
-            auto& render_comp = *ri;
-            auto& transform_comp = *ti;
-
-            for (auto& mesh : render_comp->mesh_->meshes) {
-                render_comp->shader.useProgram();
-                glCullFace(GL_BACK);
-
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, transform_comp->position);
-                model = model * glm::mat4_cast(transform_comp->rotation);
-                model = glm::scale(model, transform_comp->scale);
-
-                glm::mat4 view = rd.cam.getViewMatrix();
-                glm::mat4 projection = rd.cam.getProjectionMatrix();
-                glm::mat4 mvp = projection * view * model;
-
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
-
-                // Texture
-                float tex_id = 0.0f;
-                render_comp->texture = mesh.getTexture(0);
-                render_comp->texture.bind();
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture1"), Type::T_INT_1, &tex_id);
-
-                // Fog
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &rd.b_fog_);
-
-                glBindVertexArray(mesh.VAO);
-                glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
-                glBindVertexArray(0);
-            }
-        }
-    }
-
-    glUseProgram(0);
-}
 
 
 void RenderSystem::initEntities(ECSManager& ecs) {
-
     auto ri = ecs.getComponentList<RenderComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto riend = ecs.getComponentList<RenderComponent>().end();
@@ -84,12 +36,14 @@ void RenderSystem::initEntities(ECSManager& ecs) {
         if (ri->has_value() && ti->has_value()) {
             auto& render_comp = *ri;
             auto& transform_comp = *ti;
+
             if (render_comp->type_ == RenderType::RT_Mesh) {
                 for (auto& mesh : render_comp->mesh_->meshes) {
-
+                    
                     glGenVertexArrays(1, &mesh.VAO);
                     glBindVertexArray(mesh.VAO);
 
+                   
                     glGenBuffers(1, &mesh.VBO);
                     glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
                     glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
@@ -98,6 +52,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
                     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW);
 
+                    
                     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
                     glEnableVertexAttribArray(0);
 
@@ -107,21 +62,50 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
                     glEnableVertexAttribArray(2);
 
-                    glBindVertexArray(0);
+                    glBindVertexArray(0); 
                 }
             }
+            else if (render_comp->type_ == RenderType::RT_Terrain) {
+                if (!render_comp->terrain_) {
+                    std::cerr << "Error: terrain pointer is null!" << std::endl;
+                    continue;
+                }
+
+                auto& terrain = render_comp->terrain_;
+
+               
+                glGenBuffers(1, &terrain->VBO);
+                glBindBuffer(GL_ARRAY_BUFFER, terrain->VBO);
+                glBufferData(GL_ARRAY_BUFFER, terrain->data_.size() * sizeof(float), terrain->data_.data(), GL_STATIC_DRAW);
+
+                glGenBuffers(1, &terrain->EBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrain->EBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, terrain->order_.size() * sizeof(int), terrain->order_.data(), GL_STATIC_DRAW);
+
+                glGenVertexArrays(1, &terrain->VAO);
+                glBindVertexArray(terrain->VAO);
+                glBindBuffer(GL_ARRAY_BUFFER, terrain->VBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrain->EBO);
 
 
-            
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+                glEnableVertexAttribArray(0);
+
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+                glEnableVertexAttribArray(1);
+
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+                glEnableVertexAttribArray(2);
+
+
+                glBindVertexArray(0);
+            }
         }
     }
 }
 
 void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
-
-    // -------------------------------------------------------------
-    //Light
-    
+    // Configuración de luces
     auto li = ecs.getComponentList<LightComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto liend = ecs.getComponentList<LightComponent>().end();
@@ -130,58 +114,51 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ZERO);
 
-    int k = 0;
+    int lightIndex = 0;
     for (; li != liend && ti != tiend; ++li, ++ti) {
-     
         if (li->has_value() && ti->has_value()) {
-            auto& light_comp = li->value();
-            auto& transform = ti->value();
+            auto& light_comp = *li;
+            auto& transform = *ti;
 
-            light_comp.shader.useProgram();
+            light_comp->shader.useProgram();
 
-            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation("u_number_lights"), Type::T_INT_1, &number_lights);
-            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation("u_camera_position"), Type::T_FLOAT_3, glm::value_ptr(rd.cam.getPosition()));
-            light_comp.shader.setUniformValue(light_comp.shader.getUniformLocation("u_ambient"), Type::T_FLOAT_3, &global_ambient_color_);
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("u_number_lights"), Type::T_INT_1, &number_lights);
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("u_camera_position"), Type::T_FLOAT_3, glm::value_ptr(rd.cam.getPosition()));
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("u_ambient"), Type::T_FLOAT_3, &global_ambient_color_);
 
-            int loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].type_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_INT_1, &light_comp.light_info.type_);
+            int loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].type_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_INT_1, &light_comp->light_info.type_);
 
-            // ---
+            loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].pos_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(transform->position));
 
-            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].pos_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(transform.position));
+            loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].dir_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp->light_info.dir_));
 
-            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].dir_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.dir_));
+            loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].light_color_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp->light_info.light_color_));
 
-            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].light_color_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.light_color_));
+            loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].ambient_color_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp->light_info.ambient_color_));
 
-            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].ambient_color_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_3, glm::value_ptr(light_comp.light_info.ambient_color_));
+            loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].linear_att_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp->light_info.linear_att);
 
-            // ---
+            loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].quad_att_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp->light_info.quad_att_);
 
-            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].linear_att_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.linear_att);
+            loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].constant_att_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp->light_info.constant_att_);
 
-            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].quad_att_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.quad_att_);
+            loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].shininess_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp->light_info.shininess_);
 
-            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].constant_att_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.constant_att_);
+            loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].strength_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp->light_info.strength_);
 
-            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].shininess_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.shininess_);
+            loc = light_comp->shader.getUniformLocation(("u_light[" + std::to_string(lightIndex) + "].spot_angle_").c_str());
+            light_comp->shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp->light_info.spot_angle_);
 
-            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].strength_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.strength_);
-
-            loc = light_comp.shader.getUniformLocation(("u_light[" + std::to_string(k) + "].spot_angle_").c_str());
-            light_comp.shader.setUniformValue(loc, Type::T_FLOAT_1, &light_comp.light_info.spot_angle_);
-
-            // -------------------------------------------------------------
-            
             auto ri = ecs.getComponentList<RenderComponent>().begin();
             auto ti = ecs.getComponentList<TransformComponent>().begin();
             auto riend = ecs.getComponentList<RenderComponent>().end();
@@ -192,7 +169,6 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
                     auto& render_comp = *ri;
                     auto& transform_comp = *ti;
 
-                    //Mesh -------------------------------------------------
                     if (render_comp->type_ == RenderType::RT_Mesh) {
                         for (auto& mesh : render_comp->mesh_->meshes) {
                             render_comp->shader.useProgram();
@@ -212,14 +188,11 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
                             render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
                             render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
 
-                            // Texture
-                            float tex_id = 0.0f;
                             render_comp->texture = mesh.getTexture(0);
                             render_comp->texture.bind();
+                            float tex_id = 0.0f;
                             render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture"), Type::T_INT_1, &tex_id);
-                            // ---
 
-                            //Fog
                             render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &rd.b_fog_);
 
                             glBindVertexArray(mesh.VAO);
@@ -227,90 +200,48 @@ void RenderSystem::renderEntities(ECSManager& ecs, RenderData& rd) {
                             glBindVertexArray(0);
                         }
                     }
-                    
-                    //Terrain -------------------------------------------------
-                        if (render_comp->type_ == RenderType::RT_Terrain) {
 
-                            if (render_comp->terrain_ == nullptr) {
-                                std::cerr << "Error: terrain pointer is null!" << std::endl;
-                                continue;  // Salta esta iteración si el puntero terrain es nulo
-                            }
-
-                            auto& terrain = render_comp->terrain_;
-
-                            render_comp->shader.useProgram();
-                            glCullFace(GL_BACK);
-
-                            // Matrices de transformación para el terreno
-                            glm::mat4 model = glm::mat4(1.0f);
-                            model = glm::translate(model, transform_comp->position);  // Posición del terreno
-                            model = model * glm::mat4_cast(transform_comp->rotation);  // Rotación
-                            model = glm::scale(model, transform_comp->scale);  // Escala
-
-                            glm::mat4 view = rd.cam.getViewMatrix();
-                            glm::mat4 projection = rd.cam.getProjectionMatrix();
-                            glm::mat4 mvp = projection * view * model;
-
-                            render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
-                            render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
-                            render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
-                            render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
-
-
-                            glBindVertexArray(terrain->VAO);
-                            glDrawElements(GL_TRIANGLES, (terrain->num_cols_ * terrain->num_rows_) * 6, GL_UNSIGNED_INT, 0);
-                            glBindVertexArray(0);
+                    if (render_comp->type_ == RenderType::RT_Terrain) {
+                        if (render_comp->terrain_ == nullptr) {
+                            std::cerr << "Error: terrain pointer is null!" << std::endl;
+                            continue;
                         }
-                   
+
+                        auto& terrain = render_comp->terrain_;
+
+                        render_comp->shader.useProgram();
+                        glCullFace(GL_BACK);
+
+                        glm::mat4 model = glm::mat4(1.0f);
+                        model = glm::translate(model, transform_comp->position);
+                        model = model * glm::mat4_cast(transform_comp->rotation);
+                        model = glm::scale(model, transform_comp->scale);
+
+                        glm::mat4 view = rd.cam.getViewMatrix();
+                        glm::mat4 projection = rd.cam.getProjectionMatrix();
+                        glm::mat4 mvp = projection * view * model;
+                        
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
+
+                        glBindVertexArray(terrain->VAO);
+                        glDrawElements(GL_TRIANGLES, (terrain->num_cols_ * terrain->num_rows_) * 6, GL_UNSIGNED_INT, 0);
+                        glBindVertexArray(0);
+                    }
                 }
             }
-            k++;
+            lightIndex++;
         }
     }
-    /*
-    auto riGeometry = ecs.getComponentList<RenderComponent>().begin();
-    auto tiGeometry = ecs.getComponentList<TransformComponent>().begin();
-    auto riendGeometry = ecs.getComponentList<RenderComponent>().end();
-    auto tiendGeometry = ecs.getComponentList<TransformComponent>().end();
-
-    for (; riGeometry != riendGeometry && tiGeometry != tiendGeometry; ++riGeometry, ++tiGeometry) {
-        if (riGeometry->has_value() && tiGeometry->has_value()) {
-            auto& render_comp = *riGeometry;
-            auto& transform_comp = *tiGeometry;
-            if (render_comp->type_ == RenderType::RT_Terrain) {
-
-                auto& terrain = render_comp->terrain_;
-
-                render_comp->shader.useProgram();
-                glCullFace(GL_BACK);
-
-                // Matrices de transformación para el terreno
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, transform_comp->position);  // Posición del terreno
-                model = model * glm::mat4_cast(transform_comp->rotation);  // Rotación
-                model = glm::scale(model, transform_comp->scale);  // Escala
-
-                glm::mat4 view = rd.cam.getViewMatrix();
-                glm::mat4 projection = rd.cam.getProjectionMatrix();
-                glm::mat4 mvp = projection * view * model;
-
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
-
-
-                glBindVertexArray(terrain->VAO);
-                glDrawElements(GL_TRIANGLES, (terrain->num_cols_ * terrain->num_rows_) * 6, GL_UNSIGNED_INT, 0);
-                glBindVertexArray(0);
-            }
-        }
-    }
-
-
-    glDisable(GL_BLEND);  
-    glUseProgram(0);*/
 }
+
+
+
+
+
+
 
 void RenderSystem::setupEntities(ECSManager& ecs)
 {
@@ -336,22 +267,29 @@ size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& en
     return entity_;
 }
 
-size_t RenderSystem::createTerrain(ECSManager& ecs, Terrain& t, Shader& shader)
+size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader, int cols , int rows)
 {
-    t.init(500, 500);
+    auto terrain = std::make_shared<Terrain>();
+    terrain->init(cols, rows, 1.0f, 1.0f, true, true);
 
+   
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Terrain;
-    ecs.get_component<RenderComponent>(entity_)->terrain_ = &t;
+
+    
+    ecs.get_component<RenderComponent>(entity_)->terrain_ = terrain;
+
+
     ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
 
     entity_++;
 
     return entity_;
 }
+
 
 size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader)
 {
