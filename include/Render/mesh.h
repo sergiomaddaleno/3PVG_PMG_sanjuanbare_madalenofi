@@ -8,9 +8,12 @@
 #include <iostream>
 #include <vector>
 #include <../deps/glm/glm.hpp>
-#include "texture.h"
 
-struct RenderData;
+#include "texture.h"
+#include "Render/camera.h"
+
+struct RenderComponent;
+struct TransformComponent;
 
 struct Vertex {
     glm::vec3 pos;
@@ -24,7 +27,7 @@ public:
     
     bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
 
-    void render(RenderData& rd);
+    void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
 
     Texture getTexture(int shape_index);
 

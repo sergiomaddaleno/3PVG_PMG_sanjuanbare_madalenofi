@@ -22,7 +22,6 @@ struct DataImgui {
     PostProcessing post_proccessing;
     ECSManager* ecs;
     //Skybox sxybox;
-    RenderData rd;
 };
 
 static DataImgui data_imgui;

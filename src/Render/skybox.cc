@@ -1,6 +1,9 @@
 
 #include "Render/skybox.h"
 #include "Render/mesh.h"
+#include "Render/Camera.h"
+
+#include "Components/render_component.h"
 #include "utils.h"
 
 #include <../deps/glm/glm.hpp>
@@ -37,7 +40,7 @@ void Skybox::init() {
     glBindVertexArray(0);
 }
 
-void Skybox::render(RenderData& rd) {
+void Skybox::render(RenderComponent rc, Camera cam) {
    
     glDepthMask(GL_FALSE);
 
@@ -46,25 +49,24 @@ void Skybox::render(RenderData& rd) {
     glEnable(GL_DEPTH_TEST);
 
    
-    glm::mat4 view = glm::mat4(glm::mat3(rd.cam.getViewMatrix())); 
-    glm::mat4 projection = rd.cam.getProjectionMatrix();
+    glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix())); 
+    glm::mat4 projection = cam.getProjectionMatrix();
 
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::mat4 model = rotation;
     
     float tex_id = 0.0f;
-    rd.render_comp.skybox_shader.useProgram();
-    rd.render_comp.skybox_tex.bind();
-    rd.render_comp.skybox_shader.setUniformValue(rd.render_comp.skybox_shader.getUniformLocation("skybox"), Type::T_INT_1, &tex_id);
+    rc.skybox_shader.useProgram();
+    rc.skybox_tex.bind();
+    rc.skybox_shader.setUniformValue(rc.skybox_shader.getUniformLocation("skybox"), Type::T_INT_1, &tex_id);
 
-    
-    unsigned int viewLoc = rd.render_comp.skybox_shader.getUniformLocation("view");
-    unsigned int projLoc = rd.render_comp.skybox_shader.getUniformLocation("projection");
-    unsigned int modelLoc = rd.render_comp.skybox_shader.getUniformLocation("model");
+    unsigned int viewLoc = rc.skybox_shader.getUniformLocation("view");
+    unsigned int projLoc = rc.skybox_shader.getUniformLocation("projection");
+    unsigned int modelLoc = rc.skybox_shader.getUniformLocation("model");
 
-    rd.render_comp.skybox_shader.setUniformValue(viewLoc, Type::T_MAT_4x4, &view[0][0]);
-    rd.render_comp.skybox_shader.setUniformValue(projLoc, Type::T_MAT_4x4, &projection[0][0]);
-    rd.render_comp.skybox_shader.setUniformValue(modelLoc, Type::T_MAT_4x4, &model[0][0]);
+    rc.skybox_shader.setUniformValue(viewLoc, Type::T_MAT_4x4, &view[0][0]);
+    rc.skybox_shader.setUniformValue(projLoc, Type::T_MAT_4x4, &projection[0][0]);
+    rc.skybox_shader.setUniformValue(modelLoc, Type::T_MAT_4x4, &model[0][0]);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, sizeof(gIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);

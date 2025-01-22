@@ -21,9 +21,11 @@
 
 #include "window.h"
 #include "imgui_manager.h"
+#include "global_variables.h"
 #include "Render/mesh.h"
 #include "Render/render_system.h"
 #include "Render/shader.h"
+#include "Render/camera.h"
 #include "input.h"
 #include "Render/post_processing.h"
 #include "utils.h"
@@ -33,12 +35,15 @@
 #include "Components/scripting_component.h"
 #include "Geometry/terrain.h"
 
+#include "Components/light_component.h"
+#include "Components/render_component.h"
+#include "Components/transform_component.h"
+
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <../deps/glm/gtx/matrix_decompose.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
-#include "Components/light_component.h"
 
 #define M_PI 3.14159265358979323846
 
@@ -48,13 +53,15 @@ std::shared_ptr<Mesh> light_bulb_mesh = std::make_shared<Mesh>();
 
 ImGuiManager imgui_manager;
 RenderSystem render_system;
-RenderData rd;
 LuaScript ls;
+Camera cam;
 Skybox skybox;
 Texture skyboxTex;
 Terrain terrain;
 ECSManager ecs;
 PostProcessing postProcc;
+RenderComponent render_comp;
+TransformComponent transf_comp;
 
 auto e = ecs.create_entity();
 int selected_entity = -1;
@@ -86,16 +93,6 @@ char* lua_file = ReadFile("../scripts/settings.lua");
 
 Shader normals_shader, texture_shader, light_shader, entities_shader; //entities shader has all
 Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
-
-//Guizmo
-bool useWindow = true;
-int gizmoCount = 1;
-float camDistance = 8.f;
-static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
-static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::LOCAL);
-static bool useSnap(false);
-static float snap[3] = { 1.f, 1.f, 1.f };
-int lastUsing = 0;
 
 void ChangeShader() {
 
@@ -148,129 +145,6 @@ void ChangePostProcess() {
     }
 }
 
-void RenderScene(const glm::mat4& view, const glm::mat4& projection, int display_w, int display_h, int selected_entity) {
-    static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-    static bool useSnap = false;
-    static float snap[3] = { 1.0f, 1.0f, 1.0f };
-
-    ImGuizmo::BeginFrame();
-    ImGuizmo::SetRect(0, 0, (float)display_w, (float)display_h);
-
-    auto ri = ecs.getComponentList<RenderComponent>().begin();
-    auto ti = ecs.getComponentList<TransformComponent>().begin();
-
-    int entity_id = 0;
-
-    for (; ri != ecs.getComponentList<RenderComponent>().end() &&
-        ti != ecs.getComponentList<TransformComponent>().end();
-        ++ri, ++ti, ++entity_id) {
-        if (entity_id == selected_entity && ri->has_value() && ti->has_value()) {
-
-            auto& transform = ecs.get_component<TransformComponent>(selected_entity);
-
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, transform->position);
-            model = model * glm::mat4_cast(transform->rotation);
-            model = glm::scale(model, transform->scale);
-
-            float objectMatrix[16];
-            std::memcpy(objectMatrix, glm::value_ptr(model), sizeof(objectMatrix));
-
-            ImGuizmo::SetRect(0, 0, (float)display_w, (float)display_h);
-
-            ImGui::Begin("Gizmo Controls", nullptr,
-                ImGuiWindowFlags_NoMove |
-                ImGuiWindowFlags_NoResize |
-                ImGuiWindowFlags_NoCollapse |
-                ImGuiWindowFlags_NoTitleBar);
-            if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
-                mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-            if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
-                mCurrentGizmoOperation = ImGuizmo::ROTATE;
-            if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
-                mCurrentGizmoOperation = ImGuizmo::SCALE;
-
-            ImGui::End();
-
-            ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-                mCurrentGizmoOperation, ImGuizmo::LOCAL,
-                objectMatrix, nullptr);
-
-            if (ImGuizmo::IsUsing()) {
-                glm::mat4 newModelMatrix = glm::make_mat4(objectMatrix);
-                glm::vec3 scale, translation, skew;
-                glm::vec4 perspective;
-                glm::quat rotation;
-
-                // Decompose the matrix back into position, rotation, and scale
-                glm::decompose(newModelMatrix, scale, rotation, translation, skew, perspective);
-
-                transform->position = translation;
-                transform->rotation = rotation;
-                transform->scale = scale;
-            }
-
-            break;
-        }
-    }
-}
-
-void InitImGui(GLFWwindow* w) {
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-    ImGui_ImplGlfw_InitForOpenGL(w, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
-}
-
-void SelectorEntitys(GLFWwindow* w) {
-    ImGui::Begin("Entity Selector");
-
-    auto ri = ecs.getComponentList<RenderComponent>().begin();
-    auto ti = ecs.getComponentList<TransformComponent>().begin();
-    auto riend = ecs.getComponentList<RenderComponent>().end();
-    auto tiend = ecs.getComponentList<TransformComponent>().end();
-
-    int entity_id = 0;
-
-    for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
-        if (ti->has_value()) {
-            if (ImGui::Selectable(("Entity " + std::to_string(entity_id)).c_str(), selected_entity == entity_id)) {
-                selected_entity = entity_id;
-            }
-        }
-    }
-
-    glm::mat4 projection = glm::perspective(glm::radians(rd.fov),
-        (float)rd.w_width / (float)rd.w_height,
-        0.1f, 100.0f);
-
-    RenderScene(rd.cam.getViewMatrix(), projection, rd.w_width, rd.w_height, selected_entity);
-
-    ImGui::End();
-}
-
-void MyImGui(GLFWwindow* w) {
-
-    ImGui_ImplGlfw_NewFrame();
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui::NewFrame();
-
-    glfwGetFramebufferSize(w, &rd.w_width, &rd.w_height);
-
-    ImGui::Begin("Menu");
-
-    ChangeShader();
-    ChangePostProcess();
-    SelectorEntitys(w);
-    ImGui::End();
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
 int main(int, char**) {
 
     //lua script settings
@@ -281,17 +155,16 @@ int main(int, char**) {
     ls.pop();
 
     ls.get_table("window");
-    int w_width = ls.get_integer("window_width");
-    int w_height = ls.get_integer("window_height");
-    bool full_screen = ls.get_bool("full_screen");
+    int lua_width = ls.get_integer("window_width");
+    int lua_height = ls.get_integer("window_height");
+    bool lua_full_screen = ls.get_bool("full_screen");
     ls.pop();
 
-    rd.w_width = w_width;
-    rd.w_height = w_height;
-    rd.fov = fov;
+    window_width_ = lua_width;
+    window_height_ = lua_height;
     // --
 
-    auto window = Window::make(rd.w_width, rd.w_height, "Window ", full_screen);
+    auto window = Window::make(window_width_, window_height_, "Window ", lua_full_screen);
     window->setWindowActive();
     window->initGLEW();
     window->setResizeCallback();
@@ -314,10 +187,10 @@ int main(int, char**) {
 
     //Skybox
     if (skyboxTex.loadSkyboxTex(dds_file)) {
-        rd.render_comp.skybox_tex = skyboxTex.getTexture();
+        render_comp.skybox_tex = skyboxTex.getTexture();
     }
 
-    rd.render_comp.skybox_shader.compile(vs_sky_box, fs_sky_box);
+    render_comp.skybox_shader.compile(vs_sky_box, fs_sky_box);
 
     skybox.init();
     // ---
@@ -328,7 +201,6 @@ int main(int, char**) {
     render_system.createMesh(ecs, mario_mesh, entities_shader);
     render_system.createPointLight(ecs, entities_shader);
     render_system.createTerrain(ecs, entities_shader,5,5);
-    
     
     render_system.initEntities(ecs);
    
@@ -343,33 +215,38 @@ int main(int, char**) {
     postProcc.initData();
     //--
 
-    InitImGui(window->getWindow());
-    //imgui_manager.Init(window->getWindow());
+    //InitImGui(window->getWindow());
+    imgui_manager.Init(window->getWindow());
+    data_imgui.ecs = &ecs;
 
     double lastTime = window->getTime();
     bool done = false;
-    
     while (!done) {
         double currentTime = window->getTime();
         float dt = float(currentTime - lastTime);
         window->updateWindow();
         window->toggleFullScreen(input);
 
-        rd.w_width = window->getWidth();
-        rd.w_height = window->getHeight();
+        window_width_ = window->getWidth();
+        window_height_ = window->getHeight();
+
         postProcc.resize(window->getWidth(), window->getHeight());
 
         postProcc.beginRender();
-        rd.cam.update(input, dt, rd.w_width, rd.w_height);
+        cam.update(input, dt, window_width_, window_height_);
 
-        skybox.render(rd);
+        skybox.render(render_comp, cam);
 
-        render_system.renderEntities(ecs, rd);
+        render_system.renderEntities(ecs, cam);
        
         postProcc.endRender();
 
-        MyImGui(window->getWindow());
-        //imgui_manager.Render(window->getWindow(), rd, postProcc);
+        //MyImGui(window->getWindow());
+        data_imgui.cam = cam;
+        data_imgui.post_proccessing = postProcc;
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        imgui_manager.Render(window->getWindow(), data_imgui);
 
         if (window->closePressed()) done = true;
     }

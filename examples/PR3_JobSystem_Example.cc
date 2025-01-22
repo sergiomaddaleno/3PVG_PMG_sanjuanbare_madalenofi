@@ -3,6 +3,8 @@
 #include "Render/mesh.h"
 #include "Systems/job_sistem.h"
 #include "input.h"
+#include "Components/render_component.h"
+#include "Components/transform_component.h"
 
 #include <../deps/glm/glm.hpp>
 #include "utils.h"
@@ -26,6 +28,8 @@ std::shared_ptr<Mesh> mesh_ = std::make_shared<Mesh>();
 std::future<std::unique_ptr<Mesh>> monetemesh;
 
 JobSystem jb;
+RenderComponent rc;
+TransformComponent tc;
 
 char* vs_normals = (char*)ReadFile("../assets/shaders/normals.vs");
 char* fs_normals = (char*)ReadFile("../assets/shaders/normals.fs");
@@ -47,12 +51,11 @@ int main(int, char**) {
 
     Input input{ window->getWindow() };
 
-    RenderData rd;
-    rd.transf_comp.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };  
-    rd.transf_comp.scale = glm::vec3{ 0.8f, 0.8f, 0.8f };
-    rd.transf_comp.position = glm::vec3{ 0.0f, -2.0f, 0.0f };
+    tc.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };  
+    tc.scale = glm::vec3{ 0.8f, 0.8f, 0.8f };
+    tc.position = glm::vec3{ 0.0f, -2.0f, 0.0f };
 
-    rd.render_comp.shader.compile(vs_normals, fs_normals);
+    rc.shader.compile(vs_normals, fs_normals);
     //---
 
     double lastTime = window->getTime();
@@ -62,10 +65,10 @@ int main(int, char**) {
         float dt = float(currentTime - lastTime);
         window->updateWindow();
 
-        rd.render_comp.mesh_ = mesh_;
+        rc.mesh_ = mesh_;
 
         float time = (float)window->getTime() * 2;
-        rd.transf_comp.rotation = glm::vec3{ 0.0f, time, 0.0f };
+        tc.rotation = glm::vec3{ 0.0f, time, 0.0f };
       
         if (input.isKeyPressed(Input::RIGHT) && !loadingNewMesh) {
 
@@ -100,7 +103,7 @@ int main(int, char**) {
             loadingNewMesh = false;
         }
     
-        rd.render_comp.mesh_->render(rd);
+        rc.mesh_->render(rc, tc);
 
         if (window->closePressed()) done = true;
     }

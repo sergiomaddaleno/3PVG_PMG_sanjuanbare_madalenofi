@@ -53,6 +53,9 @@ public:
 	int getWidth() const { return width_; }
 	int getHeight() const { return height_; }
 
+	void setWidth(int width) { width_ = width; }
+	void setHeight(int height) { height_ = height; }
+
 	//---
 
 	Window(Window&& other) noexcept {

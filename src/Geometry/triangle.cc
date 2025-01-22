@@ -1,5 +1,7 @@
 
 #include "../include/Geometry/triangle.h"
+#include "Components/render_component.h"
+#include "Components/transform_component.h"
 #include "utils.h"
 
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -43,33 +45,34 @@ std::optional<Triangle> Triangle::make(float size_, Color color)
 
     return std::optional<Triangle>(t);
 }
-void Triangle::render(RenderData& rd)
+
+void Triangle::render(RenderComponent rc, TransformComponent tc, Camera cam)
 {
     GLuint vertex_buffer;
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(rd.render_comp.triangle_.my_triangle[0]) * 3, rd.render_comp.triangle_.my_triangle, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(rc.triangle_.my_triangle[0]) * 3, rc.triangle_.my_triangle, GL_STATIC_DRAW);
 
-    rd.render_comp.shader.useProgram();
+    rc.shader.useProgram();
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, rd.transf_comp.position);
-    model = model * glm::mat4_cast(rd.transf_comp.rotation);
-    model = glm::scale(model, rd.transf_comp.scale);
+    model = glm::translate(model, tc.position);
+    model = model * glm::mat4_cast(tc.rotation);
+    model = glm::scale(model, tc.scale);
 
-    glm::mat4 view = rd.cam.getViewMatrix();
-    glm::mat4 projection = rd.cam.getProjectionMatrix();
+    glm::mat4 view = cam.getViewMatrix();
+    glm::mat4 projection = cam.getProjectionMatrix();
     glm::mat4 mvp = projection * view * model;
 
-    GLint mvpLocation = rd.render_comp.shader.getUniformLocation("mvp");
-    rd.render_comp.shader.setUniformValue(mvpLocation, Type::T_MAT_4x4, glm::value_ptr(mvp));
+    GLint mvpLocation = rc.shader.getUniformLocation("mvp");
+    rc.shader.setUniformValue(mvpLocation, Type::T_MAT_4x4, glm::value_ptr(mvp));
 
-    GLuint vpos_location = glGetAttribLocation(rd.render_comp.shader.getProgram(), "a_position");
+    GLuint vpos_location = glGetAttribLocation(rc.shader.getProgram(), "a_position");
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(vpos_location);
 
-    GLuint vcol_location = glGetAttribLocation(rd.render_comp.shader.getProgram(), "a_color");
+    GLuint vcol_location = glGetAttribLocation(rc.shader.getProgram(), "a_color");
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
     glEnableVertexAttribArray(vcol_location);
 

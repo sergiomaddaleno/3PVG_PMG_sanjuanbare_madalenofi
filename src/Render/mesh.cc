@@ -3,7 +3,10 @@
 
 #include "Render/mesh.h"
 #include "Render/texture.h"
+#include "Components/render_component.h"
+#include "Components/transform_component.h"
 #include "utils.h"
+#include "global_variables.h"
 
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
@@ -13,7 +16,6 @@
 #include "../deps/tiny_obj_loader.h"
 #pragma warning(push)
 #include "../deps/stb_image.h"
-
 
 bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
 {
@@ -79,20 +81,20 @@ bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
     return true;
 }
 
-void Mesh::render(RenderData& rd)
+void Mesh::render(RenderComponent rc, TransformComponent tc, Camera cam)
 {
-    for (auto& mesh : rd.render_comp.mesh_->meshes) {
+    for (auto& mesh : rc.mesh_->meshes) {
 
         // ---
-        glGenVertexArrays(1, &rd.render_comp.mesh_->VAO);
-        glBindVertexArray(rd.render_comp.mesh_->VAO);
+        glGenVertexArrays(1, &rc.mesh_->VAO);
+        glBindVertexArray(rc.mesh_->VAO);
 
-        glGenBuffers(1, &rd.render_comp.mesh_->VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, rd.render_comp.mesh_->VBO);
+        glGenBuffers(1, &rc.mesh_->VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, rc.mesh_->VBO);
         glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
 
-        glGenBuffers(1, &rd.render_comp.mesh_->EBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rd.render_comp.mesh_->EBO);
+        glGenBuffers(1, &rc.mesh_->EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rc.mesh_->EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW);
 
         // ---
@@ -109,43 +111,46 @@ void Mesh::render(RenderData& rd)
         glBindVertexArray(0);
         // ---
 
-        rd.render_comp.shader.useProgram();
+        rc.shader.useProgram();
 
         glCullFace(GL_BACK);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, rd.transf_comp.position);
-        model = model * glm::mat4_cast(rd.transf_comp.rotation);
-        model = glm::scale(model, rd.transf_comp.scale);
+        model = glm::translate(model, tc.position);
+        model = model * glm::mat4_cast(tc.rotation);
+        model = glm::scale(model, tc.scale);
 
-        glm::mat4 view = rd.cam.getViewMatrix();
-        glm::mat4 projection = rd.cam.getProjectionMatrix();
+        glm::mat4 view = cam.getViewMatrix();
+        glm::mat4 projection = cam.getProjectionMatrix();
         glm::mat4 mvp = projection * view * model;
 
         // For shaders ---
-        rd.render_comp.shader.setUniformValue(rd.render_comp.shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
-        rd.render_comp.shader.setUniformValue(rd.render_comp.shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
-        rd.render_comp.shader.setUniformValue(rd.render_comp.shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
-        rd.render_comp.shader.setUniformValue(rd.render_comp.shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
 
         // Texture
         float tex_id = 0.0f;
-        rd.render_comp.texture = mesh.getTexture(0);
-        rd.render_comp.texture.bind();
-        rd.render_comp.shader.setUniformValue(rd.render_comp.shader.getUniformLocation("texture1"), Type::T_INT_1, &tex_id);
+        rc.texture = mesh.getTexture(0);
+        rc.texture.bind();
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("texture1"), Type::T_INT_1, &tex_id);
         // ---
 
-        glBindVertexArray(rd.render_comp.mesh_->VAO);
+        // Fog
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+
+
+        glBindVertexArray(rc.mesh_->VAO);
         glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         glUseProgram(0);
-        glDeleteVertexArrays(1, &rd.render_comp.mesh_->VAO);
-        glDeleteBuffers(1, &rd.render_comp.mesh_->VBO);
-        glDeleteBuffers(1, &rd.render_comp.mesh_->EBO);
+        glDeleteVertexArrays(1, &rc.mesh_->VAO);
+        glDeleteBuffers(1, &rc.mesh_->VBO);
+        glDeleteBuffers(1, &rc.mesh_->EBO);
     }
 }
-
 
 Texture Mesh::getTexture(int index)
 {

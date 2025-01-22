@@ -1,6 +1,7 @@
 
 #include "imgui_manager.h"
 #include "utils.h"
+#include "global_variables.h"
 #include "Render/post_processing.h"
 #include "window.h"
 
@@ -80,7 +81,7 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     }
 }
 
-void ImGuiManager::ImguiWindow(GLFWwindow* window) {
+void ImGuiManager::ImguiWindow(GLFWwindow* window ) {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     ImVec2 center_pos = ImVec2(viewport->WorkPos.x + viewport->WorkSize.x * 0.5f,
@@ -102,7 +103,8 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
     ImGui::PopStyleVar(3);
 
     ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
-    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
 
     static bool first_time = true;
     if (first_time) {
@@ -175,7 +177,7 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
 void ImGuiManager::Inspector(DataImgui& di) {
     ImGui::Begin("Inspector");
 
-    Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), di.rd.w_width, di.rd.w_height, selected_entity, di);
+    Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), window_width_, window_height_, selected_entity, di);
 
     ImGui::End();
 }

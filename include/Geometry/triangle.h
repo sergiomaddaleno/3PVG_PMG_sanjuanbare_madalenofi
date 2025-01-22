@@ -8,9 +8,12 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "Render/camera.h"
+
 #include <../deps/glm/glm.hpp>
 
-struct RenderData;
+struct RenderComponent;
+struct TransformComponent;
 
 class Triangle {
 
@@ -33,7 +36,7 @@ public:
 
 	static std::optional<Triangle> make(float size_, Color color);
 
-	void render(RenderData& rd);
+	void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
 
 	// ---
 

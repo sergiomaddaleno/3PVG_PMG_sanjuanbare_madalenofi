@@ -14,6 +14,7 @@
 #include "Render/mesh.h"
 #include "Render/render_system.h"
 #include "Render/shader.h"
+#include "Render/camera.h"
 #include "input.h"
 #include "Systems/ecs_manager.h"
 #include "utils.h"
@@ -25,19 +26,16 @@ std::shared_ptr<Mesh> light_bulb_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 
 RenderSystem render_system;
-RenderData rd;
 ECSManager ecs;
-Shader texture_shader, light_shader, mesh_shader;
+Camera cam;
+Shader texture_shader, light_shader;
 
 char* vs_texture = (char*)ReadFile("../assets/shaders/texture.vs");
 char* fs_texture = (char*)ReadFile("../assets/shaders/texture.fs");
 
 char* fs_light = (char*)ReadFile("../assets/shaders/light.fs");
-
 char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
-char* fs_simple = (char*)ReadFile("../assets/shaders/simple_fragment.fs");
 
-int num_entities = 5000;
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
 void ChangeLight(ECSManager& ecs) {
@@ -159,9 +157,9 @@ int main(int, char**) {
         window->updateWindow();
         window->colorWindow(color);
 
-        rd.cam.update(input, dt, rd.w_width, rd.w_height);
+        cam.update(input, dt, window->getWidth(), window->getHeight());
 
-        render_system.renderEntities(ecs, rd);
+        render_system.renderEntities(ecs, cam);
 
         MyImGui(ecs);
 

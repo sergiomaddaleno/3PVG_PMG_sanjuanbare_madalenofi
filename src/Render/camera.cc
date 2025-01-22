@@ -5,28 +5,28 @@ const float PI = 3.141592653589793f;
 #include "Render/camera.h"
 #include "utils.h"
 #include "input.h"
+#include "window.h"
+#include "global_variables.h"
 
 #include "../deps/glm/gtx/transform.hpp"
 
-static RenderData rd;
+Camera::Camera()
+    :
+    position_(0.0f, 0.0f, 7.0f),
+    view_direction_(0.0f, 0.0f, -1.0f),
+    up_(0.0f, 1.0f, 0.0f),
+    pos_mouse(0.0f, 0.0f),
+    curr_mouse(0.0f, 0.0f),
+    last_mouse(0.0f, 0.0f),
+    delta_mouse(0.0f, 0.0f),
+    accum_mouse_offset_(0.0f, 0.0f),
+    speed_(0.001f),
+    sensitivity_(1.0f),
+    fov_(45.0f),
+    scroll_speed_(0.5f),
+    view_(initViewTarget())
+{}
 
-Camera::Camera() : 
-
-position_(0.0f, 0.0f, 7.0f),
-view_direction_(0.0f, 0.0f, -1.0f),
-up_(0.0f, 1.0f, 0.0f),
-pos_mouse(0.0f, 0.0f),
-curr_mouse(0.0f, 0.0f),
-last_mouse(0.0f, 0.0f),
-delta_mouse(0.0f, 0.0f),
-accum_mouse_offset_(0.0f, 0.0f),
-speed_(0.001f),
-sensitivity_(1.0f),
-scroll_speed_(0.5f)
-
-{
-    view_ = initViewTarget();
-}
 
 glm::mat4 Camera::initViewTarget()
 {
@@ -123,6 +123,11 @@ const float Camera::getSpeed() const {
     return speed_;
 }
 
+const float Camera::getFov() const
+{
+    return fov_;
+}
+
 const glm::vec3 Camera::getPosition() const
 {
     return position_;
@@ -138,5 +143,5 @@ glm::mat4 Camera::getViewMatrix() const {
 
 glm::mat4 Camera::getProjectionMatrix() const
 {
-    return glm::perspective(glm::radians(rd.fov), (float)rd.w_width / rd.w_height, 0.1f, 100.0f);
+    return glm::perspective(glm::radians(fov_), (float)window_width_ / (float)window_height_, 0.1f, 100.0f);
 }

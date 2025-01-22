@@ -8,23 +8,6 @@
 #include "../deps/dds.h"
 #include "../deps/glm/glm.hpp"
 
-#include "Render/camera.h"
-#include "Components/render_component.h"
-#include "Components/transform_component.h"
-
-struct RenderData {
-
-	Camera cam;
-	RenderComponent render_comp;
-	TransformComponent transf_comp;
-
-	int w_width = 800;
-	int w_height = 600;
-	float fov = 55.0f;
-
-	bool b_fog_ = false;
-};
-
 enum Type {
     T_NONE = 0x0,
     T_FLOAT_1,

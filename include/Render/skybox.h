@@ -6,7 +6,8 @@
 #include <GLFW/glfw3.h>
 #include <../deps/glm/glm.hpp>
 
-struct RenderData;
+class Camera;
+struct RenderComponent;
 
 static const glm::vec3 gMesh[] = {
   {-1.0f, -1.0f, -1.0f},
@@ -60,7 +61,7 @@ public:
 
 	void init();
 
-	void render(RenderData& rd);
+	void render(RenderComponent rc, Camera cam);
 
 private:
 

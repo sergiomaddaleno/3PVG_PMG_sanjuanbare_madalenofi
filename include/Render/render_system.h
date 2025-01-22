@@ -13,8 +13,8 @@
 #include <GLFW/glfw3.h>
 
 #include "../Systems/ecs_manager.h"
+#include "Render/camera.h"
 
-struct RenderData;
 struct LightInfo;
 
 class Mesh;
@@ -31,9 +31,9 @@ public:
 
 	void initEntities(ECSManager &ecs);
 
-	void renderEntities(ECSManager &ecs, RenderData& rd);
+	void renderEntities(ECSManager& ecs, Camera cam = Camera());
 
-
+	void renderMesh(ECSManager& ecs, Camera cam = Camera());
 
 	//---------------------------------------------------------------
 	

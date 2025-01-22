@@ -4,7 +4,9 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include "..\include\input.h"
+#include "window.h"
 #include <../deps/glm/glm.hpp>
 
 class Camera {
@@ -27,6 +29,8 @@ public:
 
 	const float getSpeed() const;
 
+	const float getFov() const;
+
 	const glm::vec3 getPosition() const;
 
 	const float getSensitivity() const;
@@ -35,11 +39,14 @@ public:
 
 	glm::mat4 getProjectionMatrix() const;
 
+
 	//--
-	void setPosition(glm::vec3 position) {position = position_;}
-	void setScrollSpeed(float scroll_speed) { scroll_speed = scroll_speed_; }
-	void setViewDir(glm::vec3 view_direction) {view_direction = view_direction_;}
-	void setUp(glm::vec3 up) { up = up_; }
+	void setPosition(glm::vec3 position) {position_ = position;}
+	void setScrollSpeed(float scroll_speed) { scroll_speed_ = scroll_speed; }
+	void setViewDir(glm::vec3 view_direction) {view_direction_ = view_direction;}
+	void setUp(glm::vec3 up) { up_ = up; }
+	void setFov(float fov) { fov_ = fov; }
+
 
 private:
 
@@ -58,6 +65,7 @@ private:
 	float speed_;
 	float sensitivity_;
 	float scroll_speed_;
+	float fov_;
 };
 
 
