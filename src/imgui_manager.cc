@@ -66,7 +66,7 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     ImguiWindow(window);
     GameWindow(di);
     Hierarchy(di);  
-    Inspector(di); 
+    Inspector(di);
     ContentBrowser(di);  
     TopBar(di);
 
@@ -138,7 +138,8 @@ void ImGuiManager::GameWindow(DataImgui& di) {
     ImGui::Begin("GameWindow", nullptr);
     ImVec2 content_avail = ImGui::GetContentRegionAvail();
 
-    GLuint gameTex = di.post_proccessing.getGamefBO();
+    GLuint gameTex = di.frame_buffer.GetColorTexture();
+
     if (gameTex) {
         ImVec2 uv0(0.0f, 1.0f);
         ImVec2 uv1(1.0f, 0.0f);

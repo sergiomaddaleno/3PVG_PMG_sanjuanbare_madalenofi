@@ -15,28 +15,12 @@ PostProcessing::~PostProcessing()
 
 void PostProcessing::initData()
 {
-    glGenFramebuffers(1, &FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-
-    glGenTextures(1, &FBTexture);
-    glBindTexture(GL_TEXTURE_2D, FBTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBTexture, 0);
+    frame_buffer_.init(width_, height_, true, true);
 
     glGenRenderbuffers(1, &RBO);
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        printf("Framebuffer is not complete.\n");
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // --
 
@@ -55,17 +39,18 @@ void PostProcessing::initData()
 
 void PostProcessing::beginRender()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    frame_buffer_.bind();
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void PostProcessing::endRender()
 {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, frame_buffer_.GetFBO());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    
     glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    frame_buffer_.unbind();
 }
 
 void PostProcessing::render(Shader& shader, Effect effect)
@@ -91,13 +76,14 @@ void PostProcessing::render(Shader& shader, Effect effect)
     // -- 
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, FBTexture);
+    glBindTexture(GL_TEXTURE_2D, frame_buffer_.GetColorTexture());
 
     //Screen quad
     glBindVertexArray(rectVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-
     glBindVertexArray(0);
+    glUseProgram(0);
+
 }
 
 void PostProcessing::resize(unsigned int width, unsigned int height)
@@ -105,8 +91,7 @@ void PostProcessing::resize(unsigned int width, unsigned int height)
     width_ = width;
     height_ = height;
 
-    glBindTexture(GL_TEXTURE_2D, FBTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    frame_buffer_.resize(width_, height_);
 
     glBindRenderbuffer(GL_RENDERBUFFER, RBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);

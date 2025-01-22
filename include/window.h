@@ -7,7 +7,7 @@
 #include <optional>
 #include <string>
 #include <input.h>
-
+#include "framebuffer.h"
 #include <../deps/glm/glm.hpp>
 
 class WindowSystem {
@@ -26,6 +26,7 @@ class Window {
 
 public:
 	GLFWwindow* window_;
+	FrameBuffer framebuffer_;
 
 	Window(GLFWwindow* window) : width_(800), height_(600) { window_ = window; }
 

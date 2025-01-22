@@ -1,5 +1,6 @@
 
 #include <../include/window.h>
+
 #include <optional>
 
 std::optional<WindowSystem> WindowSystem::make()
@@ -100,6 +101,7 @@ void Window::colorWindow(const glm::vec4& Color)
 
 void Window::updateWindow()
 {
+
 	glfwSwapBuffers(getWindow());
 	glfwPollEvents();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -119,8 +121,6 @@ bool Window::initGLEW()
 
 	return true;
 }
-
-
 
 double Window::getTime()
 {

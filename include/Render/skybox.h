@@ -6,7 +6,8 @@
 #include <GLFW/glfw3.h>
 #include <../deps/glm/glm.hpp>
 
-class Camera;
+#include "camera.h"
+
 struct RenderComponent;
 
 static const glm::vec3 gMesh[] = {

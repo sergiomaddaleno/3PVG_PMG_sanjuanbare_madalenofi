@@ -145,6 +145,40 @@ void ChangePostProcess() {
     }
 }
 
+void InitImGui(GLFWwindow* w) {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    ImGui_ImplGlfw_InitForOpenGL(w, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
+    // Optional: Set docking space or window flags if needed
+    ImGui::StyleColorsDark();
+}
+
+void MyImGui(GLFWwindow* w) {
+
+    ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+
+    glfwGetFramebufferSize(w, &window_width_, &window_height_);
+
+    ImGui::Begin("Menu2");
+
+    ChangeShader();
+    ChangePostProcess();
+
+    ImGui::End();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 int main(int, char**) {
 
     //lua script settings
@@ -187,10 +221,10 @@ int main(int, char**) {
 
     //Skybox
     if (skyboxTex.loadSkyboxTex(dds_file)) {
-        render_comp.skybox_tex = skyboxTex.getTexture();
+        render_comp.texture = skyboxTex.getTexture();
     }
 
-    render_comp.skybox_shader.compile(vs_sky_box, fs_sky_box);
+    render_comp.shader.compile(vs_sky_box, fs_sky_box);
 
     skybox.init();
     // ---
@@ -200,7 +234,7 @@ int main(int, char**) {
 
     render_system.createMesh(ecs, mario_mesh, entities_shader);
     render_system.createPointLight(ecs, entities_shader);
-    render_system.createTerrain(ecs, entities_shader,5,5);
+    render_system.createTerrain(ecs, entities_shader,500,500);
     
     render_system.initEntities(ecs);
    
@@ -215,8 +249,8 @@ int main(int, char**) {
     postProcc.initData();
     //--
 
-    //InitImGui(window->getWindow());
-    imgui_manager.Init(window->getWindow());
+    InitImGui(window->getWindow());
+    //imgui_manager.Init(window->getWindow());
     data_imgui.ecs = &ecs;
 
     double lastTime = window->getTime();
@@ -241,12 +275,12 @@ int main(int, char**) {
        
         postProcc.endRender();
 
-        //MyImGui(window->getWindow());
+        MyImGui(window->getWindow());
         data_imgui.cam = cam;
         data_imgui.post_proccessing = postProcc;
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        imgui_manager.Render(window->getWindow(), data_imgui);
+        //data_imgui.frame_buffer = window->framebuffer_;
+        
+        //imgui_manager.Render(window->getWindow(), data_imgui);
 
         if (window->closePressed()) done = true;
     }

@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "window.h"
 #include "Render/camera.h"
 #include "Render/post_processing.h"
 #include "Render/skybox.h"
@@ -12,6 +13,7 @@
 #include "Geometry/triangle.h"
 #include "Systems/ecs_manager.h"
 #include "utils.h"
+#include "framebuffer.h"
 
 //Todo lo que quiero que se edite en imgui
 struct DataImgui {
@@ -22,6 +24,7 @@ struct DataImgui {
     PostProcessing post_proccessing;
     ECSManager* ecs;
     //Skybox sxybox;
+    FrameBuffer frame_buffer;
 };
 
 static DataImgui data_imgui;

@@ -99,6 +99,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
             }
         }
     }
+    glUseProgram(0);
 }
 
 void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
@@ -194,7 +195,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                             render_comp->texture = mesh.getTexture(0);
                             render_comp->texture.bind();
                             float tex_id = 0.0f;
-                            render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture"), Type::T_INT_1, &tex_id);
+                            render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
 
                             //Fog
                             render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
@@ -244,6 +245,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
             light_count++;
         }
     }
+    glUseProgram(0);
 }
 
 void RenderSystem::renderMesh(ECSManager& ecs, Camera cam)
@@ -342,9 +344,7 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader, int cols , i
 size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader)
 {
     std::shared_ptr<Mesh> lb_mesh = std::make_shared<Mesh>();
-    if (!lb_mesh->loadOBJ("../assets/obj/light_bulb.obj")) {
-        return printf("Light bulb mesh not found\n");
-    }
+    lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
 
     char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
     char* fs_simple = (char*)ReadFile("../assets/shaders/simple_fragment.fs");
@@ -390,9 +390,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
 size_t RenderSystem::createPointLight(ECSManager& ecs, const Shader& light_shader)
 {
     std::shared_ptr<Mesh> lb_mesh = std::make_shared<Mesh>();
-    if (!lb_mesh->loadOBJ("../assets/obj/light_bulb.obj")) {
-        return printf("Light bulb mesh not found\n");
-    }
+    lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
 
     char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
     char* fs_simple = (char*)ReadFile("../assets/shaders/simple_fragment.fs");

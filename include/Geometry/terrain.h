@@ -1,7 +1,7 @@
 
 
-#ifndef __GEOMETRY_CUSTOM_TERRAIN_H__
-#define __GEOMETRY_CUSTOM_TERRAIN_H__ 1
+#ifndef __TERRAIN_H__
+#define __TERRAIN_H__ 1
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -35,4 +35,4 @@ class Terrain {
 };
 
 
-#endif //__GEOMETRY_CUSTOM_TERRAIN_H__
+#endif //__TERRAIN_H__

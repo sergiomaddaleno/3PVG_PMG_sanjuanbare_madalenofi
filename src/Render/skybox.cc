@@ -41,42 +41,39 @@ void Skybox::init() {
 }
 
 void Skybox::render(RenderComponent rc, Camera cam) {
-   
     glDepthMask(GL_FALSE);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     glEnable(GL_DEPTH_TEST);
 
-   
-    glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix())); 
+    glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix()));
     glm::mat4 projection = cam.getProjectionMatrix();
-
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::mat4 model = rotation;
-    
+
     float tex_id = 0.0f;
-    rc.skybox_shader.useProgram();
-    rc.skybox_tex.bind();
-    rc.skybox_shader.setUniformValue(rc.skybox_shader.getUniformLocation("skybox"), Type::T_INT_1, &tex_id);
+    rc.shader.useProgram();
 
-    unsigned int viewLoc = rc.skybox_shader.getUniformLocation("view");
-    unsigned int projLoc = rc.skybox_shader.getUniformLocation("projection");
-    unsigned int modelLoc = rc.skybox_shader.getUniformLocation("model");
+    rc.texture.bind();
+    rc.shader.setUniformValue(rc.shader.getUniformLocation("skybox"), Type::T_INT_1, &tex_id);
 
-    rc.skybox_shader.setUniformValue(viewLoc, Type::T_MAT_4x4, &view[0][0]);
-    rc.skybox_shader.setUniformValue(projLoc, Type::T_MAT_4x4, &projection[0][0]);
-    rc.skybox_shader.setUniformValue(modelLoc, Type::T_MAT_4x4, &model[0][0]);
+    unsigned int viewLoc = rc.shader.getUniformLocation("view");
+    unsigned int projLoc = rc.shader.getUniformLocation("projection");
+    unsigned int modelLoc = rc.shader.getUniformLocation("model");
+
+    rc.shader.setUniformValue(viewLoc, Type::T_MAT_4x4, &view[0][0]);
+    rc.shader.setUniformValue(projLoc, Type::T_MAT_4x4, &projection[0][0]);
+    rc.shader.setUniformValue(modelLoc, Type::T_MAT_4x4, &model[0][0]);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, sizeof(gIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
-    
+
     glBindVertexArray(0);
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
     glCullFace(GL_BACK);
     glDisable(GL_CULL_FACE);
-
-    assert(glGetError() == GL_NO_ERROR);
+    glUseProgram(0);
 }
 
