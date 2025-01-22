@@ -79,6 +79,26 @@ void FrameBuffer::resize(int width, int height)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+GLuint FrameBuffer::captureWindowToTexture() {
+    GLuint captureTexture;
+    glGenTextures(1, &captureTexture);
+
+    glBindTexture(GL_TEXTURE_2D, captureTexture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, width_, height_, 0);
+
+    return captureTexture;
+}
+
+
+
 GLuint FrameBuffer::GetFBO() const
 {
     return FBO_;

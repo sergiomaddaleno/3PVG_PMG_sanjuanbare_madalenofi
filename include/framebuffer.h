@@ -14,6 +14,8 @@ public:
     void unbind();
     void resize(int width, int height);
 
+    GLuint captureWindowToTexture();
+
     GLuint GetFBO() const;
     GLuint GetColorTexture() const;
     GLuint GetDepthTexture() const;

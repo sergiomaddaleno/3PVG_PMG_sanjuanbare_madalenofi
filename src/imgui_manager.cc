@@ -65,10 +65,10 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
 
     ImguiWindow(window);
     GameWindow(di);
-    Hierarchy(di);  
+    Hierarchy(di);
     Inspector(di);
-    ContentBrowser(di);  
-    TopBar(di);
+    ContentBrowser(di);
+    //TopBar(di);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -81,7 +81,7 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     }
 }
 
-void ImGuiManager::ImguiWindow(GLFWwindow* window ) {
+void ImGuiManager::ImguiWindow(GLFWwindow* window) {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     ImVec2 center_pos = ImVec2(viewport->WorkPos.x + viewport->WorkSize.x * 0.5f,
@@ -99,21 +99,23 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window ) {
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-    ImGui::Begin("MainDockspace", nullptr, dockspace_flags);
+    ImGui::Begin("MainDockspace_", nullptr, dockspace_flags);
     ImGui::PopStyleVar(3);
 
-    ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
+    ImGuiID dockspace_id = ImGui::GetID("MainDockspace_");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
+    // Track changes in viewport size
+    static ImVec2 last_viewport_size = ImVec2(0, 0);
+    ImVec2 current_viewport_size = viewport->WorkSize;
 
-    static bool first_time = true;
-    if (first_time) {
-        first_time = false;
+    if (last_viewport_size.x != current_viewport_size.x || last_viewport_size.y != current_viewport_size.y) {
+        last_viewport_size = current_viewport_size;
 
-        ImGui::DockBuilderRemoveNode(dockspace_id);
-
+        // Rebuild dockspace when viewport size changes
+        ImGui::DockBuilderRemoveNode(dockspace_id); // Clear previous dockspace
         ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
-        ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->WorkSize);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, current_viewport_size);
 
         ImGuiID dock_main = dockspace_id;
         ImGuiID dock_top = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Up, 0.07f, nullptr, &dock_main);
@@ -121,45 +123,44 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window ) {
         ImGuiID dock_right = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Right, 0.3f, nullptr, &dock_main);
         ImGuiID dock_bottom = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Down, 0.2f, nullptr, &dock_main);
 
-
         ImGui::DockBuilderDockWindow("##TopBar", dock_top);
-        ImGui::DockBuilderDockWindow("Hierarchy", dock_left);
+        ImGui::DockBuilderDockWindow("Hierarchy3", dock_left);
         ImGui::DockBuilderDockWindow("Inspector", dock_right);
         ImGui::DockBuilderDockWindow("ContentBrowser", dock_bottom);
         ImGui::DockBuilderDockWindow("GameWindow", dock_main);
 
-        ImGui::DockBuilderFinish(dockspace_id);
+        ImGui::DockBuilderFinish(dockspace_id); // Finalize the new dockspace
     }
 
     ImGui::End();
 }
 
 void ImGuiManager::GameWindow(DataImgui& di) {
-    ImGui::Begin("GameWindow", nullptr);
+    ImGui::Begin("GameWindow", nullptr, ImGuiWindowFlags_NoInputs);
     ImVec2 content_avail = ImGui::GetContentRegionAvail();
 
-    GLuint gameTex = di.frame_buffer.GetColorTexture();
+    GLuint captureTexture = di.game_texture;
 
-    if (gameTex) {
+    if (captureTexture) {
         ImVec2 uv0(0.0f, 1.0f);
         ImVec2 uv1(1.0f, 0.0f);
 
-        ImGui::Image((ImTextureID)(intptr_t)gameTex, content_avail, uv0, uv1);
+        ImGui::Image((ImTextureID)(intptr_t)captureTexture, content_avail, uv0, uv1);
     }
 
     ImGui::End();
 }
 
 void ImGuiManager::Hierarchy(DataImgui& di) {
-    ImGui::Begin("Hierarchy");
+    ImGui::Begin("Hierarchy3");
 
-    auto& loc_ecs = *(di.ecs);
+    auto& loc_ecs = di.ecs;
 
     //--
-    auto ri = loc_ecs.getComponentList<RenderComponent>().begin();
-    auto ti = loc_ecs.getComponentList<TransformComponent>().begin();
-    auto riend = loc_ecs.getComponentList<RenderComponent>().end();
-    auto tiend = loc_ecs.getComponentList<TransformComponent>().end();
+    auto ri = loc_ecs->getComponentList<RenderComponent>().begin();
+    auto ti = loc_ecs->getComponentList<TransformComponent>().begin();
+    auto riend = loc_ecs->getComponentList<RenderComponent>().end();
+    auto tiend = loc_ecs->getComponentList<TransformComponent>().end();
 
     int entity_id = 0;
 
@@ -178,7 +179,7 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
 void ImGuiManager::Inspector(DataImgui& di) {
     ImGui::Begin("Inspector");
 
-    Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), window_width_, window_height_, selected_entity, di);
+    Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
 
     ImGui::End();
 }
@@ -190,7 +191,7 @@ void ImGuiManager::ContentBrowser(DataImgui& di) {
 }
 
 void ImGuiManager::TopBar(DataImgui& di) {
-    ImGui::Begin("##TopBar", nullptr,
+    ImGui::Begin("##TopBar2", nullptr,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
     static int curr_type_draw = 0;
@@ -220,10 +221,8 @@ void ImGuiManager::TopBar(DataImgui& di) {
     ImGui::End();
 }
 
-
-void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int display_w, int display_h, int selected_entity, DataImgui& di)
+void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di)
 {
-
     auto& loc_ecs = *(di.ecs);
 
     static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
@@ -231,57 +230,103 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
     static float snap[3] = { 1.0f, 1.0f, 1.0f };
 
     ImGuizmo::BeginFrame();
-    ImGuizmo::SetRect(0, 0, (float)display_w, (float)display_h);
 
-    auto ri = loc_ecs.getComponentList<RenderComponent>().begin();
-    auto ti = loc_ecs.getComponentList<TransformComponent>().begin();
+    if (ImGui::Begin("GameWindow", nullptr)) {
+        ImVec2 windowPos = ImGui::GetWindowPos();
+        ImVec2 windowSize = ImGui::GetWindowSize();
 
-    int entity_id = 0;
+        ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
-    for (; ri != loc_ecs.getComponentList<RenderComponent>().end() &&
-        ti != loc_ecs.getComponentList<TransformComponent>().end();
-        ++ri, ++ti, ++entity_id) {
-        if (entity_id == selected_entity && ri->has_value() && ti->has_value()) {
+        auto ri = loc_ecs.getComponentList<RenderComponent>().begin();
+        auto ti = loc_ecs.getComponentList<TransformComponent>().begin();
 
-            auto& transform = loc_ecs.get_component<TransformComponent>(selected_entity);
+        int entity_id = 0;
 
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, transform->position);
-            model = model * glm::mat4_cast(transform->rotation);
-            model = glm::scale(model, transform->scale);
+        for (; ri != loc_ecs.getComponentList<RenderComponent>().end() &&
+            ti != loc_ecs.getComponentList<TransformComponent>().end();
+            ++ri, ++ti, ++entity_id) {
+            if (entity_id == selected_entity && ri->has_value() && ti->has_value()) {
 
-            float objectMatrix[16];
-            std::memcpy(objectMatrix, glm::value_ptr(model), sizeof(objectMatrix));
+                auto& transform = loc_ecs.get_component<TransformComponent>(selected_entity);
 
-            ImGuizmo::SetRect(0, 0, (float)display_w, (float)display_h);
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, transform->position);
+                model = model * glm::mat4_cast(transform->rotation);
+                model = glm::scale(model, transform->scale);
 
+                float objectMatrix[16];
+                std::memcpy(objectMatrix, glm::value_ptr(model), sizeof(objectMatrix));
+
+                ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
+                    mCurrentGizmoOperation, ImGuizmo::LOCAL,
+                    objectMatrix, nullptr);
+
+                if (ImGuizmo::IsUsing()) {
+                    glm::mat4 newModelMatrix = glm::make_mat4(objectMatrix);
+                    glm::vec3 scale, translation, skew;
+                    glm::vec4 perspective;
+                    glm::quat rotation;
+
+                    glm::decompose(newModelMatrix, scale, rotation, translation, skew, perspective);
+
+                    transform->position = translation;
+                    transform->rotation = rotation;
+                    transform->scale = scale;
+                }
+            }
+        }
+    }
+    ImGui::End();
+
+    if (ImGui::Begin("Inspector", nullptr)) {
+        if (selected_entity >= 0) {
             if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
                 mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
             if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
                 mCurrentGizmoOperation = ImGuizmo::ROTATE;
             if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
                 mCurrentGizmoOperation = ImGuizmo::SCALE;
-
-            ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-                mCurrentGizmoOperation, ImGuizmo::LOCAL,
-                objectMatrix, nullptr);
-
-            if (ImGuizmo::IsUsing()) {
-                glm::mat4 newModelMatrix = glm::make_mat4(objectMatrix);
-                glm::vec3 scale, translation, skew;
-                glm::vec4 perspective;
-                glm::quat rotation;
-
-                // Decompose the matrix back into position, rotation, and scale
-                glm::decompose(newModelMatrix, scale, rotation, translation, skew, perspective);
-
-                transform->position = translation;
-                transform->rotation = rotation;
-                transform->scale = scale;
-            }
-
-            break;
         }
     }
+    ImGui::End();
 }
 
+/*
+void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selectedEntity, DataImgui& di) {
+    ImGui::Begin("GameWindow");
+
+    // Display rendered texture
+    ImVec2 contentAvail = ImGui::GetContentRegionAvail();
+    GLuint captureTexture = di.game_texture;
+    if (captureTexture) {
+        ImGui::Image((ImTextureID)(intptr_t)captureTexture, contentAvail, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+    }
+
+    // Gizmo interaction
+    ImVec2 windowPos = ImGui::GetWindowPos();
+    ImVec2 windowSize = ImGui::GetWindowSize();
+    ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
+
+    // Retrieve entity transform (example)
+    glm::mat4 modelMatrix = glm::mat4(1.0f); // Replace with actual model matrix for the selected entity
+
+    // Manipulate gizmo
+    if (ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
+        ImGuizmo::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(modelMatrix))) {
+        // Handle gizmo changes (decompose the matrix to get position/rotation/scale)
+        glm::vec3 translation, scale, skew;
+        glm::quat rotation;
+        glm::vec4 perspective;
+        glm::decompose(modelMatrix, scale, rotation, translation, skew, perspective);
+
+        // Apply changes to the entity's transform
+        // For example:
+        // entity->position = translation;
+        // entity->rotation = rotation;
+        // entity->scale = scale;
+    }
+
+    ImGui::End();
+}
+
+*/

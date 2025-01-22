@@ -24,7 +24,7 @@ struct DataImgui {
     PostProcessing post_proccessing;
     ECSManager* ecs;
     //Skybox sxybox;
-    FrameBuffer frame_buffer;
+    GLuint game_texture;
 };
 
 static DataImgui data_imgui;
@@ -47,7 +47,7 @@ public:
     void ContentBrowser(DataImgui& di);
     void TopBar(DataImgui& di);
 
-    void Gizmo(const glm::mat4& view, const glm::mat4& projection, int display_w, int display_h, int selected_entity, DataImgui& di);
+    void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di);
 
 private:
     int selected_entity = -1;

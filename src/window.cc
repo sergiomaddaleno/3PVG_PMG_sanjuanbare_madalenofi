@@ -80,7 +80,6 @@ bool Window::toggleFullScreen(Input& input, Input::Keys key)
 	return false;
 }
 
-
 bool Window::closePressed()
 {
 	int state = glfwGetKey(window_, GLFW_KEY_ESCAPE);

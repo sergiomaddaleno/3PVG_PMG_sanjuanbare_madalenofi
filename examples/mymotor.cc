@@ -20,6 +20,7 @@
 #include "GraphEditor.h"
 
 #include "window.h"
+#include "framebuffer.h"
 #include "imgui_manager.h"
 #include "global_variables.h"
 #include "Render/mesh.h"
@@ -52,6 +53,7 @@ std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> light_bulb_mesh = std::make_shared<Mesh>();
 
 ImGuiManager imgui_manager;
+FrameBuffer fb;
 RenderSystem render_system;
 LuaScript ls;
 Camera cam;
@@ -145,6 +147,7 @@ void ChangePostProcess() {
     }
 }
 
+/*
 void InitImGui(GLFWwindow* w) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -178,7 +181,7 @@ void MyImGui(GLFWwindow* w) {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
-
+*/
 int main(int, char**) {
 
     //lua script settings
@@ -249,8 +252,8 @@ int main(int, char**) {
     postProcc.initData();
     //--
 
-    InitImGui(window->getWindow());
-    //imgui_manager.Init(window->getWindow());
+    //InitImGui(window->getWindow());
+    imgui_manager.Init(window->getWindow());
     data_imgui.ecs = &ecs;
 
     double lastTime = window->getTime();
@@ -264,7 +267,7 @@ int main(int, char**) {
         window_width_ = window->getWidth();
         window_height_ = window->getHeight();
 
-        postProcc.resize(window->getWidth(), window->getHeight());
+        postProcc.resize(window_width_, window_height_);
 
         postProcc.beginRender();
         cam.update(input, dt, window_width_, window_height_);
@@ -275,12 +278,18 @@ int main(int, char**) {
        
         postProcc.endRender();
 
-        MyImGui(window->getWindow());
+        //MyImGui(window->getWindow());
         data_imgui.cam = cam;
         data_imgui.post_proccessing = postProcc;
-        //data_imgui.frame_buffer = window->framebuffer_;
+
+        GLuint captureTexture = fb.captureWindowToTexture();
+        data_imgui.game_texture = captureTexture;
         
-        //imgui_manager.Render(window->getWindow(), data_imgui);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        imgui_manager.Render(window->getWindow(), data_imgui);
+        
+        glDeleteTextures(1, &captureTexture);
 
         if (window->closePressed()) done = true;
     }

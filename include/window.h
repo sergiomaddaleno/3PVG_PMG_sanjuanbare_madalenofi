@@ -26,7 +26,6 @@ class Window {
 
 public:
 	GLFWwindow* window_;
-	FrameBuffer framebuffer_;
 
 	Window(GLFWwindow* window) : width_(800), height_(600) { window_ = window; }
 
