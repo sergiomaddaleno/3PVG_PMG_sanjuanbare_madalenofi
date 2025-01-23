@@ -84,17 +84,14 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
 void ImGuiManager::ImguiWindow(GLFWwindow* window) {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    // Get the framebuffer size instead of the window size
     int framebuffer_width, framebuffer_height;
     glfwGetFramebufferSize(window, &framebuffer_width, &framebuffer_height);
 
-    // Calculate the center position based on framebuffer size
     ImVec2 center_pos = ImVec2(framebuffer_width + framebuffer_width * 0.5f,
         framebuffer_height + framebuffer_height * 0.5f);
 
-    // Set up the full-screen dockspace
-    ImGui::SetNextWindowPos(viewport->WorkPos); // Position at the top-left of the GLFW window
-    ImGui::SetNextWindowSize(ImVec2((float)framebuffer_width, (float)framebuffer_height)); // Match framebuffer size
+    ImGui::SetNextWindowPos(viewport->WorkPos); 
+    ImGui::SetNextWindowSize(ImVec2((float)framebuffer_width, (float)framebuffer_height));
     ImGui::SetNextWindowViewport(viewport->ID);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -110,22 +107,20 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
     ImGuiID dockspace_id = ImGui::GetID("MainDockspace_");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f));
 
-    // Track changes in framebuffer size
     static ImVec2 last_framebuffer_size = ImVec2(0, 0);
     ImVec2 current_framebuffer_size = ImVec2((float)framebuffer_width, (float)framebuffer_height);
 
     if (last_framebuffer_size.x != current_framebuffer_size.x || last_framebuffer_size.y != current_framebuffer_size.y) {
         last_framebuffer_size = current_framebuffer_size;
 
-        // Rebuild dockspace when framebuffer size changes
-        ImGui::DockBuilderRemoveNode(dockspace_id); // Clear previous dockspace
+        ImGui::DockBuilderRemoveNode(dockspace_id);
         ImGui::DockBuilderAddNode(dockspace_id);
         ImGui::DockBuilderSetNodeSize(dockspace_id, current_framebuffer_size);
 
         ImGuiID dock_main = dockspace_id;
-        ImGuiID dock_top = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Up, 0.07f, nullptr, &dock_main);
-        ImGuiID dock_left = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Left, 0.2f, nullptr, &dock_main);
-        ImGuiID dock_right = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Right, 0.3f, nullptr, &dock_main);
+        ImGuiID dock_top = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Up, 0.05f, nullptr, &dock_main);
+        ImGuiID dock_left = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Left, 0.1f, nullptr, &dock_main);
+        ImGuiID dock_right = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Right, 0.2f, nullptr, &dock_main);
         ImGuiID dock_bottom = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Down, 0.2f, nullptr, &dock_main);
 
         ImGui::DockBuilderDockWindow("##-TopBar", dock_top);
@@ -134,14 +129,14 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
         ImGui::DockBuilderDockWindow("-ContentBrowser", dock_bottom);
         ImGui::DockBuilderDockWindow("-GameWindow", dock_main);
 
-        ImGui::DockBuilderFinish(dockspace_id); // Finalize the new dockspace
+        ImGui::DockBuilderFinish(dockspace_id);
     }
 
     ImGui::End();
 }
 
 void ImGuiManager::GameWindow(DataImgui& di) {
-    ImGui::Begin("-GameWindow", nullptr, ImGuiWindowFlags_NoInputs);
+    ImGui::Begin("-GameWindow", nullptr);
     ImVec2 content_avail = ImGui::GetContentRegionAvail();
 
     GLuint captureTexture = di.game_texture;
@@ -171,6 +166,7 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
 
     for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
         if (ti->has_value()) {
+
             if (ImGui::Selectable(("Entity " + std::to_string(entity_id)).c_str(), selected_entity == entity_id)) {
                 selected_entity = entity_id;
             }
@@ -234,9 +230,9 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
     static float snap[3] = { 1.0f, 1.0f, 1.0f };
 
     ImGuizmo::BeginFrame();
-
-    // Process Gizmo in the first active window
     if (ImGui::Begin("-GameWindow", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+        ImGuizmo::SetAlternativeWindow(ImGui::GetCurrentWindow());
+
         ImVec2 windowPos = ImGui::GetWindowPos();
         ImVec2 windowSize = ImGui::GetWindowSize();
 
@@ -282,7 +278,6 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
     }
     ImGui::End();
 
-    // Inspector window for setting Gizmo operation
     if (ImGui::Begin("-Inspector", nullptr, ImGuiWindowFlags_NoTitleBar)) {
         if (selected_entity >= 0) {
             if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
