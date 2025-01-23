@@ -283,11 +283,13 @@ int main(int, char**) {
         data_imgui.post_proccessing = postProcc;
 
         GLuint captureTexture = fb.captureWindowToTexture();
+        fb.width_ = window_width_;
+        fb.height_ = window_height_;
         data_imgui.game_texture = captureTexture;
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         imgui_manager.Render(window->getWindow(), data_imgui);
+
         
         glDeleteTextures(1, &captureTexture);
 

@@ -68,7 +68,7 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     Hierarchy(di);
     Inspector(di);
     ContentBrowser(di);
-    //TopBar(di);
+    TopBar(di);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -84,12 +84,17 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
 void ImGuiManager::ImguiWindow(GLFWwindow* window) {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    ImVec2 center_pos = ImVec2(viewport->WorkPos.x + viewport->WorkSize.x * 0.5f,
-        viewport->WorkPos.y + viewport->WorkSize.y * 0.5f);
+    // Get the framebuffer size instead of the window size
+    int framebuffer_width, framebuffer_height;
+    glfwGetFramebufferSize(window, &framebuffer_width, &framebuffer_height);
+
+    // Calculate the center position based on framebuffer size
+    ImVec2 center_pos = ImVec2(framebuffer_width + framebuffer_width * 0.5f,
+        framebuffer_height + framebuffer_height * 0.5f);
 
     // Set up the full-screen dockspace
-    ImGui::SetNextWindowPos(center_pos, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    ImGui::SetNextWindowSize(viewport->WorkSize);
+    ImGui::SetNextWindowPos(viewport->WorkPos); // Position at the top-left of the GLFW window
+    ImGui::SetNextWindowSize(ImVec2((float)framebuffer_width, (float)framebuffer_height)); // Match framebuffer size
     ImGui::SetNextWindowViewport(viewport->ID);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -103,19 +108,19 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
     ImGui::PopStyleVar(3);
 
     ImGuiID dockspace_id = ImGui::GetID("MainDockspace_");
-    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f));
 
-    // Track changes in viewport size
-    static ImVec2 last_viewport_size = ImVec2(0, 0);
-    ImVec2 current_viewport_size = viewport->WorkSize;
+    // Track changes in framebuffer size
+    static ImVec2 last_framebuffer_size = ImVec2(0, 0);
+    ImVec2 current_framebuffer_size = ImVec2((float)framebuffer_width, (float)framebuffer_height);
 
-    if (last_viewport_size.x != current_viewport_size.x || last_viewport_size.y != current_viewport_size.y) {
-        last_viewport_size = current_viewport_size;
+    if (last_framebuffer_size.x != current_framebuffer_size.x || last_framebuffer_size.y != current_framebuffer_size.y) {
+        last_framebuffer_size = current_framebuffer_size;
 
-        // Rebuild dockspace when viewport size changes
+        // Rebuild dockspace when framebuffer size changes
         ImGui::DockBuilderRemoveNode(dockspace_id); // Clear previous dockspace
-        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
-        ImGui::DockBuilderSetNodeSize(dockspace_id, current_viewport_size);
+        ImGui::DockBuilderAddNode(dockspace_id);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, current_framebuffer_size);
 
         ImGuiID dock_main = dockspace_id;
         ImGuiID dock_top = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Up, 0.07f, nullptr, &dock_main);
@@ -123,11 +128,11 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
         ImGuiID dock_right = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Right, 0.3f, nullptr, &dock_main);
         ImGuiID dock_bottom = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Down, 0.2f, nullptr, &dock_main);
 
-        ImGui::DockBuilderDockWindow("##TopBar", dock_top);
-        ImGui::DockBuilderDockWindow("Hierarchy3", dock_left);
-        ImGui::DockBuilderDockWindow("Inspector", dock_right);
-        ImGui::DockBuilderDockWindow("ContentBrowser", dock_bottom);
-        ImGui::DockBuilderDockWindow("GameWindow", dock_main);
+        ImGui::DockBuilderDockWindow("##-TopBar", dock_top);
+        ImGui::DockBuilderDockWindow("-Hierarchy", dock_left);
+        ImGui::DockBuilderDockWindow("-Inspector", dock_right);
+        ImGui::DockBuilderDockWindow("-ContentBrowser", dock_bottom);
+        ImGui::DockBuilderDockWindow("-GameWindow", dock_main);
 
         ImGui::DockBuilderFinish(dockspace_id); // Finalize the new dockspace
     }
@@ -136,7 +141,7 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
 }
 
 void ImGuiManager::GameWindow(DataImgui& di) {
-    ImGui::Begin("GameWindow", nullptr, ImGuiWindowFlags_NoInputs);
+    ImGui::Begin("-GameWindow", nullptr, ImGuiWindowFlags_NoInputs);
     ImVec2 content_avail = ImGui::GetContentRegionAvail();
 
     GLuint captureTexture = di.game_texture;
@@ -152,7 +157,7 @@ void ImGuiManager::GameWindow(DataImgui& di) {
 }
 
 void ImGuiManager::Hierarchy(DataImgui& di) {
-    ImGui::Begin("Hierarchy3");
+    ImGui::Begin("-Hierarchy", nullptr);
 
     auto& loc_ecs = di.ecs;
 
@@ -177,7 +182,7 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
 }
 
 void ImGuiManager::Inspector(DataImgui& di) {
-    ImGui::Begin("Inspector");
+    ImGui::Begin("-Inspector");
 
     Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
 
@@ -185,13 +190,13 @@ void ImGuiManager::Inspector(DataImgui& di) {
 }
 
 void ImGuiManager::ContentBrowser(DataImgui& di) {
-    ImGui::Begin("ContentBrowser");
+    ImGui::Begin("-ContentBrowser");
 
     ImGui::End();
 }
 
 void ImGuiManager::TopBar(DataImgui& di) {
-    ImGui::Begin("##TopBar2", nullptr,
+    ImGui::Begin("##-TopBar", nullptr,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
     static int curr_type_draw = 0;
@@ -221,8 +226,7 @@ void ImGuiManager::TopBar(DataImgui& di) {
     ImGui::End();
 }
 
-void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di)
-{
+void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di) {
     auto& loc_ecs = *(di.ecs);
 
     static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
@@ -231,7 +235,8 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
 
     ImGuizmo::BeginFrame();
 
-    if (ImGui::Begin("GameWindow", nullptr)) {
+    // Process Gizmo in the first active window
+    if (ImGui::Begin("-GameWindow", nullptr, ImGuiWindowFlags_NoTitleBar)) {
         ImVec2 windowPos = ImGui::GetWindowPos();
         ImVec2 windowSize = ImGui::GetWindowSize();
 
@@ -246,7 +251,6 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
             ti != loc_ecs.getComponentList<TransformComponent>().end();
             ++ri, ++ti, ++entity_id) {
             if (entity_id == selected_entity && ri->has_value() && ti->has_value()) {
-
                 auto& transform = loc_ecs.get_component<TransformComponent>(selected_entity);
 
                 glm::mat4 model = glm::mat4(1.0f);
@@ -278,7 +282,8 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
     }
     ImGui::End();
 
-    if (ImGui::Begin("Inspector", nullptr)) {
+    // Inspector window for setting Gizmo operation
+    if (ImGui::Begin("-Inspector", nullptr, ImGuiWindowFlags_NoTitleBar)) {
         if (selected_entity >= 0) {
             if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
                 mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
@@ -290,43 +295,3 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
     }
     ImGui::End();
 }
-
-/*
-void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selectedEntity, DataImgui& di) {
-    ImGui::Begin("GameWindow");
-
-    // Display rendered texture
-    ImVec2 contentAvail = ImGui::GetContentRegionAvail();
-    GLuint captureTexture = di.game_texture;
-    if (captureTexture) {
-        ImGui::Image((ImTextureID)(intptr_t)captureTexture, contentAvail, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-    }
-
-    // Gizmo interaction
-    ImVec2 windowPos = ImGui::GetWindowPos();
-    ImVec2 windowSize = ImGui::GetWindowSize();
-    ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
-
-    // Retrieve entity transform (example)
-    glm::mat4 modelMatrix = glm::mat4(1.0f); // Replace with actual model matrix for the selected entity
-
-    // Manipulate gizmo
-    if (ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-        ImGuizmo::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(modelMatrix))) {
-        // Handle gizmo changes (decompose the matrix to get position/rotation/scale)
-        glm::vec3 translation, scale, skew;
-        glm::quat rotation;
-        glm::vec4 perspective;
-        glm::decompose(modelMatrix, scale, rotation, translation, skew, perspective);
-
-        // Apply changes to the entity's transform
-        // For example:
-        // entity->position = translation;
-        // entity->rotation = rotation;
-        // entity->scale = scale;
-    }
-
-    ImGui::End();
-}
-
-*/
