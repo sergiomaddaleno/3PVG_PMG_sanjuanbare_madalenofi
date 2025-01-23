@@ -15,6 +15,7 @@
 
 #include "Geometry/sphere.h"
 #include "Geometry/terrain.h"
+#include "Geometry/cube.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -138,6 +139,41 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
                 glBindVertexArray(0);
             }
+
+            if (render_comp->type_ == RenderType::RT_Cube) {
+                if (render_comp->cube_ == nullptr) {
+                    printf("No Sphere\n");
+                    continue;
+                }
+
+                auto& cube = render_comp->cube_;
+
+                glGenVertexArrays(1, &cube->VAO);
+                glGenBuffers(1, &cube->VBO);
+                glGenBuffers(1, &cube->EBO);
+
+                glBindVertexArray(cube->VAO);
+
+                glBindBuffer(GL_ARRAY_BUFFER, cube->VBO);
+                glBufferData(GL_ARRAY_BUFFER, cube->data_.size() * sizeof(float), cube->data_.data(), GL_STATIC_DRAW);
+
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube->EBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube->order_.size() * sizeof(int), cube->order_.data(), GL_STATIC_DRAW);
+
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+                glEnableVertexAttribArray(0);
+
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+                glEnableVertexAttribArray(1);
+
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+                glEnableVertexAttribArray(2);
+
+                glBindVertexArray(0);
+            }
+
+
+           
         }
     }
     glUseProgram(0);
@@ -315,6 +351,39 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         glDrawElements(GL_TRIANGLES, (sphere->num_heights_ * sphere->num_revs_) * 6, GL_UNSIGNED_INT, 0);
                         glBindVertexArray(0);
                     }
+
+                    if (render_comp->type_ == RenderType::RT_Cube) {
+                        if (render_comp->cube_ == nullptr) {
+                            printf("No Cube\n");
+                            continue;
+                        }
+
+                        auto& cube = render_comp->cube_;
+
+                        render_comp->shader.useProgram();
+                        glCullFace(GL_BACK);
+
+                        glm::mat4 model = glm::mat4(1.0f);
+                        model = glm::translate(model, transform_comp->position);
+                        model = model * glm::mat4_cast(transform_comp->rotation);
+                        model = glm::scale(model, transform_comp->scale);
+
+                        glm::mat4 view = cam.getViewMatrix();
+                        glm::mat4 projection = cam.getProjectionMatrix();
+                        glm::mat4 mvp = projection * view * model;
+
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
+
+                        //Fog
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+
+                        glBindVertexArray(cube->VAO);
+                        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+                        glBindVertexArray(0);
+                    }
                 }
             }
             light_count++;
@@ -427,6 +496,44 @@ size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, int num_heigh
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Sphere;
     ecs.get_component<RenderComponent>(entity_)->sphere_ = sphere;
+
+    ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
+
+    entity_++;
+
+    return entity_;
+}
+
+size_t RenderSystem::createCube8v(ECSManager& ecs, Shader& shader, const float size)
+{
+    auto cube = std::make_shared<Cube>();
+    cube->init8v(size);
+
+    ecs.add_component<RenderComponent>(entity_);
+    ecs.add_component<TransformComponent>(entity_);
+
+    ecs.get_component<RenderComponent>(entity_)->shader = shader;
+    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube;
+    ecs.get_component<RenderComponent>(entity_)->cube_ = cube;
+
+    ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
+
+    entity_++;
+
+    return entity_;
+}
+
+size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, const float size)
+{
+    auto cube = std::make_shared<Cube>();
+    cube->init24v(size);
+
+    ecs.add_component<RenderComponent>(entity_);
+    ecs.add_component<TransformComponent>(entity_);
+
+    ecs.get_component<RenderComponent>(entity_)->shader = shader;
+    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube;
+    ecs.get_component<RenderComponent>(entity_)->cube_ = cube;
 
     ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
 
