@@ -201,6 +201,15 @@ void ImGuiManager::TopBar(DataImgui& di) {
 
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("Settings")) {
+            /*static float camSpeed = di.cam.getSpeed();  
+            if (ImGui::SliderFloat("Speed", &camSpeed, 0.1f, 10.0f, "%.2f")) {
+                di.cam.setSpeed(camSpeed);
+            }
+
+            static float camFov = di.cam.getFov();
+            if (ImGui::SliderFloat("FOV", &camFov, 30.0f, 120.0f, "%.1f")) {
+                di.cam.setFov(camFov);
+            }*/
 
             ImGui::EndMenu();
         }
@@ -227,13 +236,29 @@ void ImGuiManager::TopBar(DataImgui& di) {
             ImGui::EndMenu();
         }
 
-        auto& loc_rs = di.render_system;
         auto& loc_ecs = di.ecs;
+        auto& loc_rs = di.render_system;
 
         if (ImGui::BeginMenu("Tools")) {
 
             if (ImGui::MenuItem("Add Sphere")) {
                 loc_rs->createSphere(*loc_ecs, di.shader);
+            }
+
+            if (ImGui::MenuItem("Add Cube 8v")) {
+                loc_rs->createCube8v(*loc_ecs, di.shader);
+            }
+
+            if (ImGui::MenuItem("Add Cube 24v")) {
+                loc_rs->createCube24v(*loc_ecs, di.shader);
+            }
+
+            if (ImGui::MenuItem("Add Quad")) {
+                loc_rs->createQuad(*loc_ecs, di.shader);
+            }
+
+            if (ImGui::MenuItem("Add Terrain")) {
+                loc_rs->createTerrain(*loc_ecs, di.shader);
             }
 
             ImGui::EndMenu();

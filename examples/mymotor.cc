@@ -98,7 +98,7 @@ Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
 
 void ChangeShader() {
 
-    const char* shaders_name[]{ "Texture Shader", "Normals shader"};
+    const char* shaders_name[]{ "Texture Shader", "Normals shader" };
     static int curr_item = 0;
 
     if (ImGui::Combo("Shaders", &curr_item, shaders_name, 2)) {
@@ -115,7 +115,7 @@ void ChangeShader() {
 
 void ChangePostProcess() {
 
-    const char* pp_name[]{ "None", "Grey", "Negative", "Waves", "Blur", "Kernel types"};
+    const char* pp_name[]{ "None", "Grey", "Negative", "Waves", "Blur", "Kernel types" };
     static int curr_item = 0;
 
     if (ImGui::Combo("Post Process", &curr_item, pp_name, 6)) {
@@ -124,13 +124,13 @@ void ChangePostProcess() {
     switch (curr_item) {
     case 0: break;
 
-    case 1: 
+    case 1:
         postProcc.render(grey_sh, Effect::Grey);
         ImGui::DragFloat("Grey", &postProcc.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
         break;
-    case 2: 
+    case 2:
         postProcc.render(negative_sh, Effect::Negative);
-        ImGui::DragFloat("Negative", &postProcc.negative_, 0.01f, 0.5f, 1.0f, "%.3f"); 
+        ImGui::DragFloat("Negative", &postProcc.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
         break;
     case 3:
         postProcc.render(waves_sh, Effect::Waves);
@@ -171,7 +171,7 @@ int main(int, char**) {
     window->initGLEW();
     window->setResizeCallback();
 
-    Input input{ window->getWindow()};
+    Input input{ window->getWindow() };
 
     // ---
     if (!car_mesh->loadOBJ("../assets/obj/LMcQueen.obj", "../assets/textures/cars")) {
@@ -202,11 +202,10 @@ int main(int, char**) {
 
     render_system.createMesh(ecs, mario_mesh, entities_shader);
     render_system.createPointLight(ecs, entities_shader);
-    render_system.createTerrain(ecs, entities_shader,500,500);
-    render_system.createQuad(ecs, entities_shader, 1.0f);
-    
+    render_system.createTerrain(ecs, entities_shader, 500, 500);
+
     render_system.initEntities(ecs);
-   
+
     // ---
     //Post proccess
     grey_sh.compile(vertex_pp, grey_fs);
@@ -221,6 +220,8 @@ int main(int, char**) {
     //InitImGui(window->getWindow());
     imgui_manager.Init(window->getWindow());
     data_imgui.ecs = &ecs;
+    data_imgui.shader = entities_shader;
+    data_imgui.render_system = &render_system;
 
     double lastTime = window->getTime();
     bool done = false;
@@ -232,32 +233,29 @@ int main(int, char**) {
 
         window_width_ = window->getWidth();
         window_height_ = window->getHeight();
-
         postProcc.resize(window_width_, window_height_);
 
+        //--
         postProcc.beginRender();
         cam.update(input, dt, window_width_, window_height_);
 
         skybox.render(render_comp, cam);
 
         render_system.renderEntities(ecs, cam);
-       
-        postProcc.endRender();
 
-        //MyImGui(window->getWindow());
-        data_imgui.shader = entities_shader;
+        postProcc.endRender();
+        //--
+
         data_imgui.cam = cam;
         data_imgui.post_proccessing = postProcc;
-        data_imgui.render_system = &render_system;
+
         GLuint captureTexture = fb.captureWindowToTexture();
         fb.width_ = window_width_;
         fb.height_ = window_height_;
         data_imgui.game_texture = captureTexture;
-        
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         imgui_manager.Render(window->getWindow(), data_imgui);
-
-        
         glDeleteTextures(1, &captureTexture);
 
         if (window->closePressed()) done = true;
