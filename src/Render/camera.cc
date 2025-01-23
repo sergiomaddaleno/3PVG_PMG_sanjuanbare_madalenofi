@@ -34,7 +34,7 @@ glm::mat4 Camera::initViewTarget()
 }
 
 void Camera::update(Input& input, const double dt, const int window_width, const int window_height) {
-    
+
     // ----------------- Camera Rotation
     curr_mouse.x = (float)input.getMouseX();
     curr_mouse.y = window_height - (float)input.getMouseY();
@@ -64,30 +64,28 @@ void Camera::update(Input& input, const double dt, const int window_width, const
 
     view_ = initViewTarget();
 
-    glm::vec3 forward_vec = glm::normalize(glm::vec3(view_direction_.x, view_direction_.y, view_direction_.z));
-    forward_vec *= speed_ * dt;
-
-    glm::vec3 right_vec = glm::cross(forward_vec, up_);
+    glm::vec3 forward_vec = glm::normalize(view_direction_); // Direcci�n frontal normalizada
+    glm::vec3 right_vec = glm::normalize(glm::cross(forward_vec, up_)); // Direcci�n derecha normalizada
 
     // ----------------- Camera Movement
     if (input.isMouseButtonDown(Input::MouseButton::MOUSE_RIGHT)) {
         if (input.isKeyDown(Input::A)) {
-            position_ -= right_vec;
+            position_ -= right_vec * speed_ * (float)dt;
         }
         if (input.isKeyDown(Input::D)) {
-            position_ += right_vec;
+            position_ += right_vec * speed_ * (float)dt;
         }
         if (input.isKeyDown(Input::W)) {
-            position_ += forward_vec;
+            position_ += forward_vec * speed_ * (float)dt;
         }
         if (input.isKeyDown(Input::S)) {
-            position_ -= forward_vec;
+            position_ -= forward_vec * speed_ * (float)dt;
         }
         if (input.isKeyDown(Input::E)) {
-            position_.y += speed_ * dt;
+            position_.y += speed_ * (float)dt;
         }
         if (input.isKeyDown(Input::Q)) {
-            position_.y -= speed_ * dt;
+            position_.y -= speed_ * (float)dt;
         }
     }
 
@@ -116,5 +114,5 @@ glm::mat4 Camera::getViewMatrix() const {
 
 glm::mat4 Camera::getProjectionMatrix() const
 {
-    return glm::perspective(glm::radians(fov_), (float)window_width_ / (float)window_height_, 0.1f, 100.0f);
+    return glm::perspective(glm::radians(fov_), (float)window_width_ / (float)window_height_, 0.1f, 1000.0f);
 }
