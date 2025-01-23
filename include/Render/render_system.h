@@ -46,7 +46,7 @@ public:
 
 	size_t createTerrain(ECSManager& ecs, Shader& shader,int cols ,int rows);
 
-	size_t createSphere(ECSManager& ecs, Shader& shader, int num_heights_, int num_revs_, float size);
+	size_t createSphere(ECSManager& ecs, Shader& shader, int num_heights_=60, int num_revs_=60, float size=1.0f);
 	
 	//Lights
 	size_t createSpotLight(ECSManager& ecs, const Shader& light_shader);

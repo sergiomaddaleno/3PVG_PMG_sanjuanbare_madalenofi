@@ -192,14 +192,23 @@ void ImGuiManager::ContentBrowser(DataImgui& di) {
 }
 
 void ImGuiManager::TopBar(DataImgui& di) {
-    ImGui::Begin("##-TopBar", nullptr,
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-    static int curr_type_draw = 0;
+    ImGui::Begin("##-TopBar", nullptr,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_MenuBar);
+
+    static int curr_type_draw = 0; 
+
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("Settings")) {
+
+            ImGui::EndMenu();
+        }
 
         if (ImGui::BeginMenu("Edit")) {
 
             if (ImGui::BeginMenu("Drawing Type")) {
+
                 if (ImGui::MenuItem("Triangles", nullptr, curr_type_draw == 0)) {
                     curr_type_draw = 0;
                     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -212,12 +221,26 @@ void ImGuiManager::TopBar(DataImgui& di) {
                     curr_type_draw = 2;
                     glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
                 }
-
                 ImGui::EndMenu();
             }
+
             ImGui::EndMenu();
         }
-    
+
+        auto& loc_rs = di.render_system;
+        auto& loc_ecs = di.ecs;
+
+        if (ImGui::BeginMenu("Tools")) {
+
+            if (ImGui::MenuItem("Add Sphere")) {
+                loc_rs->createSphere(*loc_ecs, di.shader);
+            }
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenuBar();
+    }
 
     ImGui::End();
 }

@@ -147,41 +147,6 @@ void ChangePostProcess() {
     }
 }
 
-/*
-void InitImGui(GLFWwindow* w) {
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-    // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-    ImGui_ImplGlfw_InitForOpenGL(w, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
-
-    // Optional: Set docking space or window flags if needed
-    ImGui::StyleColorsDark();
-}
-
-void MyImGui(GLFWwindow* w) {
-
-    ImGui_ImplGlfw_NewFrame();
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui::NewFrame();
-
-    glfwGetFramebufferSize(w, &window_width_, &window_height_);
-
-    ImGui::Begin("Menu2");
-
-    ChangeShader();
-    ChangePostProcess();
-
-    ImGui::End();
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-*/
 int main(int, char**) {
 
     //lua script settings
@@ -280,9 +245,10 @@ int main(int, char**) {
         postProcc.endRender();
 
         //MyImGui(window->getWindow());
+    data_imgui.shader = entities_shader;
         data_imgui.cam = cam;
         data_imgui.post_proccessing = postProcc;
-
+        data_imgui.render_system = &render_system;
         GLuint captureTexture = fb.captureWindowToTexture();
         fb.width_ = window_width_;
         fb.height_ = window_height_;

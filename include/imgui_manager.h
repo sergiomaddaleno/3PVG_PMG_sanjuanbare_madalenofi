@@ -9,6 +9,8 @@
 #include "Render/post_processing.h"
 #include "Render/skybox.h"
 #include "Render/light.h"
+#include "Render/render_system.h"
+#include "Render/shader.h"
 #include "Geometry/terrain.h"
 #include "Geometry/triangle.h"
 #include "Systems/ecs_manager.h"
@@ -23,6 +25,8 @@ struct DataImgui {
     //LightInfo light_info;
     PostProcessing post_proccessing;
     ECSManager* ecs;
+    RenderSystem* render_system;
+    Shader shader;
     //Skybox sxybox;
     GLuint game_texture;
 };
