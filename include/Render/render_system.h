@@ -44,15 +44,15 @@ public:
 
 	size_t createMesh(ECSManager &ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader);
 
-	size_t createTerrain(ECSManager& ecs, Shader& shader,int cols ,int rows);
+	size_t createTerrain(ECSManager& ecs, Shader& shader, int cols = 40, int rows = 40);
 
-	size_t createSphere(ECSManager& ecs, Shader& shader, int num_heights_=60, int num_revs_=60, float size=1.0f);
+	size_t createSphere(ECSManager& ecs, Shader& shader, int num_heights_ = 60, int num_revs_ = 60, float size = 1.0f);
 
-	size_t createCube8v(ECSManager& ecs, Shader& shader, const float size);
+	size_t createCube8v(ECSManager& ecs, Shader& shader, const float size = 1.0f);
 
-	size_t createCube24v(ECSManager& ecs, Shader& shader, const float size);
+	size_t createCube24v(ECSManager& ecs, Shader& shader, const float size = 1.0f);
 
-	size_t createQuad(ECSManager& ecs, Shader& shader, const float size);
+	size_t createQuad(ECSManager& ecs, Shader& shader, const float size = 1.0f);
 	
 	//Lights
 	size_t createSpotLight(ECSManager& ecs, const Shader& light_shader);
