@@ -203,7 +203,7 @@ int main(int, char**) {
     render_system.createMesh(ecs, mario_mesh, entities_shader);
     render_system.createPointLight(ecs, entities_shader);
     render_system.createTerrain(ecs, entities_shader,500,500);
-    render_system.createCube24v(ecs, entities_shader, 1.0f);
+    render_system.createQuad(ecs, entities_shader, 1.0f);
     
     render_system.initEntities(ecs);
    
@@ -245,7 +245,7 @@ int main(int, char**) {
         postProcc.endRender();
 
         //MyImGui(window->getWindow());
-    data_imgui.shader = entities_shader;
+        data_imgui.shader = entities_shader;
         data_imgui.cam = cam;
         data_imgui.post_proccessing = postProcc;
         data_imgui.render_system = &render_system;

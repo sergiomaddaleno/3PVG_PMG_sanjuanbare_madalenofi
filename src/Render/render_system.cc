@@ -16,6 +16,7 @@
 #include "Geometry/sphere.h"
 #include "Geometry/terrain.h"
 #include "Geometry/cube.h"
+#include "Geometry/quad.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -280,6 +281,39 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
                         glBindVertexArray(0);
                     }
+
+                    if (render_comp->type_ == RenderType::RT_Quad) {
+                        if (render_comp->quad_ == nullptr) {
+                            printf("No Cube\n");
+                            continue;
+                        }
+
+                        auto& quad = render_comp->quad_;
+
+                        render_comp->shader.useProgram();
+                        glCullFace(GL_BACK);
+
+                        glm::mat4 model = glm::mat4(1.0f);
+                        model = glm::translate(model, transform_comp->position);
+                        model = model * glm::mat4_cast(transform_comp->rotation);
+                        model = glm::scale(model, transform_comp->scale);
+
+                        glm::mat4 view = cam.getViewMatrix();
+                        glm::mat4 projection = cam.getProjectionMatrix();
+                        glm::mat4 mvp = projection * view * model;
+
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
+
+                        //Fog
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+
+                        glBindVertexArray(quad->VAO);
+                        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                        glBindVertexArray(0);
+                    }
                 }
             }
             light_count++;
@@ -436,6 +470,26 @@ size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, const float 
     entity_++;
 
     return entity_;
+}
+
+size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, const float size)
+{
+    auto quad = std::make_shared<Quad>();
+    quad->init(size);
+
+    ecs.add_component<RenderComponent>(entity_);
+    ecs.add_component<TransformComponent>(entity_);
+
+    ecs.get_component<RenderComponent>(entity_)->shader = shader;
+    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Quad;
+    ecs.get_component<RenderComponent>(entity_)->quad_ = quad;
+
+    ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
+
+    entity_++;
+
+    return entity_;
+    
 }
 
 
