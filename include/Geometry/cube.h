@@ -22,6 +22,7 @@ class Cube {
 
   std::vector<int> order_;
   std::vector<float> data_;
+  int type = 0;
 
 
 

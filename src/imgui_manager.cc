@@ -254,22 +254,29 @@ void ImGuiManager::TopBar(DataImgui& di) {
 
             if (ImGui::MenuItem("Add Sphere")) {
                 di.render_system.createSphere(loc_ecs, di.shader);
+
+                di.render_system.initEntities(loc_ecs);
+               
             }
 
             if (ImGui::MenuItem("Add Cube 8v")) {
                 di.render_system.createCube8v(loc_ecs, di.shader);
+                di.render_system.initEntities(loc_ecs);
             }
 
             if (ImGui::MenuItem("Add Cube 24v")) {
                 di.render_system.createCube24v(loc_ecs, di.shader);
+                di.render_system.initEntities(loc_ecs);
             }
 
             if (ImGui::MenuItem("Add Quad")) {
                 di.render_system.createQuad(loc_ecs, di.shader);
+                di.render_system.initEntities(loc_ecs);
             }
 
             if (ImGui::MenuItem("Add Terrain")) {
                 di.render_system.createTerrain(loc_ecs, di.shader);
+                di.render_system.initEntities(loc_ecs);
             }
 
             ImGui::EndMenu();

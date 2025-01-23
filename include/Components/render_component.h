@@ -26,12 +26,12 @@ enum RenderType {
 
 struct RenderComponent {
 
-    std::shared_ptr<Mesh> mesh_;
+    std::unique_ptr<Mesh> mesh_;
     Triangle triangle_;
-    std::shared_ptr<Terrain> terrain_;
-    std::shared_ptr<Sphere> sphere_;
-    std::shared_ptr<Cube> cube_;
-    std::shared_ptr<Quad> quad_;
+    std::unique_ptr<Terrain> terrain_;
+    std::unique_ptr<Sphere> sphere_;
+    std::unique_ptr<Cube> cube_;
+    std::unique_ptr<Quad> quad_;
 
     Shader shader;
     Texture texture;
@@ -44,19 +44,25 @@ struct RenderComponent {
     ~RenderComponent() {}
 
     RenderComponent(const RenderComponent& other)
-        : mesh_(other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr), terrain_(other.terrain_),
-        triangle_(other.triangle_), texture(other.texture),
-        shader(other.shader), type_(other.type_)
+        : mesh_(other.mesh_ ? std::make_unique<Mesh>(*other.mesh_) : nullptr),
+        terrain_(other.terrain_ ? std::make_unique<Terrain>(*other.terrain_) : nullptr), 
+        sphere_(other.sphere_ ? std::make_unique<Sphere>(*other.sphere_) : nullptr),
+        cube_(other.cube_ ? std::make_unique<Cube>(*other.cube_) : nullptr),
+        quad_(other.quad_ ? std::make_unique<Quad>(*other.quad_) : nullptr),
+        triangle_(other.triangle_),
+        texture(other.texture),
+        shader(other.shader),
+        type_(other.type_)
     {}
+
 
     RenderComponent& operator=(const RenderComponent& other) {
         if (this != &other) {
-            mesh_ = other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr;
-            triangle_ = other.triangle_;
-            terrain_ = other.terrain_;
-            texture = other.texture;
-            shader = other.shader;
-            type_ = other.type_;
+            mesh_ = other.mesh_ ? std::make_unique<Mesh>(*other.mesh_) : nullptr;
+            terrain_ = other.terrain_ ? std::make_unique<Terrain>(*other.terrain_) : nullptr;
+            sphere_ = other.sphere_ ? std::make_unique<Sphere>(*other.sphere_) : nullptr;
+            cube_ = other.cube_ ? std::make_unique<Cube>(*other.cube_) : nullptr;
+            quad_ = other.quad_ ? std::make_unique<Quad>(*other.quad_) : nullptr;
         }
         return *this;
     }

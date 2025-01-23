@@ -71,6 +71,128 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                     glBindVertexArray(0); 
                 }
             }
+
+            if (render_comp->type_ == RenderType::RT_Terrain) {
+
+                auto& terrain = render_comp->terrain_;
+
+                glGenBuffers(1, &terrain->VBO);
+                glBindBuffer(GL_ARRAY_BUFFER, terrain->VBO);
+                glBufferData(GL_ARRAY_BUFFER, terrain->data_.size() * sizeof(float), terrain->data_.data(), GL_STATIC_DRAW);
+
+                glGenBuffers(1, &terrain->EBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrain->EBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, terrain->order_.size() * sizeof(int), terrain->order_.data(), GL_STATIC_DRAW);
+
+                glGenVertexArrays(1, &terrain->VAO);
+                glBindVertexArray(terrain->VAO);
+                glBindBuffer(GL_ARRAY_BUFFER, terrain->VBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrain->EBO);
+
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+                glEnableVertexAttribArray(0);
+
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+                glEnableVertexAttribArray(1);
+
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+                glEnableVertexAttribArray(2);
+
+                glBindVertexArray(0);
+            }
+
+            if (render_comp->type_ == RenderType::RT_Sphere) {
+
+                auto& sphere = render_comp->sphere_;
+
+                glGenBuffers(1, &sphere->VBO);
+                glBindBuffer(GL_ARRAY_BUFFER, sphere->VBO);
+                glBufferData(GL_ARRAY_BUFFER, sphere->data_.size() * sizeof(float), sphere->data_.data(), GL_STATIC_DRAW);
+
+                glGenBuffers(1, &sphere->EBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->EBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphere->order_.size() * sizeof(int), sphere->order_.data(), GL_STATIC_DRAW);
+
+                glGenVertexArrays(1, &sphere->VAO);
+                glBindVertexArray(sphere->VAO);
+                glBindBuffer(GL_ARRAY_BUFFER, sphere->VBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->EBO);
+
+
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+                glEnableVertexAttribArray(0);
+
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+                glEnableVertexAttribArray(1);
+
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+                glEnableVertexAttribArray(2);
+
+                glBindVertexArray(0);
+            }
+
+            if (render_comp->type_ == RenderType::RT_Quad) {
+
+                auto& quad = render_comp->quad_;
+
+                glGenVertexArrays(1, &quad->VAO);
+                glGenBuffers(1, &quad->VBO);
+                glGenBuffers(1, &quad->EBO);
+
+                glBindVertexArray(quad->VAO);
+
+                glBindBuffer(GL_ARRAY_BUFFER, quad->VBO);
+                glBufferData(GL_ARRAY_BUFFER, quad->data_.size() * sizeof(float), quad->data_.data(), GL_STATIC_DRAW);
+
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quad->EBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, quad->order_.size() * sizeof(int), quad->order_.data(), GL_STATIC_DRAW);
+
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); // Position
+                glEnableVertexAttribArray(0);
+
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))); // Normal
+                glEnableVertexAttribArray(1);
+
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); // UV
+                glEnableVertexAttribArray(2);
+
+                glBindVertexArray(0);
+            }
+
+            if (render_comp->type_ == RenderType::RT_Cube) {
+
+
+                auto& cube = render_comp->cube_;
+                
+                glGenVertexArrays(1, &cube->VAO);
+                glGenBuffers(1, &cube->VBO);
+                glGenBuffers(1, &cube->EBO);
+
+                glBindVertexArray(cube->VAO);
+
+                glBindBuffer(GL_ARRAY_BUFFER, cube->VBO);
+                glBufferData(GL_ARRAY_BUFFER, cube->data_.size() * sizeof(float), cube->data_.data(), GL_STATIC_DRAW);
+
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube->EBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube->order_.size() * sizeof(int), cube->order_.data(), GL_STATIC_DRAW);
+
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); // Position
+                glEnableVertexAttribArray(0);
+
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))); // Normal
+                glEnableVertexAttribArray(1);
+
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); // UV
+                glEnableVertexAttribArray(2);
+
+                glBindVertexArray(0);
+
+            }
+
+
+
+
+           
         }
     }
     glUseProgram(0);
@@ -183,10 +305,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     // Terrain ---------------------------------------------------------------
 
                     if (render_comp->type_ == RenderType::RT_Terrain) {
-                        if (render_comp->terrain_ == nullptr) {
-                            printf("No terran\n");
-                            continue;
-                        }
+                        
 
                         auto& terrain = render_comp->terrain_;
 
@@ -217,12 +336,13 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
 
 
                     if (render_comp->type_ == RenderType::RT_Sphere) {
-                        if (render_comp->sphere_ == nullptr) {
-                            printf("No terran\n");
-                            continue;
-                        }
-
+                       
                         auto& sphere = render_comp->sphere_;
+
+                        if (!sphere) {
+                            std::cout << "Error: Sphere pointer is NULL!" << std::endl;
+                            continue; // Saltar la renderización si el puntero es nulo
+                        }
 
                         render_comp->shader.useProgram();
                         glCullFace(GL_BACK);
@@ -250,10 +370,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     }
 
                     if (render_comp->type_ == RenderType::RT_Cube) {
-                        if (render_comp->cube_ == nullptr) {
-                            printf("No Cube\n");
-                            continue;
-                        }
+                        
 
                         auto& cube = render_comp->cube_;
 
@@ -283,10 +400,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     }
 
                     if (render_comp->type_ == RenderType::RT_Quad) {
-                        if (render_comp->quad_ == nullptr) {
-                            printf("No Cube\n");
-                            continue;
-                        }
+                       
 
                         auto& quad = render_comp->quad_;
 
@@ -314,6 +428,8 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
                         glBindVertexArray(0);
                     }
+
+
                 }
             }
             light_count++;
@@ -382,13 +498,21 @@ void RenderSystem::setupEntities(ECSManager& ecs)
 size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader
 )
 {
+
+    //entity_ = ecs.create_entity();
+    auto mario_mesh = std::make_unique<Mesh>();
+
+    if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
+        return -1;
+    }
+
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
    
     ecs.get_component<RenderComponent>(entity_)->shader = mesh_shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Mesh;
-    ecs.get_component<RenderComponent>(entity_)->terrain_ = NULL;
-    ecs.get_component<RenderComponent>(entity_)->mesh_ = entity_mesh;
+ 
+    ecs.get_component<RenderComponent>(entity_)->mesh_ = std::move(mario_mesh);
 
     entity_++;
 
@@ -397,7 +521,9 @@ size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& en
 
 size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader, int cols , int rows)
 {
-    auto terrain = std::make_shared<Terrain>();
+   
+
+    auto terrain = std::make_unique<Terrain>();
     terrain->init(cols, rows, 1.0f, 1.0f, true, true);
    
     ecs.add_component<RenderComponent>(entity_);
@@ -405,10 +531,11 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader, int cols , i
 
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Terrain;
-    ecs.get_component<RenderComponent>(entity_)->terrain_ = terrain;
+    ecs.get_component<RenderComponent>(entity_)->terrain_ = std::move(terrain);
 
     ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
 
+   
     entity_++;
 
     return entity_;
@@ -417,7 +544,10 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader, int cols , i
 
 size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, int num_heights_, int num_revs_,float size)
 {
-    auto sphere = std::make_shared<Sphere>();
+
+   
+
+    auto sphere = std::make_unique<Sphere>();
     sphere->init(false,size ,num_heights_,num_revs_);
 
     ecs.add_component<RenderComponent>(entity_);
@@ -425,10 +555,19 @@ size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, int num_heigh
 
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Sphere;
-    ecs.get_component<RenderComponent>(entity_)->sphere_ = sphere;
+    ecs.get_component<RenderComponent>(entity_)->sphere_ = std::move(sphere);
+    auto renderComp = ecs.get_component<RenderComponent>(entity_);
+    if (renderComp && renderComp->sphere_) {
+        std::cout << "Sphere pointer valid" << std::endl;
+    }
+    else {
+        std::cout << "Sphere pointer is NULL!" << std::endl;
+    }
+
 
     ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
 
+    
     entity_++;
 
     return entity_;
@@ -436,18 +575,21 @@ size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, int num_heigh
 
 size_t RenderSystem::createCube8v(ECSManager& ecs, Shader& shader, const float size)
 {
-    auto cube = std::make_shared<Cube>();
-    cube->init8v(size);
 
+    
+    auto cube = std::make_unique<Cube>();
+    cube->init8v(size);
+   
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube;
-    ecs.get_component<RenderComponent>(entity_)->cube_ = cube;
+   ecs.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
 
     ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
 
+    
     entity_++;
 
     return entity_;
@@ -455,15 +597,17 @@ size_t RenderSystem::createCube8v(ECSManager& ecs, Shader& shader, const float s
 
 size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, const float size)
 {
-    auto cube = std::make_shared<Cube>();
-    cube->init24v(size);
+   
 
+    auto cube = std::make_unique<Cube>();
+    cube->init24v(size);
+   
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube;
-    ecs.get_component<RenderComponent>(entity_)->cube_ = cube;
+    ecs.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
 
     ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
 
@@ -474,7 +618,10 @@ size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, const float 
 
 size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, const float size)
 {
-    auto quad = std::make_shared<Quad>();
+
+    
+
+    auto quad = std::make_unique<Quad>();
     quad->init(size);
 
     ecs.add_component<RenderComponent>(entity_);
@@ -482,12 +629,12 @@ size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, const float siz
 
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Quad;
-    ecs.get_component<RenderComponent>(entity_)->quad_ = quad;
+    ecs.get_component<RenderComponent>(entity_)->quad_ = std::move(quad);
 
     ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
 
-    entity_++;
 
+    entity_ ++;
     return entity_;
     
 }
@@ -495,7 +642,7 @@ size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, const float siz
 
 size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader)
 {
-    std::shared_ptr<Mesh> lb_mesh = std::make_shared<Mesh>();
+    std::unique_ptr<Mesh> lb_mesh = std::make_unique<Mesh>();
     lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
 
     char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
@@ -516,7 +663,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
 
     render_comp->shader = lb_sh;
     render_comp->type_ = RenderType::RT_Light;
-    render_comp->mesh_ = lb_mesh;
+    render_comp->mesh_ = std::move(lb_mesh);
 
     // ----
 
@@ -541,7 +688,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
 
 size_t RenderSystem::createPointLight(ECSManager& ecs, const Shader& light_shader)
 {
-    std::shared_ptr<Mesh> lb_mesh = std::make_shared<Mesh>();
+    std::unique_ptr<Mesh> lb_mesh = std::make_unique<Mesh>();
     lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
 
     char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
@@ -562,7 +709,7 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, const Shader& light_shade
 
     render_comp->shader = lb_sh;
     render_comp->type_ = RenderType::RT_Light;
-    render_comp->mesh_ = lb_mesh;
+    render_comp->mesh_ = std::move(lb_mesh);
 
     // ----
 

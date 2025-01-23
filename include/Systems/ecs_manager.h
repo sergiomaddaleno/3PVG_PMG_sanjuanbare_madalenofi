@@ -19,7 +19,7 @@ struct ComponentListDerived : ComponentListBase {
 
 class ECSManager {
 public:
-	ECSManager() : last_entity(0) {}
+	ECSManager() : last_entity(-1) {}
 
 	size_t create_entity() {
 		// TODO Incrementar todas las listas
