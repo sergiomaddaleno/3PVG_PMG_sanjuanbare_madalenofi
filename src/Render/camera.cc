@@ -20,7 +20,7 @@ Camera::Camera()
     last_mouse(0.0f, 0.0f),
     delta_mouse(0.0f, 0.0f),
     accum_mouse_offset_(0.0f, 0.0f),
-    speed_(0.001f),
+    speed_(0.05f),
     sensitivity_(1.0f),
     fov_(45.0f),
     scroll_speed_(0.5f),
@@ -105,36 +105,9 @@ void Camera::update(Input& input, const double dt, const int window_width, const
     input.resetScroll();
 }
 
-
-void Camera::setSpeed(const float speed) {
-    speed_ = speed;
-}
-
-void Camera::setSensitibity(const float sensitivity) {
-    sensitivity_ = sensitivity;
-}
-
 void Camera::setViewMatrix(const glm::mat4 view)
 {
     view_ = view;
-}
-
-const float Camera::getSpeed() const {
-    return speed_;
-}
-
-const float Camera::getFov() const
-{
-    return fov_;
-}
-
-const glm::vec3 Camera::getPosition() const
-{
-    return position_;
-}
-
-const float Camera::getSensitivity() const {
-    return sensitivity_;
 }
 
 glm::mat4 Camera::getViewMatrix() const {

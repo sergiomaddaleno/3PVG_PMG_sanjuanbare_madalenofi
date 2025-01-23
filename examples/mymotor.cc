@@ -221,7 +221,7 @@ int main(int, char**) {
     imgui_manager.Init(window->getWindow());
     data_imgui.ecs = &ecs;
     data_imgui.shader = entities_shader;
-    data_imgui.render_system = &render_system;
+    data_imgui.render_system = render_system;
 
     double lastTime = window->getTime();
     bool done = false;

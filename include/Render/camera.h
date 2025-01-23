@@ -21,32 +21,30 @@ public:
 
 	// ---
 
-	void setSpeed(const float speed);
+	const float getSpeed() const {return speed_;}
+	const float getSensitivity() const {return sensitivity_;}
+	const glm::vec3 getPosition() const{return position_;}
+	const float getFov() const{return fov_;}
 
-	void setSensitibity(const float sensitivity);
-
-	void setViewMatrix(const glm::mat4 view);
-
-	const float getSpeed() const;
-
-	const float getFov() const;
-
-	const glm::vec3 getPosition() const;
-
-	const float getSensitivity() const;
-
-	glm::mat4 getViewMatrix() const;
-
-	glm::mat4 getProjectionMatrix() const;
-
+	float getScrollSpeed() const { return scroll_speed_; }
+	glm::vec3 getViewDir() const { return view_direction_; }
+	glm::vec3 getUp() const { return up_; }
 
 	//--
+	void setSpeed(const float speed){ speed_ = speed; }
+	void setSensitibity(const float sensitivity){ sensitivity_ = sensitivity; }
 	void setPosition(glm::vec3 position) {position_ = position;}
+	void setFov(float fov) { fov_ = fov; }
+
 	void setScrollSpeed(float scroll_speed) { scroll_speed_ = scroll_speed; }
 	void setViewDir(glm::vec3 view_direction) {view_direction_ = view_direction;}
 	void setUp(glm::vec3 up) { up_ = up; }
-	void setFov(float fov) { fov_ = fov; }
 
+	//--
+	glm::mat4 getViewMatrix() const;
+	void setViewMatrix(const glm::mat4 view);
+
+	glm::mat4 getProjectionMatrix() const;
 
 private:
 
