@@ -28,8 +28,7 @@ class Terrain {
   std::vector<int> order_;
   std::vector<float> data_;
 
-  std::vector<int> elements_buffer;
-  std::vector<int> order_buffer;
+
 
 
 };

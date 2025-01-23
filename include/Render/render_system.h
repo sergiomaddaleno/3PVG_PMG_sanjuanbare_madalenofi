@@ -15,6 +15,7 @@
 #include "../Systems/ecs_manager.h"
 #include "Render/camera.h"
 
+
 struct LightInfo;
 
 class Mesh;
@@ -44,6 +45,8 @@ public:
 	size_t createMesh(ECSManager &ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader);
 
 	size_t createTerrain(ECSManager& ecs, Shader& shader,int cols ,int rows);
+
+	size_t createSphere(ECSManager& ecs, Shader& shader, int num_heights_, int num_revs_, float size);
 	
 	//Lights
 	size_t createSpotLight(ECSManager& ecs, const Shader& light_shader);

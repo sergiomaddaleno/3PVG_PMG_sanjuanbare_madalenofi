@@ -238,6 +238,7 @@ int main(int, char**) {
     render_system.createMesh(ecs, mario_mesh, entities_shader);
     render_system.createPointLight(ecs, entities_shader);
     render_system.createTerrain(ecs, entities_shader,500,500);
+    render_system.createSphere(ecs, entities_shader, 60, 60, 1.0f);
     
     render_system.initEntities(ecs);
    

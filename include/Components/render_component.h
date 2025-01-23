@@ -7,6 +7,7 @@
 #include "../Render/shader.h"
 #include "../Render/mesh.h"
 #include "../Geometry/terrain.h"
+#include "../Geometry/sphere.h"
 
 enum RenderType {
     RT_Default,
@@ -16,6 +17,7 @@ enum RenderType {
     RT_PostProcess,
     RT_Transparent,
     RT_Terrain,
+    RT_Sphere,
 };
 
 struct RenderComponent {
@@ -23,6 +25,7 @@ struct RenderComponent {
     std::shared_ptr<Mesh> mesh_;
     Triangle triangle_;
     std::shared_ptr<Terrain> terrain_;
+    std::shared_ptr<Sphere> sphere_;
 
     Shader shader;
     Texture texture;

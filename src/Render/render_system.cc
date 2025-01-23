@@ -4,13 +4,17 @@
 #include "Render/mesh.h"
 #include "Render/camera.h"
 #include "Render/shader.h"
-#include "Geometry/terrain.h"
+
+
 
 #include "utils.h"
 #include "global_variables.h"
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
 #include "Components\light_component.h"
+
+#include "Geometry/sphere.h"
+#include "Geometry/terrain.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -19,6 +23,8 @@
 
 #include <memory> 
 #include <iostream>
+
+
 
 #define M_PI 3.14159265358979323846
 
@@ -84,6 +90,41 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 glBindVertexArray(terrain->VAO);
                 glBindBuffer(GL_ARRAY_BUFFER, terrain->VBO);
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrain->EBO);
+
+
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+                glEnableVertexAttribArray(0);
+
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+                glEnableVertexAttribArray(1);
+
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+                glEnableVertexAttribArray(2);
+
+                glBindVertexArray(0);
+            }
+
+
+            if (render_comp->type_ == RenderType::RT_Sphere) {
+                if (render_comp->sphere_ == nullptr) {
+                    printf("No Sphere\n");
+                    continue;
+                }
+
+                auto& sphere = render_comp->sphere_;
+
+                glGenBuffers(1, &sphere->VBO);
+                glBindBuffer(GL_ARRAY_BUFFER, sphere->VBO);
+                glBufferData(GL_ARRAY_BUFFER, sphere->data_.size() * sizeof(float), sphere->data_.data(), GL_STATIC_DRAW);
+
+                glGenBuffers(1, &sphere->EBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->EBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphere->order_.size() * sizeof(int), sphere->order_.data(), GL_STATIC_DRAW);
+
+                glGenVertexArrays(1, &sphere->VAO);
+                glBindVertexArray(sphere->VAO);
+                glBindBuffer(GL_ARRAY_BUFFER, sphere->VBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->EBO);
 
 
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -240,6 +281,40 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         glDrawElements(GL_TRIANGLES, (terrain->num_cols_ * terrain->num_rows_) * 6, GL_UNSIGNED_INT, 0);
                         glBindVertexArray(0);
                     }
+
+
+                    if (render_comp->type_ == RenderType::RT_Sphere) {
+                        if (render_comp->sphere_ == nullptr) {
+                            printf("No terran\n");
+                            continue;
+                        }
+
+                        auto& sphere = render_comp->sphere_;
+
+                        render_comp->shader.useProgram();
+                        glCullFace(GL_BACK);
+
+                        glm::mat4 model = glm::mat4(1.0f);
+                        model = glm::translate(model, transform_comp->position);
+                        model = model * glm::mat4_cast(transform_comp->rotation);
+                        model = glm::scale(model, transform_comp->scale);
+
+                        glm::mat4 view = cam.getViewMatrix();
+                        glm::mat4 projection = cam.getProjectionMatrix();
+                        glm::mat4 mvp = projection * view * model;
+
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
+
+                        //Fog
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+
+                        glBindVertexArray(sphere->VAO);
+                        glDrawElements(GL_TRIANGLES, (sphere->num_heights_ * sphere->num_revs_) * 6, GL_UNSIGNED_INT, 0);
+                        glBindVertexArray(0);
+                    }
                 }
             }
             light_count++;
@@ -332,6 +407,26 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader, int cols , i
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Terrain;
     ecs.get_component<RenderComponent>(entity_)->terrain_ = terrain;
+
+    ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
+
+    entity_++;
+
+    return entity_;
+}
+
+
+size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, int num_heights_, int num_revs_,float size)
+{
+    auto sphere = std::make_shared<Sphere>();
+    sphere->init(false,size ,num_heights_,num_revs_);
+
+    ecs.add_component<RenderComponent>(entity_);
+    ecs.add_component<TransformComponent>(entity_);
+
+    ecs.get_component<RenderComponent>(entity_)->shader = shader;
+    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Sphere;
+    ecs.get_component<RenderComponent>(entity_)->sphere_ = sphere;
 
     ecs.add_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
 
