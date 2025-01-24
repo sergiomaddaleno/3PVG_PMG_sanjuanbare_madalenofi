@@ -258,6 +258,8 @@ int main(int, char**) {
         fb.width_ = window_width_;
         fb.height_ = window_height_;
         data_imgui.game_texture = captureTexture;
+        data_imgui.window = &window.value();
+        data_imgui.input = &input;
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         imgui_manager.Render(window->getWindow(), data_imgui);

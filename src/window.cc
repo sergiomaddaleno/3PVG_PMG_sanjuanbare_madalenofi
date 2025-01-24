@@ -55,9 +55,9 @@ void Window::setResizeCallback() {
 	glfwSetWindowUserPointer(window_, this);
 }
 
-bool Window::toggleFullScreen(Input& input, Input::Keys key)
+bool Window::toggleFullScreen(Input& input, Input::Keys key, bool imgui_enter)
 {
-	if (input.isKeyPressed(key))
+	if (input.isKeyPressed(key) || imgui_enter)
 	{
 		if (!full_screen)
 		{

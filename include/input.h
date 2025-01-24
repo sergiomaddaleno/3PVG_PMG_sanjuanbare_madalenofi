@@ -28,7 +28,8 @@ public:
         SPACEBAR,
         BACKSPACE,
 
-        Keys_End
+        Keys_End,
+        None,
     };
 
     enum MouseButton {

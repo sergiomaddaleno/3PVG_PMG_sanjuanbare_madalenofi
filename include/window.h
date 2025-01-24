@@ -42,7 +42,7 @@ public:
 
 	void setResizeCallback();
 
-	bool toggleFullScreen(Input &input, Input::Keys key = Input::Keys::F11);
+	bool toggleFullScreen(Input &input, Input::Keys key = Input::Keys::F11, bool imgui_enter=false);
 
 	bool closePressed();
 

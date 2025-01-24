@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "window.h"
+#include "input.h"
 #include "Render/camera.h"
 #include "Render/post_processing.h"
 #include "Render/skybox.h"
@@ -27,6 +28,8 @@ struct DataImgui {
     ECSManager* ecs;
     RenderSystem* render_system;
     Shader* shader;
+    Window* window;
+    Input* input;
     //Skybox sxybox;
     GLuint game_texture;
 };
@@ -55,6 +58,8 @@ public:
 
 private:
     int selected_entity = -1;
+    int entity_id = 0;
+
 };
 
 #endif // IGM

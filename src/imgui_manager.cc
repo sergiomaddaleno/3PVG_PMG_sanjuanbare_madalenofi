@@ -162,8 +162,6 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
     auto riend = loc_ecs->getComponentList<RenderComponent>().end();
     auto tiend = loc_ecs->getComponentList<TransformComponent>().end();
 
-    int entity_id = 0;
-
     int entity_mesh = 0;
     int entity_light = 0;
     int entity_terrain = 0;
@@ -174,7 +172,6 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
     for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
         if (ti->has_value()&&ri->has_value()) {
             auto& render_comp = *ri;
-           
 
             if (render_comp->type_ == RenderType::RT_Mesh&& !(*render_comp->light)) {
                 if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh)).c_str(), selected_entity == entity_id)) {
@@ -202,7 +199,6 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
                     selected_entity = entity_id;
                 }
                 entity_sphere++;
-
             }
 
             if (render_comp->type_ == RenderType::RT_Quad) {
@@ -230,6 +226,18 @@ void ImGuiManager::Inspector(DataImgui& di) {
 
     Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
 
+    auto& loc_ecs = di.ecs;
+
+    //--
+    auto ri = loc_ecs->getComponentList<RenderComponent>().begin();
+    auto ti = loc_ecs->getComponentList<TransformComponent>().begin();
+    auto riend = loc_ecs->getComponentList<RenderComponent>().end();
+    auto tiend = loc_ecs->getComponentList<TransformComponent>().end();
+
+    if (selected_entity == RenderType::RT_Mesh) {
+
+    }
+
     ImGui::End();
 }
 
@@ -250,22 +258,9 @@ void ImGuiManager::TopBar(DataImgui& di) {
 
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("Settings")) {
-            static float camSpeed = di.cam.getSpeed(); 
-            static float camFov = di.cam.getFov();  
-            static bool accept_button = false;
-
-            if (ImGui::SliderFloat("Camera Speed", &camSpeed, 0.1f, 10.0f, "%.2f")) {
-                accept_button = true;
-            }
-
-            if (ImGui::SliderFloat("Camera FOV", &camFov, 30.0f, 120.0f, "%.1f")) {
-                accept_button = true;
-            }
-
-            if (ImGui::Button("Apply") && accept_button) {
-                di.cam.setSpeed(camSpeed);
-                di.cam.setFov(camFov);   
-                accept_button = false;
+            
+            if (ImGui::MenuItem("Toggle Full Screen [F11]")) {
+                di.window->toggleFullScreen(*di.input, Input::None, true);
             }
 
             ImGui::EndMenu();
@@ -300,48 +295,55 @@ void ImGuiManager::TopBar(DataImgui& di) {
 
         if (ImGui::BeginMenu("Tools")) {
 
-            if (ImGui::MenuItem("Add Sphere")) {
-                di.render_system->createSphere(loc_ecs, *di.shader);
+            if (ImGui::BeginMenu("Add Geometry")) {
 
-                di.render_system->initEntities(loc_ecs);
-               
+                if (ImGui::MenuItem("Sphere")) {
+                    di.render_system->createSphere(loc_ecs, *di.shader);
+                    di.render_system->initEntities(loc_ecs);
+                }
+
+                if (ImGui::MenuItem("Cube 8v")) {
+                    di.render_system->createCube8v(loc_ecs, *di.shader);
+                    di.render_system->initEntities(loc_ecs);
+                }
+
+                if (ImGui::MenuItem("Cube 24v")) {
+                    di.render_system->createCube24v(loc_ecs, *di.shader);
+                    di.render_system->initEntities(loc_ecs);
+                }
+
+                if (ImGui::MenuItem("Quad")) {
+                    di.render_system->createQuad(loc_ecs, *di.shader);
+                    di.render_system->initEntities(loc_ecs);
+                }
+
+                if (ImGui::MenuItem("Terrain")) {
+                    di.render_system->createTerrain(loc_ecs, *di.shader);
+                    di.render_system->initEntities(loc_ecs);
+                }
+
+                ImGui::EndMenu();
             }
+            
+            if (ImGui::BeginMenu("Add Light")) {
 
-            if (ImGui::MenuItem("Add Cube 8v")) {
-                di.render_system->createCube8v(loc_ecs, *di.shader);
-                di.render_system->initEntities(loc_ecs);
+                if (ImGui::MenuItem("Point Light")) {
+                    di.render_system->createPointLight(loc_ecs, *di.shader);
+                    di.render_system->initEntities(loc_ecs);
+                }
+
+                if (ImGui::MenuItem("Spot Light")) {
+                    di.render_system->createSpotLight(loc_ecs, *di.shader);
+                    di.render_system->initEntities(loc_ecs);
+                }
+
+                if (ImGui::MenuItem("Directional Light")) {
+                    di.render_system->createDirectionalLight(loc_ecs, *di.shader);
+                    di.render_system->initEntities(loc_ecs);
+                }
+
+                ImGui::EndMenu();
             }
-
-            if (ImGui::MenuItem("Add Cube 24v")) {
-                di.render_system->createCube24v(loc_ecs, *di.shader);
-                di.render_system->initEntities(loc_ecs);
-            }
-
-            if (ImGui::MenuItem("Add Quad")) {
-                di.render_system->createQuad(loc_ecs, *di.shader);
-                di.render_system->initEntities(loc_ecs);
-            }
-
-            if (ImGui::MenuItem("Add Terrain")) {
-                di.render_system->createTerrain(loc_ecs, *di.shader);
-                di.render_system->initEntities(loc_ecs);
-            }
-
-            if (ImGui::MenuItem("Add Light")) {
-                di.render_system->createPointLight(loc_ecs, *di.shader);
-                
-                di.render_system->initEntities(loc_ecs);
-
-            }
-
-            if (ImGui::MenuItem("Add Spot Light")) {
-                di.render_system->createSpotLight(loc_ecs, *di.shader);
-
-                di.render_system->initEntities(loc_ecs);
-
-            }
-
-
             ImGui::EndMenu();
         }
 
