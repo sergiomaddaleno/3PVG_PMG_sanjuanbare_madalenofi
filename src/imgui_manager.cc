@@ -162,6 +162,9 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
     auto riend = loc_ecs->getComponentList<RenderComponent>().end();
     auto tiend = loc_ecs->getComponentList<TransformComponent>().end();
 
+    int entity_id = 0;
+
+
     int entity_mesh = 0;
     int entity_light = 0;
     int entity_terrain = 0;
@@ -226,23 +229,13 @@ void ImGuiManager::Inspector(DataImgui& di) {
 
     Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
 
-    auto& loc_ecs = di.ecs;
-
-    //--
-    auto ri = loc_ecs->getComponentList<RenderComponent>().begin();
-    auto ti = loc_ecs->getComponentList<TransformComponent>().begin();
-    auto riend = loc_ecs->getComponentList<RenderComponent>().end();
-    auto tiend = loc_ecs->getComponentList<TransformComponent>().end();
-
-    if (selected_entity == RenderType::RT_Mesh) {
-
-    }
 
     ImGui::End();
 }
 
 void ImGuiManager::ContentBrowser(DataImgui& di) {
     ImGui::Begin("-ContentBrowser");
+
 
     ImGui::End();
 }

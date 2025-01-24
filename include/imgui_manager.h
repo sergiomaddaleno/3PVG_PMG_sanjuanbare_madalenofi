@@ -58,7 +58,6 @@ public:
 
 private:
     int selected_entity = -1;
-    int entity_id = 0;
 
 };
 
