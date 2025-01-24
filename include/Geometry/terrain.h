@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <vector>
+#include "Render/texture.h"
 
 class Terrain {
  public:
@@ -28,8 +29,7 @@ class Terrain {
   std::vector<int> order_;
   std::vector<float> data_;
 
-
-
+  Texture tex;
 
 };
 
