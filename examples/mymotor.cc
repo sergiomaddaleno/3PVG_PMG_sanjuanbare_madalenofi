@@ -203,7 +203,7 @@ int main(int, char**) {
 
     render_system.createMesh(ecs, mario_mesh, entities_shader);
    
-    render_system.createPointLight(ecs, entities_shader);
+    render_system.createDirectionalLight(ecs, entities_shader);
  
     render_system.createTerrain(ecs, entities_shader);
 
@@ -230,9 +230,12 @@ int main(int, char**) {
 
     double lastTime = window->getTime();
     bool done = false;
+
+    float dt;
+    double currentTime;
     while (!done) {
-        double currentTime = window->getTime();
-        float dt = float(currentTime - lastTime);
+        currentTime = window->getTime();
+        dt = float(currentTime - lastTime);
         window->updateWindow();
         window->toggleFullScreen(input);
 

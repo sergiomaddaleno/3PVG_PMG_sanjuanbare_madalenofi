@@ -793,9 +793,9 @@ size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light
     light_comp->shader = light_shader;
     light_comp->light_info.type_ = LightType::LT_Directional;
 
-    light_comp->light_info.dir_ = glm::vec3(0.0f, -1.0f, 1.0f);
-    light_comp->light_info.light_color_ = glm::vec3(4.0f, 4.0f, 0.0f);
-    light_comp->light_info.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
+    light_comp->light_info.dir_ = glm::vec3(0.0f, -200.0f, 1.0f);
+    light_comp->light_info.light_color_ = glm::vec3(0.98f, 0.98f, 0.9f);
+    light_comp->light_info.ambient_color_ = glm::vec3(0.5f, 0.5f, 0.5f);
 
     light_comp->light_info.linear_att = 0.0f;
     light_comp->light_info.quad_att_ = 0.0f;
