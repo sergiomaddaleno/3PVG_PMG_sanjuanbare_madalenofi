@@ -57,7 +57,7 @@ public:
 	//Lights
 	size_t createSpotLight(ECSManager& ecs, const Shader& light_shader);
 
-	size_t createPointLight(ECSManager& ecs, const Shader& light_shader);
+	size_t createPointLight(ECSManager& ecs, Shader& light_shader);
 
 	size_t createDirectionalLight(ECSManager& ecs, const Shader& light_shader);
 

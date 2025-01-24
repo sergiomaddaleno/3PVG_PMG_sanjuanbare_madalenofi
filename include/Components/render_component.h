@@ -32,6 +32,7 @@ struct RenderComponent {
     std::unique_ptr<Sphere> sphere_;
     std::unique_ptr<Cube> cube_;
     std::unique_ptr<Quad> quad_;
+    std::unique_ptr<bool> light;
 
     Shader shader;
     Texture texture;
@@ -49,6 +50,7 @@ struct RenderComponent {
         sphere_(other.sphere_ ? std::make_unique<Sphere>(*other.sphere_) : nullptr),
         cube_(other.cube_ ? std::make_unique<Cube>(*other.cube_) : nullptr),
         quad_(other.quad_ ? std::make_unique<Quad>(*other.quad_) : nullptr),
+        light(other.light ? std::make_unique<bool>(*other.light) : nullptr),
         triangle_(other.triangle_),
         texture(other.texture),
         shader(other.shader),
@@ -63,6 +65,7 @@ struct RenderComponent {
             sphere_ = other.sphere_ ? std::make_unique<Sphere>(*other.sphere_) : nullptr;
             cube_ = other.cube_ ? std::make_unique<Cube>(*other.cube_) : nullptr;
             quad_ = other.quad_ ? std::make_unique<Quad>(*other.quad_) : nullptr;
+            light = other.light ? std::make_unique<bool>(*other.light) : nullptr;
         }
         return *this;
     }

@@ -45,8 +45,7 @@ static char infoLog[512];
 #include <cassert>
 
 void CheckGPUErrors(unsigned int code, const char* str, bool link) {
-    
-    // Check for OpenGL errors
+   
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
         std::string errorMessage;
@@ -61,7 +60,7 @@ void CheckGPUErrors(unsigned int code, const char* str, bool link) {
         std::cerr << "[OpenGL Error] " << errorMessage << " at: " << str << std::endl;
     }
 
-    // Check for shader or program errors
+   
     int success = 0;
     char infoLog[512] = { 0 };
 
@@ -80,6 +79,12 @@ void CheckGPUErrors(unsigned int code, const char* str, bool link) {
         }
     }
 
-    assert(error == GL_NO_ERROR && success);
+   
+    if (error != GL_NO_ERROR || !success) {
+        std::cerr << "OpenGL Error or Shader Compilation Failure occurred!" << std::endl;
+    }
+
+   assert(error == GL_NO_ERROR && success);
 }
+
 

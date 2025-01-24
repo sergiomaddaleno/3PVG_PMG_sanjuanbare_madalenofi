@@ -25,8 +25,8 @@ struct DataImgui {
     //LightInfo light_info;
     PostProcessing post_proccessing;
     ECSManager* ecs;
-    RenderSystem render_system;
-    Shader shader;
+    RenderSystem* render_system;
+    Shader* shader;
     //Skybox sxybox;
     GLuint game_texture;
 };

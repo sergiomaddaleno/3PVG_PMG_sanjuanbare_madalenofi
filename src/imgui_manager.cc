@@ -164,11 +164,59 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
 
     int entity_id = 0;
 
-    for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
-        if (ti->has_value()) {
+    int entity_mesh = 0;
+    int entity_light = 0;
+    int entity_terrain = 0;
+    int entity_sphere = 0;
+    int entity_quad = 0;
+    int entity_cube = 0;
 
-            if (ImGui::Selectable(("Entity " + std::to_string(entity_id)).c_str(), selected_entity == entity_id)) {
-                selected_entity = entity_id;
+    for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
+        if (ti->has_value()&&ri->has_value()) {
+            auto& render_comp = *ri;
+           
+
+            if (render_comp->type_ == RenderType::RT_Mesh&& !(*render_comp->light)) {
+                if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh)).c_str(), selected_entity == entity_id)) {
+                    selected_entity = entity_id;
+                }
+                entity_mesh++;
+            }
+
+            if (render_comp->type_ == RenderType::RT_Mesh && *render_comp->light) {
+                if (ImGui::Selectable(("Light " + std::to_string(entity_light)).c_str(), selected_entity == entity_id)) {
+                    selected_entity = entity_id;
+                }
+                entity_light++;
+            }
+
+            if (render_comp->type_ == RenderType::RT_Terrain) {
+                if (ImGui::Selectable(("Terrain " + std::to_string(entity_terrain)).c_str(), selected_entity == entity_id)) {
+                    selected_entity = entity_id;
+                }
+                entity_terrain++;
+            }
+
+            if (render_comp->type_ == RenderType::RT_Sphere) {
+                if (ImGui::Selectable(("Sphere " + std::to_string(entity_sphere)).c_str(), selected_entity == entity_id)) {
+                    selected_entity = entity_id;
+                }
+                entity_sphere++;
+
+            }
+
+            if (render_comp->type_ == RenderType::RT_Quad) {
+                if (ImGui::Selectable(("Quad " + std::to_string(entity_quad)).c_str(), selected_entity == entity_id)) {
+                    selected_entity = entity_id;
+                }
+                entity_quad++;
+            }
+
+            if (render_comp->type_ == RenderType::RT_Cube) {
+                if (ImGui::Selectable(("Cube " + std::to_string(entity_cube)).c_str(), selected_entity == entity_id)) {
+                    selected_entity = entity_id;
+                }
+                entity_cube++;
             }
         }
     }
@@ -253,31 +301,46 @@ void ImGuiManager::TopBar(DataImgui& di) {
         if (ImGui::BeginMenu("Tools")) {
 
             if (ImGui::MenuItem("Add Sphere")) {
-                di.render_system.createSphere(loc_ecs, di.shader);
+                di.render_system->createSphere(loc_ecs, *di.shader);
 
-                di.render_system.initEntities(loc_ecs);
+                di.render_system->initEntities(loc_ecs);
                
             }
 
             if (ImGui::MenuItem("Add Cube 8v")) {
-                di.render_system.createCube8v(loc_ecs, di.shader);
-                di.render_system.initEntities(loc_ecs);
+                di.render_system->createCube8v(loc_ecs, *di.shader);
+                di.render_system->initEntities(loc_ecs);
             }
 
             if (ImGui::MenuItem("Add Cube 24v")) {
-                di.render_system.createCube24v(loc_ecs, di.shader);
-                di.render_system.initEntities(loc_ecs);
+                di.render_system->createCube24v(loc_ecs, *di.shader);
+                di.render_system->initEntities(loc_ecs);
             }
 
             if (ImGui::MenuItem("Add Quad")) {
-                di.render_system.createQuad(loc_ecs, di.shader);
-                di.render_system.initEntities(loc_ecs);
+                di.render_system->createQuad(loc_ecs, *di.shader);
+                di.render_system->initEntities(loc_ecs);
             }
 
             if (ImGui::MenuItem("Add Terrain")) {
-                di.render_system.createTerrain(loc_ecs, di.shader);
-                di.render_system.initEntities(loc_ecs);
+                di.render_system->createTerrain(loc_ecs, *di.shader);
+                di.render_system->initEntities(loc_ecs);
             }
+
+            if (ImGui::MenuItem("Add Light")) {
+                di.render_system->createPointLight(loc_ecs, *di.shader);
+                
+                di.render_system->initEntities(loc_ecs);
+
+            }
+
+            if (ImGui::MenuItem("Add Spot Light")) {
+                di.render_system->createSpotLight(loc_ecs, *di.shader);
+
+                di.render_system->initEntities(loc_ecs);
+
+            }
+
 
             ImGui::EndMenu();
         }

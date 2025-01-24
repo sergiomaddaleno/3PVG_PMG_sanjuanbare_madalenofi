@@ -199,9 +199,12 @@ int main(int, char**) {
 
     //ECS
     render_system.setupEntities(ecs);
+    
 
     render_system.createMesh(ecs, mario_mesh, entities_shader);
+   
     render_system.createPointLight(ecs, entities_shader);
+ 
     render_system.createTerrain(ecs, entities_shader);
 
     render_system.createSphere(ecs, entities_shader, 60, 60,1.0f);
@@ -222,8 +225,8 @@ int main(int, char**) {
     //InitImGui(window->getWindow());
     imgui_manager.Init(window->getWindow());
     data_imgui.ecs = &ecs;
-    data_imgui.shader = entities_shader;
-    data_imgui.render_system = render_system;
+    data_imgui.shader = &entities_shader;
+    data_imgui.render_system = &render_system;
 
     double lastTime = window->getTime();
     bool done = false;
