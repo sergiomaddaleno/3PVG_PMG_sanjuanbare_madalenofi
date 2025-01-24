@@ -9,9 +9,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "..\include\Components\transform_component.h"
-#include "..\include\Components\render_component.h"
-
 enum LightType {
     LT_Directional,
     LT_Spot,
@@ -21,7 +18,6 @@ enum LightType {
 struct LightInfo {
 
     LightType type_;
-    int id_;
 
     // --
 
@@ -40,9 +36,8 @@ struct LightInfo {
 
     // --
 
-    LightInfo()
-        : type_(LightType::LT_Spot),
-        id_(0),
+    LightInfo() : 
+        type_(LightType::LT_Spot),
         dir_(0.0f, 0.0f, 0.0f),
         diff_color_(0.0f, 0.0f, 0.0f),
         spec_color_(0.0f, 0.0f, 0.0f),

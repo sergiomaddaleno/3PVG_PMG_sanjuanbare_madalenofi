@@ -44,7 +44,10 @@ public:
 
 	size_t createMesh(ECSManager &ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader);
 
-	size_t createTerrain(ECSManager& ecs, Shader& shader, int cols = 40, int rows = 40);
+	size_t createTerrain(ECSManager& ecs, Shader& shader, 
+		const int num_cols = 2, const int num_rows = 2,
+		const float height_mult = 1.0f, const float size = 1.0f,
+		const bool is_centered = true, const bool use_perlin_noise = true);
 
 	size_t createSphere(ECSManager& ecs, Shader& shader, int num_heights_ = 60, int num_revs_ = 60, float size = 1.0f);
 

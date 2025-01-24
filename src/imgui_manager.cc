@@ -3,6 +3,10 @@
 #include "utils.h"
 #include "global_variables.h"
 #include "Render/post_processing.h"
+#include "Components/render_component.h"
+#include "Components/light_component.h"
+#include "Components/transform_component.h"
+
 #include "window.h"
 
 #include <GL/glew.h>
@@ -161,33 +165,31 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
     auto ti = loc_ecs->getComponentList<TransformComponent>().begin();
     auto riend = loc_ecs->getComponentList<RenderComponent>().end();
     auto tiend = loc_ecs->getComponentList<TransformComponent>().end();
+    auto li = loc_ecs->getComponentList<LightComponent>().begin();
+    auto liend = loc_ecs->getComponentList<LightComponent>().end();
 
     int entity_id = 0;
 
-
     int entity_mesh = 0;
-    int entity_light = 0;
     int entity_terrain = 0;
     int entity_sphere = 0;
     int entity_quad = 0;
     int entity_cube = 0;
+    int entity_spotlight = 0;
+    int entity_pointlight = 0;
+    int entity_dirlight = 0;
 
     for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
-        if (ti->has_value()&&ri->has_value()) {
-            auto& render_comp = *ri;
 
-            if (render_comp->type_ == RenderType::RT_Mesh&& !(*render_comp->light)) {
+        if (ti->has_value() && ri->has_value()) {
+            auto& render_comp = *ri;
+            auto& tranf_comp = *ti;
+
+            if (render_comp->type_ == RenderType::RT_Mesh) {
                 if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh)).c_str(), selected_entity == entity_id)) {
                     selected_entity = entity_id;
                 }
                 entity_mesh++;
-            }
-
-            if (render_comp->type_ == RenderType::RT_Mesh && *render_comp->light) {
-                if (ImGui::Selectable(("Light " + std::to_string(entity_light)).c_str(), selected_entity == entity_id)) {
-                    selected_entity = entity_id;
-                }
-                entity_light++;
             }
 
             if (render_comp->type_ == RenderType::RT_Terrain) {
@@ -217,9 +219,29 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
                 }
                 entity_cube++;
             }
+
+            if (render_comp->type_ == RenderType::RT_SpotLight) {
+                if (ImGui::Selectable(("Spot Light " + std::to_string(entity_spotlight)).c_str(), selected_entity == entity_id)) {
+                    selected_entity = entity_id;
+                }
+                entity_spotlight++;
+            }
+
+            if (render_comp->type_ == RenderType::RT_PointLight) {
+                if (ImGui::Selectable(("Point Light " + std::to_string(entity_pointlight)).c_str(), selected_entity == entity_id)) {
+                    selected_entity = entity_id;
+                }
+                entity_pointlight++;
+            }
+
+            if (render_comp->type_ == RenderType::RT_DirectionalLight) {
+                if (ImGui::Selectable(("Directional Light " + std::to_string(entity_dirlight)).c_str(), selected_entity == entity_id)) {
+                    selected_entity = entity_id;
+                }
+                entity_dirlight++;
+            }
         }
     }
-    //--
 
     ImGui::End();
 }
@@ -347,11 +369,12 @@ void ImGuiManager::TopBar(DataImgui& di) {
 }
 
 void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di) {
-    auto& loc_ecs = *(di.ecs);
 
     static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     static bool useSnap = false;
     static float snap[3] = { 1.0f, 1.0f, 1.0f };
+
+    auto& loc_ecs = di.ecs;
 
     ImGuizmo::BeginFrame();
     if (ImGui::Begin("-GameWindow", nullptr, ImGuiWindowFlags_NoTitleBar)) {
@@ -362,16 +385,21 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
 
         ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
-        auto ri = loc_ecs.getComponentList<RenderComponent>().begin();
-        auto ti = loc_ecs.getComponentList<TransformComponent>().begin();
+        auto ri = loc_ecs->getComponentList<RenderComponent>().begin();
+        auto ti = loc_ecs->getComponentList<TransformComponent>().begin();
+        auto li = loc_ecs->getComponentList<LightComponent>().begin();
+
+        auto riend = loc_ecs->getComponentList<RenderComponent>().end();
+        auto tiend = loc_ecs->getComponentList<TransformComponent>().end();
+        auto liend = loc_ecs->getComponentList<LightComponent>().end();
 
         int entity_id = 0;
 
-        for (; ri != loc_ecs.getComponentList<RenderComponent>().end() &&
-            ti != loc_ecs.getComponentList<TransformComponent>().end();
-            ++ri, ++ti, ++entity_id) {
+        for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
+            
+            // For mesh and geometry
             if (entity_id == selected_entity && ri->has_value() && ti->has_value()) {
-                auto& transform = loc_ecs.get_component<TransformComponent>(selected_entity);
+                auto& transform = loc_ecs->get_component<TransformComponent>(selected_entity);
 
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::translate(model, transform->position);
@@ -398,7 +426,9 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
                     transform->scale = scale;
                 }
             }
-        }
+
+            
+        }     
     }
     ImGui::End();
 

@@ -200,14 +200,11 @@ int main(int, char**) {
     //ECS
     render_system.setupEntities(ecs);
     
-
-    render_system.createMesh(ecs, mario_mesh, entities_shader);
-   
     render_system.createDirectionalLight(ecs, entities_shader);
- 
-    render_system.createTerrain(ecs, entities_shader);
+   
+    render_system.createMesh(ecs, mario_mesh, entities_shader);
 
-    render_system.createSphere(ecs, entities_shader, 60, 60,1.0f);
+    render_system.createTerrain(ecs, entities_shader, 300, 300, 4.0f, true, true);
 
     render_system.initEntities(ecs);
 
