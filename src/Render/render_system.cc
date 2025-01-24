@@ -89,6 +89,14 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 glBindBuffer(GL_ARRAY_BUFFER, terrain->VBO);
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrain->EBO);
 
+
+                std::string texturePath = "../assets/textures/snow/cesped.jpg";
+
+
+                if (terrain->tex.loadTexture(texturePath)) {
+                    printf("texture load");
+                }
+
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
 
@@ -119,6 +127,14 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere->EBO);
 
 
+                std::string texturePath = "../assets/textures/snow/blue.png";
+
+
+                if (sphere->tex.loadTexture(texturePath)) {
+                    printf("texture load");
+                }
+
+
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
                 glEnableVertexAttribArray(0);
 
@@ -146,6 +162,13 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quad->EBO);
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, quad->order_.size() * sizeof(int), quad->order_.data(), GL_STATIC_DRAW);
+
+                std::string texturePath = "../assets/textures/snow/blue.png";
+
+
+                if (quad->tex.loadTexture(texturePath)) {
+                    printf("texture load");
+                }
 
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); // Position
                 glEnableVertexAttribArray(0);
@@ -175,6 +198,13 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube->EBO);
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube->order_.size() * sizeof(int), cube->order_.data(), GL_STATIC_DRAW);
+
+                std::string texturePath = "../assets/textures/snow/blue.png";
+
+
+                if (cube->tex.loadTexture(texturePath)) {
+                    printf("texture load");
+                }
 
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); // Position
                 glEnableVertexAttribArray(0);
@@ -290,7 +320,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                             //Texture
                             render_comp->texture = mesh.getTexture(0);
                             render_comp->texture.bind();
-                            float tex_id = 0.0f;
+                            int tex_id = 0;
                             render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
 
                             //Fog
@@ -320,6 +350,11 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         glm::mat4 view = cam.getViewMatrix();
                         glm::mat4 projection = cam.getProjectionMatrix();
                         glm::mat4 mvp = projection * view * model;
+
+                        render_comp->texture = terrain->tex;
+                        render_comp->texture.bind();
+                        int tex_id = 0;
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
                         
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
@@ -356,6 +391,11 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         glm::mat4 projection = cam.getProjectionMatrix();
                         glm::mat4 mvp = projection * view * model;
 
+                        render_comp->texture = sphere->tex;
+                        render_comp->texture.bind();
+                        int tex_id = 0;
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
+
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
@@ -386,6 +426,11 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         glm::mat4 projection = cam.getProjectionMatrix();
                         glm::mat4 mvp = projection * view * model;
 
+                        render_comp->texture = cube->tex;
+                        render_comp->texture.bind();
+                        int tex_id = 0;
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
+
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
@@ -415,6 +460,11 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         glm::mat4 view = cam.getViewMatrix();
                         glm::mat4 projection = cam.getProjectionMatrix();
                         glm::mat4 mvp = projection * view * model;
+
+                        render_comp->texture = quad->tex;
+                        render_comp->texture.bind();
+                        int tex_id = 0;
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
 
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));

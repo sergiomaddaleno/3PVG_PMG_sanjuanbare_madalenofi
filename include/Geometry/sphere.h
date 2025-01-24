@@ -5,7 +5,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
+#include "Render/texture.h"
 #include <memory>
 #include <vector>
 
@@ -26,7 +26,7 @@ class Sphere {
   std::vector<int> order_;
   std::vector<float> data_;
 
-
+  Texture tex;
 
 };
 

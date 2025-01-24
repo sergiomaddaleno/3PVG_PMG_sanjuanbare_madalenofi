@@ -7,6 +7,10 @@
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
 #include <../deps/glm/gtc/quaternion.hpp>
+#include "../deps/stb_image.h"
+#include <string>
+#include <iostream>
+
 
 Terrain::Terrain() {
         num_rows_ = 0;
@@ -176,6 +180,16 @@ void Terrain::init(const int num_cols, const int num_rows,
                 order_.push_back(base_index + num_rows + 2);
             }
         }
+
+
+     
+           
+
+          
+         
+                
+            
+        
         
 }
 

@@ -5,7 +5,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
+#include "Render/texture.h"
 #include <memory>
 #include <vector>
 
@@ -25,7 +25,7 @@ class Cube {
   int type = 0;
 
 
-
+  Texture tex;
 
 };
 
