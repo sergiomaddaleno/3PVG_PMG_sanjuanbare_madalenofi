@@ -5,6 +5,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "../deps/nlohmann/json.hpp"
+
 enum Type;
 
 class Shader {
@@ -24,6 +26,20 @@ public:
 	void useProgram();
 
 	GLuint getProgram();
+
+    //Save data
+    nlohmann::json serialize() const {
+        nlohmann::json json_data;
+
+        json_data["program"] = program_;
+
+        return json_data;
+    }
+
+    nlohmann::json deSerialize(nlohmann::json& j) {
+		j.at("program").get<GLuint>();
+		return j;
+    }
 
 private:
 

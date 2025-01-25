@@ -10,7 +10,6 @@ uniform bool u_fog;
 vec3 skyColour = vec3(0.5, 0.5, 0.5);
 in float visibility;
 
-
 out vec4 FragColor;
 
 in vec3 normal;
@@ -122,5 +121,5 @@ void main() {
 
    if(u_fog){
         FragColor = mix(vec4(skyColour, 1.0), FragColor, visibility);
-    }
+   }
 }

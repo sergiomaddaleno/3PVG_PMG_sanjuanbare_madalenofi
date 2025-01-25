@@ -17,6 +17,7 @@
 #include "Systems/ecs_manager.h"
 #include "utils.h"
 #include "framebuffer.h"
+#include "save_manager.h"
 
 //Todo lo que quiero que se edite en imgui
 struct DataImgui {
@@ -32,6 +33,8 @@ struct DataImgui {
     Input* input;
     //Skybox sxybox;
     GLuint game_texture;
+
+    SaveManager save_manager;
 };
 
 static DataImgui data_imgui;

@@ -25,6 +25,9 @@
 
 #define M_PI 3.14159265358979323846
 
+auto simple_vertex = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
+auto simple_fragment = (char*)ReadFile("../assets/shaders/simple_fragment.fs");
+
 RenderSystem::RenderSystem(){}
 RenderSystem::~RenderSystem(){}
 
@@ -97,6 +100,8 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 glEnableVertexAttribArray(2);
 
                 glBindVertexArray(0);
+
+                //---
 
                 if (!terrain->tex.loadTexture("../assets/textures/images/grass.jpg")) {
                     printf("Texture not found\n");
@@ -206,7 +211,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
                 glBindVertexArray(0);
 
-                //--
+                //-- 
 
                 if (!cube->tex.loadTexture("../assets/textures/images/blue.png")) {
                     printf("Texture not found\n");
@@ -313,7 +318,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                             render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
 
                             //Fog
-                            render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+                            render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
 
                             glBindVertexArray(mesh.VAO);
                             glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
@@ -351,7 +356,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
 
                         //Fog
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
 
                         glBindVertexArray(terrain->VAO);
                         glDrawElements(GL_TRIANGLES, (terrain->num_cols_ * terrain->num_rows_) * 6, GL_UNSIGNED_INT, 0);
@@ -387,7 +392,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
 
                         //Fog
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
 
                         glBindVertexArray(sphere->VAO);
                         glDrawElements(GL_TRIANGLES, (sphere->num_heights_ * sphere->num_revs_) * 6, GL_UNSIGNED_INT, 0);
@@ -422,7 +427,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
 
                         //Fog
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
 
                         glBindVertexArray(cube->VAO);
                         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
@@ -457,7 +462,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
 
                         //Fog
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
 
                         glBindVertexArray(quad->VAO);
                         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -510,7 +515,7 @@ void RenderSystem::renderMesh(ECSManager& ecs, Camera cam)
                 render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture1"), Type::T_INT_1, &tex_id);
 
                 // Fog
-                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+                render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
 
                 glBindVertexArray(mesh.VAO);
                 glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
@@ -641,9 +646,6 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
 {
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
-
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_SpotLight;
 
     // ----
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
@@ -671,9 +673,6 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader)
 {
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
-
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_PointLight;
 
     //--
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
@@ -700,9 +699,7 @@ size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light
 {
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
 
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_DirectionalLight;
     // ----
 
     auto& light_comp = ecs.get_component<LightComponent>(entity_);

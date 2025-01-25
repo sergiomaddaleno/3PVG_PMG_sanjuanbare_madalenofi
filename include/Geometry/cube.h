@@ -17,16 +17,33 @@ class Cube {
     void init8v(const float cube_size = 1.0f);
     void init24v(const float cube_size = 1.0f);
 
-  GLuint VAO = 0, VBO = 0, EBO = 0;
+    GLuint VAO = 0, VBO = 0, EBO = 0;
 
+    std::vector<int> order_;
+    std::vector<float> data_;
 
-  std::vector<int> order_;
-  std::vector<float> data_;
-  int type = 0;
+    Texture tex;
 
+    //Save data
+    nlohmann::json serialize() const {
+        nlohmann::json json_data;
 
-  Texture tex;
+        json_data["Texture"].push_back(tex.serialize());
+        json_data["VAO"] = VAO;
+        json_data["VBO"] = VBO;
+        json_data["EBO"] = EBO;
 
+        return json_data;
+    }
+
+    nlohmann::json deSerialize(nlohmann::json& j) {
+        tex.deSerialize(j["Texture"][0]);
+        VAO = j["VAO"].get<GLuint>();
+        VBO = j["VBO"].get<GLuint>();
+        EBO = j["EBO"].get<GLuint>();
+
+        return j;
+    }
 };
 
 

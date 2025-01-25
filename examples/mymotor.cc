@@ -30,6 +30,7 @@
 #include "input.h"
 #include "Render/post_processing.h"
 #include "utils.h"
+#include "save_manager.h"
 #include "Render/skybox.h"
 #include "Systems/ecs_manager.h"
 #include "Systems/scripting.h"
@@ -64,6 +65,7 @@ ECSManager ecs;
 PostProcessing postProcc;
 RenderComponent render_comp;
 TransformComponent transf_comp;
+SaveManager save_manager;
 
 auto e = ecs.create_entity();
 int selected_entity = -1;
@@ -162,11 +164,11 @@ int main(int, char**) {
     bool lua_full_screen = ls.get_bool("full_screen");
     ls.pop();
 
-    window_width_ = lua_width;
-    window_height_ = lua_height;
+    g_window_width_ = lua_width;
+    g_window_height_ = lua_height;
     // --
 
-    auto window = Window::make(window_width_, window_height_, "Window ", lua_full_screen);
+    auto window = Window::make(g_window_width_, g_window_height_, "Window ", lua_full_screen);
     window->setWindowActive();
     window->initGLEW();
     window->setResizeCallback();
@@ -236,13 +238,13 @@ int main(int, char**) {
         window->updateWindow();
         window->toggleFullScreen(input);
 
-        window_width_ = window->getWidth();
-        window_height_ = window->getHeight();
-        postProcc.resize(window_width_, window_height_);
+        g_window_width_ = window->getWidth();
+        g_window_height_ = window->getHeight();
+        postProcc.resize(g_window_width_, g_window_height_);
 
         //--
         postProcc.beginRender();
-        cam.update(input, dt, window_width_, window_height_);
+        cam.update(input, dt, g_window_width_, g_window_height_);
 
         skybox.render(render_comp, cam);
 
@@ -255,8 +257,8 @@ int main(int, char**) {
         data_imgui.post_proccessing = postProcc;
 
         GLuint captureTexture = fb.captureWindowToTexture();
-        fb.width_ = window_width_;
-        fb.height_ = window_height_;
+        fb.width_ = g_window_width_;
+        fb.height_ = g_window_height_;
         data_imgui.game_texture = captureTexture;
         data_imgui.window = &window.value();
         data_imgui.input = &input;

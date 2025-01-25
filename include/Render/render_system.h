@@ -68,7 +68,6 @@ private:
 
 	size_t entity_ = 0;
 	int number_lights = 0;
-
 };
 
 #endif // RST

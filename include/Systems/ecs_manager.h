@@ -10,11 +10,19 @@
 
 struct ComponentListBase {
 	virtual ~ComponentListBase() {}
+
+	virtual void remove_entity(size_t entity_id) = 0;
 };
 
 template<typename T>
 struct ComponentListDerived : ComponentListBase {
 	std::vector<std::optional<T>> component_list_;
+
+	void remove_entity(size_t entity_id) override {
+		if (entity_id < component_list_.size()) {
+			component_list_[entity_id] = std::nullopt;
+		}
+	}
 };
 
 class ECSManager {
@@ -29,6 +37,17 @@ public:
 		}
 
 		return last_entity++;
+	}
+
+	void destroy_entity(size_t entity_id) {
+
+		for (auto& [key, component_list] : component_list_map_) {
+			auto* derived_list = static_cast<ComponentListDerived<std::any>*>(component_list.get());
+			if (derived_list) {
+				derived_list->remove_entity(entity_id);
+			}
+		}
+		last_entity--;
 	}
 
 	// delete_entity
@@ -95,8 +114,8 @@ public:
 private:
 	typedef std::unordered_map<size_t, std::unique_ptr<ComponentListBase>> map_type;
 	map_type component_list_map_;
-
 	size_t last_entity;
+
 };
 
 #endif // ECS

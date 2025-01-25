@@ -12,6 +12,8 @@
 #include "texture.h"
 #include "Render/camera.h"
 
+#include "../deps/nlohmann/json.hpp"
+
 struct RenderComponent;
 struct TransformComponent;
 
@@ -25,14 +27,6 @@ class Mesh {
 
 public:
     
-    bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
-
-    void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
-
-    Texture getTexture(int shape_index);
-
-    //--
-
     std::vector<Vertex> vertices;
     std::vector<Mesh> meshes;
     std::vector<Texture> textures;
@@ -41,6 +35,56 @@ public:
     int materialID;
 
     GLuint VAO = 0, VBO = 0, EBO = 0;
+
+    //---
+
+    bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
+
+    void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
+
+    Texture getTexture(int shape_index);
+
+    //Save data
+    nlohmann::json serialize() const {
+        nlohmann::json json_data;
+
+        for (const auto& mesh : meshes) {
+            json_data["meshes"].push_back(mesh.serialize());
+        }
+
+        for (const auto& texture : textures) {
+            json_data["textures"].push_back(texture.serialize());
+        }
+
+        json_data["materialID"] = materialID;
+        json_data["VAO"] = VAO;
+        json_data["VBO"] = VBO;
+        json_data["EBO"] = EBO;
+
+        return json_data;
+    }
+
+    void deSerialize(const nlohmann::json& j) {
+
+        for (const auto& mesh_json : j["meshes"]) {
+            Mesh mesh;
+            mesh.deSerialize(mesh_json);
+            meshes.push_back(mesh);
+        }
+
+        for (const auto& texture_json : j["textures"]) {
+            Texture texture;
+            texture.deSerialize(texture_json);
+            textures.push_back(texture);
+        }
+        
+        materialID = j["materialID"].get<int>();
+        VAO = j["VAO"].get<GLuint>();
+        VBO = j["VBO"].get<GLuint>();
+        EBO = j["EBO"].get<GLuint>();
+    }
+
+    //--
 
     Mesh() : VAO(0), VBO(0), EBO(0), materialID(0){};
 

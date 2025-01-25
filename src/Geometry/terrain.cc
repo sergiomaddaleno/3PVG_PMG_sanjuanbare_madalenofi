@@ -179,22 +179,8 @@ void Terrain::init(const int num_cols, const int num_rows,
                 order_.push_back(base_index + num_rows + 1);
                 order_.push_back(base_index + num_rows + 2);
             }
-        }
-
-
-     
-           
-
-          
-         
-                
-            
-        
-        
+        }    
 }
-
-
-
 
 float* Terrain::GetVertexTerrain()
 {

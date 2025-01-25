@@ -138,7 +138,7 @@ void Mesh::render(RenderComponent rc, TransformComponent tc, Camera cam)
         // ---
 
         // Fog
-        rc.shader.setUniformValue(rc.shader.getUniformLocation("u_fog"), Type::T_INT_1, &b_fog_);
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
 
 
         glBindVertexArray(rc.mesh_->VAO);

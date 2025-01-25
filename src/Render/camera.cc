@@ -114,5 +114,5 @@ glm::mat4 Camera::getViewMatrix() const {
 
 glm::mat4 Camera::getProjectionMatrix() const
 {
-    return glm::perspective(glm::radians(fov_), (float)window_width_ / (float)window_height_, 0.1f, 1000.0f);
+    return glm::perspective(glm::radians(fov_), (float)g_window_width_ / (float)g_window_height_, g_min_render_distance, g_max_render_distance);
 }

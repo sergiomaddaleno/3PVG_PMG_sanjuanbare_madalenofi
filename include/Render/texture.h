@@ -6,6 +6,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "../deps/nlohmann/json.hpp"
+
 class Texture {
 private:
     GLuint textureID;
@@ -30,6 +32,20 @@ public:
         Texture tex;
         tex.textureID = this->textureID;
         return tex;
+    }
+
+    //Save data
+    nlohmann::json serialize() const {
+        nlohmann::json json_data;
+
+        json_data["textureID"] = textureID;
+
+        return json_data;
+    }
+
+    nlohmann::json deSerialize(const nlohmann::json& j) const {
+        j.at("textureID").get<GLuint>();
+        return j;
     }
 };
 

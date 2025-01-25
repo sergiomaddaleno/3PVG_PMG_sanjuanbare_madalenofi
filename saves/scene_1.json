@@ -1,0 +1,252 @@
+{
+ "entities": [
+  {
+   "entity_id": 1,
+   "render_component": {
+    "mesh": {
+     "EBO": 0,
+     "VAO": 0,
+     "VBO": 0,
+     "materialID": 7,
+     "meshes": [
+      {
+       "EBO": 4,
+       "VAO": 2,
+       "VBO": 3,
+       "materialID": 0,
+       "textures": [
+        {
+         "textureID": 14
+        }
+       ]
+      },
+      {
+       "EBO": 6,
+       "VAO": 3,
+       "VBO": 5,
+       "materialID": 0,
+       "textures": [
+        {
+         "textureID": 15
+        }
+       ]
+      },
+      {
+       "EBO": 8,
+       "VAO": 4,
+       "VBO": 7,
+       "materialID": 0,
+       "textures": [
+        {
+         "textureID": 16
+        }
+       ]
+      },
+      {
+       "EBO": 10,
+       "VAO": 5,
+       "VBO": 9,
+       "materialID": 0,
+       "textures": [
+        {
+         "textureID": 17
+        }
+       ]
+      },
+      {
+       "EBO": 12,
+       "VAO": 6,
+       "VBO": 11,
+       "materialID": 0,
+       "textures": [
+        {
+         "textureID": 18
+        }
+       ]
+      },
+      {
+       "EBO": 14,
+       "VAO": 7,
+       "VBO": 13,
+       "materialID": 0,
+       "textures": [
+        {
+         "textureID": 19
+        }
+       ]
+      },
+      {
+       "EBO": 16,
+       "VAO": 8,
+       "VBO": 15,
+       "materialID": 0,
+       "textures": [
+        {
+         "textureID": 20
+        }
+       ]
+      },
+      {
+       "EBO": 18,
+       "VAO": 9,
+       "VBO": 17,
+       "materialID": 0,
+       "textures": [
+        {
+         "textureID": 21
+        }
+       ]
+      }
+     ]
+    },
+    "render_type": 1,
+    "shader": {
+     "program": 12
+    },
+    "texture": {
+     "textureID": 21
+    }
+   },
+   "transform_component": {
+    "position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "entity_id": 2,
+   "render_component": {
+    "render_type": 5,
+    "shader": {
+     "program": 12
+    },
+    "terrain": {
+     "EBO": 20,
+     "Texture": [
+      {
+       "textureID": 22
+      }
+     ],
+     "VAO": 10,
+     "VBO": 19
+    },
+    "texture": {
+     "textureID": 22
+    }
+   },
+   "transform_component": {
+    "position": [
+     0.0,
+     -5.0,
+     0.0
+    ],
+    "rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "entity_id": 3,
+   "light_component": {
+    "light_info": {
+     "Ambient Color": [
+      [
+       0.5,
+       0.5,
+       0.5
+      ]
+     ],
+     "Constant attenuation": [
+      1.0
+     ],
+     "Diffusion Color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       0.0,
+       -1.0,
+       1.0
+      ]
+     ],
+     "Light Color": [
+      [
+       0.9800000190734863,
+       0.9800000190734863,
+       0.8999999761581421
+      ]
+     ],
+     "Linear attenuation": [
+      0.0
+     ],
+     "Quadratic attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      0.0
+     ],
+     "Specular Color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Spot Angle": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    },
+    "shader": {
+     "program": 12
+    }
+   },
+   "transform_component": {
+    "position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  }
+ ]
+}

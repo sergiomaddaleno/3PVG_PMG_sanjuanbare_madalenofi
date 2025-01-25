@@ -9,6 +9,8 @@
 #include <memory>
 #include <vector>
 
+#include <../nlohmann/json.hpp>
+
 class Sphere {
  public:
      Sphere();
@@ -27,6 +29,28 @@ class Sphere {
   std::vector<float> data_;
 
   Texture tex;
+
+  //Save data
+  nlohmann::json serialize() const {
+      nlohmann::json json_data;
+
+      json_data["Texture"].push_back(tex.serialize());
+      json_data["VAO"] = VAO;
+      json_data["VBO"] = VBO;
+      json_data["EBO"] = EBO;
+
+      return json_data;
+  }
+
+  nlohmann::json deSerialize(nlohmann::json& j) {
+
+      tex.deSerialize(j["Texture"][0]);
+      VAO = j["VAO"].get<GLuint>();
+      VBO = j["VBO"].get<GLuint>();
+      EBO = j["EBO"].get<GLuint>();
+
+      return j;
+  }
 
 };
 

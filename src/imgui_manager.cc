@@ -6,6 +6,7 @@
 #include "Components/render_component.h"
 #include "Components/light_component.h"
 #include "Components/transform_component.h"
+#include "save_manager.h"
 
 #include "window.h"
 
@@ -185,63 +186,56 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
             auto& render_comp = *ri;
             auto& tranf_comp = *ti;
 
-            if (render_comp->type_ == RenderType::RT_Mesh) {
-                if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh)).c_str(), selected_entity == entity_id)) {
+            switch (render_comp->type_) {
+            case RenderType::RT_Mesh:
+                if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
-                }
-                entity_mesh++;
-            }
+                break;
 
-            if (render_comp->type_ == RenderType::RT_Terrain) {
-                if (ImGui::Selectable(("Terrain " + std::to_string(entity_terrain)).c_str(), selected_entity == entity_id)) {
+            case RenderType::RT_Terrain:
+                if (ImGui::Selectable(("Terrain " + std::to_string(entity_terrain++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
-                }
-                entity_terrain++;
-            }
+                break;
 
-            if (render_comp->type_ == RenderType::RT_Sphere) {
-                if (ImGui::Selectable(("Sphere " + std::to_string(entity_sphere)).c_str(), selected_entity == entity_id)) {
+            case RenderType::RT_Sphere:
+                if (ImGui::Selectable(("Sphere " + std::to_string(entity_sphere++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
-                }
-                entity_sphere++;
-            }
+                break;
 
-            if (render_comp->type_ == RenderType::RT_Quad) {
-                if (ImGui::Selectable(("Quad " + std::to_string(entity_quad)).c_str(), selected_entity == entity_id)) {
+            case RenderType::RT_Quad:
+                if (ImGui::Selectable(("Quad " + std::to_string(entity_quad++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
-                }
-                entity_quad++;
-            }
+                break;
 
-            if (render_comp->type_ == RenderType::RT_Cube) {
-                if (ImGui::Selectable(("Cube " + std::to_string(entity_cube)).c_str(), selected_entity == entity_id)) {
+            case RenderType::RT_Cube:
+                if (ImGui::Selectable(("Cube " + std::to_string(entity_cube++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
-                }
-                entity_cube++;
-            }
-
-            if (render_comp->type_ == RenderType::RT_SpotLight) {
-                if (ImGui::Selectable(("Spot Light " + std::to_string(entity_spotlight)).c_str(), selected_entity == entity_id)) {
-                    selected_entity = entity_id;
-                }
-                entity_spotlight++;
-            }
-
-            if (render_comp->type_ == RenderType::RT_PointLight) {
-                if (ImGui::Selectable(("Point Light " + std::to_string(entity_pointlight)).c_str(), selected_entity == entity_id)) {
-                    selected_entity = entity_id;
-                }
-                entity_pointlight++;
-            }
-
-            if (render_comp->type_ == RenderType::RT_DirectionalLight) {
-                if (ImGui::Selectable(("Directional Light " + std::to_string(entity_dirlight)).c_str(), selected_entity == entity_id)) {
-                    selected_entity = entity_id;
-                }
-                entity_dirlight++;
+                break;
             }
         }
     }
+
+     for (; li != liend; ++li, ++entity_id) {
+         if (li->has_value()) {
+
+             auto& light_comp = *li;
+
+             switch (light_comp->light_info.type_) {
+             case LightType::LT_Spot:
+                 if (ImGui::Selectable(("Spot Light " + std::to_string(entity_spotlight++)).c_str(), selected_entity == entity_id))
+                     selected_entity = entity_id;
+                 break;
+             case LightType::LT_Point:
+                 if (ImGui::Selectable(("Point Light " + std::to_string(entity_pointlight++)).c_str(), selected_entity == entity_id))
+                     selected_entity = entity_id;
+                 break;
+             case LightType::LT_Directional:
+                 if (ImGui::Selectable(("Directional Light " + std::to_string(entity_dirlight++)).c_str(), selected_entity == entity_id))
+                     selected_entity = entity_id;
+                 break;
+             }
+         }
+     }
 
     ImGui::End();
 }
@@ -251,6 +245,9 @@ void ImGuiManager::Inspector(DataImgui& di) {
 
     Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
 
+    if (selected_entity && ImGui::Button("Delete Entity")) {
+        di.ecs->destroy_entity(selected_entity);
+    }
 
     ImGui::End();
 }
@@ -276,6 +273,14 @@ void ImGuiManager::TopBar(DataImgui& di) {
             
             if (ImGui::MenuItem("Toggle Full Screen [F11]")) {
                 di.window->toggleFullScreen(*di.input, Input::None, true);
+            }
+
+            if (ImGui::MenuItem("Save Scene [CTRL + S]")) {
+                di.save_manager.saveToFile(*di.ecs, "../saves/scene_1.json");
+            }
+
+            if (ImGui::MenuItem("Load Scene")) {
+                di.save_manager.loadFromFile(*di.ecs, "../saves/scene_1.json");
             }
 
             ImGui::EndMenu();
@@ -387,17 +392,14 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
 
         auto ri = loc_ecs->getComponentList<RenderComponent>().begin();
         auto ti = loc_ecs->getComponentList<TransformComponent>().begin();
-        auto li = loc_ecs->getComponentList<LightComponent>().begin();
 
         auto riend = loc_ecs->getComponentList<RenderComponent>().end();
         auto tiend = loc_ecs->getComponentList<TransformComponent>().end();
-        auto liend = loc_ecs->getComponentList<LightComponent>().end();
 
         int entity_id = 0;
 
         for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
             
-            // For mesh and geometry
             if (entity_id == selected_entity && ri->has_value() && ti->has_value()) {
                 auto& transform = loc_ecs->get_component<TransformComponent>(selected_entity);
 
