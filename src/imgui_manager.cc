@@ -26,6 +26,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include <../deps/imfilebrowser.h>
+
 #include "ImGuizmo.h"
 #include "ImSequencer.h"
 #include "ImZoomSlider.h"
@@ -37,6 +39,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <../deps/glm/gtx/matrix_decompose.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
+
+ImGui::FileBrowser fileDialog;
 
 ImGuiManager::ImGuiManager() {}
 
@@ -56,6 +60,16 @@ void ImGuiManager::Init(GLFWwindow* window) {
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+    //Content browser init
+    fileDialog.SetTitle("title");
+    fileDialog.SetTypeFilters({ 
+        ".h", ".cc", ".hpp", ".cpp", 
+        ".png", ".jpg", ".mtl",
+        ".lua", ".json", 
+        ".obj", 
+        ".vs", ".fs", 
+    });
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -180,9 +194,9 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
     int entity_pointlight = 0;
     int entity_dirlight = 0;
 
-    for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
+    for (; ri != riend; ++ri, ++entity_id) {
 
-        if (ti->has_value() && ri->has_value()) {
+        if (ri->has_value()) {
             auto& render_comp = *ri;
             auto& tranf_comp = *ti;
 
@@ -254,6 +268,12 @@ void ImGuiManager::Inspector(DataImgui& di) {
 
 void ImGuiManager::ContentBrowser(DataImgui& di) {
     ImGui::Begin("-ContentBrowser");
+
+    if (ImGui::Button("Open File")) {
+        fileDialog.Open();
+    }
+
+    fileDialog.Display();
 
 
     ImGui::End();
@@ -390,17 +410,17 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
 
         ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
-        auto ri = loc_ecs->getComponentList<RenderComponent>().begin();
         auto ti = loc_ecs->getComponentList<TransformComponent>().begin();
-
-        auto riend = loc_ecs->getComponentList<RenderComponent>().end();
+        auto li = loc_ecs->getComponentList<LightComponent>().begin();
         auto tiend = loc_ecs->getComponentList<TransformComponent>().end();
+        auto liend = loc_ecs->getComponentList<LightComponent>().end();
 
         int entity_id = 0;
 
-        for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity_id) {
+        for (; ti != tiend; ++ti, ++entity_id) {
             
-            if (entity_id == selected_entity && ri->has_value() && ti->has_value()) {
+            if (entity_id == selected_entity && ti->has_value()) {
+
                 auto& transform = loc_ecs->get_component<TransformComponent>(selected_entity);
 
                 glm::mat4 model = glm::mat4(1.0f);
@@ -428,8 +448,6 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
                     transform->scale = scale;
                 }
             }
-
-            
         }     
     }
     ImGui::End();
