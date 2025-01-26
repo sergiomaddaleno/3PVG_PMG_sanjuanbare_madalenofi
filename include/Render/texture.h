@@ -27,6 +27,9 @@ public:
     //--
 
     GLuint getID() const {return textureID;}
+    int getwidth() const { return width; }
+    int getHeight() const { return height; }
+
 
     Texture getTexture() const {
         Texture tex;

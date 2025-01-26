@@ -12,6 +12,8 @@ struct ComponentListBase {
 	virtual ~ComponentListBase() {}
 
 	virtual void remove_entity(size_t entity_id) = 0;
+
+	virtual size_t get_entities() = 0;
 };
 
 template<typename T>
@@ -22,6 +24,10 @@ struct ComponentListDerived : ComponentListBase {
 		if (entity_id < component_list_.size()) {
 			component_list_[entity_id] = std::nullopt;
 		}
+	}
+
+	size_t get_entities() override {
+		return component_list_.size();
 	}
 };
 
@@ -48,6 +54,17 @@ public:
 			}
 		}
 		last_entity--;
+	}
+
+	size_t getEntityCount() {
+		if (!component_list_map_.empty()) {
+			auto& component_list = component_list_map_.begin()->second;
+			auto* derived_list = static_cast<ComponentListDerived<std::any>*>(component_list.get());
+			if (derived_list) {
+				return derived_list->get_entities();
+			}
+		}
+		return 0;
 	}
 
 	// delete_entity

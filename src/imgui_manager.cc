@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <filesystem>
 #include <vector>
 #include <algorithm>
 #include <optional>
@@ -42,7 +43,12 @@
 
 ImGui::FileBrowser fileDialog;
 
-ImGuiManager::ImGuiManager() {}
+ImGuiManager::ImGuiManager() 
+    :
+    m_BaseDirectory("../"),
+    m_CurrentDirectory(m_BaseDirectory)
+{
+}
 
 ImGuiManager::~ImGuiManager() {
     Cleanup();
@@ -54,27 +60,114 @@ void ImGuiManager::Cleanup() {
     ImGui::DestroyContext();
 }
 
+void ImGuiManager::SetImguiTheme() {
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImVec4* colors = style.Colors;
+
+    // Background
+    colors[ImGuiCol_WindowBg] = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+
+    // Borders
+    colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+    colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+
+    // Text
+    colors[ImGuiCol_Text] = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
+    colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+
+    // Headers
+    colors[ImGuiCol_Header] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+
+    // Buttons
+    colors[ImGuiCol_Button] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
+
+    // Frame background (e.g., input boxes, sliders)
+    colors[ImGuiCol_FrameBg] = ImVec4(0.16f, 0.16f, 0.16f, 1.00f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.26f, 0.26f, 1.00f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+
+    // Tabs
+    colors[ImGuiCol_Tab] = ImVec4(0.13f, 0.13f, 0.13f, 1.00f);
+    colors[ImGuiCol_TabHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+    colors[ImGuiCol_TabActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+    colors[ImGuiCol_TabUnfocused] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f); 
+    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f); 
+
+    // Title bar
+    colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.20f, 0.45f, 0.20f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.05f, 0.05f, 0.05f, 1.00f);
+
+    // Scrollbar
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f); 
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f); 
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f); 
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f); 
+
+    // Checkboxes, radio buttons, sliders
+    colors[ImGuiCol_CheckMark] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
+    colors[ImGuiCol_SliderGrab] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f); 
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+
+    // Resize grips
+    colors[ImGuiCol_ResizeGrip] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+    colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+
+    // Separator
+    colors[ImGuiCol_Separator] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.43f, 0.43f, 0.50f, 0.75f);
+    colors[ImGuiCol_SeparatorActive] = ImVec4(0.43f, 0.43f, 0.50f, 1.00f);
+
+    // Hover effects for hovered items
+    style.FrameRounding = 4.0f; 
+    style.WindowRounding = 5.0f; 
+    style.ChildRounding = 4.0f; 
+
+    // Docking colors
+    colors[ImGuiCol_DockingPreview] = ImVec4(0.26f, 0.59f, 0.98f, 0.70f); 
+    colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+
+    // Adjust separators for docking clarity
+    colors[ImGuiCol_Separator] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.43f, 0.43f, 0.43f, 1.00f); 
+    colors[ImGuiCol_SeparatorActive] = ImVec4(0.53f, 0.53f, 0.53f, 1.00f);
+
+}
+
+
 void ImGuiManager::Init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
-    //Content browser init
-    fileDialog.SetTitle("title");
-    fileDialog.SetTypeFilters({ 
-        ".h", ".cc", ".hpp", ".cpp", 
+    SetImguiTheme();
+
+    // Initialize content browser
+    fileDialog.SetTitle("File Browser");
+    fileDialog.SetTypeFilters({
+        ".h", ".cc", ".hpp", ".cpp",
         ".png", ".jpg", ".mtl",
-        ".lua", ".json", 
-        ".obj", 
-        ".vs", ".fs", 
-    });
+        ".lua", ".json", ".obj",
+        ".vs", ".fs",
+        });
+
+    m_DirectoryIcon.loadTexture("../assets/textures/imgui/DirectoryIcon.png");
+    m_FileIcon.loadTexture("../assets/textures/imgui/FileIcon.png");
+    m_EntityIcon.loadTexture("../assets/textures/imgui/cube.png");
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    ImGui::StyleColorsDark();
 }
 
 void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
@@ -82,16 +175,19 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
+    // Render ImGui windows
     ImguiWindow(window);
     GameWindow(di);
-    Hierarchy(di);
-    Inspector(di);
-    ContentBrowser(di);
-    TopBar(di);
+    HierarchyWindow(di);
+    InspectorWindow(di);
+    ContentBrowserWindow(di);
+    TopBarWindow(di);
 
+    // Render draw data
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+    // Handle viewports
     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
@@ -103,38 +199,26 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
 void ImGuiManager::ImguiWindow(GLFWwindow* window) {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    int framebuffer_width, framebuffer_height;
-    glfwGetFramebufferSize(window, &framebuffer_width, &framebuffer_height);
-
-    ImVec2 center_pos = ImVec2(framebuffer_width + framebuffer_width * 0.5f,
-        framebuffer_height + framebuffer_height * 0.5f);
-
-    ImGui::SetNextWindowPos(viewport->WorkPos); 
-    ImGui::SetNextWindowSize(ImVec2((float)framebuffer_width, (float)framebuffer_height));
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowSize(viewport->WorkSize);
     ImGui::SetNextWindowViewport(viewport->ID);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
     ImGuiWindowFlags dockspace_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
     ImGui::Begin("MainDockspace_", nullptr, dockspace_flags);
-    ImGui::PopStyleVar(3);
 
     ImGuiID dockspace_id = ImGui::GetID("MainDockspace_");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f));
 
-    static ImVec2 last_framebuffer_size = ImVec2(0, 0);
-    ImVec2 current_framebuffer_size = ImVec2((float)framebuffer_width, (float)framebuffer_height);
-
-    if (last_framebuffer_size.x != current_framebuffer_size.x || last_framebuffer_size.y != current_framebuffer_size.y) {
-        last_framebuffer_size = current_framebuffer_size;
+    static bool initialized = false;
+    if (!initialized) {
+        initialized = true;
 
         ImGui::DockBuilderRemoveNode(dockspace_id);
         ImGui::DockBuilderAddNode(dockspace_id);
-        ImGui::DockBuilderSetNodeSize(dockspace_id, current_framebuffer_size);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->WorkSize);
 
         ImGuiID dock_main = dockspace_id;
         ImGuiID dock_top = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Up, 0.05f, nullptr, &dock_main);
@@ -142,11 +226,11 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
         ImGuiID dock_right = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Right, 0.2f, nullptr, &dock_main);
         ImGuiID dock_bottom = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Down, 0.2f, nullptr, &dock_main);
 
-        ImGui::DockBuilderDockWindow("##-TopBar", dock_top);
-        ImGui::DockBuilderDockWindow("-Hierarchy", dock_left);
-        ImGui::DockBuilderDockWindow("-Inspector", dock_right);
-        ImGui::DockBuilderDockWindow("-ContentBrowser", dock_bottom);
-        ImGui::DockBuilderDockWindow("-GameWindow", dock_main);
+        ImGui::DockBuilderDockWindow("Menu", dock_top);
+        ImGui::DockBuilderDockWindow("Hierarchy", dock_left);
+        ImGui::DockBuilderDockWindow("Inspector", dock_right);
+        ImGui::DockBuilderDockWindow("ContentBrowser", dock_bottom);
+        ImGui::DockBuilderDockWindow("GameWindow", dock_main);
 
         ImGui::DockBuilderFinish(dockspace_id);
     }
@@ -155,7 +239,7 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
 }
 
 void ImGuiManager::GameWindow(DataImgui& di) {
-    ImGui::Begin("-GameWindow", nullptr);
+    ImGui::Begin("GameWindow", nullptr);
     ImVec2 content_avail = ImGui::GetContentRegionAvail();
 
     GLuint captureTexture = di.game_texture;
@@ -170,8 +254,8 @@ void ImGuiManager::GameWindow(DataImgui& di) {
     ImGui::End();
 }
 
-void ImGuiManager::Hierarchy(DataImgui& di) {
-    ImGui::Begin("-Hierarchy", nullptr);
+void ImGuiManager::HierarchyWindow(DataImgui& di) {
+    ImGui::Begin("Hierarchy", nullptr);
 
     auto& loc_ecs = di.ecs;
 
@@ -194,68 +278,74 @@ void ImGuiManager::Hierarchy(DataImgui& di) {
     int entity_pointlight = 0;
     int entity_dirlight = 0;
 
-    for (; ri != riend; ++ri, ++entity_id) {
+    for (; ri != riend; ++ri, entity_id++) {
 
-        if (ri->has_value()) {
+        if (ri->has_value() && ri != riend) {
             auto& render_comp = *ri;
-            auto& tranf_comp = *ti;
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
                 if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
+
                 break;
 
             case RenderType::RT_Terrain:
                 if (ImGui::Selectable(("Terrain " + std::to_string(entity_terrain++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
+
                 break;
 
             case RenderType::RT_Sphere:
                 if (ImGui::Selectable(("Sphere " + std::to_string(entity_sphere++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
+
                 break;
 
             case RenderType::RT_Quad:
                 if (ImGui::Selectable(("Quad " + std::to_string(entity_quad++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
+
                 break;
 
             case RenderType::RT_Cube:
                 if (ImGui::Selectable(("Cube " + std::to_string(entity_cube++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
+
                 break;
             }
         }
     }
 
-     for (; li != liend; ++li, ++entity_id) {
-         if (li->has_value()) {
+    for (; li != liend; ++li, entity_id++) {
 
-             auto& light_comp = *li;
+        if (li->has_value() && li != liend) {
+            auto& light_comp = *li;
 
-             switch (light_comp->light_info.type_) {
-             case LightType::LT_Spot:
-                 if (ImGui::Selectable(("Spot Light " + std::to_string(entity_spotlight++)).c_str(), selected_entity == entity_id))
-                     selected_entity = entity_id;
-                 break;
-             case LightType::LT_Point:
-                 if (ImGui::Selectable(("Point Light " + std::to_string(entity_pointlight++)).c_str(), selected_entity == entity_id))
-                     selected_entity = entity_id;
-                 break;
-             case LightType::LT_Directional:
-                 if (ImGui::Selectable(("Directional Light " + std::to_string(entity_dirlight++)).c_str(), selected_entity == entity_id))
-                     selected_entity = entity_id;
-                 break;
-             }
-         }
-     }
+            switch (light_comp->light_info.type_) {
+            case LightType::LT_Spot:
+                if (ImGui::Selectable(("Spot Light " + std::to_string(entity_spotlight++)).c_str(), selected_entity == entity_id))
+                    selected_entity = entity_id;
+                break;
+            case LightType::LT_Point:
+                if (ImGui::Selectable(("Point Light " + std::to_string(entity_pointlight++)).c_str(), selected_entity == entity_id))
+                    selected_entity = entity_id;
+
+                break;
+            case LightType::LT_Directional:
+                if (ImGui::Selectable(("Directional Light " + std::to_string(entity_dirlight++)).c_str(), selected_entity == entity_id))
+                    selected_entity = entity_id;
+
+                break;
+            }
+        }
+    }
 
     ImGui::End();
 }
 
-void ImGuiManager::Inspector(DataImgui& di) {
-    ImGui::Begin("-Inspector");
+void ImGuiManager::InspectorWindow(DataImgui& di) {
+    ImGui::Begin("Inspector");
 
     Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
 
@@ -266,23 +356,70 @@ void ImGuiManager::Inspector(DataImgui& di) {
     ImGui::End();
 }
 
-void ImGuiManager::ContentBrowser(DataImgui& di) {
-    ImGui::Begin("-ContentBrowser");
+void ImGuiManager::ContentBrowserWindow(DataImgui& di) {
+    ImGui::Begin("ContentBrowser");
 
-    if (ImGui::Button("Open File")) {
-        fileDialog.Open();
+    if (std::filesystem::canonical(m_CurrentDirectory) != std::filesystem::canonical(m_BaseDirectory))
+    {
+        if (ImGui::Button("<-"))
+        {
+            m_CurrentDirectory = m_CurrentDirectory.parent_path();
+        }
     }
 
-    fileDialog.Display();
+    static float padding = 16.0f;
+    static float thumbnailSize = 128.0f;
+    float cellSize = thumbnailSize + padding;
 
+    float panelWidth = ImGui::GetContentRegionAvail().x;
+    int columnCount = (int)(panelWidth / cellSize);
+    if (columnCount < 1) columnCount = 1;
+
+    ImGui::Columns(columnCount, 0, false);
+
+    for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
+    {
+        const auto& path = directoryEntry.path();
+        std::string filenameString = path.filename().string();
+
+        ImGui::PushID(filenameString.c_str());
+        Texture icon = directoryEntry.is_directory() ? m_DirectoryIcon : m_FileIcon;
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        ImGui::ImageButton("B", (ImTextureID)icon.getID(), {thumbnailSize, thumbnailSize}, {0, 1}, {1, 0});
+        
+        if (ImGui::BeginDragDropSource())
+        {
+            std::filesystem::path relativePath(path);
+            const wchar_t* itemPath = relativePath.c_str();
+            ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
+            ImGui::EndDragDropSource();
+        }
+
+        ImGui::PopStyleColor();
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+        {
+            if (directoryEntry.is_directory())
+                m_CurrentDirectory /= path.filename();
+
+        }
+        ImGui::TextWrapped(filenameString.c_str());
+
+        ImGui::NextColumn();
+
+        ImGui::PopID();
+    }
+
+    ImGui::Columns(1);
+
+    //ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
+    //ImGui::SliderFloat("Padding", &padding, 0, 32);
 
     ImGui::End();
 }
 
-void ImGuiManager::TopBar(DataImgui& di) {
+void ImGuiManager::TopBarWindow(DataImgui& di) {
 
-    ImGui::Begin("##-TopBar", nullptr,
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+    ImGui::Begin("Menu", nullptr,
         ImGuiWindowFlags_MenuBar);
 
     auto& loc_ecs = *(di.ecs);
@@ -402,7 +539,7 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
     auto& loc_ecs = di.ecs;
 
     ImGuizmo::BeginFrame();
-    if (ImGui::Begin("-GameWindow", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+    if (ImGui::Begin("GameWindow", nullptr, ImGuiWindowFlags_NoTitleBar)) {
         ImGuizmo::SetAlternativeWindow(ImGui::GetCurrentWindow());
 
         ImVec2 windowPos = ImGui::GetWindowPos();
@@ -452,7 +589,7 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
     }
     ImGui::End();
 
-    if (ImGui::Begin("-Inspector", nullptr, ImGuiWindowFlags_NoTitleBar)) {
+    if (ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoTitleBar)) {
         if (selected_entity >= 0) {
             if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
                 mCurrentGizmoOperation = ImGuizmo::TRANSLATE;

@@ -1,6 +1,8 @@
 #ifndef IGM
 #define IGM
 
+#include <filesystem>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -18,6 +20,7 @@
 #include "utils.h"
 #include "framebuffer.h"
 #include "save_manager.h"
+#include "Render/texture.h"
 
 //Todo lo que quiero que se edite en imgui
 struct DataImgui {
@@ -48,19 +51,28 @@ public:
     void Render(GLFWwindow* window, DataImgui &di);
     void Cleanup();
 
+    void SetImguiTheme();
+
     // ---
 
     void ImguiWindow(GLFWwindow* window);
     void GameWindow(DataImgui& di);
-    void Hierarchy(DataImgui& di);
-    void Inspector(DataImgui& di);
-    void ContentBrowser(DataImgui& di);
-    void TopBar(DataImgui& di);
+    void HierarchyWindow(DataImgui& di);
+    void InspectorWindow(DataImgui& di);
+    void ContentBrowserWindow(DataImgui& di);
+    void TopBarWindow(DataImgui& di);
 
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di);
 
 private:
     int selected_entity = -1;
+
+    std::filesystem::path m_BaseDirectory;
+    std::filesystem::path m_CurrentDirectory;
+
+    Texture m_DirectoryIcon;
+    Texture m_FileIcon;
+    Texture m_EntityIcon;
 
 };
 
