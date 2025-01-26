@@ -5,9 +5,11 @@
 
 extern int g_window_width_;
 extern int g_window_height_;
+extern bool g_full_screen_;
 
-extern float g_min_render_distance;
-extern float g_max_render_distance;
+extern float g_fov_;
+extern float g_min_render_distance_;
+extern float g_max_render_distance_;
 
 extern bool g_b_fog_;
 

@@ -64,6 +64,9 @@ private:
 	float sensitivity_;
 	float scroll_speed_;
 	float fov_;
+	float aspect_ratio_;
+	float min_render_distance_;
+	float max_render_distance_;
 };
 
 

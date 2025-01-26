@@ -9,22 +9,23 @@
 
 #include "Core/window.h"
 #include "Core/framebuffer.h"
-#include "Managers/imgui_manager.h"
-#include "global_variables.h"
+#include "Core/shader.h"
+#include "Core/input.h"
 #include "Core/mesh.h"
 #include "Render/render_system.h"
-#include "Core/shader.h"
 #include "Render/camera.h"
-#include "Core/input.h"
 #include "Render/post_processing.h"
-#include "utils.h"
-#include "Managers/save_manager.h"
 #include "Render/skybox.h"
-#include "Systems/ecs_manager.h"
-#include "Systems/scripting.h"
-#include "Components/scripting_component.h"
-#include "Geometry/terrain.h"
+#include "Managers/imgui_manager.h"
+#include "Managers/save_manager.h"
+#include "Managers/lua_manager.h"
 
+#include "Systems/ecs_manager.h"
+#include "Geometry/terrain.h"
+#include "global_variables.h"
+#include "utils.h"
+
+#include "Components/scripting_component.h"
 #include "Components/light_component.h"
 #include "Components/render_component.h"
 #include "Components/transform_component.h"
@@ -44,7 +45,6 @@ std::shared_ptr<Mesh> light_bulb_mesh = std::make_shared<Mesh>();
 ImGuiManager imgui_manager;
 FrameBuffer fb;
 RenderSystem render_system;
-LuaScript ls;
 Camera cam;
 Skybox skybox;
 Texture skyboxTex;
@@ -141,24 +141,7 @@ void ChangePostProcess() {
 
 int main(int, char**) {
 
-    //lua script settings
-    ls.run(lua_file);
-
-    ls.get_table("graphics");
-    float fov = ls.get_float("fov");
-    ls.pop();
-
-    ls.get_table("window");
-    int lua_width = ls.get_integer("window_width");
-    int lua_height = ls.get_integer("window_height");
-    bool lua_full_screen = ls.get_bool("full_screen");
-    ls.pop();
-
-    g_window_width_ = lua_width;
-    g_window_height_ = lua_height;
-    // --
-
-    auto window = Window::make(g_window_width_, g_window_height_, "Window ", lua_full_screen);
+    auto window = Window::make(g_window_width_, g_window_height_, "Window ", g_full_screen_);
     window->setWindowActive();
     window->initGLEW();
     window->setResizeCallback();
@@ -166,9 +149,6 @@ int main(int, char**) {
     Input input{ window->getWindow() };
 
     // ---
-    if (!car_mesh->loadOBJ("../assets/obj/LMcQueen.obj", "../assets/textures/cars")) {
-        return -1;
-    }
 
     if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
         return -1;
@@ -211,11 +191,12 @@ int main(int, char**) {
     postProcc.initData();
     //--
 
-    //InitImGui(window->getWindow());
     imgui_manager.Init(window->getWindow());
     data_imgui.ecs = &ecs;
     data_imgui.shader = &entities_shader;
     data_imgui.render_system = &render_system;
+    data_imgui.input = &input;
+
 
     double lastTime = window->getTime();
     bool done = false;
@@ -245,17 +226,11 @@ int main(int, char**) {
 
         data_imgui.cam = cam;
         data_imgui.post_proccessing = postProcc;
-
-        GLuint captureTexture = fb.captureWindowToTexture();
-        fb.width_ = g_window_width_;
-        fb.height_ = g_window_height_;
-        data_imgui.game_texture = captureTexture;
+        data_imgui.game_texture = postProcc.frame_buffer_.GetColorTexture();
         data_imgui.window = &window.value();
-        data_imgui.input = &input;
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         imgui_manager.Render(window->getWindow(), data_imgui);
-        glDeleteTextures(1, &captureTexture);
 
         if (window->closePressed()) done = true;
     }

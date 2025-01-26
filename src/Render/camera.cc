@@ -22,7 +22,10 @@ Camera::Camera()
     accum_mouse_offset_(0.0f, 0.0f),
     speed_(0.05f),
     sensitivity_(1.0f),
-    fov_(45.0f),
+    fov_(g_fov_),
+    aspect_ratio_((float)g_window_width_ / (float)g_window_height_),
+    min_render_distance_(g_min_render_distance_),
+    max_render_distance_(g_max_render_distance_),
     scroll_speed_(0.5f),
     view_(initViewTarget())
 {}
@@ -114,5 +117,5 @@ glm::mat4 Camera::getViewMatrix() const {
 
 glm::mat4 Camera::getProjectionMatrix() const
 {
-    return glm::perspective(glm::radians(fov_), (float)g_window_width_ / (float)g_window_height_, g_min_render_distance, g_max_render_distance);
+    return glm::perspective(glm::radians(fov_), aspect_ratio_, min_render_distance_, max_render_distance_);
 }

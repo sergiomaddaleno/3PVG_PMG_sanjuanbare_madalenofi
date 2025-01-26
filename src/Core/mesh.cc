@@ -3,10 +3,10 @@
 
 #include "Core/mesh.h"
 #include "Core/texture.h"
+#include "global_variables.h"
 #include "Components/render_component.h"
 #include "Components/transform_component.h"
 #include "utils.h"
-#include "global_variables.h"
 
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>

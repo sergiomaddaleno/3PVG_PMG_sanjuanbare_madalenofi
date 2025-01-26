@@ -1,7 +1,6 @@
 
 #include "Managers/imgui_manager.h"
 #include "utils.h"
-#include "global_variables.h"
 #include "Render/post_processing.h"
 #include "Components/render_component.h"
 #include "Components/light_component.h"
