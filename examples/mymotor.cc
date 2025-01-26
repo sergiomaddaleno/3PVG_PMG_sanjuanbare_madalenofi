@@ -7,30 +7,18 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_internal.h"
-
-#include "ImGuizmo.h"
-#include "ImSequencer.h"
-#include "ImZoomSlider.h"
-#include "ImCurveEdit.h"
-#include "GraphEditor.h"
-
-#include "window.h"
-#include "framebuffer.h"
-#include "imgui_manager.h"
+#include "Core/window.h"
+#include "Core/framebuffer.h"
+#include "Managers/imgui_manager.h"
 #include "global_variables.h"
-#include "Render/mesh.h"
+#include "Core/mesh.h"
 #include "Render/render_system.h"
-#include "Render/shader.h"
+#include "Core/shader.h"
 #include "Render/camera.h"
-#include "input.h"
+#include "Core/input.h"
 #include "Render/post_processing.h"
 #include "utils.h"
-#include "save_manager.h"
+#include "Managers/save_manager.h"
 #include "Render/skybox.h"
 #include "Systems/ecs_manager.h"
 #include "Systems/scripting.h"
@@ -98,6 +86,7 @@ char* lua_file = ReadFile("../scripts/settings.lua");
 Shader normals_shader, texture_shader, light_shader, entities_shader; //entities shader has all
 Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
 
+/*
 void ChangeShader() {
 
     const char* shaders_name[]{ "Texture Shader", "Normals shader" };
@@ -148,6 +137,7 @@ void ChangePostProcess() {
         break;
     }
 }
+*/
 
 int main(int, char**) {
 

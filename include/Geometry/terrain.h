@@ -9,7 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "Render/texture.h"
+#include "Core/texture.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../nlohmann/json.hpp>

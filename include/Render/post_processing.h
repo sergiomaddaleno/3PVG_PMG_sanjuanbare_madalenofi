@@ -3,8 +3,8 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "shader.h"
-#include "framebuffer.h"
+#include "Core/shader.h"
+#include "Core/framebuffer.h"
 
 #include <string>
 #include <iostream>

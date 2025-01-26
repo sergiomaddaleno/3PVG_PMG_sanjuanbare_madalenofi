@@ -5,7 +5,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "Render/texture.h"
+#include "Core/texture.h"
 #include <memory>
 #include <vector>
 

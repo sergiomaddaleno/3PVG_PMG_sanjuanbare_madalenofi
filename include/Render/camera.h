@@ -5,8 +5,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "..\include\input.h"
-#include "window.h"
+#include "Core/input.h"
+#include "Core/window.h"
 #include <../deps/glm/glm.hpp>
 
 class Camera {

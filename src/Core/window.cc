@@ -1,5 +1,5 @@
 
-#include <../include/window.h>
+#include <Core/window.h>
 
 #include <optional>
 
@@ -27,6 +27,8 @@ std::optional<Window> Window::make(int x, int y, const std::string& name, bool f
 		w_ = glfwCreateWindow(x, y, name.c_str(), NULL, NULL);
 	}
 	else {
+
+		glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
@@ -61,6 +63,11 @@ bool Window::toggleFullScreen(Input& input, Input::Keys key, bool imgui_enter)
 	{
 		if (!full_screen)
 		{
+			int xpos, ypos;
+			glfwGetWindowPos(window_, &xpos, &ypos);
+			int width, height;
+			glfwGetWindowSize(window_, &width, &height);
+
 			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 

@@ -1,9 +1,9 @@
 
 
 #include "Render/render_system.h"
-#include "Render/mesh.h"
+#include "Core/mesh.h"
 #include "Render/camera.h"
-#include "Render/shader.h"
+#include "Core/shader.h"
 #include "utils.h"
 #include "global_variables.h"
 #include "Components\transform_component.h"

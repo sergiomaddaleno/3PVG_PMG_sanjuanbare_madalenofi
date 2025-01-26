@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <optional>
 #include <string>
-#include <input.h>
+#include <Core/input.h>
 #include "framebuffer.h"
 #include <../deps/glm/glm.hpp>
 

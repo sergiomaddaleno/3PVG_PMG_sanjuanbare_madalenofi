@@ -1,14 +1,14 @@
 
-#include "imgui_manager.h"
+#include "Managers/imgui_manager.h"
 #include "utils.h"
 #include "global_variables.h"
 #include "Render/post_processing.h"
 #include "Components/render_component.h"
 #include "Components/light_component.h"
 #include "Components/transform_component.h"
-#include "save_manager.h"
+#include "Managers/save_manager.h"
 
-#include "window.h"
+#include "Core/window.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

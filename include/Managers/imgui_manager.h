@@ -6,21 +6,25 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "window.h"
-#include "input.h"
+#include "Core/window.h"
+#include "Core/input.h"
+#include "Core/texture.h"
+#include "Core/shader.h"
+#include "Core/framebuffer.h"
+
 #include "Render/camera.h"
 #include "Render/post_processing.h"
 #include "Render/skybox.h"
 #include "Render/light.h"
 #include "Render/render_system.h"
-#include "Render/shader.h"
+
 #include "Geometry/terrain.h"
 #include "Geometry/triangle.h"
+
 #include "Systems/ecs_manager.h"
-#include "utils.h"
-#include "framebuffer.h"
 #include "save_manager.h"
-#include "Render/texture.h"
+#include "utils.h"
+
 
 //Todo lo que quiero que se edite en imgui
 struct DataImgui {

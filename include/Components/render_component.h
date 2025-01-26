@@ -3,9 +3,9 @@
 
 #include <memory>
 #include "../Geometry/triangle.h"
-#include "../Render/texture.h"
-#include "../Render/shader.h"
-#include "../Render/mesh.h"
+#include "../Core/texture.h"
+#include "../Core/shader.h"
+#include "../Core/mesh.h"
 #include "Render/light.h"
 #include "../Geometry/terrain.h"
 #include "../Geometry/sphere.h"

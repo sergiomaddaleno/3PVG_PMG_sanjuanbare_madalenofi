@@ -2,7 +2,7 @@
 #define LCP
 
 #include <memory>
-#include "../Render/shader.h"
+#include "../Core/shader.h"
 #include "../Render/light.h"
 
 #include "../deps/nlohmann/json.hpp"

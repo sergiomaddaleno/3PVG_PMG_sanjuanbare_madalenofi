@@ -1,7 +1,7 @@
 ﻿#ifndef TRNS
 #define TRNS
 
-#include "..\include\input.h"
+#include "Core/input.h"
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/quaternion.hpp>
 #include <cmath>

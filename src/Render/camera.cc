@@ -4,8 +4,8 @@ const float PI = 3.141592653589793f;
 
 #include "Render/camera.h"
 #include "utils.h"
-#include "input.h"
-#include "window.h"
+#include "Core/input.h"
+#include "Core/window.h"
 #include "global_variables.h"
 
 #include "../deps/glm/gtx/transform.hpp"

@@ -1,8 +1,8 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "Render/mesh.h"
-#include "Render/texture.h"
+#include "Core/mesh.h"
+#include "Core/texture.h"
 #include "Components/render_component.h"
 #include "Components/transform_component.h"
 #include "utils.h"
