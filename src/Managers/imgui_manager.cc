@@ -352,71 +352,116 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
 void ImGuiManager::InspectorWindow(DataImgui& di) {
     ImGui::Begin("Inspector");
 
-    
     if (di.ecs->has_component<RenderComponent>(selected_entity)) {
 
         Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
+
+        ImGui::Dummy(ImVec2(0.0f, 15.0f));
 
         if (di.ecs->has_component<TransformComponent>(selected_entity)) {
             auto& transform = di.ecs->get_component<TransformComponent>(selected_entity);
 
             if (transform.has_value()) {
-          
                 ImGui::DragFloat("Position X", &transform->position.x, 0.1f, -1000.0f, 1000.0f);
                 ImGui::DragFloat("Position Y", &transform->position.y, 0.1f, -1000.0f, 1000.0f);
                 ImGui::DragFloat("Position Z", &transform->position.z, 0.1f, -1000.0f, 1000.0f);
             }
         }
 
+        ImGui::Dummy(ImVec2(0.0f, 15.0f));
+
         if (di.ecs->has_component<LightComponent>(selected_entity)) {
             auto& light_component = di.ecs->get_component<LightComponent>(selected_entity);
 
             if (light_component.has_value()) {
-                
+
                 glm::vec3& light_color = light_component->light_info.light_color_;
 
-                
                 float color[3] = {
                     light_color.r / 255.0f,
                     light_color.g / 255.0f,
                     light_color.b / 255.0f
                 };
 
-               
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
                 if (ImGui::ColorPicker3("Light Color", color)) {
-                   
                     light_color.r = color[0] * 255.0f;
                     light_color.g = color[1] * 255.0f;
                     light_color.b = color[2] * 255.0f;
                 }
 
-               
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
                 ImGui::Text("Current Light Color: R: %.2f, G: %.2f, B: %.2f",
                     light_color.r, light_color.g, light_color.b);
+
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
             }
         }
 
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-
-       
+        // Change shader
+        ImGui::Text("Drag and Drop Vertex and Fragment here:");
+        ImGui::Separator();
         
-        if (selected_entity && ImGui::Button("Delete Entity")) {
+        if (ImGui::Button("VS Drop here", { 100.0f, 35.0f })) {}
+        static char* vertexShaderCode = nullptr;
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                std::filesystem::path filePath = (const wchar_t*)payload->Data;
 
+                std::string filePathString = filePath.string();
+                const char* file_char = filePathString.c_str();
+                if (filePath.extension() == ".vs") {
+                    vertexShaderCode = (char*)ReadFile(file_char);
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("FS Drop here", { 100.0f, 35.0f })) {}
+        static char* fragmentShaderCode = nullptr;
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                std::filesystem::path filePath = (const wchar_t*)payload->Data;
+
+                std::string filePathString = filePath.string();
+                const char* file_char = filePathString.c_str();
+                if (filePath.extension() == ".fs") {
+                    fragmentShaderCode = (char*)ReadFile(file_char);
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        if (vertexShaderCode && fragmentShaderCode) {
+
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            if (ImGui::Button("Compile")) {
+                Shader newShader;
+                newShader.compile(vertexShaderCode, fragmentShaderCode);
+                di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
+            }
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        }
+
+        //----
+
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+        if (selected_entity && ImGui::Button("Delete Entity")) {
             if (di.ecs->get_component<RenderComponent>(selected_entity)->type_entity_ != EntityType::ET_PointLight
                 && di.ecs->get_component<RenderComponent>(selected_entity)->type_entity_ != EntityType::ET_SpotLight) {
-
                 di.ecs->destroy_entity(selected_entity);
-
             }
             else {
-
                 di.ecs->destroy_entity(selected_entity);
                 di.render_system->number_lights--;
-
-
             }
         }
-
     }
 
     ImGui::End();

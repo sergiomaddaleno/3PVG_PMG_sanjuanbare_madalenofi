@@ -229,7 +229,7 @@ int main(int, char**) {
         data_imgui.game_texture = postProcc.frame_buffer_.GetColorTexture();
         data_imgui.window = &window.value();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         imgui_manager.Render(window->getWindow(), data_imgui);
 
         if (window->closePressed()) done = true;
