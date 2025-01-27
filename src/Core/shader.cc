@@ -4,30 +4,28 @@
 
 void Shader::compile(const char* vertex_src, const char* fragment_src)
 {
-   
     if (program_ != 0) {
         glUseProgram(0);
         glDeleteProgram(program_); 
         program_ = 0;
     }
-
     
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertex_src, nullptr);
     glCompileShader(vertexShader);
-    CheckGPUErrors(vertexShader, "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n", false);
+    //CheckGPUErrors(vertexShader, "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n", false);
 
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragment_src, nullptr);
     glCompileShader(fragmentShader);
-    CheckGPUErrors(fragmentShader, "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n", false);
+    //CheckGPUErrors(fragmentShader, "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n", false);
 
    
     program_ = glCreateProgram();
     glAttachShader(program_, vertexShader);
     glAttachShader(program_, fragmentShader);
     glLinkProgram(program_);
-    CheckGPUErrors(program_, "ERROR::SHADER::PROGRAM::LINKING_FAILED\n", true);
+    //CheckGPUErrors(program_, "ERROR::SHADER::PROGRAM::LINKING_FAILED\n", true);
 
    
     glDeleteShader(vertexShader);
@@ -38,10 +36,6 @@ void Shader::compile(const char* vertex_src, const char* fragment_src)
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
 }
-
-
-
-
 
 bool Shader::isCompiled() const
 {

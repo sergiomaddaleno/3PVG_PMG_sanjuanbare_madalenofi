@@ -403,46 +403,46 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         // Change shader
-        ImGui::Text("Drag and Drop Vertex and Fragment here:");
+        ImGui::Text("Drag and Drop Vertex and Fragment:");
         ImGui::Separator();
-        
-        if (ImGui::Button("VS Drop here", { 100.0f, 35.0f })) {}
-        static char* vertexShaderCode = nullptr;
+
+        static std::string vertex_file_name;
+        static char* vertex_content;
+        if (ImGui::Button(!vertex_file_name.empty() ? std::string("" + vertex_file_name).c_str() : "VS Drop here", { 120.0f, 40.0f })) {}
+
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                 std::filesystem::path filePath = (const wchar_t*)payload->Data;
-
-                std::string filePathString = filePath.string();
-                const char* file_char = filePathString.c_str();
                 if (filePath.extension() == ".vs") {
-                    vertexShaderCode = (char*)ReadFile(file_char);
+                    vertex_file_name = filePath.filename().string();
+                    vertex_content = ReadFile(filePath.string().c_str());
                 }
             }
             ImGui::EndDragDropTarget();
         }
 
+        static std::string fragment_file_name;
+        static char* fragment_content;
         ImGui::SameLine();
-        if (ImGui::Button("FS Drop here", { 100.0f, 35.0f })) {}
-        static char* fragmentShaderCode = nullptr;
+        if (ImGui::Button(!fragment_file_name.empty() ? std::string("" + fragment_file_name).c_str() : "FS Drop here", { 120.0f, 40.0f })) {}
+
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                 std::filesystem::path filePath = (const wchar_t*)payload->Data;
-
-                std::string filePathString = filePath.string();
-                const char* file_char = filePathString.c_str();
                 if (filePath.extension() == ".fs") {
-                    fragmentShaderCode = (char*)ReadFile(file_char);
+                    fragment_file_name = filePath.filename().string();
+                    fragment_content = ReadFile(filePath.string().c_str());
                 }
             }
             ImGui::EndDragDropTarget();
         }
 
-        if (vertexShaderCode && fragmentShaderCode) {
+        if (vertex_content && fragment_content) {
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             if (ImGui::Button("Compile")) {
                 Shader newShader;
-                newShader.compile(vertexShaderCode, fragmentShaderCode);
+                newShader.compile(vertex_content, fragment_content);
                 di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
             }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
@@ -451,6 +451,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
         //----
 
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        ImGui::Separator();
 
         if (selected_entity && ImGui::Button("Delete Entity")) {
             if (di.ecs->get_component<RenderComponent>(selected_entity)->type_entity_ != EntityType::ET_PointLight
