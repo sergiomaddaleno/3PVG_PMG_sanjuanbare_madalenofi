@@ -407,7 +407,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
         ImGui::Separator();
 
         static std::string vertex_file_name;
-        static char* vertex_content;
+        static char* vertex_content = nullptr;
         if (ImGui::Button(!vertex_file_name.empty() ? std::string("" + vertex_file_name).c_str() : "VS Drop here", { 120.0f, 40.0f })) {}
 
         if (ImGui::BeginDragDropTarget()) {
@@ -422,7 +422,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
         }
 
         static std::string fragment_file_name;
-        static char* fragment_content;
+        static char* fragment_content = nullptr;
         ImGui::SameLine();
         if (ImGui::Button(!fragment_file_name.empty() ? std::string("" + fragment_file_name).c_str() : "FS Drop here", { 120.0f, 40.0f })) {}
 
@@ -444,6 +444,13 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
                 Shader newShader;
                 newShader.compile(vertex_content, fragment_content);
                 di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
+
+                vertex_file_name.clear();
+                fragment_file_name.clear();
+
+                vertex_content = nullptr;
+                fragment_content = nullptr;
+          
             }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
         }
