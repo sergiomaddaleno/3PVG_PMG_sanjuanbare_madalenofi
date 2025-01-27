@@ -20,7 +20,7 @@ Camera::Camera()
     last_mouse(0.0f, 0.0f),
     delta_mouse(0.0f, 0.0f),
     accum_mouse_offset_(0.0f, 0.0f),
-    speed_(0.05f),
+    speed_(10.0f),
     sensitivity_(1.0f),
     fov_(g_fov_),
     aspect_ratio_((float)g_window_width_ / (float)g_window_height_),
