@@ -284,8 +284,23 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
-                if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh++)).c_str(), selected_entity == entity_id))
-                    selected_entity = entity_id;
+                if (render_comp->type_entity_ != EntityType::ET_SpotLight && render_comp->type_entity_ != EntityType::ET_PointLight) {
+                    if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh++)).c_str(), selected_entity == entity_id))
+                        selected_entity = entity_id;
+                    break;
+                }
+
+                if (render_comp->type_entity_ == EntityType::ET_PointLight) {
+                    if (ImGui::Selectable(("Point Light " + std::to_string(entity_pointlight++)).c_str(), selected_entity == entity_id))
+                        selected_entity = entity_id;
+                    break;
+                }
+
+                if (render_comp->type_entity_ == EntityType::ET_SpotLight) {
+                    if (ImGui::Selectable(("Spot Light " + std::to_string(entity_spotlight++)).c_str(), selected_entity == entity_id))
+                        selected_entity = entity_id;
+                    break;
+                }
 
                 break;
 
@@ -315,29 +330,20 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
             }
         }
     }
-
+    
     for (; li != liend; ++li, entity_id++) {
 
         if (li->has_value() && li != liend) {
             auto& light_comp = *li;
 
-            switch (light_comp->light_info.type_) {
-            case LightType::LT_Spot:
-                if (ImGui::Selectable(("Spot Light " + std::to_string(entity_spotlight++)).c_str(), selected_entity == entity_id))
-                    selected_entity = entity_id;
-                break;
-            case LightType::LT_Point:
-                if (ImGui::Selectable(("Point Light " + std::to_string(entity_pointlight++)).c_str(), selected_entity == entity_id))
-                    selected_entity = entity_id;
-
-                break;
-            case LightType::LT_Directional:
+           
+            if (light_comp->light_info.type_ == LightType::LT_Directional) {
                 if (ImGui::Selectable(("Directional Light " + std::to_string(entity_dirlight++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
 
-                break;
             }
-        }
+         }
+        
     }
 
     ImGui::End();
@@ -346,10 +352,71 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
 void ImGuiManager::InspectorWindow(DataImgui& di) {
     ImGui::Begin("Inspector");
 
-    Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
+    
+    if (di.ecs->has_component<RenderComponent>(selected_entity)) {
 
-    if (selected_entity && ImGui::Button("Delete Entity")) {
-        di.ecs->destroy_entity(selected_entity);
+        Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
+
+        if (di.ecs->has_component<TransformComponent>(selected_entity)) {
+            auto& transform = di.ecs->get_component<TransformComponent>(selected_entity);
+
+            if (transform.has_value()) {
+          
+                ImGui::DragFloat("Position X", &transform->position.x, 0.1f, -1000.0f, 1000.0f);
+                ImGui::DragFloat("Position Y", &transform->position.y, 0.1f, -1000.0f, 1000.0f);
+                ImGui::DragFloat("Position Z", &transform->position.z, 0.1f, -1000.0f, 1000.0f);
+            }
+        }
+
+        if (di.ecs->has_component<LightComponent>(selected_entity)) {
+            auto& light_component = di.ecs->get_component<LightComponent>(selected_entity);
+
+            if (light_component.has_value()) {
+                
+                glm::vec3& light_color = light_component->light_info.light_color_;
+
+                
+                float color[3] = {
+                    light_color.r / 255.0f,
+                    light_color.g / 255.0f,
+                    light_color.b / 255.0f
+                };
+
+               
+                if (ImGui::ColorPicker3("Light Color", color)) {
+                   
+                    light_color.r = color[0] * 255.0f;
+                    light_color.g = color[1] * 255.0f;
+                    light_color.b = color[2] * 255.0f;
+                }
+
+               
+                ImGui::Text("Current Light Color: R: %.2f, G: %.2f, B: %.2f",
+                    light_color.r, light_color.g, light_color.b);
+            }
+        }
+
+
+
+       
+        
+        if (selected_entity && ImGui::Button("Delete Entity")) {
+
+            if (di.ecs->get_component<RenderComponent>(selected_entity)->type_entity_ != EntityType::ET_PointLight
+                && di.ecs->get_component<RenderComponent>(selected_entity)->type_entity_ != EntityType::ET_SpotLight) {
+
+                di.ecs->destroy_entity(selected_entity);
+
+            }
+            else {
+
+                di.ecs->destroy_entity(selected_entity);
+                di.render_system->number_lights--;
+
+
+            }
+        }
+
     }
 
     ImGui::End();
@@ -514,6 +581,7 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
                 }
 
                 if (ImGui::MenuItem("Directional Light")) {
+                   
                     di.render_system->createDirectionalLight(loc_ecs, *di.shader);
                     di.render_system->initEntities(loc_ecs);
                 }

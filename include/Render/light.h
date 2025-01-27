@@ -15,6 +15,7 @@ enum LightType {
     LT_Directional,
     LT_Spot,
     LT_Point,
+
 };
 
 struct LightInfo {

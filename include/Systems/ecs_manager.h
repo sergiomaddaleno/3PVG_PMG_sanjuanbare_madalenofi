@@ -128,6 +128,26 @@ public:
 		return cld->component_list_;
 	}
 
+	template<typename T>
+	bool has_component(size_t entity) {
+		size_t hash = typeid(T).hash_code();
+
+		
+		auto it = component_list_map_.find(hash);
+		if (it == component_list_map_.end()) {
+			return false;
+		}
+
+		
+		auto* cld = static_cast<ComponentListDerived<T>*>(it->second.get());
+		if (entity >= cld->component_list_.size()) {
+			return false; 
+		}
+
+		
+		return cld->component_list_[entity].has_value();
+	}
+
 private:
 	typedef std::unordered_map<size_t, std::unique_ptr<ComponentListBase>> map_type;
 	map_type component_list_map_;

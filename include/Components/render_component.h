@@ -27,6 +27,13 @@ enum RenderType {
     RT_Quad,
 };
 
+enum EntityType {
+    ET_Object,
+    ET_PointLight,
+    ET_SpotLight,
+   
+};
+
 struct RenderComponent {
 
     std::unique_ptr<Mesh> mesh_;
@@ -40,6 +47,7 @@ struct RenderComponent {
     Shader shader;
     Texture texture;
     RenderType type_;
+    EntityType type_entity_;
 
     // Save data
     nlohmann::json serialize() const {
@@ -58,6 +66,7 @@ struct RenderComponent {
         json_data["shader"] = shader.serialize();
         json_data["texture"] = texture.serialize();
         json_data["render_type"] = (int)type_;
+        json_data["entity_type"] = (int)type_entity_;
 
         return json_data;
     }
@@ -74,6 +83,7 @@ struct RenderComponent {
         shader.deSerialize(j["shader"]);
         texture.deSerialize(j["texture"]);
         type_ = j["render_type"].get<RenderType>();
+        type_entity_= j["render_type"].get<EntityType>();
 
         return j;
     }
@@ -90,7 +100,8 @@ struct RenderComponent {
         shader(),
         texture(), 
         triangle_(triangle_.my_triangle),
-        type_(RenderType::RT_Mesh) 
+        type_(RenderType::RT_Mesh), 
+        type_entity_(EntityType::ET_Object)
     {}
     ~RenderComponent() {}
     
@@ -116,7 +127,8 @@ struct RenderComponent {
         triangle_(other.triangle_),
         texture(other.texture),
         shader(other.shader),
-        type_(other.type_)
+        type_(other.type_),
+        type_entity_(other.type_entity_)
     {}
 };
 

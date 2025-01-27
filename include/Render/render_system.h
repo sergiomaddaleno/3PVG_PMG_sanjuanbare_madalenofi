@@ -63,11 +63,12 @@ public:
 	size_t createPointLight(ECSManager& ecs, Shader& light_shader);
 
 	size_t createDirectionalLight(ECSManager& ecs, const Shader& light_shader);
+	
+	int number_lights = 0;
 
 private:
 
 	size_t entity_ = 0;
-	int number_lights = 0;
 };
 
 #endif // RST

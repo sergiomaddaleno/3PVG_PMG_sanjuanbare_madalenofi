@@ -549,6 +549,8 @@ size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& en
    
     ecs.get_component<RenderComponent>(entity_)->shader = mesh_shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Mesh;
+    ecs.get_component<RenderComponent>(entity_)->type_entity_ = EntityType::ET_Object;
+
     ecs.get_component<RenderComponent>(entity_)->mesh_ = std::move(mario_mesh);
 
     entity_++;
@@ -568,6 +570,7 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader, const int nu
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Terrain;
     ecs.get_component<RenderComponent>(entity_)->terrain_ = std::move(terrain);
+    ecs.get_component<RenderComponent>(entity_)->type_entity_ = EntityType::ET_Object;
 
     ecs.get_component<TransformComponent>(entity_)->position = glm::vec3(0.0f, -5.0f, 0.0f);
 
@@ -587,6 +590,8 @@ size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, int num_heigh
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Sphere;
     ecs.get_component<RenderComponent>(entity_)->sphere_ = std::move(sphere);
+    ecs.get_component<RenderComponent>(entity_)->type_entity_ = EntityType::ET_Object;
+
 
     entity_++;
 
@@ -604,6 +609,7 @@ size_t RenderSystem::createCube8v(ECSManager& ecs, Shader& shader, const float s
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube;
     ecs.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
+    ecs.get_component<RenderComponent>(entity_)->type_entity_ = EntityType::ET_Object;
     entity_++;
 
     return entity_;
@@ -620,6 +626,7 @@ size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, const float 
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube;
     ecs.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
+    ecs.get_component<RenderComponent>(entity_)->type_entity_ = EntityType::ET_Object;
     entity_++;
 
     return entity_;
@@ -636,6 +643,7 @@ size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, const float siz
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Quad;
     ecs.get_component<RenderComponent>(entity_)->quad_ = std::move(quad);
+    ecs.get_component<RenderComponent>(entity_)->type_entity_ = EntityType::ET_Object;
 
     entity_ ++;
     return entity_;
@@ -644,15 +652,25 @@ size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, const float siz
 
 size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader)
 {
+    auto lb_mesh = std::make_unique<Mesh>();
+    lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
+
+
+
+    ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
 
+    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Mesh;
+    ecs.get_component<RenderComponent>(entity_)->shader = light_shader;
+    ecs.get_component<RenderComponent>(entity_)->mesh_ = std::move(lb_mesh);
+    ecs.get_component<RenderComponent>(entity_)->type_entity_ = EntityType::ET_SpotLight;
     // ----
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
 
     light_comp->light_info.type_ = LightType::LT_Spot;
     light_comp->shader = light_shader;
-
+    
     light_comp->light_info.dir_ = glm::vec3(0.0f, 0.0f, -1.0f);
     light_comp->light_info.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
     light_comp->light_info.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
@@ -671,9 +689,19 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
 
 size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader)
 {
+    auto lb_mesh = std::make_unique<Mesh>();
+    lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
+
+
+
+    ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
 
+    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Mesh;
+    ecs.get_component<RenderComponent>(entity_)->type_entity_ = EntityType::ET_PointLight;
+    ecs.get_component<RenderComponent>(entity_)->shader = light_shader;
+    ecs.get_component<RenderComponent>(entity_)->mesh_ = std::move(lb_mesh);
     //--
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
     
