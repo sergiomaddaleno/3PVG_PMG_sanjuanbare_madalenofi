@@ -530,6 +530,7 @@ void RenderSystem::renderMesh(ECSManager& ecs, Camera cam)
 void RenderSystem::setupEntities(ECSManager& ecs)
 {
     entity_ = ecs.create_entity();
+
     ecs.add_component_type<RenderComponent>();
     ecs.add_component_type<TransformComponent>();
     ecs.add_component_type<LightComponent>();

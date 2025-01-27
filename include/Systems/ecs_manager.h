@@ -13,6 +13,8 @@ struct ComponentListBase {
 
 	virtual void remove_entity(size_t entity_id) = 0;
 
+	virtual void remove_all_entities() = 0;
+
 	virtual size_t get_entities() = 0;
 };
 
@@ -23,6 +25,12 @@ struct ComponentListDerived : ComponentListBase {
 	void remove_entity(size_t entity_id) override {
 		if (entity_id < component_list_.size()) {
 			component_list_[entity_id] = std::nullopt;
+		}
+	}
+
+	void remove_all_entities() {
+		for (size_t i = 0; i < component_list_.size(); ++i) {
+			component_list_[i] = std::nullopt;
 		}
 	}
 
@@ -54,6 +62,15 @@ public:
 			}
 		}
 		last_entity--;
+	}
+
+	void remove_entities() {
+		for (auto& [key, component_list] : component_list_map_) {
+			auto* derived_list = dynamic_cast<ComponentListBase*>(component_list.get());
+			if (derived_list) {
+				derived_list->remove_all_entities();
+			}
+		}
 	}
 
 	size_t getEntityCount() {

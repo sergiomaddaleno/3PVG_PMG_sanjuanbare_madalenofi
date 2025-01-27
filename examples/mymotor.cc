@@ -172,7 +172,7 @@ int main(int, char**) {
     //ECS
     render_system.setupEntities(ecs);
     
-    render_system.createDirectionalLight(ecs, entities_shader);
+    //render_system.createPointLight(ecs, entities_shader);
    
     render_system.createMesh(ecs, mario_mesh, entities_shader);
 

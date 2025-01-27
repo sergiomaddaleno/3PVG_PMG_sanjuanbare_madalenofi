@@ -556,7 +556,7 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
             }
 
             if (ImGui::MenuItem("Load Scene")) {
-                di.save_manager.loadFromFile(*di.ecs, "../saves/scene_1.json");
+                di.save_manager.loadFromFile(*di.ecs, "../saves/scene_1.json",*di.render_system,*di.shader);
             }
 
             ImGui::EndMenu();
