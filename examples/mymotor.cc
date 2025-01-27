@@ -216,6 +216,7 @@ int main(int, char**) {
         //--
         postProcc.beginRender();
         cam.update(input, dt, g_window_width_, g_window_height_);
+        lastTime = currentTime;
 
         skybox.render(render_comp, cam);
 
@@ -231,6 +232,7 @@ int main(int, char**) {
 
         //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         imgui_manager.Render(window->getWindow(), data_imgui);
+       
 
         if (window->closePressed()) done = true;
     }
