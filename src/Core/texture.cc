@@ -8,6 +8,7 @@
 bool Texture::loadTexture(const std::string& file_path) {
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
+    data_ = data;
     if (!data) {
         printf("Failed to load texture: %s\n", file_path.c_str());
         return false;

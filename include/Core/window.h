@@ -40,6 +40,8 @@ public:
 	//---
 	void colorWindow(const glm::vec4& Color);
 
+	void setWindowIcon(GLFWwindow* window, const char* path);
+
 	void setResizeCallback();
 
 	bool toggleFullScreen(Input &input, Input::Keys key = Input::Keys::F11, bool imgui_enter=false);

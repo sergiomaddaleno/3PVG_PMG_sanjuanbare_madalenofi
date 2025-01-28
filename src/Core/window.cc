@@ -1,6 +1,6 @@
 
 #include <Core/window.h>
-
+#include "Core/texture.h"
 #include <optional>
 
 std::optional<WindowSystem> WindowSystem::make()
@@ -103,6 +103,19 @@ void Window::colorWindow(const glm::vec4& Color)
 {
 	glClearColor(Color[0], Color[1], Color[2], Color[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Window::setWindowIcon(GLFWwindow* window, const char* path)
+{
+	Texture tex;
+	tex.loadTexture(path);
+
+	GLFWimage icon;
+	icon.width = tex.getwidth();
+	icon.height = tex.getHeight();
+	icon.pixels = tex.getData();
+
+	glfwSetWindowIcon(window, 1, &icon);
 }
 
 void Window::updateWindow()

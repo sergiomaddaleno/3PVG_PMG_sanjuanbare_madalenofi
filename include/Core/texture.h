@@ -14,6 +14,8 @@ private:
 
     int width, height, channels;
 
+    unsigned char* data_;
+
 public:
     Texture() : textureID(0), width(0), height(0), channels(0) {}
     ~Texture() {}
@@ -29,7 +31,7 @@ public:
     GLuint getID() const {return textureID;}
     int getwidth() const { return width; }
     int getHeight() const { return height; }
-
+    unsigned char* getData() const { return data_; }
 
     Texture getTexture() const {
         Texture tex;
