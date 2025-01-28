@@ -76,10 +76,58 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
 
     rs.number_lights = 0;
 
-    rs.createDirectionalLight(ecs, shader);
+    
 
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 color(255.0f, 255.0f, 255.0f);
+
+
+
+   
+
+    std::vector<glm::vec3> light_colors_array;
+
+    for (const auto& entity : j["entities"]) {
+
+
+        int index = 0;
+       
+       if (entity.contains("light_component") && entity.contains("transform_component")) {
+               
+
+                const auto& light_component = entity["light_component"];
+                if (light_component.contains("light_info")) {
+                    const auto& light_info = light_component["light_info"];
+                    if (light_info.contains("Light Color")) {
+                        const auto& light_colors = light_info["Light Color"];
+                        if (light_colors.is_array()) {
+                            for (const auto& color : light_colors) {
+                                if (color.is_array() && color.size() == 3) {
+                                    glm::vec3 json_light_color(
+                                        color[0].get<float>(),
+                                        color[1].get<float>(),
+                                        color[2].get<float>()
+                                    );
+
+                                    
+                                    light_colors_array.push_back(json_light_color);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        
+    }
+
+    rs.createDirectionalLight(ecs, shader);
+
+    for (size_t i = 0; i < light_colors_array.size(); ++i) {
+        const auto& color = light_colors_array[i];
+        printf("Light %zu: %f %f %f\n", i, color[0], color[1], color[2]);
+    }
+
+
 
     for (const auto& entity : j["entities"]) {
         if (entity.contains("transform_component") && entity.contains("render_component") &&
@@ -130,7 +178,32 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
                 break;
             }
         }
+
+    
+
     }
+
+    auto li = ecs.getComponentList<LightComponent>().begin();
+    auto ti = ecs.getComponentList<TransformComponent>().begin();
+    auto liend = ecs.getComponentList<LightComponent>().end();
+    auto tiend = ecs.getComponentList<TransformComponent>().end();
+
+    int count = 0;
+
+    for (; li != liend && ti != tiend; ++li, ++ti) {
+        if (li->has_value() && ti->has_value()) {
+            auto& light_comp = *li;
+            auto& transform = *ti;
+
+            light_comp->light_info.light_color_ = light_colors_array[count];
+
+            count++;
+
+        }
+    }
+
+
+
 
     rs.initEntities(ecs);
 }

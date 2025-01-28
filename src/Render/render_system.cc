@@ -238,6 +238,9 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
             auto& light_comp = *li;
             auto& transform = *ti;
 
+
+
+
             // Light ---------------------------------------------------------------
 
             light_comp->shader.useProgram();
