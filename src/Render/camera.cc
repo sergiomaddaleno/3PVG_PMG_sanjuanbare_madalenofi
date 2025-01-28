@@ -26,7 +26,7 @@ Camera::Camera()
     aspect_ratio_((float)g_window_width_ / (float)g_window_height_),
     min_render_distance_(g_min_render_distance_),
     max_render_distance_(g_max_render_distance_),
-    scroll_speed_(0.5f),
+    scroll_speed_(10.0f),
     view_(initViewTarget())
 {}
 

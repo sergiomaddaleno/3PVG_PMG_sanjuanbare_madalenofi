@@ -86,11 +86,14 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
    
 
     std::vector<glm::vec3> light_colors_array;
+    std::vector<std::string> file_array;
+    std::vector<std::string> file_texture_array;
+
 
     for (const auto& entity : j["entities"]) {
 
 
-        int index = 0;
+        
        
        if (entity.contains("light_component") && entity.contains("transform_component")) {
                
@@ -117,17 +120,35 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
                     }
                 }
             }
+
+
+       if (entity.contains("render_component")) {
+           const auto& render_component = entity["render_component"];
+
+          
+           if (render_component.contains("mesh")) {
+               const auto& mesh = render_component["mesh"];
+
+               
+               if (mesh.contains("File")) {
+                   file_array.push_back(mesh["File"].get<std::string>());
+               }
+               if (mesh.contains("File_texture")) {
+                   file_texture_array.push_back(mesh["File_texture"].get<std::string>());
+               }
+
+              
+           }
+       }
         
     }
 
     rs.createDirectionalLight(ecs, shader);
 
-    for (size_t i = 0; i < light_colors_array.size(); ++i) {
-        const auto& color = light_colors_array[i];
-        printf("Light %zu: %f %f %f\n", i, color[0], color[1], color[2]);
-    }
+   
+    
 
-
+    int countmesh = 0;
 
     for (const auto& entity : j["entities"]) {
         if (entity.contains("transform_component") && entity.contains("render_component") &&
@@ -148,7 +169,9 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
                     switch (entityType) {
                     case EntityType::ET_Object: {
                         std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
-                        rs.createMesh(ecs, mario_mesh, shader, position);
+                        
+                        rs.createMesh(ecs, mario_mesh, shader, file_array[countmesh], file_texture_array[countmesh], position);
+                        countmesh++;
                         break;
                     }
                     case EntityType::ET_PointLight:

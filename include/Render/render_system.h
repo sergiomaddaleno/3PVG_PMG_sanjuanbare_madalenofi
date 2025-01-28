@@ -42,7 +42,7 @@ public:
 	void setupEntities(ECSManager& ecs);
 	//--
 
-	size_t createMesh(ECSManager &ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader, glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f));
+	size_t createMesh(ECSManager &ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader, std::string& file, std::string& textureFolder, glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f));
 
 	size_t createTerrain(ECSManager& ecs, Shader& shader, glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
 		const int num_cols = 2, const int num_rows = 2,

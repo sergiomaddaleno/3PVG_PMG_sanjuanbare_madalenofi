@@ -541,14 +541,18 @@ void RenderSystem::setupEntities(ECSManager& ecs)
     ecs.add_component_type<LightComponent>();
 }
 
-size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader,glm::vec3 pos
+size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader, std::string& file, std::string& textureFolder, glm::vec3 pos 
 )
 {
     auto mario_mesh = std::make_unique<Mesh>();
 
-    if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
+
+
+    if (!mario_mesh->loadOBJ(file, textureFolder)) {
         return -1;
     }
+
+    
 
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
@@ -749,12 +753,14 @@ size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light
     light_comp->light_info.type_ = LightType::LT_Directional;
     light_comp->shader = light_shader;
 
-    light_comp->light_info.dir_ = glm::vec3(0.0f, -1.0f, 1.0f);
-    light_comp->light_info.light_color_ = glm::vec3(0.98f, 0.98f, 0.9f);
-    light_comp->light_info.ambient_color_ = glm::vec3(0.5f, 0.5f, 0.5f);
-    light_comp->light_info.linear_att = 0.0f;
-    light_comp->light_info.quad_att_ = 0.0f;
+    light_comp->light_info.dir_ = glm::normalize(glm::vec3(-1.0f, -1.0f, -0.5f)); 
+    light_comp->light_info.light_color_ = glm::vec3(1.0f, 1.0f, 0.95f); 
+    light_comp->light_info.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
+    light_comp->light_info.spec_color_ = glm::vec3(1.0f, 1.0f, 0.95f); 
+    light_comp->light_info.linear_att = 0.0f; 
+    light_comp->light_info.quad_att_ = 0.0f; 
     light_comp->light_info.constant_att_ = 1.0f;
+    light_comp->light_info.shininess_ = 32.0f;
 
     number_lights++;
     entity_++;
