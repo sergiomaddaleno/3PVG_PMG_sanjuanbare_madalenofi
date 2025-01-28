@@ -91,20 +91,26 @@ int main(int, char**) {
 
     skybox.init();
     // ---
-
-    render_system.setupEntities(ecs);
-
-    render_system.createDirectionalLight(ecs, light_shader);
-
-    postProcc.initData();
-
-    //--
-
+    
+   
+    
     imgui_manager.Init(window->getWindow());
     data_imgui.ecs = &ecs;
     data_imgui.shader = &entities_shader;
     data_imgui.render_system = &render_system;
     data_imgui.input = &input;
+    
+
+    postProcc.initData();
+
+    render_system.setupEntities(ecs);
+
+
+    data_imgui.save_manager.loadFromFile(ecs, "../saves/scene_1.json", render_system, *data_imgui.shader);
+
+    //--
+
+    
 
     double lastTime = window->getTime();
     bool done = false;
@@ -136,6 +142,7 @@ int main(int, char**) {
         data_imgui.window = &window.value();
 
         imgui_manager.Render(window->getWindow(), data_imgui);
+        lastTime = currentTime;
 
         if (window->closePressed()) done = true;
     }
