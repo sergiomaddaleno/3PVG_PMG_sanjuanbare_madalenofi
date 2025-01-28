@@ -165,6 +165,31 @@ public:
 		return cld->component_list_[entity].has_value();
 	}
 
+	std::vector<size_t> getAllEntities() {
+		std::vector<size_t> entities;
+
+		// Recorremos todos los tipos de componentes en el mapa.
+		for (auto& [key, component_list] : component_list_map_) {
+			// Intentamos acceder a la lista de componentes de cualquier tipo.
+			// Aquí asumimos que si hay una lista de componentes, todas las entidades han sido asignadas de manera similar.
+			auto* derived_list = dynamic_cast<ComponentListBase*>(component_list.get());
+			if (derived_list) {
+				size_t entity_count = derived_list->get_entities();
+
+				// Recorremos todas las posibles entidades (por el número de elementos en la lista de componentes)
+				for (size_t entity_id = 0; entity_id < entity_count; ++entity_id) {
+					// Si al menos uno de los componentes de la entidad no es nulo, lo añadimos a la lista de entidades.
+					if (this->has_component<std::any>(entity_id)) {
+						entities.push_back(entity_id);
+					}
+				}
+			}
+		}
+
+		return entities;
+	}
+
+
 private:
 	typedef std::unordered_map<size_t, std::unique_ptr<ComponentListBase>> map_type;
 	map_type component_list_map_;

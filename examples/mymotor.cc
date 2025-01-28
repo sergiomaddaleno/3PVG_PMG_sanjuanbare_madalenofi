@@ -169,15 +169,20 @@ int main(int, char**) {
     skybox.init();
     // ---
 
+
+    imgui_manager.Init(window->getWindow());
+    data_imgui.ecs = &ecs;
+    data_imgui.shader = &entities_shader;
+    data_imgui.render_system = &render_system;
+    data_imgui.input = &input;
+
     //ECS
     render_system.setupEntities(ecs);
+
+
+    data_imgui.save_manager.loadFromFile(ecs, "../saves/scene_1.json", render_system, *data_imgui.shader);
+
     
-    //render_system.createPointLight(ecs, entities_shader);
-   
-    render_system.createMesh(ecs, mario_mesh, entities_shader);
-
-    render_system.createTerrain(ecs, entities_shader, 300, 300, 4.0f, true, true);
-
     render_system.initEntities(ecs);
 
     // ---
@@ -191,11 +196,6 @@ int main(int, char**) {
     postProcc.initData();
     //--
 
-    imgui_manager.Init(window->getWindow());
-    data_imgui.ecs = &ecs;
-    data_imgui.shader = &entities_shader;
-    data_imgui.render_system = &render_system;
-    data_imgui.input = &input;
 
 
     double lastTime = window->getTime();
