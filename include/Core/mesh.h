@@ -64,26 +64,6 @@ public:
         return json_data;
     }
 
-    void deSerialize(const nlohmann::json& j) {
-
-        for (const auto& mesh_json : j["meshes"]) {
-            Mesh mesh;
-            mesh.deSerialize(mesh_json);
-            meshes.push_back(mesh);
-        }
-
-        for (const auto& texture_json : j["textures"]) {
-            Texture texture;
-            texture.deSerialize(texture_json);
-            textures.push_back(texture);
-        }
-        
-        materialID = j["materialID"].get<int>();
-        VAO = j["VAO"].get<GLuint>();
-        VBO = j["VBO"].get<GLuint>();
-        EBO = j["EBO"].get<GLuint>();
-    }
-
     //--
 
     Mesh() : VAO(0), VBO(0), EBO(0), materialID(0){};

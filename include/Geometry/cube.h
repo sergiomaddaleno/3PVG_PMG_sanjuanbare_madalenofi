@@ -23,26 +23,20 @@ class Cube {
     std::vector<float> data_;
 
     Texture tex;
+    float size_ = 0.0f;
+    bool cube_8v_= false;
+    bool cube_24v_ = false;
 
     //Save data
     nlohmann::json serialize() const {
         nlohmann::json json_data;
 
         json_data["Texture"].push_back(tex.serialize());
-        json_data["VAO"] = VAO;
-        json_data["VBO"] = VBO;
-        json_data["EBO"] = EBO;
+        json_data["size"] = size_;
+        json_data["cube_8v"] = cube_8v_;
+        json_data["cube_24v"] = cube_24v_;
 
         return json_data;
-    }
-
-    nlohmann::json deSerialize(nlohmann::json& j) {
-        tex.deSerialize(j["Texture"][0]);
-        VAO = j["VAO"].get<GLuint>();
-        VBO = j["VBO"].get<GLuint>();
-        EBO = j["EBO"].get<GLuint>();
-
-        return j;
     }
 };
 

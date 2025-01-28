@@ -29,34 +29,29 @@ class Terrain {
 
   int num_rows_=0;
   int num_cols_=0;
+  float height_mult_ = 0.0f;
+  float size_ = 0.0f;
+  bool is_centered_ = true;
+  bool use_perlin_noise_ = true;
 
   std::vector<int> order_;
   std::vector<float> data_;
 
   Texture tex;
-  glm::vec3 rgb_ = { 0.0f, 100.0f, 0.0f };
-  bool activate_color_ = true;
 
   //Save data
   nlohmann::json serialize() const {
       nlohmann::json json_data;
 
       json_data["Texture"].push_back(tex.serialize());
-      json_data["VAO"] = VAO;
-      json_data["VBO"] = VBO;
-      json_data["EBO"] = EBO;
+      json_data["num_rows"] = num_rows_;
+      json_data["num_cols"] = num_cols_;
+      json_data["height_mult"] = height_mult_;
+      json_data["size"] = size_;
+      json_data["is_centered"] = is_centered_;
+      json_data["use_perlin_noise"] = use_perlin_noise_;
 
       return json_data;
-  }
-
-  nlohmann::json deSerialize(nlohmann::json& j) {
-      
-      tex.deSerialize(j["Texture"][0]);
-      VAO = j["VAO"].get<GLuint>();
-      VBO = j["VBO"].get<GLuint>();
-      EBO = j["EBO"].get<GLuint>();
-
-      return j;
   }
 
 };

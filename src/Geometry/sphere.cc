@@ -26,6 +26,8 @@ void Sphere::init(bool sky, const float sphere_size, const int num_heights, cons
    
     num_heights_ = num_heights;
     num_revs_ = num_revs;
+    size_ = sphere_size;
+    sky_ = sky;
 
     int num_vertex = (num_heights + 1) * (num_revs + 1);
     std::vector<float> vertex_sphere(num_vertex * 3); 

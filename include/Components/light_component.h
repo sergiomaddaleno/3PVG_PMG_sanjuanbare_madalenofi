@@ -22,14 +22,6 @@ struct LightComponent {
 		return json_data;
 	}
 
-	nlohmann::json deSerialize(nlohmann::json j) {
-
-		light_info.deSerialize(j["light_info"]);
-		shader.deSerialize(j["shader"]);
-
-		return j;
-	}
-
 };
 
 #endif //LCP

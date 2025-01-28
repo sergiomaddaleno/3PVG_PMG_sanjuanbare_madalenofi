@@ -71,7 +71,7 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs)
     return j;
 }
 
-void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSystem& rs , Shader& shader) {
+void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSystem& rs, Shader& shader) {
     ecs.remove_entities();
 
     rs.number_lights = 0;
@@ -80,14 +80,13 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
 
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 color(255.0f, 255.0f, 255.0f);
+
     for (const auto& entity : j["entities"]) {
-        
         if (entity.contains("transform_component") && entity.contains("render_component") &&
             entity["render_component"].contains("render_type")) {
 
             int renderType = entity["render_component"]["render_type"];
 
-           
             if (entity["transform_component"].contains("position")) {
                 const auto& pos = entity["transform_component"]["position"];
                 position = glm::vec3(pos[0], pos[1], pos[2]);
@@ -95,7 +94,6 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
 
             switch (renderType) {
             case RenderType::RT_Mesh: {
-               
                 if (entity["render_component"].contains("entity_type")) {
                     int entityType = entity["render_component"]["entity_type"];
 
@@ -103,30 +101,18 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
                     case EntityType::ET_Object: {
                         std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
                         rs.createMesh(ecs, mario_mesh, shader, position);
-                    } break;
-
-                    case EntityType::ET_PointLight: {
-                       
-
+                        break;
+                    }
+                    case EntityType::ET_PointLight:
                         rs.createPointLight(ecs, shader, position, color);
-
-                    } break;
-
-                    case EntityType::ET_SpotLight: {
-
+                        break;
+                    case EntityType::ET_SpotLight:
                         rs.createSpotLight(ecs, shader, position, color);
-
-                    } break;
-
-                    default:
-                        std::cerr << "Unknown entity_type: " << entityType << std::endl;
+                        break;
                     }
                 }
-                else {
-                    std::cerr << "render_component does not contain entity_type." << std::endl;
-                }
-            } break;
-
+                break;
+            }
             case RenderType::RT_Terrain:
                 rs.createTerrain(ecs, shader, position, 500, 500);
                 break;
@@ -142,52 +128,12 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
             case RenderType::RT_Cube:
                 rs.createCube24v(ecs, shader, position);
                 break;
-
-            default:
-                std::cerr << "Unknown render_type: " << renderType << std::endl;
-            }
-        }
-        else {
-            std::cout << "Entity ID: " << entity["entity_id"]
-                << " does not have a render_type or transform_component." << std::endl;
-        }
-    }
-
-   
-
-    /*
-    for (const auto& entity : j["entities"]) {
-        std::cout << "Checking light_component..." << std::endl;
-        if (entity.contains("light_component") && entity.contains("transform_component")) {
-            std::cout << "light_component found!" << std::endl;
-            const auto& light_component = entity["light_component"];
-            if (light_component.contains("light_info")) {
-                std::cout << "light_info found!" << std::endl;
-                const auto& light_info = light_component["light_info"];
-                if (light_info.contains("Light Color")) {
-                    std::cout << "Light Color found!" << std::endl;
-                    const auto& light_color = light_info["Light Color"];
-
-                    // Access the first element inside the Light Color array
-                    auto& light_comp = ecs.get_component<LightComponent>(entity);
-
-                    glm::vec3 json_light_color(
-                        light_color[0][0].get<float>(), // Access first element of the inner array
-                        light_color[0][1].get<float>(), // Access second element of the inner array
-                        light_color[0][2].get<float>()  // Access third element of the inner array
-                    );
-
-                    light_comp->light_info.light_color_ = json_light_color;
-                }
             }
         }
     }
-    */
+
     rs.initEntities(ecs);
-    
 }
-
-
 
 
 void SaveManager::saveToFile(ECSManager& ecs, const char* filename)

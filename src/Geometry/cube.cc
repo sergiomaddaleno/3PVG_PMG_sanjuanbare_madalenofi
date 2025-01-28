@@ -19,12 +19,14 @@ Cube::~Cube()
 }
 
 void Cube::init8v(const float cube_size) {
-    float size = cube_size;
 
+    size_ = cube_size;
+    cube_8v_ = true;
+    cube_24v_ = false;
    
     glm::vec3 positions[] = {
-        {-size, -size, size}, {-size, +size, size}, {+size, +size, size}, {+size, -size, size},
-        {+size, -size, -size}, {+size, +size, -size}, {-size, +size, -size}, {-size, -size, -size},
+        {-size_, -size_, size_}, {-size_, +size_, size_}, {+size_, +size_, size_}, {+size_, -size_, size_},
+        {+size_, -size_, -size_}, {+size_, +size_, -size_}, {-size_, +size_, -size_}, {-size_, -size_, -size_},
     };
 
     glm::vec3 normals[] = {
@@ -51,7 +53,6 @@ void Cube::init8v(const float cube_size) {
         data_.push_back(uvs[i].x);
         data_.push_back(uvs[i].y);
     }
-
    
     unsigned int order[] = {
         0, 3, 1, 1, 3, 2,
@@ -67,24 +68,25 @@ void Cube::init8v(const float cube_size) {
 }
 
 void Cube::init24v(const float cube_size) {
-    float size = cube_size;
-
+    
+    size_ = cube_size;
+    cube_8v_ = false;
+    cube_24v_ = true;
     
     glm::vec3 positions[] = {
         
-        {-size, +size, +size}, {+size, +size, +size}, {+size, -size, +size}, {-size, -size, +size},
+        {-size_, +size_, +size_}, {+size_, +size_, +size_}, {+size_, -size_, +size_}, {-size_, -size_, +size_},
         
-        {+size, +size, +size}, {+size, +size, -size}, {+size, -size, -size}, {+size, -size, +size},
+        {+size_, +size_, +size_}, {+size_, +size_, -size_}, {+size_, -size_, -size_}, {+size_, -size_, +size_},
        
-        {+size, +size, -size}, {-size, +size, -size}, {-size, -size, -size}, {+size, -size, -size},
+        {+size_, +size_, -size_}, {-size_, +size_, -size_}, {-size_, -size_, -size_}, {+size_, -size_, -size_},
        
-        {-size, +size, -size}, {-size, +size, +size}, {-size, -size, +size}, {-size, -size, -size},
+        {-size_, +size_, -size_}, {-size_, +size_, +size_}, {-size_, -size_, +size_}, {-size_, -size_, -size_},
        
-        {-size, +size, -size}, {+size, +size, -size}, {+size, +size, +size}, {-size, +size, +size},
+        {-size_, +size_, -size_}, {+size_, +size_, -size_}, {+size_, +size_, +size_}, {-size_, +size_, +size_},
        
-        {-size, -size, +size}, {+size, -size, +size}, {+size, -size, -size}, {-size, -size, -size},
+        {-size_, -size_, +size_}, {+size_, -size_, +size_}, {+size_, -size_, -size_}, {-size_, -size_, -size_},
     };
-
    
     glm::vec3 normals[] = {
         
@@ -100,7 +102,6 @@ void Cube::init24v(const float cube_size) {
        
         {0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f},
     };
-
     
     glm::vec2 uvs[] = {
        
@@ -116,7 +117,6 @@ void Cube::init24v(const float cube_size) {
        
         {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f},
     };
-
    
     data_.reserve(24 * 8);
     for (int i = 0; i < 24; ++i) {
@@ -131,7 +131,6 @@ void Cube::init24v(const float cube_size) {
         data_.push_back(uvs[i].x);
         data_.push_back(uvs[i].y);
     }
-
 
     unsigned int order[] = {
       
@@ -150,9 +149,6 @@ void Cube::init24v(const float cube_size) {
 
    
     order_.assign(order, order + sizeof(order) / sizeof(order[0]));
-
-
-   
 }
 
 

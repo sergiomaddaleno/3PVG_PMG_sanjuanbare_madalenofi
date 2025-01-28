@@ -47,22 +47,6 @@ struct TransformComponent {
         };
     }
 
-    nlohmann::json deSerialize(nlohmann::json j) {
-
-        std::vector<float> temp_float;
-
-        temp_float = j["position"].get<std::vector<float>>();
-        position = { temp_float[0], temp_float[1], temp_float[2] };
-
-        temp_float = j["rotation"].get<std::vector<float>>();
-        rotation = { temp_float[0], temp_float[1], temp_float[2], temp_float[3] };
-
-        temp_float = j["scale"].get<std::vector<float>>();
-        scale = { temp_float[0], temp_float[1], temp_float[2] };
-
-        return j;
-    }
-
     // ----------------------------------
 
     TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(1.0f, 0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f){}

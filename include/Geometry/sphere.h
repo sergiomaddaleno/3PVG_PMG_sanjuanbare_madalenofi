@@ -24,6 +24,8 @@ class Sphere {
 
   int num_heights_=0;
   int num_revs_=0;
+  float size_ = 0.0f;
+  bool sky_ = false;
 
   std::vector<int> order_;
   std::vector<float> data_;
@@ -35,21 +37,12 @@ class Sphere {
       nlohmann::json json_data;
 
       json_data["Texture"].push_back(tex.serialize());
-      json_data["VAO"] = VAO;
-      json_data["VBO"] = VBO;
-      json_data["EBO"] = EBO;
+      json_data["num_heights"] = num_heights_;
+      json_data["num_revs"] = num_revs_;
+      json_data["size_"] = size_;
+      json_data["sky"] = sky_;
 
       return json_data;
-  }
-
-  nlohmann::json deSerialize(nlohmann::json& j) {
-
-      tex.deSerialize(j["Texture"][0]);
-      VAO = j["VAO"].get<GLuint>();
-      VBO = j["VBO"].get<GLuint>();
-      EBO = j["EBO"].get<GLuint>();
-
-      return j;
   }
 
 };

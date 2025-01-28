@@ -36,11 +36,6 @@ public:
         return json_data;
     }
 
-    nlohmann::json deSerialize(nlohmann::json& j) {
-		j.at("program").get<GLuint>();
-		return j;
-    }
-
 private:
 
 	GLuint program_;

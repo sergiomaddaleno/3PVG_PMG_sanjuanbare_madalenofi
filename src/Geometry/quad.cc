@@ -22,13 +22,13 @@ Quad::~Quad()
 }
 
 void Quad::init(const float quad_size) {
-    float size = quad_size;
+    size_ = quad_size;
 
     glm::vec3 positions[] = {
-        {-size, size, 0.0f},  
-        {size, size, 0.0f},  
-        {size, -size, 0.0f}, 
-        {-size, -size, 0.0f} 
+        {-size_, size_, 0.0f},
+        {size_, size_, 0.0f},
+        {size_, -size_, 0.0f},
+        {-size_, -size_, 0.0f}
     };
 
     glm::vec3 normals[] = {

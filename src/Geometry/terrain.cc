@@ -25,6 +25,10 @@ void Terrain::init(const int num_cols, const int num_rows,
 
         num_cols_ = num_cols;
         num_rows_ = num_rows;
+        float height_mult_ = height_mult;
+        float size_ = size;
+        bool is_centered_ = is_centered;
+        bool use_perlin_noise_ = use_perlin_noise;
 
         int num_vertex = (num_cols + 1) * (num_rows + 1);
         std::vector<float> vertex_terrain(num_vertex * 3); // x, y, z

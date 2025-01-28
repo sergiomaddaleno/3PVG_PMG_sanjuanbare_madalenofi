@@ -45,11 +45,6 @@ public:
 
         return json_data;
     }
-
-    nlohmann::json deSerialize(const nlohmann::json& j) const {
-        j.at("textureID").get<GLuint>();
-        return j;
-    }
 };
 
 #endif

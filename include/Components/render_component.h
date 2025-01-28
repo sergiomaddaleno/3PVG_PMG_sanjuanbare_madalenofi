@@ -71,7 +71,7 @@ struct RenderComponent {
         return json_data;
     }
 
-    nlohmann::json deSerialize(nlohmann::json j)  {
+    /*nlohmann::json deSerialize(nlohmann::json j) {
        
         mesh_->deSerialize(j["mesh"]);
         terrain_->deSerialize(j["terrain"]);
@@ -86,7 +86,7 @@ struct RenderComponent {
         type_entity_= j["render_type"].get<EntityType>();
 
         return j;
-    }
+    }*/
 
     // ----------------------------------
 
