@@ -42,6 +42,13 @@
 
 ImGui::FileBrowser fileDialog;
 
+char* vertex_pp = (char*)ReadFile("../assets/shaders/postprocess/vertex_pp.vs");
+char* grey_fs = (char*)ReadFile("../assets/shaders/postprocess/grey.fs");
+char* negative_fs = (char*)ReadFile("../assets/shaders/postprocess/negative.fs");
+char* waves_fs = (char*)ReadFile("../assets/shaders/postprocess/waves.fs");
+char* blur_fs = (char*)ReadFile("../assets/shaders/postprocess/blur.fs");
+char* kernel_fs = (char*)ReadFile("../assets/shaders/postprocess/kernel.fs");
+
 ImGuiManager::ImGuiManager() 
     :
     m_BaseDirectory("../"),
@@ -165,6 +172,12 @@ void ImGuiManager::Init(GLFWwindow* window) {
     m_EntityIcon.loadTexture("../assets/textures/imgui/cube.png");
     m_EntityLightBulbIcon.loadTexture("../assets/textures/imgui/lb.png");
 
+    grey_sh.compile(vertex_pp, grey_fs);
+    negative_sh.compile(vertex_pp, negative_fs);
+    waves_sh.compile(vertex_pp, waves_fs);
+    blur_sh.compile(vertex_pp, blur_fs);
+    kernel_sh.compile(vertex_pp, kernel_fs);
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
@@ -182,6 +195,10 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     InspectorWindow(di);
     ContentBrowserWindow(di);
     TopBarWindow(di);
+
+    if (post_process_window) {
+        PostProcessWindow(di);
+    }
 
     // Render draw data
     ImGui::Render();
@@ -600,6 +617,7 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
 
             if (ImGui::BeginMenu("Post Proccess")) {
 
+                ImGui::Checkbox("Show Post Process Window", &post_process_window);
                 ImGui::EndMenu();
             }
 
@@ -662,6 +680,44 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
         }
 
         ImGui::EndMenuBar();
+    }
+
+    ImGui::End();
+}
+
+void ImGuiManager::PostProcessWindow(DataImgui& di)
+{
+    ImGui::Begin("PostProcess");
+
+    const char* pp_name[]{ "None", "Grey", "Negative", "Waves", "Blur", "Kernel types" };
+    static int curr_item = 0;
+
+    if (ImGui::Combo("Post Process", &curr_item, pp_name, 6)) {
+    }
+
+    switch (curr_item) {
+    case 0: break;
+
+    case 1:
+        di.post_proccessing.render(grey_sh, Effect::Grey);
+        ImGui::DragFloat("Grey", &di.post_proccessing.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
+        break;
+    case 2:
+        di.post_proccessing.render(negative_sh, Effect::Negative);
+        ImGui::DragFloat("Negative", &di.post_proccessing.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
+        break;
+    case 3:
+        di.post_proccessing.render(waves_sh, Effect::Waves);
+        ImGui::DragFloat("Waves", &di.post_proccessing.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
+        break;
+    case 4:
+        di.post_proccessing.render(blur_sh, Effect::Blur);
+        ImGui::DragFloat("Blur", &di.post_proccessing.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
+        break;
+    case 5:
+        di.post_proccessing.render(kernel_sh, Effect::Kernel);
+        ImGui::DragInt("Kernel types", &di.post_proccessing.kernel_types_, 0.01f, 0, 2, "%d");
+        break;
     }
 
     ImGui::End();

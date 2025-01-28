@@ -73,71 +73,12 @@ char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
 char* vs_sky_box = (char*)ReadFile("../assets/shaders/skybox.vs");
 char* fs_sky_box = (char*)ReadFile("../assets/shaders/skybox.fs");
 
-char* vertex_pp = (char*)ReadFile("../assets/shaders/postprocess/vertex_pp.vs");
-char* grey_fs = (char*)ReadFile("../assets/shaders/postprocess/grey.fs");
-char* negative_fs = (char*)ReadFile("../assets/shaders/postprocess/negative.fs");
-char* waves_fs = (char*)ReadFile("../assets/shaders/postprocess/waves.fs");
-char* blur_fs = (char*)ReadFile("../assets/shaders/postprocess/blur.fs");
-char* kernel_fs = (char*)ReadFile("../assets/shaders/postprocess/kernel.fs");
-
 char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
 char* lua_file = ReadFile("../scripts/settings.lua");
 
 Shader normals_shader, texture_shader, light_shader, entities_shader; //entities shader has all
 Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
 
-/*
-void ChangeShader() {
-
-    const char* shaders_name[]{ "Texture Shader", "Normals shader" };
-    static int curr_item = 0;
-
-    if (ImGui::Combo("Shaders", &curr_item, shaders_name, 2)) {
-        switch (curr_item) {
-        case 0:
-            ecs.get_component<RenderComponent>(e)->shader = texture_shader;
-            break;
-        case 1:
-            ecs.get_component<RenderComponent>(e)->shader = normals_shader;
-            break;
-        }
-    }
-}
-
-void ChangePostProcess() {
-
-    const char* pp_name[]{ "None", "Grey", "Negative", "Waves", "Blur", "Kernel types" };
-    static int curr_item = 0;
-
-    if (ImGui::Combo("Post Process", &curr_item, pp_name, 6)) {
-    }
-
-    switch (curr_item) {
-    case 0: break;
-
-    case 1:
-        postProcc.render(grey_sh, Effect::Grey);
-        ImGui::DragFloat("Grey", &postProcc.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
-        break;
-    case 2:
-        postProcc.render(negative_sh, Effect::Negative);
-        ImGui::DragFloat("Negative", &postProcc.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
-        break;
-    case 3:
-        postProcc.render(waves_sh, Effect::Waves);
-        ImGui::DragFloat("Waves", &postProcc.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
-        break;
-    case 4:
-        postProcc.render(blur_sh, Effect::Blur);
-        ImGui::DragFloat("Blur", &postProcc.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
-        break;
-    case 5:
-        postProcc.render(kernel_sh, Effect::Kernel);
-        ImGui::DragInt("Kernel types", &postProcc.kernel_types_, 0.01f, 0, 2, "%d");
-        break;
-    }
-}
-*/
 
 int main(int, char**) {
 
@@ -169,34 +110,26 @@ int main(int, char**) {
     skybox.init();
     // ---
 
+    //ECS
+    render_system.setupEntities(ecs);
+    
+    render_system.createDirectionalLight(ecs, entities_shader);
+   
+    render_system.createMesh(ecs, mario_mesh, entities_shader);
+
+    //render_system.createTerrain(ecs, entities_shader, 300, 300, 4.0f, true, true);
+
+    render_system.initEntities(ecs);
+
+    // ---
+    postProcc.initData();
+    //--
 
     imgui_manager.Init(window->getWindow());
     data_imgui.ecs = &ecs;
     data_imgui.shader = &entities_shader;
     data_imgui.render_system = &render_system;
     data_imgui.input = &input;
-
-    //ECS
-    render_system.setupEntities(ecs);
-
-
-    data_imgui.save_manager.loadFromFile(ecs, "../saves/scene_1.json", render_system, *data_imgui.shader);
-
-    
-    render_system.initEntities(ecs);
-
-    // ---
-    //Post proccess
-    grey_sh.compile(vertex_pp, grey_fs);
-    negative_sh.compile(vertex_pp, negative_fs);
-    waves_sh.compile(vertex_pp, waves_fs);
-    blur_sh.compile(vertex_pp, blur_fs);
-    kernel_sh.compile(vertex_pp, kernel_fs);
-
-    postProcc.initData();
-    //--
-
-
 
     double lastTime = window->getTime();
     bool done = false;
@@ -216,7 +149,6 @@ int main(int, char**) {
         //--
         postProcc.beginRender();
         cam.update(input, dt, g_window_width_, g_window_height_);
-        lastTime = currentTime;
 
         skybox.render(render_comp, cam);
 
@@ -232,7 +164,6 @@ int main(int, char**) {
 
         //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         imgui_manager.Render(window->getWindow(), data_imgui);
-       
 
         if (window->closePressed()) done = true;
     }

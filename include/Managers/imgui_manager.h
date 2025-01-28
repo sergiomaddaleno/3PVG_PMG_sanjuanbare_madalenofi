@@ -66,6 +66,8 @@ public:
     void ContentBrowserWindow(DataImgui& di);
     void TopBarWindow(DataImgui& di);
 
+    void PostProcessWindow(DataImgui& di);
+
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di);
 
 private:
@@ -78,6 +80,10 @@ private:
     Texture m_FileIcon;
     Texture m_EntityIcon;
     Texture m_EntityLightBulbIcon;
+
+    Shader new_pp_shader;
+    Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
+    bool post_process_window = false;
 
 };
 
