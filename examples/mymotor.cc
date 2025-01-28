@@ -111,9 +111,9 @@ int main(int, char**) {
 
     render_system.setupEntities(ecs);
 
-    postProcc.initData();
+    render_system.createDirectionalLight(ecs, light_shader);
 
-    data_imgui.save_manager.loadFromFile(ecs, "../saves/scene_1.json", render_system, *data_imgui.shader);
+    postProcc.initData();
 
     //--
 
