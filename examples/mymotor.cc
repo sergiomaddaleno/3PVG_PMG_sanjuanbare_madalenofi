@@ -36,11 +36,7 @@
 #include <../deps/glm/gtx/matrix_decompose.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
 
-#define M_PI 3.14159265358979323846
-
-std::shared_ptr<Mesh> car_mesh = std::make_shared<Mesh>();
 std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
-std::shared_ptr<Mesh> light_bulb_mesh = std::make_shared<Mesh>();
 
 ImGuiManager imgui_manager;
 FrameBuffer fb;
@@ -55,15 +51,6 @@ RenderComponent render_comp;
 TransformComponent transf_comp;
 SaveManager save_manager;
 
-auto e = ecs.create_entity();
-int selected_entity = -1;
-
-char* vs_normals = (char*)ReadFile("../assets/shaders/normals.vs");
-char* fs_normals = (char*)ReadFile("../assets/shaders/normals.fs");
-
-char* vs_texture = (char*)ReadFile("../assets/shaders/texture.vs");
-char* fs_texture = (char*)ReadFile("../assets/shaders/texture.fs");
-
 char* vs_entities = (char*)ReadFile("../assets/shaders/entities.vs");
 char* fs_entities = (char*)ReadFile("../assets/shaders/entities.fs");
 
@@ -76,9 +63,9 @@ char* fs_sky_box = (char*)ReadFile("../assets/shaders/skybox.fs");
 char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
 char* lua_file = ReadFile("../scripts/settings.lua");
 
-Shader normals_shader, texture_shader, light_shader, entities_shader; //entities shader has all
-Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
+Shader light_shader, entities_shader; //entities shader has all
 
+auto e = ecs.create_entity();
 
 int main(int, char**) {
 
@@ -91,10 +78,6 @@ int main(int, char**) {
     Input input{ window->getWindow() };
 
     // ---
-
-    if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
-        return -1;
-    }
 
     light_shader.compile(vs_simple, fs_light);
     entities_shader.compile(vs_entities, fs_entities);
