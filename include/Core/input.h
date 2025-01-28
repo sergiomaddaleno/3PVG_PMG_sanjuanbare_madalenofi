@@ -20,6 +20,7 @@ public:
 
         CTRL,
         SHIFT,
+        SUPR,
         F11,
 
         ALT,

@@ -44,9 +44,9 @@ void Input::InitKeyMap() {
 
     keyGLFW_map[GLFW_KEY_LEFT_CONTROL] = Keys::CTRL;
     keyGLFW_map[GLFW_KEY_RIGHT_CONTROL] = Keys::CTRL;
-
     keyGLFW_map[GLFW_KEY_LEFT_SHIFT] = Keys::SHIFT;
     keyGLFW_map[GLFW_KEY_RIGHT_SHIFT] = Keys::SHIFT;
+    keyGLFW_map[GLFW_KEY_DELETE] = Keys::SUPR;
 
     keyGLFW_map[GLFW_KEY_F11] = Keys::F11;
 }

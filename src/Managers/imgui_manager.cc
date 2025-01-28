@@ -163,6 +163,7 @@ void ImGuiManager::Init(GLFWwindow* window) {
     m_DirectoryIcon.loadTexture("../assets/textures/imgui/DirectoryIcon.png");
     m_FileIcon.loadTexture("../assets/textures/imgui/FileIcon.png");
     m_EntityIcon.loadTexture("../assets/textures/imgui/cube.png");
+    m_EntityLightBulbIcon.loadTexture("../assets/textures/imgui/lb.png");
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -282,9 +283,18 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
         if (ri->has_value() && ri != riend) {
             auto& render_comp = *ri;
 
+            if ((render_comp->type_entity_ != EntityType::ET_PointLight) && (render_comp->type_entity_ != EntityType::ET_SpotLight)) {
+                ImGui::Image(m_EntityIcon.getID(), { 25.0f, 25.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+            }else {
+                ImGui::Image(m_EntityLightBulbIcon.getID(), { 23.0f, 23.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+            }
+            ImGui::SameLine();
+
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
+
                 if (render_comp->type_entity_ != EntityType::ET_SpotLight && render_comp->type_entity_ != EntityType::ET_PointLight) {
+
                     if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh++)).c_str(), selected_entity == entity_id))
                         selected_entity = entity_id;
                     break;
@@ -336,8 +346,10 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
         if (li->has_value() && li != liend) {
             auto& light_comp = *li;
 
-           
             if (light_comp->light_info.type_ == LightType::LT_Directional) {
+                ImGui::Image(m_EntityLightBulbIcon.getID(), { 23.0f, 23.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+                ImGui::SameLine();
+
                 if (ImGui::Selectable(("Directional Light " + std::to_string(entity_dirlight++)).c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
 
@@ -356,7 +368,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
 
         Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
 
-        ImGui::Dummy(ImVec2(0.0f, 15.0f));
+        ImGui::Dummy(ImVec2(10.0f, 15.0f));
 
         if (di.ecs->has_component<TransformComponent>(selected_entity)) {
             auto& transform = di.ecs->get_component<TransformComponent>(selected_entity);
@@ -374,6 +386,8 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             auto& light_component = di.ecs->get_component<LightComponent>(selected_entity);
 
             if (light_component.has_value()) {
+
+                ImGui::Separator();
 
                 glm::vec3& light_color = light_component->light_info.light_color_;
 
@@ -400,11 +414,13 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             }
         }
 
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
         // Change shader
-        ImGui::Text("Drag and Drop Vertex and Fragment:");
         ImGui::Separator();
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        ImGui::Text("Drag and Drop Vertex and Fragment:");
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         static std::string vertex_file_name;
         static char* vertex_content = nullptr;
@@ -459,8 +475,9 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
 
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
         ImGui::Separator();
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-        if (selected_entity && ImGui::Button("Delete Entity")) {
+        if (selected_entity && (ImGui::Button("Delete Entity") || selected_entity && di.input->isKeyPressed(Input::SUPR))) {
             if (di.ecs->get_component<RenderComponent>(selected_entity)->type_entity_ != EntityType::ET_PointLight
                 && di.ecs->get_component<RenderComponent>(selected_entity)->type_entity_ != EntityType::ET_SpotLight) {
                 di.ecs->destroy_entity(selected_entity);

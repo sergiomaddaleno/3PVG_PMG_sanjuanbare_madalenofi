@@ -77,6 +77,7 @@ private:
     Texture m_DirectoryIcon;
     Texture m_FileIcon;
     Texture m_EntityIcon;
+    Texture m_EntityLightBulbIcon;
 
 };
 
