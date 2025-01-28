@@ -169,6 +169,7 @@ int main(int, char**) {
 
         //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         imgui_manager.Render(window->getWindow(), data_imgui);
+        lastTime = currentTime;
 
         if (window->closePressed()) done = true;
     }
