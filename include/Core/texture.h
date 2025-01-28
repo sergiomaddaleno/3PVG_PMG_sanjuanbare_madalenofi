@@ -17,7 +17,7 @@ private:
     unsigned char* data_;
 
 public:
-    Texture() : textureID(0), width(0), height(0), channels(0) {}
+    Texture() : textureID(0), width(0), height(0), channels(0), data_(nullptr) {}
     ~Texture() {}
 
     bool loadTexture(const std::string& file_path);

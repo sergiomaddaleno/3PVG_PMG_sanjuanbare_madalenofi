@@ -32,15 +32,13 @@ struct DataImgui {
     //Triangle triangle;
     Camera cam;
     //LightInfo light_info;
-    PostProcessing post_proccessing;
+    PostProcessing* post_proccessing;
     ECSManager* ecs;
     RenderSystem* render_system;
     Shader* shader;
     Window* window;
     Input* input;
     //Skybox sxybox;
-    GLuint game_texture;
-
     SaveManager save_manager;
 };
 
@@ -84,6 +82,9 @@ private:
     Shader new_pp_shader;
     Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
     bool post_process_window = false;
+    bool post_process_compiled = false;
+    Effect current_effect = Effect::None;
+    bool none_render = false;
 
 };
 

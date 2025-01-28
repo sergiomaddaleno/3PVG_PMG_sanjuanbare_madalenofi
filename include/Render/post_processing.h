@@ -28,6 +28,7 @@ enum Effect{
 	Waves,
 	Blur,
 	Kernel,
+	None,
 };
 
 class PostProcessing {
