@@ -113,7 +113,7 @@ void Window::setWindowIcon(GLFWwindow* window, const char* path)
 	GLFWimage icon;
 	icon.width = tex.getwidth();
 	icon.height = tex.getHeight();
-	icon.pixels = tex.getData();
+	//icon.pixels = tex.getData();
 
 	glfwSetWindowIcon(window, 1, &icon);
 }

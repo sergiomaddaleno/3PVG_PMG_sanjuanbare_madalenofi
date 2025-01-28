@@ -42,13 +42,6 @@
 
 ImGui::FileBrowser fileDialog;
 
-char* vertex_pp = (char*)ReadFile("../assets/shaders/postprocess/vertex_pp.vs");
-char* grey_fs = (char*)ReadFile("../assets/shaders/postprocess/grey.fs");
-char* negative_fs = (char*)ReadFile("../assets/shaders/postprocess/negative.fs");
-char* waves_fs = (char*)ReadFile("../assets/shaders/postprocess/waves.fs");
-char* blur_fs = (char*)ReadFile("../assets/shaders/postprocess/blur.fs");
-char* kernel_fs = (char*)ReadFile("../assets/shaders/postprocess/kernel.fs");
-
 ImGuiManager::ImGuiManager() 
     :
     m_BaseDirectory("../"),
@@ -147,7 +140,6 @@ void ImGuiManager::SetImguiTheme() {
 
 }
 
-
 void ImGuiManager::Init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -172,12 +164,6 @@ void ImGuiManager::Init(GLFWwindow* window) {
     m_EntityIcon.loadTexture("../assets/textures/imgui/cube.png");
     m_EntityLightBulbIcon.loadTexture("../assets/textures/imgui/lb.png");
 
-    grey_sh.compile(vertex_pp, grey_fs);
-    negative_sh.compile(vertex_pp, negative_fs);
-    waves_sh.compile(vertex_pp, waves_fs);
-    blur_sh.compile(vertex_pp, blur_fs);
-    kernel_sh.compile(vertex_pp, kernel_fs);
-
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
@@ -190,15 +176,17 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
 
     // Render ImGui windows
     ImguiWindow(window);
-    GameWindow(di);
     HierarchyWindow(di);
     InspectorWindow(di);
     ContentBrowserWindow(di);
     TopBarWindow(di);
 
-    if (post_process_window) {
-        PostProcessWindow(di);
-    }
+    if (post_process_window) PostProcessWindow(di);
+
+    di.post_proccessing->endRender();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    GameWindow(di);
 
     // Render draw data
     ImGui::Render();
@@ -259,7 +247,7 @@ void ImGuiManager::GameWindow(DataImgui& di) {
     ImGui::Begin("GameWindow", nullptr);
     ImVec2 content_avail = ImGui::GetContentRegionAvail();
 
-    GLuint captureTexture = di.game_texture;
+    GLuint captureTexture = di.post_proccessing->frame_buffer_.GetColorTexture();
 
     if (captureTexture) {
         ImVec2 uv0(0.0f, 1.0f);
@@ -475,8 +463,26 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             if (ImGui::Button("Compile")) {
                 Shader newShader;
+
+                if (vertex_file_name == "entities.vs" && fragment_file_name == "entities.fs") {
+
+
+                }
+
+                    
+
                 newShader.compile(vertex_content, fragment_content);
-                di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
+
+                if (vertex_file_name != "entities.vs" && fragment_file_name != "entities.fs") {
+                    di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
+
+                }
+                else {
+                    di.ecs->get_component<RenderComponent>(selected_entity)->shader = *di.shader;
+
+                }
+
+               
 
                 vertex_file_name.clear();
                 fragment_file_name.clear();
@@ -617,7 +623,7 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
 
             if (ImGui::BeginMenu("Post Proccess")) {
 
-                ImGui::Checkbox("Show Post Process Window", &post_process_window);
+                ImGui::Checkbox("Post Process Window", &post_process_window);
                 ImGui::EndMenu();
             }
 
@@ -649,7 +655,12 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
                 }
 
                 if (ImGui::MenuItem("Terrain")) {
-                    di.render_system->createTerrain(loc_ecs, *di.shader);
+
+                    glm::vec3 position(0.0f);
+                    glm::vec3 scale(1.0f);
+                    glm::vec3 rotation(0.0f);
+
+                    di.render_system->createTerrain(loc_ecs, *di.shader,position,scale,rotation,500,500);
                     di.render_system->initEntities(loc_ecs);
                 }
 
@@ -689,35 +700,105 @@ void ImGuiManager::PostProcessWindow(DataImgui& di)
 {
     ImGui::Begin("PostProcess");
 
-    const char* pp_name[]{ "None", "Grey", "Negative", "Waves", "Blur", "Kernel types" };
-    static int curr_item = 0;
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    ImGui::Text("Drag and Drop Vertex and Fragment:");
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-    if (ImGui::Combo("Post Process", &curr_item, pp_name, 6)) {
+    static std::string vertex_file_name;
+    static char* vertex_content = nullptr;
+    if (ImGui::Button(!vertex_file_name.empty() ? vertex_file_name.c_str() : "VS Drop here", { 120.0f, 40.0f })) {}
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+            std::filesystem::path filePath = (const wchar_t*)payload->Data;
+            if (filePath.extension() == ".vs") {
+                vertex_file_name = filePath.filename().string();
+                vertex_content = ReadFile(filePath.string().c_str());
+            }
+        }
+        ImGui::EndDragDropTarget();
     }
 
-    switch (curr_item) {
-    case 0: break;
+    static std::string fragment_file_name;
+    static char* fragment_content = nullptr;
+    ImGui::SameLine();
+    if (ImGui::Button(!fragment_file_name.empty() ? fragment_file_name.c_str() : "FS Drop here", { 120.0f, 40.0f })) {}
 
-    case 1:
-        di.post_proccessing.render(grey_sh, Effect::Grey);
-        ImGui::DragFloat("Grey", &di.post_proccessing.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
-        break;
-    case 2:
-        di.post_proccessing.render(negative_sh, Effect::Negative);
-        ImGui::DragFloat("Negative", &di.post_proccessing.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
-        break;
-    case 3:
-        di.post_proccessing.render(waves_sh, Effect::Waves);
-        ImGui::DragFloat("Waves", &di.post_proccessing.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
-        break;
-    case 4:
-        di.post_proccessing.render(blur_sh, Effect::Blur);
-        ImGui::DragFloat("Blur", &di.post_proccessing.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
-        break;
-    case 5:
-        di.post_proccessing.render(kernel_sh, Effect::Kernel);
-        ImGui::DragInt("Kernel types", &di.post_proccessing.kernel_types_, 0.01f, 0, 2, "%d");
-        break;
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+            std::filesystem::path filePath = (const wchar_t*)payload->Data;
+            if (filePath.extension() == ".fs") {
+                fragment_file_name = filePath.filename().string();
+                fragment_content = ReadFile(filePath.string().c_str());
+
+                if (fragment_file_name == "grey.fs") current_effect = Effect::Grey;
+                if (fragment_file_name == "negative.fs") current_effect = Effect::Negative;
+                if (fragment_file_name == "waves.fs") current_effect = Effect::Waves;
+                if (fragment_file_name == "blur.fs") current_effect = Effect::Blur;
+                if (fragment_file_name == "kernel.fs") current_effect = Effect::Kernel;
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    if (vertex_content && fragment_content) {
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        if (ImGui::Button("Compile")) {
+            new_pp_shader.compile(vertex_content, fragment_content);
+            post_process_compiled = true;  
+        }
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    }
+
+    if (post_process_compiled) {
+
+        switch (current_effect) {
+        case Effect::Grey:
+            di.post_proccessing->render(new_pp_shader, Effect::Grey);
+            ImGui::DragFloat("Grey", &di.post_proccessing->grey_, 0.01f, 0.0f, 1.0f, "%.3f");
+            break;
+
+        case Effect::Negative:
+            di.post_proccessing->render(new_pp_shader, Effect::Negative);
+            ImGui::DragFloat("Negative", &di.post_proccessing->negative_, 0.01f, 0.5f, 1.0f, "%.3f");
+            break;
+
+        case Effect::Waves:
+            di.post_proccessing->render(new_pp_shader, Effect::Waves);
+            ImGui::DragFloat("Waves", &di.post_proccessing->waves_, 0.001f, 0.00f, 0.09f, "%.3f");
+            break;
+
+        case Effect::Blur:
+            di.post_proccessing->render(new_pp_shader, Effect::Blur);
+            ImGui::DragFloat("Blur", &di.post_proccessing->blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
+            break;
+
+        case Effect::Kernel:
+            di.post_proccessing->render(new_pp_shader, Effect::Kernel);
+            ImGui::DragInt("Kernel types", &di.post_proccessing->kernel_types_, 1, 0, 2, "%d");
+            break;
+
+        default:
+            di.post_proccessing->render(new_pp_shader, Effect::None);
+            break;
+        }
+
+        ImGui::Dummy({ 0.0f, 5.0f });
+        ImGui::Separator();
+        ImGui::Dummy({ 0.0f, 5.0f });
+
+        if(ImGui::Button("Reset")){
+            post_process_compiled = false;
+
+            vertex_file_name.clear();
+            fragment_file_name.clear();
+
+            vertex_content = nullptr;
+            fragment_content = nullptr;
+        }
+
+        ImGui::Dummy({ 0.0f, 5.0f });
+
     }
 
     ImGui::End();
@@ -776,6 +857,8 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
                     transform->position = translation;
                     transform->rotation = rotation;
                     transform->scale = scale;
+
+                    
                 }
             }
         }     

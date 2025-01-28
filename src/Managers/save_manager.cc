@@ -79,6 +79,11 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
     
 
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    glm::vec3 scale = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+
     glm::vec3 color(255.0f, 255.0f, 255.0f);
 
 
@@ -156,10 +161,31 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
 
             int renderType = entity["render_component"]["render_type"];
 
+            
+            glm::vec3 position(0.0f);
+            glm::vec3 scale(1.0f);
+            glm::vec3 rotation(0.0f);
+
+            
             if (entity["transform_component"].contains("position")) {
                 const auto& pos = entity["transform_component"]["position"];
                 position = glm::vec3(pos[0], pos[1], pos[2]);
             }
+
+          
+            if (entity["transform_component"].contains("scale")) {
+                const auto& scal = entity["transform_component"]["scale"];
+                scale = glm::vec3(scal[0], scal[1], scal[2]);
+            }
+            
+           
+            if (entity["transform_component"].contains("rotation")) {
+                const auto& rot = entity["transform_component"]["rotation"];
+               
+                rotation = glm::vec3(rot[0], rot[1], rot[2]);
+            }
+            
+            
 
             switch (renderType) {
             case RenderType::RT_Mesh: {
@@ -169,42 +195,44 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
                     switch (entityType) {
                     case EntityType::ET_Object: {
                         std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
-                        
-                        rs.createMesh(ecs, mario_mesh, shader, file_array[countmesh], file_texture_array[countmesh], position);
+
+                        // Llama a la función para crear el mesh
+                        rs.createMesh(ecs, mario_mesh, shader,
+                            file_array[countmesh],
+                            file_texture_array[countmesh],
+                            position, scale, rotation);
                         countmesh++;
                         break;
                     }
                     case EntityType::ET_PointLight:
-                        rs.createPointLight(ecs, shader, position, color);
+                        rs.createPointLight(ecs, shader, position, color, scale, rotation);
                         break;
                     case EntityType::ET_SpotLight:
-                        rs.createSpotLight(ecs, shader, position, color);
+                        rs.createSpotLight(ecs, shader, position, color, scale, rotation);
                         break;
                     }
                 }
                 break;
             }
             case RenderType::RT_Terrain:
-                rs.createTerrain(ecs, shader, position, 500, 500);
+                rs.createTerrain(ecs, shader, position, scale, rotation, 500, 500);
                 break;
 
             case RenderType::RT_Sphere:
-                rs.createSphere(ecs, shader, position);
+                rs.createSphere(ecs, shader, position, scale, rotation);
                 break;
 
             case RenderType::RT_Quad:
-                rs.createQuad(ecs, shader, position);
+                rs.createQuad(ecs, shader, position, scale, rotation);
                 break;
 
             case RenderType::RT_Cube:
-                rs.createCube24v(ecs, shader, position);
+                rs.createCube24v(ecs, shader, position, scale, rotation);
                 break;
             }
         }
-
-    
-
     }
+
 
     auto li = ecs.getComponentList<LightComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
