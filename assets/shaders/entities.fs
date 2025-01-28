@@ -78,22 +78,23 @@ vec3 SpotLight(LightInfo lc) {
 }
 
 vec3 DirectionalLight(LightInfo lc) {
-    
+   
     vec3 light_dir = normalize(-lc.dir_);
-    
+
     float diff = max(dot(normal, light_dir), 0.0);
     vec3 diffuse = diff * lc.light_color_;
 
+    
     vec3 view_dir = normalize(u_camera_position - FragPos);
     vec3 reflect_dir = reflect(-light_dir, normal);
-
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), lc.shininess_);
     vec3 specular = spec * lc.spec_color_;
 
+    
     vec3 ambient = lc.ambient_color_ * lc.light_color_;
+
     return ambient + diffuse + specular;
 }
-
 
 void main() {
 
