@@ -24,6 +24,8 @@ bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
+    url = file;
+    url_texture = textureFolder;
     bool obj = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file.c_str(), textureFolder.c_str());
     if (!obj) {
         printf("Failed to load OBJ file: ");

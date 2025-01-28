@@ -33,6 +33,8 @@ public:
 
     std::vector<unsigned int> indices;
     int materialID;
+    std::string url;
+    std::string url_texture;
 
     GLuint VAO = 0, VBO = 0, EBO = 0;
 
@@ -60,6 +62,8 @@ public:
         json_data["VAO"] = VAO;
         json_data["VBO"] = VBO;
         json_data["EBO"] = EBO;
+        json_data["File"] = url;
+        json_data["File_texture"] = url_texture;
 
         return json_data;
     }

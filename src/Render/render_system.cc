@@ -541,14 +541,18 @@ void RenderSystem::setupEntities(ECSManager& ecs)
     ecs.add_component_type<LightComponent>();
 }
 
-size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader,glm::vec3 pos
+size_t RenderSystem::createMesh(ECSManager& ecs, const std::shared_ptr<Mesh>& entity_mesh, Shader& mesh_shader, std::string& file, std::string& textureFolder, glm::vec3 pos 
 )
 {
     auto mario_mesh = std::make_unique<Mesh>();
 
-    if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
+
+
+    if (!mario_mesh->loadOBJ(file, textureFolder)) {
         return -1;
     }
+
+    
 
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
