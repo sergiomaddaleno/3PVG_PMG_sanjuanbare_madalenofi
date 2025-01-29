@@ -1,7 +1,7 @@
 {
  "entities": [
   {
-   "entity_id": 7,
+   "entity_id": 0,
    "render_component": {
     "entity_type": 0,
     "mesh": {
@@ -13,106 +13,106 @@
      "materialID": 7,
      "meshes": [
       {
-       "EBO": 65,
+       "EBO": 21,
        "File": "",
        "File_texture": "",
-       "VAO": 32,
-       "VBO": 64,
+       "VAO": 11,
+       "VBO": 20,
        "materialID": 0,
        "textures": [
         {
-         "textureID": 30
+         "textureID": 8
         }
        ]
       },
       {
-       "EBO": 67,
+       "EBO": 31,
        "File": "",
        "File_texture": "",
-       "VAO": 33,
-       "VBO": 66,
+       "VAO": 15,
+       "VBO": 30,
        "materialID": 0,
        "textures": [
         {
-         "textureID": 31
+         "textureID": 9
         }
        ]
       },
       {
-       "EBO": 69,
+       "EBO": 33,
        "File": "",
        "File_texture": "",
-       "VAO": 34,
-       "VBO": 68,
+       "VAO": 16,
+       "VBO": 32,
        "materialID": 0,
        "textures": [
         {
-         "textureID": 32
+         "textureID": 10
         }
        ]
       },
       {
-       "EBO": 71,
+       "EBO": 35,
        "File": "",
        "File_texture": "",
-       "VAO": 35,
-       "VBO": 70,
+       "VAO": 17,
+       "VBO": 34,
        "materialID": 0,
        "textures": [
         {
-         "textureID": 33
+         "textureID": 11
         }
        ]
       },
       {
-       "EBO": 73,
+       "EBO": 37,
        "File": "",
        "File_texture": "",
-       "VAO": 36,
-       "VBO": 72,
+       "VAO": 18,
+       "VBO": 36,
        "materialID": 0,
        "textures": [
         {
-         "textureID": 34
+         "textureID": 12
         }
        ]
       },
       {
-       "EBO": 75,
+       "EBO": 39,
        "File": "",
        "File_texture": "",
-       "VAO": 37,
-       "VBO": 74,
+       "VAO": 19,
+       "VBO": 38,
        "materialID": 0,
        "textures": [
         {
-         "textureID": 35
+         "textureID": 13
         }
        ]
       },
       {
-       "EBO": 77,
+       "EBO": 41,
        "File": "",
        "File_texture": "",
-       "VAO": 38,
-       "VBO": 76,
+       "VAO": 20,
+       "VBO": 40,
        "materialID": 0,
        "textures": [
         {
-         "textureID": 36
+         "textureID": 14
         }
        ]
       },
       {
-       "EBO": 79,
+       "EBO": 43,
        "File": "",
        "File_texture": "",
-       "VAO": 39,
-       "VBO": 78,
+       "VAO": 21,
+       "VBO": 42,
        "materialID": 0,
        "textures": [
         {
-         "textureID": 37
+         "textureID": 15
         }
        ]
       }
@@ -120,23 +120,23 @@
     },
     "render_type": 1,
     "shader": {
-     "program": 12
+     "program": 6
     },
     "texture": {
-     "textureID": 37
+     "textureID": 15
     }
    },
    "transform_component": {
     "position": [
-     -6.209918022155762,
+     3.7705020904541016,
      0.0,
      0.0
     ],
     "rotation": [
-     -0.27669596672058105,
+     -0.06889890879392624,
      0.0,
      0.0,
-     0.9609575271606445
+     0.99762362241745
     ],
     "scale": [
      1.0,
@@ -146,97 +146,59 @@
    }
   },
   {
-   "entity_id": 8,
+   "entity_id": 2,
    "render_component": {
     "entity_type": 0,
-    "mesh": {
-     "EBO": 0,
-     "File": "../assets/obj/Toad.obj",
-     "File_texture": "../assets/textures/toad",
-     "VAO": 0,
-     "VBO": 0,
-     "materialID": 0,
-     "meshes": [
-      {
-       "EBO": 81,
-       "File": "",
-       "File_texture": "",
-       "VAO": 40,
-       "VBO": 80,
-       "materialID": 0,
-       "textures": [
-        {
-         "textureID": 38
-        }
-       ]
-      },
-      {
-       "EBO": 83,
-       "File": "",
-       "File_texture": "",
-       "VAO": 41,
-       "VBO": 82,
-       "materialID": 0,
-       "textures": [
-        {
-         "textureID": 39
-        }
-       ]
-      },
-      {
-       "EBO": 85,
-       "File": "",
-       "File_texture": "",
-       "VAO": 42,
-       "VBO": 84,
-       "materialID": 0,
-       "textures": [
-        {
-         "textureID": 40
-        }
-       ]
-      }
-     ]
-    },
-    "render_type": 1,
+    "render_type": 6,
     "shader": {
-     "program": 12
+     "program": 6
+    },
+    "sphere": {
+     "Texture": [
+      {
+       "textureID": 20
+      }
+     ],
+     "num_heights": 60,
+     "num_revs": 60,
+     "size_": 1.0,
+     "sky": false
     },
     "texture": {
-     "textureID": 40
+     "textureID": 0
     }
    },
    "transform_component": {
     "position": [
-     6.7518630027771,
-     1.8938355445861816,
-     0.010282210074365139
+     -2.922401189804077,
+     14.487624168395996,
+     21.271207809448242
     ],
     "rotation": [
      0.0,
-     0.04045712575316429,
      0.0,
-     0.9991812705993652
+     0.0,
+     1.0
     ],
     "scale": [
-     28.525741577148438,
-     51.50202941894531,
-     31.562103271484375
+     5.65844202041626,
+     7.9334797859191895,
+     47.30523681640625
     ]
    }
   },
   {
-   "entity_id": 9,
+   "entity_id": 3,
    "render_component": {
     "entity_type": 0,
     "render_type": 5,
     "shader": {
-     "program": 12
+     "program": 6
     },
     "terrain": {
      "Texture": [
       {
-       "textureID": 42
+       "textureID": 21
       }
      ],
      "height_mult": 0.0,
@@ -247,7 +209,7 @@
      "use_perlin_noise": true
     },
     "texture": {
-     "textureID": 42
+     "textureID": 21
     }
    },
    "transform_component": {
@@ -270,9 +232,51 @@
    }
   },
   {
-   "entity_id": 10,
+   "entity_id": 4,
    "render_component": {
-    "entity_type": 1,
+    "entity_type": 0,
+    "render_type": 6,
+    "shader": {
+     "program": 6
+    },
+    "sphere": {
+     "Texture": [
+      {
+       "textureID": 22
+      }
+     ],
+     "num_heights": 60,
+     "num_revs": 60,
+     "size_": 1.0,
+     "sky": false
+    },
+    "texture": {
+     "textureID": 0
+    }
+   },
+   "transform_component": {
+    "position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "entity_id": 5,
+   "render_component": {
+    "entity_type": 2,
     "mesh": {
      "EBO": 0,
      "File": "../assets/obj/light_bulb.obj",
@@ -282,18 +286,18 @@
      "materialID": 0,
      "meshes": [
       {
-       "EBO": 89,
+       "EBO": 51,
        "File": "",
        "File_texture": "",
-       "VAO": 44,
-       "VBO": 88,
+       "VAO": 25,
+       "VBO": 50,
        "materialID": 0
       }
      ]
     },
     "render_type": 1,
     "shader": {
-     "program": 12
+     "program": 6
     },
     "texture": {
      "textureID": 0
@@ -301,9 +305,9 @@
    },
    "transform_component": {
     "position": [
-     -0.8110954761505127,
-     0.0,
-     6.462554931640625
+     3.746527671813965,
+     6.246669292449951,
+     9.69675064086914
     ],
     "rotation": [
      0.0,
@@ -320,179 +324,6 @@
   },
   {
    "entity_id": 11,
-   "render_component": {
-    "entity_type": 1,
-    "mesh": {
-     "EBO": 0,
-     "File": "../assets/obj/light_bulb.obj",
-     "File_texture": "",
-     "VAO": 0,
-     "VBO": 0,
-     "materialID": 0,
-     "meshes": [
-      {
-       "EBO": 91,
-       "File": "",
-       "File_texture": "",
-       "VAO": 45,
-       "VBO": 90,
-       "materialID": 0
-      }
-     ]
-    },
-    "render_type": 1,
-    "shader": {
-     "program": 12
-    },
-    "texture": {
-     "textureID": 0
-    }
-   },
-   "transform_component": {
-    "position": [
-     8.568864822387695,
-     0.0,
-     4.071319103240967
-    ],
-    "rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "entity_id": 12,
-   "render_component": {
-    "entity_type": 0,
-    "render_type": 6,
-    "shader": {
-     "program": 12
-    },
-    "sphere": {
-     "Texture": [
-      {
-       "textureID": 43
-      }
-     ],
-     "num_heights": 60,
-     "num_revs": 60,
-     "size_": 1.0,
-     "sky": false
-    },
-    "texture": {
-     "textureID": 43
-    }
-   },
-   "transform_component": {
-    "position": [
-     -8.696690559387207,
-     11.207170486450195,
-     0.0
-    ],
-    "rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "scale": [
-     5.65844202041626,
-     7.9334797859191895,
-     10.139739990234375
-    ]
-   }
-  },
-  {
-   "entity_id": 19,
-   "light_component": {
-    "light_info": {
-     "Ambient Color": [
-      [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
-      ]
-     ],
-     "Constant attenuation": [
-      1.0
-     ],
-     "Diffusion Color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       -0.6666666865348816,
-       -0.6666666865348816,
-       -0.3333333432674408
-      ]
-     ],
-     "Light Color": [
-      [
-       1.0,
-       1.0,
-       0.949999988079071
-      ]
-     ],
-     "Linear attenuation": [
-      0.0
-     ],
-     "Quadratic attenuation": [
-      0.0
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular Color": [
-      [
-       1.0,
-       1.0,
-       0.949999988079071
-      ]
-     ],
-     "Spot Angle": [
-      0.0
-     ],
-     "Strength": [
-      0.0
-     ],
-     "Type": 0
-    },
-    "shader": {
-     "program": 12
-    }
-   },
-   "transform_component": {
-    "position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "entity_id": 23,
    "light_component": {
     "light_info": {
      "Ambient Color": [
@@ -516,14 +347,14 @@
       [
        0.0,
        0.0,
-       0.0
+       -1.0
       ]
      ],
      "Light Color": [
       [
-       0.0,
-       105.07536315917969,
-       255.0
+       150.0,
+       150.0,
+       150.0
       ]
      ],
      "Linear attenuation": [
@@ -543,104 +374,22 @@
       ]
      ],
      "Spot Angle": [
-      0.0
+      20.0
      ],
      "Strength": [
       1.0
      ],
-     "Type": 2
+     "Type": 1
     },
     "shader": {
-     "program": 12
+     "program": 6
     }
    },
    "transform_component": {
     "position": [
-     -0.8110954761505127,
-     0.0,
-     6.462554931640625
-    ],
-    "rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "entity_id": 24,
-   "light_component": {
-    "light_info": {
-     "Ambient Color": [
-      [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
-      ]
-     ],
-     "Constant attenuation": [
-      1.0
-     ],
-     "Diffusion Color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Light Color": [
-      [
-       253.7185821533203,
-       0.0,
-       0.0
-      ]
-     ],
-     "Linear attenuation": [
-      0.699999988079071
-     ],
-     "Quadratic attenuation": [
-      1.7999999523162842
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular Color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Spot Angle": [
-      0.0
-     ],
-     "Strength": [
-      1.0
-     ],
-     "Type": 2
-    },
-    "shader": {
-     "program": 12
-    }
-   },
-   "transform_component": {
-    "position": [
-     8.568864822387695,
-     0.0,
-     4.071319103240967
+     3.746527671813965,
+     6.246669292449951,
+     9.69675064086914
     ],
     "rotation": [
      0.0,

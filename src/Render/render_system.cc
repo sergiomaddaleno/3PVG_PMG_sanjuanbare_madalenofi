@@ -222,33 +222,6 @@ void RenderSystem::initEntities(ECSManager& ecs) {
     glUseProgram(0);
 }
 
-void setupShadowMap(LightComponent* lightComp, GLuint width, GLuint height) {
-
-
-    glGenFramebuffers(1, &lightComp->shadowMapFBO);
-
-    ;
-
-    glGenTextures(1, &lightComp->shadowMap);
-
-
-    glBindTexture(GL_TEXTURE_2D, lightComp->shadowMap);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, lightComp->shadowMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, lightComp->shadowMap, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-
-}
 
 
 void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
@@ -261,37 +234,62 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ZERO);
-
+    
     int light_count = 0;
     for (; li != liend && ti != tiend; ++li, ++ti) {
         if (li->has_value() && ti->has_value()) {
             auto& light_comp = *li;
             auto& light_transform = *ti;
+            
+           
+            glGenFramebuffers(1, &light_comp->shadowMapFBO);
 
+            glGenTextures(1, &light_comp->shadowMap);
+            glBindTexture(GL_TEXTURE_2D, light_comp->shadowMap);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+                1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-            if (light_comp->shadowMap == 0) {
-                GLuint shadowWidth = 1024;
-                GLuint shadowHeight = 1024;
-                std::cout << "Configurando mapa de sombras para la luz #" << light_count << std::endl;
-                setupShadowMap(&(*light_comp), shadowWidth, shadowHeight);
-            }
+            glBindFramebuffer(GL_FRAMEBUFFER, light_comp->shadowMapFBO);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, light_comp->shadowMap, 0);
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            
+           
 
+            glViewport(0, 0, 1024, 1024);
+            glBindFramebuffer(GL_FRAMEBUFFER, light_comp->shadowMapFBO);
+            
+            glClear(GL_DEPTH_BUFFER_BIT);
+            
+     
+            light_comp->shader.useProgram();
 
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, light_transform->position);
+            model = model * glm::mat4_cast(light_transform->rotation);
+            model = glm::scale(model, light_transform->scale);
 
-            glDisable(GL_BLEND);
-            glEnable(GL_DEPTH_TEST);
+            glm::mat4 view = cam.getViewMatrix();
+            glm::mat4 projection = cam.getProjectionMatrix();
+            glm::mat4 mvp = projection * view * model;
 
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
 
-
-
-
-            glm::mat4 lightProjection = glm::ortho<float>(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
+            glm::mat4 lightProjection = cam.getProjectionMatrix();
             glm::mat4 lightView = glm::lookAt(light_transform->position, light_transform->position + light_comp->light_info.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
             glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
-
-            light_comp->shader.useProgram();
             light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("lightSpaceMatrix"), Type::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
+
+            
 
             auto ri2 = ecs.getComponentList<RenderComponent>().begin();
             auto ti2 = ecs.getComponentList<TransformComponent>().begin();
@@ -305,27 +303,11 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
 
                     render_comp->shader.useProgram();
 
-                    glm::mat4 model = glm::translate(glm::mat4(1.0f), transform_comp->position);
-                    model = glm::scale(model, transform_comp->scale);
-
-
-                    light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
-
-
-                    GLuint tex_id = 4;
-                    glActiveTexture(GL_TEXTURE4);
-                    glBindTexture(GL_TEXTURE_2D, light_comp->shadowMap);
-                    light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("shadowMap"), Type::T_INT_1, &tex_id);
-
 
                     if (render_comp->type_ == RenderType::RT_Mesh) {
                         for (auto& mesh : render_comp->mesh_->meshes) {
                             render_comp->shader.useProgram();
                             glCullFace(GL_BACK);
-
-
-
-
 
                             //Texture
                             render_comp->texture = mesh.getTexture(0);
@@ -366,84 +348,38 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         glBindVertexArray(0);
                     }
 
-                    if (render_comp->type_ == RenderType::RT_Sphere) {
-
-                        auto& sphere = render_comp->sphere_;
-
-                        render_comp->shader.useProgram();
-                        glCullFace(GL_BACK);
-
-
-                        //Texture
-                        render_comp->texture = sphere->tex;
-                        render_comp->texture.bind();
-                        int tex_id = 0;
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
-
-                        //Fog
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
-
-                        glBindVertexArray(sphere->VAO);
-                        glDrawElements(GL_TRIANGLES, (sphere->num_heights_ * sphere->num_revs_) * 6, GL_UNSIGNED_INT, 0);
-                        glBindVertexArray(0);
-                    }
-
-                    if (render_comp->type_ == RenderType::RT_Cube) {
-
-                        auto& cube = render_comp->cube_;
-
-                        render_comp->shader.useProgram();
-                        glCullFace(GL_BACK);
-
-
-
-
-                        //Texture
-                        render_comp->texture = cube->tex;
-                        render_comp->texture.bind();
-                        int tex_id = 0;
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
-
-                        //Fog
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
-
-                        glBindVertexArray(cube->VAO);
-                        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-                        glBindVertexArray(0);
-                    }
-
-
-                    if (render_comp->type_ == RenderType::RT_Quad) {
-
-                        auto& quad = render_comp->quad_;
-
-                        render_comp->shader.useProgram();
-                        glCullFace(GL_BACK);
-
-
-
-                        //Texture
-                        render_comp->texture = quad->tex;
-                        render_comp->texture.bind();
-                        int tex_id = 0;
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
-
-                        //Fog
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
-
-                        glBindVertexArray(quad->VAO);
-                        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-                        glBindVertexArray(0);
-                    }
-
-
                 }
             }
+            
+          
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);  
+            glDrawBuffer(GL_BACK);  
+            glReadBuffer(GL_BACK);
+            glViewport(0, 0, g_window_width_, g_window_height_);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);  // Desactivar FBO
-            glCullFace(GL_BACK);
+
+
+            GLuint tex_id = 4;
+            glActiveTexture(GL_TEXTURE4);
+            glBindTexture(GL_TEXTURE_2D, light_comp->shadowMap);
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("shadowMap"), Type::T_INT_1, &tex_id);
 
             light_comp->shader.useProgram();
+
+             model = glm::mat4(1.0f);
+            model = glm::translate(model, light_transform->position);
+            model = model * glm::mat4_cast(light_transform->rotation);
+            model = glm::scale(model, light_transform->scale);
+            
+            view = cam.getViewMatrix();
+            projection = cam.getProjectionMatrix();
+             mvp = projection * view * model;
+
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
 
             light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("u_number_lights"), Type::T_INT_1, &number_lights);
             light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("u_camera_position"), Type::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
@@ -498,6 +434,9 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                 if (ri->has_value() && ti->has_value()) {
                     auto& render_comp = *ri;
                     auto& transform_comp = *ti;
+
+
+                    render_comp->shader.useProgram();
 
                     glm::mat4 model = glm::mat4(1.0f);
                     model = glm::translate(model, transform_comp->position);
@@ -571,101 +510,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     }
 
 
-                    if (render_comp->type_ == RenderType::RT_Sphere) {
-
-                        auto& sphere = render_comp->sphere_;
-
-                        render_comp->shader.useProgram();
-                        glCullFace(GL_BACK);
-
-                        glm::mat4 model = glm::mat4(1.0f);
-                        model = glm::translate(model, transform_comp->position);
-                        model = model * glm::mat4_cast(transform_comp->rotation);
-                        model = glm::scale(model, transform_comp->scale);
-
-                        glm::mat4 view = cam.getViewMatrix();
-                        glm::mat4 projection = cam.getProjectionMatrix();
-                        glm::mat4 mvp = projection * view * model;
-
-
-
-                        //Texture
-                        render_comp->texture = sphere->tex;
-                        render_comp->texture.bind();
-                        int tex_id = 0;
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
-
-                        //Fog
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
-
-                        glBindVertexArray(sphere->VAO);
-                        glDrawElements(GL_TRIANGLES, (sphere->num_heights_ * sphere->num_revs_) * 6, GL_UNSIGNED_INT, 0);
-                        glBindVertexArray(0);
-                    }
-
-                    if (render_comp->type_ == RenderType::RT_Cube) {
-
-                        auto& cube = render_comp->cube_;
-
-                        render_comp->shader.useProgram();
-                        glCullFace(GL_BACK);
-
-                        glm::mat4 model = glm::mat4(1.0f);
-                        model = glm::translate(model, transform_comp->position);
-                        model = model * glm::mat4_cast(transform_comp->rotation);
-                        model = glm::scale(model, transform_comp->scale);
-
-                        glm::mat4 view = cam.getViewMatrix();
-                        glm::mat4 projection = cam.getProjectionMatrix();
-                        glm::mat4 mvp = projection * view * model;
-
-
-                        //Texture
-                        render_comp->texture = cube->tex;
-                        render_comp->texture.bind();
-                        int tex_id = 0;
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
-
-                        //Fog
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
-
-                        glBindVertexArray(cube->VAO);
-                        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-                        glBindVertexArray(0);
-                    }
-
-                    if (render_comp->type_ == RenderType::RT_Quad) {
-
-                        auto& quad = render_comp->quad_;
-
-                        render_comp->shader.useProgram();
-                        glCullFace(GL_BACK);
-
-                        glm::mat4 model = glm::mat4(1.0f);
-                        model = glm::translate(model, transform_comp->position);
-                        model = model * glm::mat4_cast(transform_comp->rotation);
-                        model = glm::scale(model, transform_comp->scale);
-
-                        glm::mat4 view = cam.getViewMatrix();
-                        glm::mat4 projection = cam.getProjectionMatrix();
-                        glm::mat4 mvp = projection * view * model;
-
-
-
-                        //Texture
-                        render_comp->texture = quad->tex;
-                        render_comp->texture.bind();
-                        int tex_id = 0;
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("texture_"), Type::T_INT_1, &tex_id);
-
-                        //Fog
-                        render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
-
-                        glBindVertexArray(quad->VAO);
-                        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-                        glBindVertexArray(0);
-                    }
-
+                    
 
                 }
             }

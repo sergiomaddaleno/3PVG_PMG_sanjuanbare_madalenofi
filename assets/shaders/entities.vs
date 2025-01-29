@@ -21,30 +21,30 @@ const float gradient = 2.0;                // Gradiente de la niebla
 
 void main()
 {
-    // Posición en el espacio mundial
+
     vec4 world_pos = model * vec4(aPos, 1.0);
 
-    // Posición en el espacio de la cámara
+  
     vec4 pos_relative_to_cam = view * world_pos;
 
-    // Calcular visibilidad en base a la distancia (para niebla)
+   
     float distance = length(pos_relative_to_cam.xyz);
     visibility = exp(-pow((distance * density), gradient));
     visibility = clamp(visibility, 0.0, 1.0);
 
-    // Coordenadas de textura
+    
     uv = aTexCoord;
 
-    // Transformar la normal por la matriz del modelo (para asegurar que las normales estén bien transformadas)
+    
     normal = mat3(transpose(inverse(model))) * aNormal;
 
-    // Posición del fragmento en el espacio mundial
+   
     FragPos = world_pos.xyz;
 
-    // Calculamos la posición en el espacio de la luz (para sombras)
+    
     FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
 
-    // Calcular la posición final en pantalla (proyección)
+   
     gl_Position = projection * pos_relative_to_cam;
 }
 

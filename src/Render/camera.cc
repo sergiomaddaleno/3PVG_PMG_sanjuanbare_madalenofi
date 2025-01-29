@@ -33,7 +33,13 @@ Camera::Camera()
 
 glm::mat4 Camera::initViewTarget()
 {
-	return glm::lookAt(position_, position_ + view_direction_, up_);
+
+   
+
+     glm::vec3 view = glm::vec3(0.0f,0.0f,-1.0f);
+     glm::vec3 position = glm::vec3(3.746527671813965f, 6.246669292449951f, 9.69675064086914f);
+
+	return glm::lookAt(position, position + view, up_);
 }
 
 void Camera::update(Input& input, const double dt, const int window_width, const int window_height) {

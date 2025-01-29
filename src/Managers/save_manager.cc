@@ -148,7 +148,7 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
         
     }
 
-    rs.createDirectionalLight(ecs, shader);
+    //rs.createDirectionalLight(ecs, shader);
 
    
     

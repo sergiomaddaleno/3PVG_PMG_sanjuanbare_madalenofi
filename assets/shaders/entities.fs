@@ -39,25 +39,23 @@ struct LightInfo {
 
 uniform LightInfo u_light[kMaxLights];
 
-// Función para calcular la sombra
+
 float ShadowCalculation(vec4 fragPosLightSpace)
 {
-    // Transformar la posición del fragmento a espacio de luz
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  // Dividir por w (perspectiva)
-    projCoords = projCoords * 0.5 + 0.5; // Transformar a rango [0, 1]
+    
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  
+    projCoords = projCoords * 0.5 + 0.5; 
 
-    // Muestrear el mapa de sombras
+   
     float closestDepth = texture(shadowMap, projCoords.xy).r;
     float currentDepth = projCoords.z;
 
-    // Desplazamiento para evitar el acne de sombra
     float bias = 0.005;
 
-    // Determinar si el fragmento está en sombra
     return currentDepth - bias > closestDepth ? 0.0 : 1.0;
 }
 
-// Función para luz puntual
+
 vec3 PointLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
     float distance = length(lc.pos_ - FragPos);
@@ -74,7 +72,7 @@ vec3 PointLight(LightInfo lc) {
     return diffuse + specular;
 }
 
-// Función para luz direccional
+
 vec3 DirectionalLight(LightInfo lc) {
     vec3 light_dir = normalize(-lc.dir_);
 
@@ -90,7 +88,7 @@ vec3 DirectionalLight(LightInfo lc) {
     return ambient + diffuse + specular;
 }
 
-// Función para luz spot
+
 vec3 SpotLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
     float cutOff = cos(radians(lc.spot_angle_));
@@ -120,18 +118,18 @@ void main()
     vec3 final_light = u_ambient;
 
     for (int i = 0; i < u_number_lights; ++i) {
-        float shadow = ShadowCalculation(FragPosLightSpace); // Verificar si está en sombra
+        float shadow = ShadowCalculation(FragPosLightSpace); 
 
         if (u_light[i].type_ == 0) {
-            final_light += DirectionalLight(u_light[i]) * shadow; // Aplicar sombra
+            final_light += DirectionalLight(u_light[i]) * shadow; 
         }
 
         if (u_light[i].type_ == 1) {
-            final_light += SpotLight(u_light[i]) * shadow;  // Aplicar sombra
+            final_light += SpotLight(u_light[i]) * shadow; 
         }
 
         if (u_light[i].type_ == 2) {
-            final_light += PointLight(u_light[i]) * shadow;  // Aplicar sombra
+            final_light += PointLight(u_light[i]) * shadow;  
         }
     }
 
