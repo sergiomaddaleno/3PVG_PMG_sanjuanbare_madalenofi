@@ -1,34 +1,50 @@
-#version 330
+#version 330 core
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec2 aTexCoord;
+layout(location = 0) in vec3 aPos;        // Posición del vértice
+layout(location = 1) in vec3 aNormal;     // Normal del vértice
+layout(location = 2) in vec2 aTexCoord;   // Coordenadas de textura
 
-uniform mat4 mvp;
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 mvp;                          // Matriz de Proyección * Vista * Modelo
+uniform mat4 model;                        // Matriz de modelo
+uniform mat4 view;                         // Matriz de vista
+uniform mat4 projection;                   // Matriz de proyección
+uniform mat4 lightSpaceMatrix;             // Matriz de proyección de la luz (para sombras)
 
-out vec2 uv;
-out vec3 normal;
-out vec3 FragPos;
+out vec2 uv;                               // Coordenadas de textura
+out float visibility;                      // Visibilidad (para niebla)
+out vec3 normal;                           // Normal del vértice transformada
+out vec3 FragPos;                          // Posición del fragmento en el espacio mundial
+out vec4 FragPosLightSpace;                // Posición en el espacio de la luz
 
-out float visibility;
-uniform float u_density = 0.06;
-uniform float u_gradient = 2.0;
+const float density = 0.06;                // Densidad de la niebla
+const float gradient = 2.0;                // Gradiente de la niebla
 
 void main()
 {
+    // Posición en el espacio mundial
     vec4 world_pos = model * vec4(aPos, 1.0);
+
+    // Posición en el espacio de la cámara
     vec4 pos_relative_to_cam = view * world_pos;
 
+    // Calcular visibilidad en base a la distancia (para niebla)
     float distance = length(pos_relative_to_cam.xyz);
-    visibility = exp(-pow((distance * u_density), u_gradient));
+    visibility = exp(-pow((distance * density), gradient));
     visibility = clamp(visibility, 0.0, 1.0);
 
+    // Coordenadas de textura
     uv = aTexCoord;
-    normal = mat3(transpose(inverse(model))) * aNormal; // Transform normal by model matrix
-    FragPos = world_pos.xyz; // Pass world position to FragPos
 
+    // Transformar la normal por la matriz del modelo (para asegurar que las normales estén bien transformadas)
+    normal = mat3(transpose(inverse(model))) * aNormal;
+
+    // Posición del fragmento en el espacio mundial
+    FragPos = world_pos.xyz;
+
+    // Calculamos la posición en el espacio de la luz (para sombras)
+    FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
+
+    // Calcular la posición final en pantalla (proyección)
     gl_Position = projection * pos_relative_to_cam;
 }
+

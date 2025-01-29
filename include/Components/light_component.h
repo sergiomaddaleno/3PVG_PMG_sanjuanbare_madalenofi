@@ -11,7 +11,8 @@ struct LightComponent {
 
 	LightInfo light_info;
 	Shader shader;
-
+	unsigned int shadowMap=0;
+    unsigned int shadowMapFBO = 0;
 	nlohmann::json serialize() {
 
 		nlohmann::json json_data;
