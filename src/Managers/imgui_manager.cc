@@ -6,8 +6,8 @@
 #include "Components/light_component.h"
 #include "Components/transform_component.h"
 #include "Managers/save_manager.h"
-
 #include "Core/window.h"
+#include "global_variables.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -181,7 +181,10 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     ContentBrowserWindow(di);
     TopBarWindow(di);
 
+    if (console_window) ConsoleWindow(di);
     if (post_process_window) PostProcessWindow(di);
+    if (skybox_window) SkyboxWindow(di);
+    if (fog_window) FogWindow(di);
 
     di.post_proccessing->endRender();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -464,25 +467,14 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             if (ImGui::Button("Compile")) {
                 Shader newShader;
 
-                if (vertex_file_name == "entities.vs" && fragment_file_name == "entities.fs") {
-
-
-                }
-
-                    
-
                 newShader.compile(vertex_content, fragment_content);
 
                 if (vertex_file_name != "entities.vs" && fragment_file_name != "entities.fs") {
                     di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
-
                 }
                 else {
                     di.ecs->get_component<RenderComponent>(selected_entity)->shader = *di.shader;
-
                 }
-
-               
 
                 vertex_file_name.clear();
                 fragment_file_name.clear();
@@ -622,8 +614,17 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
             }
 
             if (ImGui::BeginMenu("Post Proccess")) {
-
                 ImGui::Checkbox("Post Process Window", &post_process_window);
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Fog")) {
+                ImGui::Checkbox("Fog Window", &fog_window);
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("SkyBox")) {
+                ImGui::Checkbox("SkyBox Window", &skybox_window);
                 ImGui::EndMenu();
             }
 
@@ -800,6 +801,91 @@ void ImGuiManager::PostProcessWindow(DataImgui& di)
         ImGui::Dummy({ 0.0f, 5.0f });
 
     }
+
+    ImGui::End();
+}
+
+void ImGuiManager::FogWindow(DataImgui& di)
+{
+    ImGui::Begin("Fog");
+
+    ImGui::Dummy({ 0.0f, 5.0f });
+
+    ImGui::Checkbox("Activate", &g_b_fog_);
+
+    ImGui::Dummy({ 0.0f, 5.0f });
+
+    ImGui::DragFloat("Density", &g_fog_density_, 0.001f, 0.0f, 2.0f, "%.3f");
+    ImGui::DragFloat("Gradient", &g_fog_gradient_, 0.001f, 0.0f, 10.0f, "%.3f");
+
+    ImGui::Dummy({ 0.0f, 5.0f });
+    
+    float color[3] = {
+                    g_sky_colour_.r / 255.0f,
+                    g_sky_colour_.g / 255.0f,
+                    g_sky_colour_.b / 255.0f
+    };
+
+    if (ImGui::ColorPicker3("Sky Colour", color)) {
+        g_sky_colour_.x = color[0];
+        g_sky_colour_.y = color[1];
+        g_sky_colour_.z = color[2];
+    }
+
+
+    ImGui::End();
+}
+
+char* loc_vs_sky_box = (char*)ReadFile("../assets/shaders/skybox.vs");
+char* loc_fs_sky_box = (char*)ReadFile("../assets/shaders/skybox.fs");
+
+void ImGuiManager::SkyboxWindow(DataImgui& di)
+{
+    ImGui::Begin("SkyBox");
+
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    ImGui::Text("Drag and Drop DDS file");
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+    static std::string skybox_file_name;
+    static char* skybox_content = nullptr;
+    if (ImGui::Button(!skybox_file_name.empty() ? skybox_file_name.c_str() : "DDS Drop here", { 120.0f, 40.0f })) {}
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+            std::filesystem::path filePath = (const wchar_t*)payload->Data;
+            if (filePath.extension() == ".dds") {
+                skybox_file_name = filePath.filename().string();
+                skybox_content = ReadFile(filePath.string().c_str());
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    if (skybox_content) {
+
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        if (ImGui::Button("Compile")) {
+
+            Texture tex;
+
+            if (tex.loadSkyboxTex(skybox_content))  di.skybox.texture_ = tex.getTexture();
+
+            di.skybox.shader_.compile(loc_vs_sky_box, loc_fs_sky_box);
+
+            di.skybox.init();
+
+        }
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    }
+
+    ImGui::End();
+}
+
+void ImGuiManager::ConsoleWindow(DataImgui& di)
+{
+    ImGui::Begin("Console");
+
 
     ImGui::End();
 }

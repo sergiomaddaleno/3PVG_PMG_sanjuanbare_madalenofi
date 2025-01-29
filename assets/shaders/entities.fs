@@ -7,7 +7,7 @@ uniform vec3 u_camera_position;
 uniform vec3 u_ambient;
 
 uniform bool u_fog;
-vec3 skyColour = vec3(0.5, 0.5, 0.5);
+uniform vec3 u_sky_colour;
 in float visibility;
 
 out vec4 FragColor;
@@ -121,6 +121,6 @@ void main() {
    FragColor = vec4(texture_and_light, 1.0);
 
    if(u_fog){
-        FragColor = mix(vec4(skyColour, 1.0), FragColor, visibility);
+        FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
    }
 }

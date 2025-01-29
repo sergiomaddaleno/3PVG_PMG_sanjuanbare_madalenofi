@@ -49,7 +49,7 @@ struct TransformComponent {
 
     // ----------------------------------
 
-    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(1.0f, 0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f){}
+    TransformComponent() : position(0.0f, 0.0f, 0.0f), rotation(0.0f, 0.0f, 0.0f, 0.0f), scale(1.0f, 1.0f, 1.0f){}
 
     TransformComponent(glm::vec3 position_, glm::vec3 rotation_, glm::vec3 scale_, float angle_)
         : position(position_), rotation(rotation_), scale(scale_){}

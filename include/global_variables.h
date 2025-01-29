@@ -12,5 +12,9 @@ extern float g_min_render_distance_;
 extern float g_max_render_distance_;
 
 extern bool g_b_fog_;
+extern float g_fog_density_;
+extern float g_fog_gradient_;
+extern glm::vec3 g_sky_colour_;
+
 
 #endif // GLOBALS_H

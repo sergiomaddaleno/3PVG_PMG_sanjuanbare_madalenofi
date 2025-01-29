@@ -38,7 +38,7 @@ struct DataImgui {
     Shader* shader;
     Window* window;
     Input* input;
-    //Skybox sxybox;
+    Skybox skybox;
     SaveManager save_manager;
 };
 
@@ -65,6 +65,9 @@ public:
     void TopBarWindow(DataImgui& di);
 
     void PostProcessWindow(DataImgui& di);
+    void FogWindow(DataImgui& di);
+    void SkyboxWindow(DataImgui& di);
+    void ConsoleWindow(DataImgui& di);
 
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di);
 
@@ -79,9 +82,13 @@ private:
     Texture m_EntityIcon;
     Texture m_EntityLightBulbIcon;
 
+    bool post_process_window = false;
+    bool skybox_window = false;
+    bool console_window = false;
+    bool fog_window = false;
+
     Shader new_pp_shader;
     Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
-    bool post_process_window = false;
     bool post_process_compiled = false;
     Effect current_effect = Effect::None;
     bool none_render = false;

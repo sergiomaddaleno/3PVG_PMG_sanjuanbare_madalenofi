@@ -40,7 +40,7 @@ void Skybox::init() {
     glBindVertexArray(0);
 }
 
-void Skybox::render(RenderComponent rc, Camera cam) {
+void Skybox::render(Shader shader, Texture texture, Camera cam) {
     glDepthMask(GL_FALSE);
 
     glEnable(GL_CULL_FACE);
@@ -53,18 +53,18 @@ void Skybox::render(RenderComponent rc, Camera cam) {
     glm::mat4 model = rotation;
 
     float tex_id = 0.0f;
-    rc.shader.useProgram();
+    shader.useProgram();
 
-    rc.texture.bind();
-    rc.shader.setUniformValue(rc.shader.getUniformLocation("skybox"), Type::T_INT_1, &tex_id);
+    texture.bind();
+    shader.setUniformValue(shader.getUniformLocation("skybox"), Type::T_INT_1, &tex_id);
 
-    unsigned int viewLoc = rc.shader.getUniformLocation("view");
-    unsigned int projLoc = rc.shader.getUniformLocation("projection");
-    unsigned int modelLoc = rc.shader.getUniformLocation("model");
+    unsigned int viewLoc = shader.getUniformLocation("view");
+    unsigned int projLoc = shader.getUniformLocation("projection");
+    unsigned int modelLoc = shader.getUniformLocation("model");
 
-    rc.shader.setUniformValue(viewLoc, Type::T_MAT_4x4, &view[0][0]);
-    rc.shader.setUniformValue(projLoc, Type::T_MAT_4x4, &projection[0][0]);
-    rc.shader.setUniformValue(modelLoc, Type::T_MAT_4x4, &model[0][0]);
+    shader.setUniformValue(viewLoc, Type::T_MAT_4x4, &view[0][0]);
+    shader.setUniformValue(projLoc, Type::T_MAT_4x4, &projection[0][0]);
+    shader.setUniformValue(modelLoc, Type::T_MAT_4x4, &model[0][0]);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, sizeof(gIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);

@@ -9,3 +9,6 @@ float g_min_render_distance_ = 0.1f;
 float g_max_render_distance_ = 400.0f;
 
 bool g_b_fog_ = false;
+float g_fog_density_ = 0.06f;
+float g_fog_gradient_ = 2.0f;
+glm::vec3 g_sky_colour_ = {0.5f, 0.5f, 0.5f};

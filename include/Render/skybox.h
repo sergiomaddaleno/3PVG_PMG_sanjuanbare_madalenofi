@@ -7,8 +7,8 @@
 #include <../deps/glm/glm.hpp>
 
 #include "camera.h"
-
-struct RenderComponent;
+#include "Core/shader.h"
+#include "Core/texture.h"
 
 static const glm::vec3 gMesh[] = {
   {-1.0f, -1.0f, -1.0f},
@@ -62,10 +62,13 @@ public:
 
 	void init();
 
-	void render(RenderComponent rc, Camera cam);
+	void render(Shader shader, Texture texture, Camera cam);
+
+	Shader shader_;
+	Texture texture_;
 
 private:
-
+	
 	float skybox_angle;
 
 	GLuint VAO, VBO, EBO;
