@@ -38,6 +38,7 @@ class Terrain {
   std::vector<float> data_;
 
   Texture tex;
+  Texture height_map;
 
   //Save data
   nlohmann::json serialize() const {
