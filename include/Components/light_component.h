@@ -4,21 +4,23 @@
 #include <memory>
 #include "../Core/shader.h"
 #include "../Render/light.h"
+#include "../Core/framebuffer.h"
 
 #include "../deps/nlohmann/json.hpp"
 
 struct LightComponent {
 
-	LightInfo light_info;
+	Light light;
 	Shader shader;
-	unsigned int shadowMap=0;
-    unsigned int shadowMapFBO = 0;
+	FrameBuffer shadow_map;
+
+	// To save data
 	nlohmann::json serialize() {
 
 		nlohmann::json json_data;
 
-		json_data["light_info"] = light_info.serialize();
-		json_data["shader"] = shader.serialize();
+		json_data["light"] = light.serialize();
+		json_data["Shader"] = shader.serialize();
 
 		return json_data;
 	}

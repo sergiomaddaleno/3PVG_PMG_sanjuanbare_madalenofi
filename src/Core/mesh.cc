@@ -24,8 +24,8 @@ bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
-    url = file;
-    url_texture = textureFolder;
+    mesh_path = file;
+    texture_folder = textureFolder;
     bool obj = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file.c_str(), textureFolder.c_str());
     if (!obj) {
         printf("Failed to load OBJ file: ");
@@ -151,6 +151,53 @@ void Mesh::render(RenderComponent rc, TransformComponent tc, Camera cam)
         glDeleteVertexArrays(1, &rc.mesh_->VAO);
         glDeleteBuffers(1, &rc.mesh_->VBO);
         glDeleteBuffers(1, &rc.mesh_->EBO);
+    }
+}
+
+void Mesh::bind()
+{
+    for (auto& mesh : meshes) {
+
+        glGenVertexArrays(1, &mesh.VAO);
+        glBindVertexArray(mesh.VAO);
+
+        glGenBuffers(1, &mesh.VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+        glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), &mesh.vertices[0], GL_STATIC_DRAW);
+
+        glGenBuffers(1, &mesh.EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), &mesh.indices[0], GL_STATIC_DRAW);
+
+        //---
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
+        glEnableVertexAttribArray(2);
+
+        glBindVertexArray(0);
+    }
+}
+
+void Mesh::renderElements() {
+    
+    for (auto& mesh : meshes) {
+        
+        if (!mesh.textures.empty()) {
+            mesh.textures[0].bind();
+        }
+
+        if (!mesh.indices.empty()) {
+            glBindVertexArray(mesh.VAO);
+            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+        }
+        
     }
 }
 

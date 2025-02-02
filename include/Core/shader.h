@@ -31,7 +31,7 @@ public:
     nlohmann::json serialize() const {
         nlohmann::json json_data;
 
-        json_data["program"] = program_;
+        json_data["Program"] = program_;
 
         return json_data;
     }

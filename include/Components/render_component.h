@@ -18,6 +18,8 @@
 enum RenderType {
     RT_Default,
     RT_Mesh,
+    RT_PointLight,
+    RT_SpotLight,
     RT_Skybox,
     RT_PostProcess,
     RT_Transparent,
@@ -25,13 +27,6 @@ enum RenderType {
     RT_Sphere,
     RT_Cube,
     RT_Quad,
-};
-
-enum EntityType {
-    ET_Object,
-    ET_PointLight,
-    ET_SpotLight,
-   
 };
 
 struct RenderComponent {
@@ -42,51 +37,32 @@ struct RenderComponent {
     std::unique_ptr<Sphere>sphere_;
     std::unique_ptr<Cube>cube_;
     std::unique_ptr<Quad>quad_;
-    std::unique_ptr<LightInfo>light_info_;
+    std::unique_ptr<Light>light_;
 
     Shader shader;
     Texture texture;
     RenderType type_;
-    EntityType type_entity_;
 
     // Save data
     nlohmann::json serialize() const {
         nlohmann::json json_data;
 
-        if (mesh_) {json_data["mesh"] = mesh_->serialize();
+        if (mesh_) {json_data["Mesh"] = mesh_->serialize();
         }
         //json_data["triangle"] = { triangle_.ToJson() };
 
-        if (terrain_) { json_data["terrain"] = terrain_->serialize(); }
-        if (sphere_) { json_data["sphere"] = sphere_->serialize(); }
-        if (cube_) { json_data["cube"] = cube_->serialize(); }
-        if (quad_) { json_data["quad"] = quad_->serialize(); }
-        if (light_info_) { json_data["light_info"] = light_info_->serialize(); }
+        if (terrain_) { json_data["Terrain"] = terrain_->serialize(); }
+        if (sphere_) { json_data["Sphere"] = sphere_->serialize(); }
+        if (cube_) { json_data["Cube"] = cube_->serialize(); }
+        if (quad_) { json_data["Quad"] = quad_->serialize(); }
+        if (light_) { json_data["Light"] = light_->serialize(); }
 
-        json_data["shader"] = shader.serialize();
-        json_data["texture"] = texture.serialize();
-        json_data["render_type"] = (int)type_;
-        json_data["entity_type"] = (int)type_entity_;
+        json_data["Shader"] = shader.serialize();
+        json_data["Texture"] = texture.serialize();
+        json_data["Render_type"] = (int)type_;
 
         return json_data;
     }
-
-    /*nlohmann::json deSerialize(nlohmann::json j) {
-       
-        mesh_->deSerialize(j["mesh"]);
-        terrain_->deSerialize(j["terrain"]);
-        sphere_->deSerialize(j["sphere"]);
-        cube_->deSerialize(j["cube"]);
-        quad_->deSerialize(j["quad"]);
-        light_info_->deSerialize(j["light_info"]);
-
-        shader.deSerialize(j["shader"]);
-        texture.deSerialize(j["texture"]);
-        type_ = j["render_type"].get<RenderType>();
-        type_entity_= j["render_type"].get<EntityType>();
-
-        return j;
-    }*/
 
     // ----------------------------------
 
@@ -96,12 +72,11 @@ struct RenderComponent {
         sphere_(nullptr), 
         cube_(nullptr),
         quad_(nullptr), 
-        light_info_(nullptr),
+        light_(nullptr),
         shader(),
         texture(), 
         triangle_(triangle_.my_triangle),
-        type_(RenderType::RT_Mesh), 
-        type_entity_(EntityType::ET_Object)
+        type_(RenderType::RT_Default)
     {}
     ~RenderComponent() {}
     
@@ -112,7 +87,7 @@ struct RenderComponent {
             sphere_ = other.sphere_ ? std::make_unique<Sphere>(*other.sphere_) : nullptr;
             cube_ = other.cube_ ? std::make_unique<Cube>(*other.cube_) : nullptr;
             quad_ = other.quad_ ? std::make_unique<Quad>(*other.quad_) : nullptr;
-            light_info_ = other.light_info_ ? std::make_unique<LightInfo>(*other.light_info_) : nullptr;
+            light_ = other.light_ ? std::make_unique<Light>(*other.light_) : nullptr;
         }
         return *this;
     }
@@ -123,12 +98,11 @@ struct RenderComponent {
         sphere_(other.sphere_ ? std::make_unique<Sphere>(*other.sphere_) : nullptr),
         cube_(other.cube_ ? std::make_unique<Cube>(*other.cube_) : nullptr),
         quad_(other.quad_ ? std::make_unique<Quad>(*other.quad_) : nullptr),
-        light_info_(other.light_info_ ? std::make_unique<LightInfo>(*other.light_info_) : nullptr),
+        light_(other.light_ ? std::make_unique<Light>(*other.light_) : nullptr),
         triangle_(other.triangle_),
         texture(other.texture),
         shader(other.shader),
-        type_(other.type_),
-        type_entity_(other.type_entity_)
+        type_(other.type_)
     {}
 };
 

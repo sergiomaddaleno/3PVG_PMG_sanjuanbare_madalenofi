@@ -18,6 +18,9 @@ class Sphere {
  
   void init(bool sky = false, const float sphere_size = 1.0f, const int num_heights = 20, const int num_revs = 20);
 
+  void bind();
+  void render();
+
   float* GetVertexSphere();
 
   GLuint VAO = 0, VBO = 0, EBO = 0;

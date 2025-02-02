@@ -43,7 +43,7 @@ public:
     nlohmann::json serialize() const {
         nlohmann::json json_data;
 
-        json_data["textureID"] = textureID;
+        json_data["TextureID"] = textureID;
 
         return json_data;
     }

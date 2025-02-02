@@ -1,13 +1,15 @@
+
 #version 330 core
 
-uniform sampler2D texture_;
-uniform sampler2D shadowMap;  // Mapa de sombras
+uniform sampler2D u_texture;
+uniform sampler2D u_shadow_map;
+
 uniform int u_number_lights;
 uniform vec3 u_camera_position;
 uniform vec3 u_ambient;
-uniform bool u_fog;
 
-vec3 skyColour = vec3(0.5, 0.5, 0.5);
+uniform bool u_fog;
+uniform vec3 u_sky_colour;
 in float visibility;
 
 out vec4 FragColor;
@@ -16,7 +18,7 @@ in vec3 normal;
 in vec3 pos;
 in vec2 uv;
 in vec3 FragPos;
-in vec4 FragPosLightSpace;  // Posición en el espacio de la luz
+in vec4 FragPosLightSpace;
 
 const int kMaxLights = 50;
 
@@ -39,23 +41,6 @@ struct LightInfo {
 
 uniform LightInfo u_light[kMaxLights];
 
-
-float ShadowCalculation(vec4 fragPosLightSpace)
-{
-    
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  
-    projCoords = projCoords * 0.5 + 0.5; 
-
-   
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
-    float currentDepth = projCoords.z;
-
-    float bias = 0.005;
-
-    return currentDepth - bias > closestDepth ? 0.0 : 1.0;
-}
-
-
 vec3 PointLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
     float distance = length(lc.pos_ - FragPos);
@@ -71,23 +56,6 @@ vec3 PointLight(LightInfo lc) {
     vec3 specular = specStrength * lc.light_color_ * attenuation;
     return diffuse + specular;
 }
-
-
-vec3 DirectionalLight(LightInfo lc) {
-    vec3 light_dir = normalize(-lc.dir_);
-
-    float diff = max(dot(normal, light_dir), 0.0);
-    vec3 diffuse = diff * lc.light_color_;
-
-    vec3 view_dir = normalize(u_camera_position - FragPos);
-    vec3 reflect_dir = reflect(-light_dir, normal);
-    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), lc.shininess_);
-    vec3 specular = spec * lc.spec_color_;
-
-    vec3 ambient = lc.ambient_color_ * lc.light_color_;
-    return ambient + diffuse + specular;
-}
-
 
 vec3 SpotLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
@@ -107,17 +75,53 @@ vec3 SpotLight(LightInfo lc) {
         vec3 specular = specStrength * lc.light_color_ * attenuation;
 
         return diffuse + specular;
-    }
-    else {
+    } else {
         return lc.ambient_color_ * u_ambient;
     }
 }
 
-void main()
+vec3 DirectionalLight(LightInfo lc) {
+   
+    vec3 light_dir = normalize(-lc.dir_);
+
+    float diff = max(dot(normal, light_dir), 0.0);
+    vec3 diffuse = diff * lc.light_color_;
+
+    
+    vec3 view_dir = normalize(u_camera_position - FragPos);
+    vec3 reflect_dir = reflect(-light_dir, normal);
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), lc.shininess_);
+    vec3 specular = spec * lc.spec_color_;
+
+    
+    vec3 ambient = lc.ambient_color_ * lc.light_color_;
+
+    return ambient + diffuse + specular;
+}
+
+float ShadowCalculation(vec4 fragPosLightSpace)
 {
+    
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  
+    projCoords = projCoords * 0.5 + 0.5; 
+
+   
+    float closestDepth = texture(u_shadow_map, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+
+
+    float bias = 0.005;
+
+
+    return currentDepth - bias > closestDepth ? 0.0 : 1.0;
+}
+
+void main() {
+
     vec3 final_light = u_ambient;
 
-    for (int i = 0; i < u_number_lights; ++i) {
+   for (int i = 0; i < u_number_lights; ++i) {
+
         float shadow = ShadowCalculation(FragPosLightSpace); 
 
         if (u_light[i].type_ == 0) {
@@ -131,14 +135,14 @@ void main()
         if (u_light[i].type_ == 2) {
             final_light += PointLight(u_light[i]) * shadow;  
         }
-    }
+   }
 
-    vec4 texture_color = texture(texture_, uv);
-    vec3 texture_and_light = texture_color.rgb * final_light;
+   vec4 texture_color = texture(u_texture, uv);
+   vec3 texture_and_light = texture_color.rgb * final_light;
+    
+   FragColor = vec4(texture_and_light, 1.0);
 
-    FragColor = vec4(texture_and_light, 1.0);
-
-    if (u_fog) {
-        FragColor = mix(vec4(skyColour, 1.0), FragColor, visibility);
-    }
+   //if(u_fog){
+   //     FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
+   //}
 }

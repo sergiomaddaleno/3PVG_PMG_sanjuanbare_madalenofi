@@ -23,6 +23,10 @@ class Terrain {
             const float height_mult = 1.0f, const float size = 1.0f,
             const bool is_centered = true, const bool use_perlin_noise = true);  //false for heightmap
 
+  void bind();
+
+  void render();
+
   float* GetVertexTerrain();
 
   GLuint VAO = 0, VBO = 0, EBO = 0;

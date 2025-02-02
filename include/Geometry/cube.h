@@ -17,6 +17,9 @@ class Cube {
     void init8v(const float cube_size = 1.0f);
     void init24v(const float cube_size = 1.0f);
 
+    void bind();
+    void render();
+
     GLuint VAO = 0, VBO = 0, EBO = 0;
 
     std::vector<int> order_;

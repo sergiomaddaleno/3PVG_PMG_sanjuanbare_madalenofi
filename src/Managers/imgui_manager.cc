@@ -174,7 +174,6 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
-    // Render ImGui windows
     ImguiWindow(window);
     HierarchyWindow(di);
     InspectorWindow(di);
@@ -191,11 +190,9 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
 
     GameWindow(di);
 
-    // Render draw data
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    // Handle viewports
     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
@@ -291,7 +288,7 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
         if (ri->has_value() && ri != riend) {
             auto& render_comp = *ri;
 
-            if ((render_comp->type_entity_ != EntityType::ET_PointLight) && (render_comp->type_entity_ != EntityType::ET_SpotLight)) {
+            if ((render_comp->type_ != RenderType::RT_PointLight) && (render_comp->type_ != RenderType::RT_SpotLight)) {
                 ImGui::Image(m_EntityIcon.getID(), { 25.0f, 25.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
             }else {
                 ImGui::Image(m_EntityLightBulbIcon.getID(), { 23.0f, 23.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
@@ -301,25 +298,8 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
 
-                if (render_comp->type_entity_ != EntityType::ET_SpotLight && render_comp->type_entity_ != EntityType::ET_PointLight) {
-
-                    if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh++)).c_str(), selected_entity == entity_id))
+               if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh++)).c_str(), selected_entity == entity_id))
                         selected_entity = entity_id;
-                    break;
-                }
-
-                if (render_comp->type_entity_ == EntityType::ET_PointLight) {
-                    if (ImGui::Selectable(("Point Light " + std::to_string(entity_pointlight++)).c_str(), selected_entity == entity_id))
-                        selected_entity = entity_id;
-                    break;
-                }
-
-                if (render_comp->type_entity_ == EntityType::ET_SpotLight) {
-                    if (ImGui::Selectable(("Spot Light " + std::to_string(entity_spotlight++)).c_str(), selected_entity == entity_id))
-                        selected_entity = entity_id;
-                    break;
-                }
-
                 break;
 
             case RenderType::RT_Terrain:
@@ -345,6 +325,18 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
                     selected_entity = entity_id;
 
                 break;
+
+            case RenderType::RT_PointLight:
+
+                if (ImGui::Selectable(("Point Light " + std::to_string(entity_spotlight++)).c_str(), selected_entity == entity_id))
+                    selected_entity = entity_id;
+                break;
+
+            case RenderType::RT_SpotLight:
+
+                if (ImGui::Selectable(("Spot Light " + std::to_string(entity_pointlight++)).c_str(), selected_entity == entity_id))
+                    selected_entity = entity_id;
+                break;
             }
         }
     }
@@ -354,7 +346,7 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
         if (li->has_value() && li != liend) {
             auto& light_comp = *li;
 
-            if (light_comp->light_info.type_ == LightType::LT_Directional) {
+            if (light_comp->light.light_info_.type_ == LightType::LT_Directional) {
                 ImGui::Image(m_EntityLightBulbIcon.getID(), { 23.0f, 23.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
                 ImGui::SameLine();
 
@@ -397,7 +389,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
 
                 ImGui::Separator();
 
-                glm::vec3& light_color = light_component->light_info.light_color_;
+                glm::vec3& light_color = light_component->light.light_info_.light_color_;
 
                 float color[3] = {
                     light_color.r / 255.0f,
@@ -473,7 +465,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
                     di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
                 }
                 else {
-                    di.ecs->get_component<RenderComponent>(selected_entity)->shader = *di.shader;
+                    di.ecs->get_component<RenderComponent>(selected_entity)->shader = di.shader;
                 }
 
                 vertex_file_name.clear();
@@ -493,8 +485,8 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         if (selected_entity && (ImGui::Button("Delete Entity") || selected_entity && di.input->isKeyPressed(Input::SUPR))) {
-            if (di.ecs->get_component<RenderComponent>(selected_entity)->type_entity_ != EntityType::ET_PointLight
-                && di.ecs->get_component<RenderComponent>(selected_entity)->type_entity_ != EntityType::ET_SpotLight) {
+            if (di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_PointLight
+                && di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_SpotLight) {
                 di.ecs->destroy_entity(selected_entity);
             }
             else {
@@ -588,7 +580,7 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
             }
 
             if (ImGui::MenuItem("Load Scene")) {
-                di.save_manager.loadFromFile(*di.ecs, "../saves/scene_1.json",*di.render_system,*di.shader);
+                di.save_manager.loadFromFile(*di.ecs, "../saves/scene_1.json",*di.render_system, di.shader);
             }
 
             ImGui::EndMenu();
@@ -636,22 +628,22 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
             if (ImGui::BeginMenu("Add Geometry")) {
 
                 if (ImGui::MenuItem("Sphere")) {
-                    di.render_system->createSphere(loc_ecs, *di.shader);
+                    di.render_system->createSphere(loc_ecs, di.shader);
                     di.render_system->initEntities(loc_ecs);
                 }
 
                 if (ImGui::MenuItem("Cube 8v")) {
-                    di.render_system->createCube8v(loc_ecs, *di.shader);
+                    di.render_system->createCube8v(loc_ecs, di.shader);
                     di.render_system->initEntities(loc_ecs);
                 }
 
                 if (ImGui::MenuItem("Cube 24v")) {
-                    di.render_system->createCube24v(loc_ecs, *di.shader);
+                    di.render_system->createCube24v(loc_ecs, di.shader);
                     di.render_system->initEntities(loc_ecs);
                 }
 
                 if (ImGui::MenuItem("Quad")) {
-                    di.render_system->createQuad(loc_ecs, *di.shader);
+                    di.render_system->createQuad(loc_ecs, di.shader);
                     di.render_system->initEntities(loc_ecs);
                 }
 
@@ -661,7 +653,7 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
                     glm::vec3 scale(1.0f);
                     glm::vec3 rotation(0.0f);
 
-                    di.render_system->createTerrain(loc_ecs, *di.shader,position,scale,rotation,500,500);
+                    di.render_system->createTerrain(loc_ecs, di.shader,position,scale,rotation,500,500);
                     di.render_system->initEntities(loc_ecs);
                 }
 
@@ -671,18 +663,18 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
             if (ImGui::BeginMenu("Add Light")) {
 
                 if (ImGui::MenuItem("Point Light")) {
-                    di.render_system->createPointLight(loc_ecs, *di.shader);
+                    di.render_system->createPointLight(loc_ecs, di.shader);
                     di.render_system->initEntities(loc_ecs);
                 }
 
                 if (ImGui::MenuItem("Spot Light")) {
-                    di.render_system->createSpotLight(loc_ecs, *di.shader);
+                    di.render_system->createSpotLight(loc_ecs, di.shader);
                     di.render_system->initEntities(loc_ecs);
                 }
 
                 if (ImGui::MenuItem("Directional Light")) {
                    
-                    di.render_system->createDirectionalLight(loc_ecs, *di.shader);
+                    di.render_system->createDirectionalLight(loc_ecs, di.shader);
                     di.render_system->initEntities(loc_ecs);
                 }
 
@@ -919,6 +911,11 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
             if (entity_id == selected_entity && ti->has_value()) {
 
                 auto& transform = loc_ecs->get_component<TransformComponent>(selected_entity);
+
+                if (loc_ecs->has_component<LightComponent>(selected_entity)) {
+                    auto& light_comp = loc_ecs->get_component<LightComponent>(selected_entity);
+                    light_comp->light.light_info_.pos_ = transform->position;
+                }
 
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::translate(model, transform->position);

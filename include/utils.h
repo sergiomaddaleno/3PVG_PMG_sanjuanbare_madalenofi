@@ -33,6 +33,4 @@ char* ReadFile(const char* file_path = nullptr);
 
 void CheckGPUErrors(unsigned int code, const char* str, bool link);
 
-
-
 #endif // UTILS

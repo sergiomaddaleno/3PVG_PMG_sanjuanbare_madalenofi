@@ -35,7 +35,7 @@ struct DataImgui {
     PostProcessing* post_proccessing;
     ECSManager* ecs;
     RenderSystem* render_system;
-    Shader* shader;
+    Shader shader;
     Window* window;
     Input* input;
     Skybox skybox;

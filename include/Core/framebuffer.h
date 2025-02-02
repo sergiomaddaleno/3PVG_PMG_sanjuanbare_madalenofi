@@ -9,7 +9,10 @@ public:
     FrameBuffer();
     ~FrameBuffer();
 
-    void init(int width, int height, bool useColor = true, bool useDepth = false);
+    void init(int width, int height, 
+        bool useColor = true, 
+        bool useDepth = true);
+
     void bind();
     void unbind();
     void resize(int width, int height);

@@ -54,9 +54,6 @@ SaveManager save_manager;
 char* vs_entities = (char*)ReadFile("../assets/shaders/entities.vs");
 char* fs_entities = (char*)ReadFile("../assets/shaders/entities.fs");
 
-char* fs_light = (char*)ReadFile("../assets/shaders/light.fs");
-char* vs_simple = (char*)ReadFile("../assets/shaders/simple_vertex.vs");
-
 char* vs_sky_box = (char*)ReadFile("../assets/shaders/skybox.vs");
 char* fs_sky_box = (char*)ReadFile("../assets/shaders/skybox.fs");
 
@@ -75,11 +72,11 @@ int main(int, char**) {
     window->setResizeCallback();
     //window->setWindowIcon(window->getWindow(), "../assets/textures/images/AE.png");
 
+
     Input input{ window->getWindow() };
 
     // ---
 
-    light_shader.compile(vs_simple, fs_light);
     entities_shader.compile(vs_entities, fs_entities);
 
     //Skybox
@@ -89,18 +86,18 @@ int main(int, char**) {
     skybox.init();
     // ---
     
-    imgui_manager.Init(window->getWindow());
-    data_imgui.ecs = &ecs;
-    data_imgui.shader = &entities_shader;
-    data_imgui.render_system = &render_system;
-    data_imgui.input = &input;
-    
     postProcc.initData();
 
     render_system.setupEntities(ecs);
 
-    data_imgui.save_manager.loadFromFile(ecs, "../saves/scene_1.json", render_system, *data_imgui.shader);
+    save_manager.loadFromFile(ecs, "../saves/scene_1.json", render_system, entities_shader);
 
+    imgui_manager.Init(window->getWindow());
+
+    data_imgui.ecs = &ecs;
+    data_imgui.shader = entities_shader;
+    data_imgui.render_system = &render_system;
+    data_imgui.input = &input;
     //--
 
     double lastTime = window->getTime();
@@ -119,7 +116,7 @@ int main(int, char**) {
         postProcc.resize(g_window_width_, g_window_height_);
 
         //--
-        postProcc.beginRender();
+        //postProcc.beginRender();
         cam.update(input, dt, g_window_width_, g_window_height_);
 
         skybox.render(skybox.shader_, skybox.texture_, cam);
@@ -133,8 +130,7 @@ int main(int, char**) {
         data_imgui.window = &window.value();
         data_imgui.skybox = skybox;
 
-        imgui_manager.Render(window->getWindow(), data_imgui);
-        lastTime = currentTime;
+        //imgui_manager.Render(window->getWindow(), data_imgui);
 
         if (window->closePressed()) done = true;
     }

@@ -41,9 +41,9 @@ struct TransformComponent {
     // Save data
     nlohmann::json serialize() const {
         return {
-            {"position", {position.x, position.y, position.z}},
-            {"rotation", {rotation.x, rotation.y, rotation.z, rotation.w}},
-            {"scale", {scale.x, scale.y, scale.z}}
+            {"Position", {position.x, position.y, position.z}},
+            {"Rotation", {rotation.x, rotation.y, rotation.z, rotation.w}},
+            {"Scale", {scale.x, scale.y, scale.z}}
         };
     }
 

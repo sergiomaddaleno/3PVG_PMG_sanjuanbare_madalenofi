@@ -2,6 +2,8 @@
 #include "Managers/save_manager.h"
 #include "Systems/ecs_manager.h"
 #include "Render/render_system.h"
+#include "Core/mesh.h"
+#include "Render/light.h"
 
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
@@ -15,7 +17,7 @@
 nlohmann::json SaveManager::serialize(ECSManager& ecs)
 {
     nlohmann::json j;
-    j["entities"] = nlohmann::json::array();
+    j["Entities"] = nlohmann::json::array();
 
     auto ri = ecs.getComponentList<RenderComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
@@ -26,236 +28,121 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs)
     auto liend = ecs.getComponentList<LightComponent>().end();
 
     int counter = 0;
-    nlohmann::json entity_json;
+    size_t max_components = std::max({ ecs.getComponentList<RenderComponent>().size(),
+                                      ecs.getComponentList<TransformComponent>().size(),
+                                      ecs.getComponentList<LightComponent>().size() });
 
-    for (; ri != riend && ti != tiend; ++ri, ++ti, ++counter) {
-        if (ri->has_value() && ti->has_value()) {
-            entity_json.clear();
+    for (size_t i = 0; i < max_components; ++i) {
+        nlohmann::json entity_json;
+        entity_json["Entity_id"] = counter;
 
-            auto& render_comp = *ri;
-            auto& tranform_comp = *ti;
-            
-
-            entity_json["entity_id"] = counter;
-
-            entity_json["render_component"] = render_comp->serialize();
-            entity_json["transform_component"] = tranform_comp->serialize();
-            
- 
-            j["entities"].push_back(entity_json);
+        if (ri != riend) {
+            if (ri->has_value()) {
+                entity_json["Render_component"] = (*ri)->serialize();
+            }
+            ++ri;
         }
 
-
-
-
-    }
-
-    ti = ecs.getComponentList<TransformComponent>().begin();
-
-    for (; li != liend && ti != tiend; ++li, ++ti, ++counter) {
-        if (li->has_value() && ti->has_value()) {
-            entity_json.clear();
-
-            auto& light_comp = *li;
-            auto& tranform_comp = *ti;
-
-            entity_json["entity_id"] = counter;
-
-            entity_json["light_component"] = light_comp->serialize();
-            entity_json["transform_component"] = tranform_comp->serialize();
-
-            j["entities"].push_back(entity_json);
+        if (ti != tiend) {
+            if (ti->has_value()) {
+                entity_json["Transform_component"] = (*ti)->serialize();
+            }
+            ++ti;
         }
+
+        if (li != liend) {
+            if (li->has_value()) {
+                entity_json["Light_component"] = (*li)->serialize();
+            }
+            ++li;
+        }
+
+        if (!entity_json.empty()) {
+            j["Entities"].push_back(entity_json);
+        }
+
+        ++counter;
     }
 
     return j;
 }
 
+
 void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSystem& rs, Shader& shader) {
+
     ecs.remove_entities();
-
     rs.number_lights = 0;
-
-    
-
-    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-
-    glm::vec3 scale = glm::vec3(0.0f, 0.0f, 0.0f);
-
-    glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-
-    glm::vec3 color(255.0f, 255.0f, 255.0f);
-
-
-
-   
-
-    std::vector<glm::vec3> light_colors_array;
-    std::vector<std::string> file_array;
-    std::vector<std::string> file_texture_array;
-
-
-    for (const auto& entity : j["entities"]) {
-
-
-        
-       
-       if (entity.contains("light_component") && entity.contains("transform_component")) {
-               
-
-                const auto& light_component = entity["light_component"];
-                if (light_component.contains("light_info")) {
-                    const auto& light_info = light_component["light_info"];
-                    if (light_info.contains("Light Color")) {
-                        const auto& light_colors = light_info["Light Color"];
-                        if (light_colors.is_array()) {
-                            for (const auto& color : light_colors) {
-                                if (color.is_array() && color.size() == 3) {
-                                    glm::vec3 json_light_color(
-                                        color[0].get<float>(),
-                                        color[1].get<float>(),
-                                        color[2].get<float>()
-                                    );
-
-                                    
-                                    light_colors_array.push_back(json_light_color);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-
-       if (entity.contains("render_component")) {
-           const auto& render_component = entity["render_component"];
-
-          
-           if (render_component.contains("mesh")) {
-               const auto& mesh = render_component["mesh"];
-
-               
-               if (mesh.contains("File")) {
-                   file_array.push_back(mesh["File"].get<std::string>());
-               }
-               if (mesh.contains("File_texture")) {
-                   file_texture_array.push_back(mesh["File_texture"].get<std::string>());
-               }
-
-              
-           }
-       }
-        
-    }
-
     //rs.createDirectionalLight(ecs, shader);
 
-   
-    
+    for (const auto& entity : j["Entities"]) {
 
-    int countmesh = 0;
 
-    for (const auto& entity : j["entities"]) {
-        if (entity.contains("transform_component") && entity.contains("render_component") &&
-            entity["render_component"].contains("render_type")) {
+        if (entity.contains("Render_component")) {
 
-            int renderType = entity["render_component"]["render_type"];
+            const auto& tc = entity["Transform_component"];
+            glm::vec3 position = parseVec3(tc["Position"]);
+            glm::quat rotation = parseQuat(tc["Rotation"]);
+            glm::vec3 scale = parseVec3(tc["Scale"]);
 
-            
-            glm::vec3 position(0.0f);
-            glm::vec3 scale(1.0f);
-            glm::vec3 rotation(0.0f);
-
-            
-            if (entity["transform_component"].contains("position")) {
-                const auto& pos = entity["transform_component"]["position"];
-                position = glm::vec3(pos[0], pos[1], pos[2]);
+            int renderType = -1;
+            if (entity.contains("Render_component")) {
+                const auto& rc = entity["Render_component"];
+                renderType = rc.value("Render_type", -1);
             }
 
-          
-            if (entity["transform_component"].contains("scale")) {
-                const auto& scal = entity["transform_component"]["scale"];
-                scale = glm::vec3(scal[0], scal[1], scal[2]);
+            glm::vec3 light_pos = { 0.0f, 0.0f, 0.0f }, light_dir = { 0.0f, 0.0f, 0.0f }, diff_color = { 0.0f, 0.0f, 0.0f },
+                spec_color = { 0.0f, 0.0f, 0.0f }, light_color = { 0.0f, 0.0f, 0.0f }, ambient_color = { 0.0f, 0.0f, 0.0f };
+            float linear_att = 0.0f, quad_att = 0.0f, constant_att = 0.0f, shininess = 0.0f, strength = 0.0f, spot_angle = 0.0f;
+
+            if (entity.contains("Light_component")) {
+                const auto& lc = entity["Light_component"]["light"];
+
+                light_pos = position;
+                light_dir = parseVec3(lc["Direction"][0]);
+                diff_color = parseVec3(lc["Diffusion_color"][0]);
+                spec_color = parseVec3(lc["Specular_color"][0]);
+                light_color = parseVec3(lc["Light_color"][0]);
+                ambient_color = parseVec3(lc["Ambient_color"][0]);
+
+                linear_att = lc["Linear_attenuation"][0].get<float>();
+                quad_att = lc["Quadratic_attenuation"][0].get<float>();
+                constant_att = lc["Constant_attenuation"][0].get<float>();
+                shininess = lc["Shininnes"][0].get<float>();
+                strength = lc["Strength"][0].get<float>();
+                spot_angle = lc["Spot_angle"][0].get<float>();
+
+                int lightType = lc["Type"].get<int>();
             }
-            
-           
-            if (entity["transform_component"].contains("rotation")) {
-                const auto& rot = entity["transform_component"]["rotation"];
-               
-                rotation = glm::vec3(rot[0], rot[1], rot[2]);
-            }
-            
-            
 
             switch (renderType) {
             case RenderType::RT_Mesh: {
-                if (entity["render_component"].contains("entity_type")) {
-                    int entityType = entity["render_component"]["entity_type"];
-
-                    switch (entityType) {
-                    case EntityType::ET_Object: {
-                        std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
-
-                        // Llama a la función para crear el mesh
-                        rs.createMesh(ecs, mario_mesh, shader,
-                            file_array[countmesh],
-                            file_texture_array[countmesh],
-                            position, scale, rotation);
-                        countmesh++;
-                        break;
-                    }
-                    case EntityType::ET_PointLight:
-                        rs.createPointLight(ecs, shader, position, color, scale, rotation);
-                        break;
-                    case EntityType::ET_SpotLight:
-                        rs.createSpotLight(ecs, shader, position, color, scale, rotation);
-                        break;
-                    }
-                }
+                std::string mesh_path = entity["Render_component"]["Mesh"].value("Mesh_path", "");
+                std::string texture_folder = entity["Render_component"]["Mesh"].value("Texture_folder", "");
+                rs.createMesh(ecs, shader, mesh_path, texture_folder, position, scale, rotation);
                 break;
             }
+            case RenderType::RT_Cube:
+                rs.createCube8v(ecs, shader, position, scale, rotation);
+                break;
+            case RenderType::RT_Quad:
+                rs.createQuad(ecs, shader, position, scale, rotation);
+                break;
+            case RenderType::RT_Sphere:
+                rs.createSphere(ecs, shader, position, scale, rotation);
+                break;
             case RenderType::RT_Terrain:
                 rs.createTerrain(ecs, shader, position, scale, rotation, 500, 500);
                 break;
 
-            case RenderType::RT_Sphere:
-                rs.createSphere(ecs, shader, position, scale, rotation);
+            case RenderType::RT_PointLight:
+                rs.createPointLight(ecs, shader, light_pos, scale, rotation, light_color);
                 break;
-
-            case RenderType::RT_Quad:
-                rs.createQuad(ecs, shader, position, scale, rotation);
-                break;
-
-            case RenderType::RT_Cube:
-                rs.createCube24v(ecs, shader, position, scale, rotation);
+            case RenderType::RT_SpotLight:
+                rs.createSpotLight(ecs, shader, light_pos, scale, rotation, light_color);
                 break;
             }
         }
     }
-
-
-    auto li = ecs.getComponentList<LightComponent>().begin();
-    auto ti = ecs.getComponentList<TransformComponent>().begin();
-    auto liend = ecs.getComponentList<LightComponent>().end();
-    auto tiend = ecs.getComponentList<TransformComponent>().end();
-
-    int count = 0;
-
-    for (; li != liend && ti != tiend; ++li, ++ti) {
-        if (li->has_value() && ti->has_value()) {
-            auto& light_comp = *li;
-            auto& transform = *ti;
-
-            light_comp->light_info.light_color_ = light_colors_array[count];
-
-            count++;
-
-        }
-    }
-
-
-
-
     rs.initEntities(ecs);
 }
 

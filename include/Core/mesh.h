@@ -33,8 +33,9 @@ public:
 
     std::vector<unsigned int> indices;
     int materialID;
-    std::string url;
-    std::string url_texture;
+
+    std::string mesh_path;
+    std::string texture_folder;
 
     GLuint VAO = 0, VBO = 0, EBO = 0;
 
@@ -44,6 +45,9 @@ public:
 
     void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
 
+    void bind();
+    void renderElements();
+
     Texture getTexture(int shape_index);
 
     //Save data
@@ -51,19 +55,16 @@ public:
         nlohmann::json json_data;
 
         for (const auto& mesh : meshes) {
-            json_data["meshes"].push_back(mesh.serialize());
+            json_data["Meshes"].push_back(mesh.serialize());
         }
 
         for (const auto& texture : textures) {
-            json_data["textures"].push_back(texture.serialize());
+            json_data["Textures"].push_back(texture.serialize());
         }
 
-        json_data["materialID"] = materialID;
-        json_data["VAO"] = VAO;
-        json_data["VBO"] = VBO;
-        json_data["EBO"] = EBO;
-        json_data["File"] = url;
-        json_data["File_texture"] = url_texture;
+        json_data["MaterialID"] = materialID;
+        json_data["Mesh_path"] = mesh_path;
+        json_data["Texture_folder"] = texture_folder;
 
         return json_data;
     }

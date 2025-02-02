@@ -18,6 +18,9 @@ class Quad {
  
    void init(const float quad_size = 1.0f);
 
+   void bind();
+   void render();
+
   GLuint VAO = 0, VBO = 0, EBO = 0;
 
   std::vector<int> order_;

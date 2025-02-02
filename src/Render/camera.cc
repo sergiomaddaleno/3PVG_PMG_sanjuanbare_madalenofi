@@ -12,15 +12,15 @@ const float PI = 3.141592653589793f;
 
 Camera::Camera()
     :
-    position_(0.0f, 0.0f, 7.0f),
-    view_direction_(0.0f, 0.0f, -1.0f),
+    position_(0.0f, 5.0f, 10.0f),
+    view_direction_(-1.0f, 0.0f, 1.0f),
     up_(0.0f, 1.0f, 0.0f),
     pos_mouse(0.0f, 0.0f),
     curr_mouse(0.0f, 0.0f),
     last_mouse(0.0f, 0.0f),
     delta_mouse(0.0f, 0.0f),
     accum_mouse_offset_(0.0f, 0.0f),
-    speed_(10.0f),
+    speed_(0.005f),
     sensitivity_(1.0f),
     fov_(g_fov_),
     aspect_ratio_((float)g_window_width_ / (float)g_window_height_),
@@ -33,13 +33,7 @@ Camera::Camera()
 
 glm::mat4 Camera::initViewTarget()
 {
-
-   
-
-     glm::vec3 view = glm::vec3(0.0f,0.0f,-1.0f);
-     glm::vec3 position = glm::vec3(3.746527671813965f, 6.246669292449951f, 9.69675064086914f);
-
-	return glm::lookAt(position, position + view, up_);
+	return glm::lookAt(position_, position_ + view_direction_, up_);
 }
 
 void Camera::update(Input& input, const double dt, const int window_width, const int window_height) {
