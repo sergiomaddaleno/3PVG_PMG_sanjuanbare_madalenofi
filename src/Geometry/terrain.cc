@@ -36,12 +36,9 @@ void Terrain::init(const int num_cols, const int num_rows,
         std::vector<float> uv_terrain(num_vertex * 2); // u, v
 
         int index = 0;
-        unsigned char* heightmap_data = nullptr;
-        int width = 0, height = 0, nChannels = 0;
 
         if (!use_perlin_noise) {
-            heightmap_data = stbi_load("../assets/textures/heightmaps/heightmap.png", &width, &height, &nChannels, 0);
-            if (!heightmap_data) printf("Heightmap not found\n");
+            height_map.loadTexture("../assets/textures/heightmaps/heightmap.png");
         }
 
         glm::vec3 center = { 0.0f, 0.0f, 0.0f };
@@ -61,12 +58,12 @@ void Terrain::init(const int num_cols, const int num_rows,
                     height_value = SimplexNoise::noise(perlin_x, perlin_z);
                 }
                 else {
-                    if (i < height && j < width) {
-                        int mapped_i = (int)(i / (float)num_cols * height);
-                        int mapped_j = (int)(j / (float)num_rows * width);
+                    if (height_map.getData() && i < height_map.getwidth() && j < height_map.getHeight()) {
+                        int mapped_i = glm::clamp((int)((float)i / num_cols * height_map.getHeight()), 0, height_map.getHeight() - 1);
+                        int mapped_j = glm::clamp((int)((float)j / num_rows * height_map.getwidth()), 0, height_map.getwidth() - 1);
 
-                        unsigned char* texel = heightmap_data + (mapped_j + width * mapped_i) * nChannels;
-                        unsigned char y = texel[0];
+                        unsigned char* texel = height_map.getData() + (mapped_j + height_map.getwidth() * mapped_i) * height_map.getChannels();
+                        unsigned char y = height_map.getChannels() >= 1 ? texel[0] : 0;
 
                         float yScale = 32.0f / 256.0f;
                         float yShift = 10.0f;
@@ -84,10 +81,6 @@ void Terrain::init(const int num_cols, const int num_rows,
 
                 index++;
             }
-        }
-
-        if (heightmap_data) {
-            stbi_image_free(heightmap_data);
         }
 
         index = 0;

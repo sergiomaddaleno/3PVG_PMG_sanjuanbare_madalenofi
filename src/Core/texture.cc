@@ -5,6 +5,15 @@
 #include "../deps/dds.h"
 #include <cassert>
 
+Texture::Texture() : textureID(0), width(0), height(0), channels(0), data_(nullptr) {}
+
+Texture::~Texture()
+{
+    /*if (data_ != nullptr) {
+        stbi_image_free(data_);
+    }*/
+}
+
 bool Texture::loadTexture(const std::string& file_path) {
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
@@ -26,7 +35,6 @@ bool Texture::loadTexture(const std::string& file_path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glBindTexture(GL_TEXTURE_2D, textureID);
-    stbi_image_free(data);
 
     return true;
 }

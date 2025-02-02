@@ -17,8 +17,8 @@ private:
     unsigned char* data_;
 
 public:
-    Texture() : textureID(0), width(0), height(0), channels(0), data_(nullptr) {}
-    ~Texture() {}
+    Texture();
+    ~Texture();
 
     bool loadTexture(const std::string& file_path);
 
@@ -32,6 +32,7 @@ public:
     int getwidth() const { return width; }
     int getHeight() const { return height; }
     unsigned char* getData() const { return data_; }
+    int getChannels() const { return channels; }
 
     Texture getTexture() const {
         Texture tex;
