@@ -649,11 +649,9 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
 
                 if (ImGui::MenuItem("Terrain")) {
 
-                    glm::vec3 position(0.0f);
-                    glm::vec3 scale(1.0f);
-                    glm::vec3 rotation(0.0f);
+                    TransformComponent tc;
 
-                    di.render_system->createTerrain(loc_ecs, di.shader,position,scale,rotation,500,500);
+                    di.render_system->createTerrain(loc_ecs, di.shader, tc, 500,500);
                     di.render_system->initEntities(loc_ecs);
                 }
 

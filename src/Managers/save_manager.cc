@@ -79,10 +79,12 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
 
         if (entity.contains("Render_component")) {
 
-            const auto& tc = entity["Transform_component"];
-            glm::vec3 position = parseVec3(tc["Position"]);
-            glm::quat rotation = parseQuat(tc["Rotation"]);
-            glm::vec3 scale = parseVec3(tc["Scale"]);
+            const auto& tc_jsonc = entity["Transform_component"];
+            TransformComponent tc;
+
+            tc.position = parseVec3(tc_jsonc["Position"]);
+            tc.rotation = parseQuat(tc_jsonc["Rotation"]);
+            tc.scale = parseVec3(tc_jsonc["Scale"]);
 
             int renderType = -1;
             if (entity.contains("Render_component")) {
@@ -90,55 +92,53 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
                 renderType = rc.value("Render_type", -1);
             }
 
-            glm::vec3 light_pos = { 0.0f, 0.0f, 0.0f }, light_dir = { 0.0f, 0.0f, 0.0f }, diff_color = { 0.0f, 0.0f, 0.0f },
-                spec_color = { 0.0f, 0.0f, 0.0f }, light_color = { 0.0f, 0.0f, 0.0f }, ambient_color = { 0.0f, 0.0f, 0.0f };
-            float linear_att = 0.0f, quad_att = 0.0f, constant_att = 0.0f, shininess = 0.0f, strength = 0.0f, spot_angle = 0.0f;
+            LightInfo li;
 
             if (entity.contains("Light_component")) {
                 const auto& lc = entity["Light_component"]["light"];
 
-                light_pos = position;
-                light_dir = parseVec3(lc["Direction"][0]);
-                diff_color = parseVec3(lc["Diffusion_color"][0]);
-                spec_color = parseVec3(lc["Specular_color"][0]);
-                light_color = parseVec3(lc["Light_color"][0]);
-                ambient_color = parseVec3(lc["Ambient_color"][0]);
+                li.pos_ = tc.position;
+                li.dir_ = parseVec3(lc["Direction"][0]);
+                li.diff_color_ = parseVec3(lc["Diffusion_color"][0]);
+                li.spec_color_ = parseVec3(lc["Specular_color"][0]);
+                li.light_color_ = parseVec3(lc["Light_color"][0]);
+                li.ambient_color_ = parseVec3(lc["Ambient_color"][0]);
 
-                linear_att = lc["Linear_attenuation"][0].get<float>();
-                quad_att = lc["Quadratic_attenuation"][0].get<float>();
-                constant_att = lc["Constant_attenuation"][0].get<float>();
-                shininess = lc["Shininnes"][0].get<float>();
-                strength = lc["Strength"][0].get<float>();
-                spot_angle = lc["Spot_angle"][0].get<float>();
+                li.linear_att = lc["Linear_attenuation"][0].get<float>();
+                li.quad_att_ = lc["Quadratic_attenuation"][0].get<float>();
+                li.constant_att_ = lc["Constant_attenuation"][0].get<float>();
+                li.shininess_ = lc["Shininnes"][0].get<float>();
+                li.strength_ = lc["Strength"][0].get<float>();
+                li.spot_angle_= lc["Spot_angle"][0].get<float>();
 
-                int lightType = lc["Type"].get<int>();
+                li.type_ = lc["Type"].get<LightType>();
             }
 
             switch (renderType) {
             case RenderType::RT_Mesh: {
                 std::string mesh_path = entity["Render_component"]["Mesh"].value("Mesh_path", "");
                 std::string texture_folder = entity["Render_component"]["Mesh"].value("Texture_folder", "");
-                rs.createMesh(ecs, shader, mesh_path, texture_folder, position, scale, rotation);
+                rs.createMesh(ecs, shader, mesh_path, texture_folder, tc);
                 break;
             }
             case RenderType::RT_Cube:
-                rs.createCube8v(ecs, shader, position, scale, rotation);
+                rs.createCube8v(ecs, shader, tc);
                 break;
             case RenderType::RT_Quad:
-                rs.createQuad(ecs, shader, position, scale, rotation);
+                rs.createQuad(ecs, shader, tc);
                 break;
             case RenderType::RT_Sphere:
-                rs.createSphere(ecs, shader, position, scale, rotation);
+                rs.createSphere(ecs, shader, tc);
                 break;
             case RenderType::RT_Terrain:
-                rs.createTerrain(ecs, shader, position, scale, rotation, 500, 500);
+                rs.createTerrain(ecs, shader, tc, 500, 500);
                 break;
 
             case RenderType::RT_PointLight:
-                rs.createPointLight(ecs, shader, light_pos, scale, rotation, light_color);
+                rs.createPointLight(ecs, shader, li);
                 break;
             case RenderType::RT_SpotLight:
-                rs.createSpotLight(ecs, shader, light_pos, scale, rotation, light_color);
+                rs.createSpotLight(ecs, shader, li);
                 break;
             }
         }

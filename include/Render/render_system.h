@@ -16,9 +16,9 @@
 #include "Render/camera.h"
 
 
-struct LightInfo;
-struct RenderComponent;
-struct TransformComponent;
+#include "Components\transform_component.h"
+#include "Components\render_component.h"
+#include "Components\light_component.h"
 
 class Mesh;
 class Shader;
@@ -33,7 +33,7 @@ public:
 
 	void initEntities(ECSManager &ecs);
 
-	void renderShadowMap(ECSManager& ecs);
+	void renderShadowMap(ECSManager& ecs, Shader shader);
 
 	void renderEntities(ECSManager& ecs, Camera cam = Camera());
 
@@ -51,59 +51,38 @@ public:
 	//--
 
 	size_t createMesh(ECSManager &ecs, Shader& mesh_shader, std::string file, std::string textureFolder, 
-		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 
-		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f), 
-		glm::quat rotate = glm::quat(0.0f, 0.0f, 0.0f, 0.0f));
+		TransformComponent tc = TransformComponent());
 
-	size_t createTerrain(ECSManager& ecs, Shader& shader, 
-		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::quat rotate = glm::quat(0.0f, 0.0f, 0.0f, 0.0f),
-
+	size_t createTerrain(ECSManager& ecs, Shader& shader, TransformComponent tc = TransformComponent(),
 		const int num_cols = 2, const int num_rows = 2,
 		const float height_mult = 1.0f, const float size = 1.0f,
 		const bool is_centered = true, const bool use_perlin_noise = true);
 
 	size_t createSphere(ECSManager& ecs, Shader& shader, 
-		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::quat rotate = glm::quat(0.0f, 0.0f, 0.0f, 0.0f),
-
+		TransformComponent tc = TransformComponent(),
 		int num_heights_ = 60, int num_revs_ = 60, float size = 1.0f);
 
 	size_t createCube8v(ECSManager& ecs, Shader& shader, 
-		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::quat rotate = glm::quat(0.0f, 0.0f, 0.0f, 0.0f),
+		TransformComponent tc = TransformComponent(),
 		const float size = 1.0f);
 
 	size_t createCube24v(ECSManager& ecs, Shader& shader, 
-		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::quat rotate = glm::quat(0.0f, 0.0f, 0.0f, 0.0f),
-
+		TransformComponent tc = TransformComponent(),
 		const float size = 1.0f);
 
 	size_t createQuad(ECSManager& ecs, Shader& shader, 
-		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::quat rotate = glm::quat(0.0f, 0.0f, 0.0f, 0.0f),
+		TransformComponent tc = TransformComponent(),
 		const float size = 1.0f);
 	
 	//Lights
 	size_t createSpotLight(ECSManager& ecs, const Shader& light_shader, 
-		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::quat rotate = glm::quat(0.0f, 0.0f, 0.0f, 0.0f),
-		glm::vec3 color = glm::vec3(255.0f, 255.0f, 255.0f));
+		LightInfo li = LightInfo());
 
 	size_t createPointLight(ECSManager& ecs, Shader& light_shader, 
-		glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::quat rotate = glm::quat(0.0f, 0.0f, 0.0f, 0.0f),
-		glm::vec3 color = glm::vec3(255.0f, 255.0f, 255.0f));
+		LightInfo li = LightInfo());
 
-	size_t createDirectionalLight(ECSManager& ecs, const Shader& light_shader);
+	size_t createDirectionalLight(ECSManager& ecs, const Shader& light_shader, 
+		LightInfo li = LightInfo());
 	
 	int number_lights = 0;
 

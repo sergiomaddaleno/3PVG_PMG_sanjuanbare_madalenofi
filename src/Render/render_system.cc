@@ -104,7 +104,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
     glUseProgram(0);
 }
 
-void RenderSystem::renderShadowMap(ECSManager& ecs) {
+void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader) {
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -115,13 +115,13 @@ void RenderSystem::renderShadowMap(ECSManager& ecs) {
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
     glm::mat4 model = glm::mat4(1.0f);
 
-    entities_shader2.useProgram();
-    entities_shader2.setUniformValue(entities_shader2.getUniformLocation("u_light_space"), Type::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
-    entities_shader2.setUniformValue(entities_shader2.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(lightView));
-    entities_shader2.setUniformValue(entities_shader2.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(lightProjection));
-    entities_shader2.setUniformValue(entities_shader2.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+    shader.useProgram();
+    shader.setUniformValue(shader.getUniformLocation("u_light_space"), Type::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
+    shader.setUniformValue(shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(lightView));
+    shader.setUniformValue(shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(lightProjection));
+    shader.setUniformValue(shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
     int one = 1;
-    entities_shader2.setUniformValue(entities_shader2.getUniformLocation("u_shadow_map"), Type::T_INT_1, &one);
+    shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), Type::T_INT_1, &one);
 
     auto ri = ecs.getComponentList<RenderComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
@@ -326,59 +326,62 @@ void RenderSystem::setupEntities(ECSManager& ecs)
     ecs.add_component_type<LightComponent>();
 }
 
-size_t RenderSystem::createMesh(ECSManager& ecs, Shader& mesh_shader, std::string file, std::string textureFolder, glm::vec3 pos, glm::vec3 scale, glm::quat rotate
-)
+size_t RenderSystem::createMesh(ECSManager& ecs, Shader& mesh_shader, std::string file, std::string textureFolder, 
+    TransformComponent tc)
 {
     auto mario_mesh = std::make_unique<Mesh>();
-
     if (!mario_mesh->loadOBJ(file, textureFolder)) {
         return -1;
     }
-
+    
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
+    //---
+
     auto& transform = ecs.get_component<TransformComponent>(entity_);
+    transform->position = tc.position;
+    transform->rotation = tc.rotation;
+    transform->scale = tc.scale;
 
-    transform->position = pos;
-    transform->rotation = rotate;
-    transform->scale = scale;
-
-    ecs.get_component<RenderComponent>(entity_)->shader = mesh_shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Mesh;
-
     ecs.get_component<RenderComponent>(entity_)->mesh_ = std::move(mario_mesh);
+    ecs.get_component<RenderComponent>(entity_)->shader = mesh_shader;
 
     entity_++;
 
     return entity_;
 }
 
-size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader, glm::vec3 pos, glm::vec3 scale, glm::quat rotate, const int num_cols, const int num_rows,
-    const float height_mult, const float size, const bool is_centered, const bool use_perlin_noise)
-{
+size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader, 
+    TransformComponent tc,
+    const int num_cols, const int num_rows,
+    const float height_mult, const float size, 
+    const bool is_centered, const bool use_perlin_noise){
+
     auto terrain = std::make_unique<Terrain>();
     terrain->init(num_cols, num_rows, height_mult, size, is_centered, use_perlin_noise);
 
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
+    //---
+
     auto& transform = ecs.get_component<TransformComponent>(entity_);
+    transform->position = tc.position;
+    transform->rotation = tc.rotation;
+    transform->scale = tc.scale;
 
-    transform->position = pos;
-    transform->rotation = rotate;
-    transform->scale = scale;
-
-    ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Terrain;
     ecs.get_component<RenderComponent>(entity_)->terrain_ = std::move(terrain);
+    ecs.get_component<RenderComponent>(entity_)->shader = shader;
 
     entity_++;
 
     return entity_;
 }
 
-size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, glm::vec3 pos, glm::vec3 scale, glm::quat rotate, int num_heights_, int num_revs_, float size)
+size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, TransformComponent tc, int num_heights_, int num_revs_, float size)
 {
     auto sphere = std::make_unique<Sphere>();
     sphere->init(false, size, num_heights_, num_revs_);
@@ -386,23 +389,23 @@ size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, glm::vec3 pos
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
+    //---
+
     auto& transform = ecs.get_component<TransformComponent>(entity_);
+    transform->position = tc.position;
+    transform->rotation = tc.rotation;
+    transform->scale = tc.scale;
 
-    transform->position = pos;
-    transform->rotation = rotate;
-    transform->scale = scale;
-
-    ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Sphere;
     ecs.get_component<RenderComponent>(entity_)->sphere_ = std::move(sphere);
-
+    ecs.get_component<RenderComponent>(entity_)->shader = shader;
 
     entity_++;
 
     return entity_;
 }
 
-size_t RenderSystem::createCube8v(ECSManager& ecs, Shader& shader, glm::vec3 pos, glm::vec3 scale, glm::quat rotate, const float size)
+size_t RenderSystem::createCube8v(ECSManager& ecs, Shader& shader, TransformComponent tc, const float size)
 {
     auto cube = std::make_unique<Cube>();
     cube->init8v(size);
@@ -410,22 +413,23 @@ size_t RenderSystem::createCube8v(ECSManager& ecs, Shader& shader, glm::vec3 pos
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
+    //---
+
     auto& transform = ecs.get_component<TransformComponent>(entity_);
+    transform->position = tc.position;
+    transform->rotation = tc.rotation;
+    transform->scale = tc.scale;
 
-    transform->position = pos;
-    transform->rotation = rotate;
-    transform->scale = scale;
-
-    ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube;
     ecs.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
+    ecs.get_component<RenderComponent>(entity_)->shader = shader;
 
     entity_++;
 
     return entity_;
 }
 
-size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, glm::vec3 pos, glm::vec3 scale, glm::quat rotate, const float size)
+size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, TransformComponent tc, const float size)
 {
     auto cube = std::make_unique<Cube>();
     cube->init24v(size);
@@ -433,11 +437,12 @@ size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, glm::vec3 po
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
-    auto& transform = ecs.get_component<TransformComponent>(entity_);
+    //---
 
-    transform->position = pos;
-    transform->rotation = rotate;
-    transform->scale = scale;
+    auto& transform = ecs.get_component<TransformComponent>(entity_);
+    transform->position = tc.position;
+    transform->rotation = tc.rotation;
+    transform->scale = tc.scale;
 
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube;
@@ -448,7 +453,7 @@ size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, glm::vec3 po
     return entity_;
 }
 
-size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, glm::vec3 pos, glm::vec3 scale, glm::quat rotate, const float size)
+size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, TransformComponent tc, const float size)
 {
     auto quad = std::make_unique<Quad>();
     quad->init(size);
@@ -456,22 +461,23 @@ size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, glm::vec3 pos, 
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
+    //---
+
     auto& transform = ecs.get_component<TransformComponent>(entity_);
+    transform->position = tc.position;
+    transform->rotation = tc.rotation;
+    transform->scale = tc.scale;
 
-    transform->position = pos;
-    transform->rotation = rotate;
-    transform->scale = scale;
-
-    ecs.get_component<RenderComponent>(entity_)->shader = shader;
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Quad;
     ecs.get_component<RenderComponent>(entity_)->quad_ = std::move(quad);
+    ecs.get_component<RenderComponent>(entity_)->shader = shader;
 
     entity_++;
     return entity_;
 
 }
 
-size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader, glm::vec3 pos, glm::vec3 scale, glm::quat rotate, glm::vec3 color)
+size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader, LightInfo li)
 {
     auto lb_mesh = std::make_unique<Mesh>();
     lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
@@ -480,19 +486,19 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
 
-    ecs.add_component<TransformComponent>(entity_)->position = pos;
+    //---
+
+    ecs.add_component<TransformComponent>(entity_)->position = li.pos_;
 
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_SpotLight;
-    ecs.get_component<RenderComponent>(entity_)->shader = light_shader;
     ecs.get_component<RenderComponent>(entity_)->mesh_ = std::move(lb_mesh);
+    ecs.get_component<RenderComponent>(entity_)->shader = light_shader;
 
     // ----
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
-
     light_comp->light.light_info_.type_ = LightType::LT_Spot;
     light_comp->shader = light_shader;
-
-    light_comp->light.light_info_.pos_ = pos;
+    light_comp->light.light_info_.pos_ = li.pos_;
     light_comp->light.light_info_.dir_ = glm::vec3(0.0f, 0.0f, -1.0f);
     light_comp->light.light_info_.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
     light_comp->light.light_info_.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
@@ -509,7 +515,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
     return entity_;
 }
 
-size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, glm::vec3 pos, glm::vec3 scale, glm::quat rotate, glm::vec3 color)
+size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, LightInfo li)
 {
     auto lb_mesh = std::make_unique<Mesh>();
     lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
@@ -518,20 +524,20 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, glm
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
 
-    ecs.get_component<TransformComponent>(entity_)->position = pos;
+    //---
+
+    ecs.get_component<TransformComponent>(entity_)->position = li.pos_;
 
     ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_PointLight;
-    ecs.get_component<RenderComponent>(entity_)->shader = light_shader;
     ecs.get_component<RenderComponent>(entity_)->mesh_ = std::move(lb_mesh);
+    ecs.get_component<RenderComponent>(entity_)->shader = light_shader;
 
     //--
 
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
-
     light_comp->light.light_info_.type_ = LightType::LT_Point;
     light_comp->shader = light_shader;
-
-    light_comp->light.light_info_.pos_ = pos;
+    light_comp->light.light_info_.pos_ = li.pos_;
     light_comp->light.light_info_.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
     light_comp->light.light_info_.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
     light_comp->light.light_info_.linear_att = 0.7f;
@@ -546,7 +552,7 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, glm
     return entity_;
 }
 
-size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light_shader)
+size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light_shader, LightInfo li)
 {
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
