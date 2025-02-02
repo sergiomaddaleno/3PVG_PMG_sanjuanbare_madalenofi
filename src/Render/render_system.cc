@@ -57,12 +57,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
-                render_comp->mesh_->bind();
-                break;
             case RenderType::RT_PointLight:
-                render_comp->mesh_->bind();
-                break;
-
             case RenderType::RT_SpotLight:
                 render_comp->mesh_->bind();
                 break;
@@ -103,8 +98,6 @@ void RenderSystem::initEntities(ECSManager& ecs) {
         }
     }
 
-    
-
     depth_map.compile(fs_depthmap, vs_depthmap);
     entities_shader2.compile(fs_entities2, vs_entities2);
 
@@ -127,6 +120,8 @@ void RenderSystem::renderShadowMap(ECSManager& ecs) {
     entities_shader2.setUniformValue(entities_shader2.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(lightView));
     entities_shader2.setUniformValue(entities_shader2.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(lightProjection));
     entities_shader2.setUniformValue(entities_shader2.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+    int one = 1;
+    entities_shader2.setUniformValue(entities_shader2.getUniformLocation("u_shadow_map"), Type::T_INT_1, &one);
 
     auto ri = ecs.getComponentList<RenderComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
@@ -241,8 +236,6 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     glCullFace(GL_BACK);
                     render_comp->shader.useProgram();
 
-                    int one = 1;
-                    render_comp->shader.setUniformValue(render_comp->shader.getUniformLocation("u_shadow_map"), Type::T_INT_1, &one);
                     setEntitiesUniforms(*transform_comp, render_comp->shader, cam);
 
                     switch (render_comp->type_) {
