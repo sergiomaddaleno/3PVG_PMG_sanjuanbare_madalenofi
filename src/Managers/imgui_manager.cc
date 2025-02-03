@@ -576,11 +576,11 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
             }
 
             if (ImGui::MenuItem("Save Scene [CTRL + S]")) {
-                di.save_manager.saveToFile(*di.ecs, "../saves/scene_1.json");
+                di.save_manager.saveToFile("../saves/scene_1.json", *di.ecs, di.cam);
             }
 
             if (ImGui::MenuItem("Load Scene")) {
-                di.save_manager.loadFromFile(*di.ecs, "../saves/scene_1.json",*di.render_system, di.shader);
+                di.save_manager.loadFromFile("../saves/scene_1.json", *di.ecs, *di.render_system, di.cam);
             }
 
             ImGui::EndMenu();

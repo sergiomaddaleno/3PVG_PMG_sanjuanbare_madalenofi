@@ -10,12 +10,14 @@
 #include "Components\render_component.h"
 #include "Components\light_component.h"
 
+#include "global_variables.h"
+
 #include <../nlohmann/json.hpp>
 #include <iostream>
 #include <fstream>
 #include "utils.h"
 
-nlohmann::json SaveManager::serialize(ECSManager& ecs)
+nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam)
 {
     nlohmann::json j;
     j["Entities"] = nlohmann::json::array();
@@ -67,21 +69,41 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs)
 
     //-----------------
 
-    Camera cam;
     j["Camera"] = cam.serialize(); 
 
     return j;
 }
 
 
-void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSystem& rs, Shader& shader) {
+void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera &cam) {
 
     ecs.remove_entities();
     rs.number_lights = 0;
     //rs.createDirectionalLight(ecs, shader);
+    //-----------------------------------------------------------
+
+    char* vs_entities = (char*)ReadFile("../assets/shaders/entities.vs");
+    char* fs_entities = (char*)ReadFile("../assets/shaders/entities.fs");
+
+    Shader shader;
+    shader.compile(vs_entities, fs_entities);
+
+    //-----------------------------------------------------------
+
+    const auto& camera = j["Camera"]; 
+
+    cam.setPosition(parseVec3(camera["Position"]));
+    cam.setFov(camera["Fov"]);
+    cam.setScrollSpeed(camera["Scroll_speed"]);
+    cam.setSensitibity(camera["Sensitivity"]);
+    cam.setSpeed(camera["Speed"]);
+    cam.setAspectRatio(camera["Aspect_ratio"]);
+    cam.setMinRenderDistance_(camera["Min_render_distance"]);
+    cam.setMaxRenderDistance_(camera["Max_render_distance_"]);
+    
+    //-----------------------------------------------------------
 
     for (const auto& entity : j["Entities"]) {
-
 
         if (entity.contains("Render_component")) {
 
@@ -180,9 +202,9 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
 }
 
 
-void SaveManager::saveToFile(ECSManager& ecs, const char* filename)
+void SaveManager::saveToFile(const char* filename, ECSManager& ecs, Camera& cam)
 {
-    nlohmann::json j = serialize(ecs);
+    nlohmann::json j = serialize(ecs, cam);
     std::ofstream file(filename);
 
     if (file.is_open()) {
@@ -195,13 +217,13 @@ void SaveManager::saveToFile(ECSManager& ecs, const char* filename)
     }
 }
 
-void SaveManager::loadFromFile(ECSManager& ecs, const char* filename,RenderSystem& rs,Shader& shader) {
+void SaveManager::loadFromFile(const char* filename, ECSManager& ecs, RenderSystem& rs, Camera& cam) {
     std::ifstream file(filename);
     if (file.is_open()) {
         nlohmann::json j;
         file >> j;
         file.close();
-        deSerialize(ecs, j,rs,shader);
+        deSerialize(j, ecs,rs, cam);
         std::cout << "ECS data loaded from " << filename << std::endl;
     }
     else {

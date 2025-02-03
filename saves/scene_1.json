@@ -1,30 +1,35 @@
 {
  "Camera": {
-  "Aspect_ratio": 1.7777777910232544,
+  "Aspect_ratio": 1.3333333730697632,
   "Fov": 45.0,
   "Max_render_distance_": 400.0,
   "Min_render_distance": 0.10000000149011612,
   "Position": [
-   [
-    0.0,
-    5.0,
-    10.0
-   ]
+   -16.975727081298828,
+   13.146544456481934,
+   17.530166625976563
   ],
   "Scroll_speed": 10.0,
   "Sensitivity": 1.0,
   "Speed": 0.004999999888241291,
   "View_direction": [
-   [
-    -1.0,
-    0.0,
-    1.0
-   ]
+   0.7395184636116028,
+   -0.3680318593978882,
+   -0.5636178255081177
   ]
  },
  "Entities": [
   {
-   "Entity_id": 0,
+   "Entity_id": 0
+  },
+  {
+   "Entity_id": 1
+  },
+  {
+   "Entity_id": 2
+  },
+  {
+   "Entity_id": 3,
    "Render_component": {
     "Mesh": {
      "MaterialID": 7,
@@ -36,7 +41,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 4
+         "TextureID": 21
         }
        ]
       },
@@ -46,7 +51,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 5
+         "TextureID": 22
         }
        ]
       },
@@ -56,7 +61,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 6
+         "TextureID": 23
         }
        ]
       },
@@ -66,7 +71,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 7
+         "TextureID": 24
         }
        ]
       },
@@ -76,7 +81,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 8
+         "TextureID": 25
         }
        ]
       },
@@ -86,7 +91,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 9
+         "TextureID": 26
         }
        ]
       },
@@ -96,7 +101,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 10
+         "TextureID": 27
         }
        ]
       },
@@ -106,7 +111,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 11
+         "TextureID": 28
         }
        ]
       }
@@ -115,7 +120,7 @@
     },
     "Render_type": 1,
     "Shader": {
-     "Program": 3
+     "Program": 19
     },
     "Texture": {
      "TextureID": 0
@@ -141,10 +146,10 @@
    }
   },
   {
-   "Entity_id": 1,
+   "Entity_id": 4,
    "Light_component": {
     "Shader": {
-     "Program": 3
+     "Program": 19
     },
     "light": {
      "Ambient_color": [
@@ -225,7 +230,7 @@
     },
     "Render_type": 3,
     "Shader": {
-     "Program": 3
+     "Program": 19
     },
     "Texture": {
      "TextureID": 0
@@ -251,23 +256,11 @@
    }
   },
   {
-   "Entity_id": 2
-  },
-  {
-   "Entity_id": 3
-  },
-  {
-   "Entity_id": 4
-  },
-  {
-   "Entity_id": 5
-  },
-  {
-   "Entity_id": 6,
+   "Entity_id": 5,
    "Render_component": {
     "Render_type": 7,
     "Shader": {
-     "Program": 3
+     "Program": 19
     },
     "Terrain": {
      "height_mult": 1.0,

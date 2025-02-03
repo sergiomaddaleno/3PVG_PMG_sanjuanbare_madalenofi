@@ -11,15 +11,16 @@
 class ECSManager;
 class RenderSystem;
 class Shader;
+class Camera;
 
 class SaveManager {
 
 public:
-	nlohmann::json serialize(ECSManager& ecs);
-	void deSerialize(ECSManager& ecs, const nlohmann::json& j,RenderSystem& rs,Shader& shader);
+	nlohmann::json serialize(ECSManager& ecs, Camera& cam);
+	void deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera& cam);
 
-	void saveToFile(ECSManager& ecs, const char* filename);
-	void loadFromFile(ECSManager& ecs, const char* filename,RenderSystem& rs,Shader& shader);
+	void saveToFile(const char* filename, ECSManager& ecs, Camera& cam);
+	void loadFromFile(const char* filename, ECSManager& ecs, RenderSystem& rs, Camera& cam);
 	
 	glm::vec3 parseVec3(const nlohmann::json& j) {
 		return glm::vec3(j[0], j[1], j[2]);
@@ -28,8 +29,6 @@ public:
 	glm::quat parseQuat(const nlohmann::json& j) {
 		return glm::quat(j[3], j[0], j[1], j[2]);
 	}
-
-	std::vector<nlohmann::json> entities_;
 
 private:
 

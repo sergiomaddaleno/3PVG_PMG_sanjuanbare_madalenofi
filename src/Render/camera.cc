@@ -125,8 +125,8 @@ nlohmann::json Camera::serialize()
 {
     nlohmann::json json_data;
 
-    json_data["Position"].push_back({position_.x, position_.y, position_.z});
-    json_data["View_direction"].push_back({ view_direction_.x, view_direction_.y, view_direction_.z });
+    json_data["Position"] = {position_.x, position_.y, position_.z};
+    json_data["View_direction"] = { view_direction_.x, view_direction_.y, view_direction_.z };
     json_data["Speed"] = speed_;
     json_data["Sensitivity"] = sensitivity_;
     json_data["Scroll_speed"] = scroll_speed_;

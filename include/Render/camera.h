@@ -37,6 +37,9 @@ public:
 	void setSensitibity(const float sensitivity){ sensitivity_ = sensitivity; }
 	void setPosition(glm::vec3 position) {position_ = position;}
 	void setFov(float fov) { fov_ = fov; }
+	void setAspectRatio(float aspect_ratio) { aspect_ratio_ = aspect_ratio; }
+	void setMinRenderDistance_(float min_render_distance) { min_render_distance_ = min_render_distance; }
+	void setMaxRenderDistance_(float max_render_distance) { max_render_distance_ = max_render_distance; }
 
 	void setScrollSpeed(float scroll_speed) { scroll_speed_ = scroll_speed; }
 	void setViewDir(glm::vec3 view_direction) {view_direction_ = view_direction;}
