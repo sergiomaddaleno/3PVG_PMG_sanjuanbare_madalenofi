@@ -8,6 +8,7 @@ const float PI = 3.141592653589793f;
 #include "Core/window.h"
 #include "global_variables.h"
 
+#include <../nlohmann/json.hpp>
 #include "../deps/glm/gtx/transform.hpp"
 
 Camera::Camera()
@@ -118,4 +119,21 @@ glm::mat4 Camera::getViewMatrix() const {
 glm::mat4 Camera::getProjectionMatrix() const
 {
     return glm::perspective(glm::radians(fov_), aspect_ratio_, min_render_distance_, max_render_distance_);
+}
+
+nlohmann::json Camera::serialize()
+{
+    nlohmann::json json_data;
+
+    json_data["Position"].push_back({position_.x, position_.y, position_.z});
+    json_data["View_direction"].push_back({ view_direction_.x, view_direction_.y, view_direction_.z });
+    json_data["Speed"] = speed_;
+    json_data["Sensitivity"] = sensitivity_;
+    json_data["Scroll_speed"] = scroll_speed_;
+    json_data["Fov"] = fov_;
+    json_data["Aspect_ratio"] = aspect_ratio_;
+    json_data["Min_render_distance"] = min_render_distance_;
+    json_data["Max_render_distance_"] = max_render_distance_;
+
+    return json_data;
 }

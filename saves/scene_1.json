@@ -1,4 +1,27 @@
 {
+ "Camera": {
+  "Aspect_ratio": 1.7777777910232544,
+  "Fov": 45.0,
+  "Max_render_distance_": 400.0,
+  "Min_render_distance": 0.10000000149011612,
+  "Position": [
+   [
+    0.0,
+    5.0,
+    10.0
+   ]
+  ],
+  "Scroll_speed": 10.0,
+  "Sensitivity": 1.0,
+  "Speed": 0.004999999888241291,
+  "View_direction": [
+   [
+    -1.0,
+    0.0,
+    1.0
+   ]
+  ]
+ },
  "Entities": [
   {
    "Entity_id": 0,
@@ -118,10 +141,7 @@
    }
   },
   {
-   "Entity_id": 1
-  },
-  {
-   "Entity_id": 2,
+   "Entity_id": 1,
    "Light_component": {
     "Shader": {
      "Program": 3
@@ -231,151 +251,19 @@
    }
   },
   {
+   "Entity_id": 2
+  },
+  {
    "Entity_id": 3
   },
   {
-   "Entity_id": 4,
-   "Render_component": {
-    "Render_type": 8,
-    "Shader": {
-     "Program": 3
-    },
-    "Sphere": {
-     "num_heights": 60,
-     "num_revs": 60,
-     "size": 1.0
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     -7.602250099182129,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
+   "Entity_id": 4
   },
   {
-   "Entity_id": 5,
-   "Render_component": {
-    "Cube": {
-     "cube_24v": false,
-     "cube_8v": true,
-     "size": 1.0
-    },
-    "Render_type": 9,
-    "Shader": {
-     "Program": 3
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     7.57463264465332,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
+   "Entity_id": 5
   },
   {
    "Entity_id": 6,
-   "Render_component": {
-    "Cube": {
-     "cube_24v": true,
-     "cube_8v": false,
-     "size": 1.0
-    },
-    "Render_type": 9,
-    "Shader": {
-     "Program": 3
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     7.460690975189209,
-     3.1286211013793945,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 7,
-   "Render_component": {
-    "Quad": {
-     "size": 1.0
-    },
-    "Render_type": 10,
-    "Shader": {
-     "Program": 3
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     -3.0097954273223877,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 8
-  },
-  {
-   "Entity_id": 9,
    "Render_component": {
     "Render_type": 7,
     "Shader": {

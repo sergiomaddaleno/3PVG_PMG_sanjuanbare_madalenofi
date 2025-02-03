@@ -2,6 +2,7 @@
 #include "Managers/save_manager.h"
 #include "Systems/ecs_manager.h"
 #include "Render/render_system.h"
+#include "Render/camera.h"
 #include "Core/mesh.h"
 #include "Render/light.h"
 
@@ -63,6 +64,11 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs)
 
         ++counter;
     }
+
+    //-----------------
+
+    Camera cam;
+    j["Camera"] = cam.serialize(); 
 
     return j;
 }

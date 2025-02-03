@@ -9,6 +9,8 @@
 #include "Core/window.h"
 #include <../deps/glm/glm.hpp>
 
+#include <../nlohmann/json.hpp>
+
 class Camera {
 
 public:
@@ -45,6 +47,9 @@ public:
 	void setViewMatrix(const glm::mat4 view);
 
 	glm::mat4 getProjectionMatrix() const;
+
+	//Save data
+	nlohmann::json serialize();
 
 private:
 
