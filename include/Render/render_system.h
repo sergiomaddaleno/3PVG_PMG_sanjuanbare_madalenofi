@@ -33,9 +33,11 @@ public:
 
 	void initEntities(ECSManager &ecs);
 
-	void renderShadowMap(ECSManager& ecs, Shader shader);
+	void setEntitiesUniformsToCalculateShadow(TransformComponent tc, Shader shader, Camera cam);
 
-	void renderEntities(ECSManager& ecs, Camera cam = Camera());
+	void renderShadowMap(ECSManager& ecs, Shader shader, Camera cam = Camera());
+
+	void renderEntities(ECSManager& ecs, Shader shader, Camera cam = Camera());
 
 	//--
 

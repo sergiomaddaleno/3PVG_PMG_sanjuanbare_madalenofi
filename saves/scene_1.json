@@ -13,150 +13,24 @@
   "Sensitivity": 1.0,
   "Speed": 0.004999999888241291,
   "View_direction": [
-   0.7395184636116028,
-   -0.3680318593978882,
-   -0.5636178255081177
+   0.2745594382286072,
+   -0.014551270753145218,
+   -0.9614600539207458
   ]
  },
  "Entities": [
   {
-   "Entity_id": 0
-  },
-  {
-   "Entity_id": 1
-  },
-  {
-   "Entity_id": 2
-  },
-  {
-   "Entity_id": 3,
-   "Render_component": {
-    "Mesh": {
-     "MaterialID": 7,
-     "Mesh_path": "../assets/obj/Mario.obj",
-     "Meshes": [
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 21
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 22
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 23
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 24
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 25
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 26
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 27
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 28
-        }
-       ]
-      }
-     ],
-     "Texture_folder": "../assets/textures/mario"
-    },
-    "Render_type": 1,
-    "Shader": {
-     "Program": 19
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 4,
+   "Entity_id": 0,
    "Light_component": {
     "Shader": {
-     "Program": 19
+     "Program": 6
     },
     "light": {
      "Ambient_color": [
       [
-       0.0,
-       0.0,
-       0.0
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
       ]
      ],
      "Constant_attenuation": [
@@ -171,76 +45,55 @@
      ],
      "Direction": [
       [
-       0.0,
-       0.0,
-       -1.0
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
       ]
      ],
      "Light_color": [
       [
-       255.0,
-       255.0,
-       255.0
+       1.0,
+       1.0,
+       0.949999988079071
       ]
      ],
      "Linear_attenuation": [
-      0.699999988079071
+      0.0
      ],
      "Position": [
-      [
-       0.0,
-       5.0,
-       10.0
-      ]
-     ],
-     "Quadratic_attenuation": [
-      1.7999999523162842
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular_color": [
       [
        0.0,
        0.0,
        0.0
       ]
      ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      32.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
      "Spot_angle": [
-      20.0
+      0.0
      ],
      "Strength": [
-      1.0
+      0.0
      ],
-     "Type": 1
-    }
-   },
-   "Render_component": {
-    "Mesh": {
-     "MaterialID": 0,
-     "Mesh_path": "../assets/obj/light_bulb.obj",
-     "Meshes": [
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": ""
-      }
-     ],
-     "Texture_folder": ""
-    },
-    "Render_type": 3,
-    "Shader": {
-     "Program": 19
-    },
-    "Texture": {
-     "TextureID": 0
+     "Type": 0
     }
    },
    "Transform_component": {
     "Position": [
      0.0,
-     5.0,
-     10.0
+     0.0,
+     0.0
     ],
     "Rotation": [
      0.0,
@@ -256,19 +109,139 @@
    }
   },
   {
-   "Entity_id": 5,
+   "Entity_id": 1,
+   "Render_component": {
+    "Mesh": {
+     "MaterialID": 7,
+     "Mesh_path": "../assets/obj/Mario.obj",
+     "Meshes": [
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": "",
+       "Textures": [
+        {
+         "TextureID": 3
+        }
+       ]
+      },
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": "",
+       "Textures": [
+        {
+         "TextureID": 4
+        }
+       ]
+      },
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": "",
+       "Textures": [
+        {
+         "TextureID": 5
+        }
+       ]
+      },
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": "",
+       "Textures": [
+        {
+         "TextureID": 6
+        }
+       ]
+      },
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": "",
+       "Textures": [
+        {
+         "TextureID": 7
+        }
+       ]
+      },
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": "",
+       "Textures": [
+        {
+         "TextureID": 8
+        }
+       ]
+      },
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": "",
+       "Textures": [
+        {
+         "TextureID": 9
+        }
+       ]
+      },
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": "",
+       "Textures": [
+        {
+         "TextureID": 10
+        }
+       ]
+      }
+     ],
+     "Texture_folder": "../assets/textures/mario"
+    },
+    "Render_type": 1,
+    "Shader": {
+     "Program": 6
+    },
+    "Texture": {
+     "TextureID": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 2
+  },
+  {
+   "Entity_id": 3,
    "Render_component": {
     "Render_type": 7,
     "Shader": {
-     "Program": 19
+     "Program": 6
     },
     "Terrain": {
-     "height_mult": 1.0,
+     "height_mult": 0.0,
      "is_centered": true,
-     "num_cols": 500,
-     "num_rows": 500,
+     "num_cols": 10,
+     "num_rows": 10,
      "size": 1.0,
-     "use_perlin_noise": true
+     "use_perlin_noise": false
     },
     "Texture": {
      "TextureID": 0

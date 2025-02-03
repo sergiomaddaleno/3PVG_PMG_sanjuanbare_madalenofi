@@ -14,7 +14,7 @@ const float PI = 3.141592653589793f;
 Camera::Camera()
     :
     position_(0.0f, 5.0f, 10.0f),
-    view_direction_(-1.0f, 0.0f, 1.0f),
+    view_direction_(0.0f, 0.0f, -1.0f),
     up_(0.0f, 1.0f, 0.0f),
     pos_mouse(0.0f, 0.0f),
     curr_mouse(0.0f, 0.0f),

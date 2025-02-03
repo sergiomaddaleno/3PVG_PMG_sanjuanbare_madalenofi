@@ -115,7 +115,7 @@ void Mesh::render(RenderComponent rc, TransformComponent tc, Camera cam)
 
         rc.shader.useProgram();
 
-        glCullFace(GL_BACK);
+        //glCullFace(GL_BACK);
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, tc.position);
