@@ -938,8 +938,6 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
                     transform->position = translation;
                     transform->rotation = rotation;
                     transform->scale = scale;
-
-                    
                 }
             }
         }     

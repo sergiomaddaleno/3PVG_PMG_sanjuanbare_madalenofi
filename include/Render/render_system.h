@@ -76,13 +76,13 @@ public:
 	
 	//Lights
 	size_t createSpotLight(ECSManager& ecs, const Shader& light_shader, 
-		LightInfo li = LightInfo());
+		LightInfo li = LightInfo(), bool default_light = true);
 
 	size_t createPointLight(ECSManager& ecs, Shader& light_shader, 
-		LightInfo li = LightInfo());
+		LightInfo li = LightInfo(), bool default_light = true);
 
 	size_t createDirectionalLight(ECSManager& ecs, const Shader& light_shader, 
-		LightInfo li = LightInfo());
+		LightInfo li = LightInfo(), bool default_light = true);
 	
 	int number_lights = 0;
 

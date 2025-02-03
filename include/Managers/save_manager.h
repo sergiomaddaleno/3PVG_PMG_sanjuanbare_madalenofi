@@ -6,6 +6,8 @@
 #include <../deps/glm/gtc/quaternion.hpp>
 #include <vector>
 
+#include "Render/light.h"
+
 #include "../deps/nlohmann/json.hpp"
 
 class ECSManager;
@@ -31,6 +33,27 @@ public:
 	}
 
 	std::vector<nlohmann::json> entities_;
+
+private:
+
+	LightInfo li;
+
+	int terrain_num_rows = 0;
+	int terrain_num_cols = 0;
+	float terrain_height_mult = 0.0f;
+	float terrain_size = 0.0f;
+	bool terrain_is_centered = true;
+	bool terrain_use_perlin_noise = true;
+
+	int sphere_num_heights = 0;
+	int sphere_num_revs = 0;
+	float sphere_size = 0.0f;
+
+	float cube_size = 0.0f;
+	bool cube_8v = false;
+	bool cube_24v = false;
+
+	float quad_size = 0.0f;
 };
 
 

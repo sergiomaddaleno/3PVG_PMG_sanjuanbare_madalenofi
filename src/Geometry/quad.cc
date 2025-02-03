@@ -10,9 +10,9 @@
 
 
 Quad::Quad()
-{
-
-
+    : VAO(0), VBO(0), EBO(0),
+    order_(), data_(),
+    tex(), size_(0.0f) {
 }
 
 Quad::~Quad()
@@ -105,6 +105,15 @@ void Quad::render()
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+nlohmann::json Quad::serialize() const
+{
+    nlohmann::json json_data;
+
+    json_data["size"] = size_;
+
+    return json_data;
 }
 
 

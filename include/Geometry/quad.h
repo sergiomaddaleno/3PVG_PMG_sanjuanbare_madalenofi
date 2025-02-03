@@ -21,24 +21,18 @@ class Quad {
    void bind();
    void render();
 
-  GLuint VAO = 0, VBO = 0, EBO = 0;
+   //Save data
+   nlohmann::json serialize() const;
+
+   //---
+
+  GLuint VAO, VBO, EBO;
+
+  float size_;
+  Texture tex;
 
   std::vector<int> order_;
   std::vector<float> data_;
-
-  Texture tex;
-  float size_ = 0.0f;
-
-  //Save data
-  nlohmann::json serialize() const {
-      nlohmann::json json_data;
-
-      json_data["Texture"].push_back(tex.serialize());
-      json_data["size"] = size_;
-
-      return json_data;
-  }
-
 };
 
 

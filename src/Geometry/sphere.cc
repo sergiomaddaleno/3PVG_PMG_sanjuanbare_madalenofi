@@ -10,12 +10,9 @@
 
 #define PI 3.14159265359
 
-
 Sphere::Sphere()
-{
-
-    num_heights_=0;
-    num_revs_=0;
+    : VAO(0), VBO(0), EBO(0),
+    num_heights_(0), num_revs_(0), size_(0.0f) {
 }
 
 Sphere::~Sphere()
@@ -27,7 +24,6 @@ void Sphere::init(bool sky, const float sphere_size, const int num_heights, cons
     num_heights_ = num_heights;
     num_revs_ = num_revs;
     size_ = sphere_size;
-    sky_ = sky;
 
     int num_vertex = (num_heights + 1) * (num_revs + 1);
     std::vector<float> vertex_sphere(num_vertex * 3); 
@@ -38,7 +34,6 @@ void Sphere::init(bool sky, const float sphere_size, const int num_heights, cons
     const float omega = (PI * 2.0f) / num_revs;
 
     int index = 0;
-
    
     for (int i = 0; i <= num_heights; i++) {
         for (int j = 0; j <= num_revs; j++) {
@@ -56,7 +51,6 @@ void Sphere::init(bool sky, const float sphere_size, const int num_heights, cons
             index++;
         }
     }
-
     
     data_.reserve(8 * num_vertex);
     for (int i = 0; i < num_vertex; i++) {
@@ -71,37 +65,19 @@ void Sphere::init(bool sky, const float sphere_size, const int num_heights, cons
         data_.push_back(uv_sphere[i * 2]);
         data_.push_back(uv_sphere[i * 2 + 1]);
     }
-
     
     order_.reserve((num_heights * num_revs) * 6);
-    index = 0;
-    if (!sky) {
-        for (int i = 0; i < num_heights; i++) {
-            for (int j = 0; j < num_revs; j++) {
-                int base_index = ((num_heights + 1) * i) + j;
-                order_.push_back(base_index);
-                order_.push_back(base_index + num_heights + 1);
-                order_.push_back(base_index + 1);
-                order_.push_back(base_index + 1);
-                order_.push_back(base_index + num_heights + 1);
-                order_.push_back(base_index + num_heights + 2);
-            }
+    for (int i = 0; i < num_heights; i++) {
+        for (int j = 0; j < num_revs; j++) {
+            int base_index = ((num_heights + 1) * i) + j;
+            order_.push_back(base_index + num_heights + 1);
+            order_.push_back(base_index);
+            order_.push_back(base_index + 1);
+            order_.push_back(base_index + num_heights + 1);
+            order_.push_back(base_index + 1);
+            order_.push_back(base_index + num_heights + 2);
         }
     }
-    else {
-        for (int i = 0; i < num_heights; i++) {
-            for (int j = 0; j < num_revs; j++) {
-                int base_index = ((num_heights + 1) * i) + j;
-                order_.push_back(base_index + num_heights + 1);
-                order_.push_back(base_index);
-                order_.push_back(base_index + 1);
-                order_.push_back(base_index + num_heights + 1);
-                order_.push_back(base_index + 1);
-                order_.push_back(base_index + num_heights + 2);
-            }
-        }
-    }
-   
 }
 
 void Sphere::bind()
@@ -152,4 +128,15 @@ void Sphere::render()
 float* Sphere::GetVertexSphere()
 {
     return nullptr;
+}
+
+nlohmann::json Sphere::serialize() const
+{
+    nlohmann::json json_data;
+
+    json_data["num_heights"] = num_heights_;
+    json_data["num_revs"] = num_revs_;
+    json_data["size"] = size_;
+
+    return json_data;
 }

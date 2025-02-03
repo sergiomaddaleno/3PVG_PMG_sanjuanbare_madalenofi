@@ -6,7 +6,10 @@
 #include <../deps/glm/gtc/type_ptr.hpp>
 
 PostProcessing::PostProcessing()
-{
+    : grey_(0.0f), negative_(1.0f), waves_(0.0f), blur_(0.0f),
+    kernel_types_(0), frame_buffer_(),
+    width_(800), height_(600),
+    rectVAO(0), rectVBO(0), RBO(0) {
 }
 
 PostProcessing::~PostProcessing()

@@ -92,7 +92,7 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
                 renderType = rc.value("Render_type", -1);
             }
 
-            LightInfo li;
+            // Light data ------------------------------------------------------
 
             if (entity.contains("Light_component")) {
                 const auto& lc = entity["Light_component"]["light"];
@@ -114,6 +114,8 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
                 li.type_ = lc["Type"].get<LightType>();
             }
 
+            // ---
+
             switch (renderType) {
             case RenderType::RT_Mesh: {
                 std::string mesh_path = entity["Render_component"]["Mesh"].value("Mesh_path", "");
@@ -121,24 +123,49 @@ void SaveManager::deSerialize(ECSManager& ecs, const nlohmann::json& j, RenderSy
                 rs.createMesh(ecs, shader, mesh_path, texture_folder, tc);
                 break;
             }
-            case RenderType::RT_Cube:
-                rs.createCube8v(ecs, shader, tc);
-                break;
-            case RenderType::RT_Quad:
-                rs.createQuad(ecs, shader, tc);
-                break;
-            case RenderType::RT_Sphere:
-                rs.createSphere(ecs, shader, tc);
-                break;
-            case RenderType::RT_Terrain:
-                rs.createTerrain(ecs, shader, tc, 500, 500);
-                break;
+            case RenderType::RT_Cube: {
+                const auto& cube = entity["Render_component"]["Cube"];
+                cube_8v = cube["cube_8v"];
+                cube_24v = cube["cube_24v"];
+                cube_size = cube["size"];
+                if (cube_8v) rs.createCube8v(ecs, shader, tc, cube_size);
+                if (cube_24v) rs.createCube24v(ecs, shader, tc, cube_size);
 
+                break;
+            }
+            case RenderType::RT_Quad: {
+                const auto& quad = entity["Render_component"]["Quad"];
+                quad_size = quad["size"];
+                rs.createQuad(ecs, shader, tc, quad_size);
+
+                break;
+            }
+            case RenderType::RT_Sphere:{
+                const auto& sphere = entity["Render_component"]["Sphere"];
+                sphere_num_heights = sphere["num_heights"];
+                sphere_num_revs = sphere["num_revs"];
+                sphere_size = sphere["size"];
+                rs.createSphere(ecs, shader, tc, sphere_num_heights, sphere_num_revs, sphere_size);
+
+                break;
+            }
+            case RenderType::RT_Terrain: {
+                const auto& terrain = entity["Render_component"]["Terrain"];
+                terrain_num_rows = terrain["num_rows"];
+                terrain_num_cols = terrain["num_cols"];
+                terrain_height_mult = terrain["height_mult"];
+                terrain_size = terrain["size"];
+                terrain_is_centered = terrain["is_centered"];
+                terrain_use_perlin_noise = terrain["use_perlin_noise"];
+                rs.createTerrain(ecs, shader, tc, terrain_num_cols, terrain_num_rows, terrain_height_mult, terrain_size, terrain_is_centered, terrain_use_perlin_noise);
+
+                break;
+            }
             case RenderType::RT_PointLight:
-                rs.createPointLight(ecs, shader, li);
+                rs.createPointLight(ecs, shader, li, false);
                 break;
             case RenderType::RT_SpotLight:
-                rs.createSpotLight(ecs, shader, li);
+                rs.createSpotLight(ecs, shader, li, false);
                 break;
             }
         }

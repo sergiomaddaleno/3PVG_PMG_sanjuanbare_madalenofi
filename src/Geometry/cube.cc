@@ -8,10 +8,11 @@
 #include <../deps/glm/gtc/type_ptr.hpp>
 #include <../deps/glm/gtc/quaternion.hpp>
 
-
-
 Cube::Cube()
-{
+    : VAO(0), VBO(0), EBO(0),
+    order_(), data_(),
+    tex(), size_(0.0f),
+    cube_8v_(false), cube_24v_(false) {
 }
 
 Cube::~Cube()
@@ -192,6 +193,17 @@ void Cube::render()
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+nlohmann::json Cube::serialize() const
+{
+    nlohmann::json json_data;
+
+    json_data["size"] = size_;
+    json_data["cube_8v"] = cube_8v_;
+    json_data["cube_24v"] = cube_24v_;
+
+    return json_data;
 }
 
 

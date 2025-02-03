@@ -12,11 +12,13 @@
 #include <iostream>
 
 
-Terrain::Terrain() {
-        num_rows_ = 0;
-        num_cols_ = 0;
-
+Terrain::Terrain()
+    : VAO(0), VBO(0), EBO(0),
+    num_rows_(0), num_cols_(0),
+    height_mult_(0.0f), size_(0.0f),
+    is_centered_(true), use_perlin_noise_(true) {
 }
+
 Terrain::~Terrain() {}
 
 void Terrain::init(const int num_cols, const int num_rows,
@@ -25,10 +27,10 @@ void Terrain::init(const int num_cols, const int num_rows,
 
         num_cols_ = num_cols;
         num_rows_ = num_rows;
-        float height_mult_ = height_mult;
-        float size_ = size;
-        bool is_centered_ = is_centered;
-        bool use_perlin_noise_ = use_perlin_noise;
+        height_mult_ = height_mult;
+        size_ = size;
+        is_centered_ = is_centered;
+        use_perlin_noise_ = use_perlin_noise;
 
         int num_vertex = (num_cols + 1) * (num_rows + 1);
         std::vector<float> vertex_terrain(num_vertex * 3); // x, y, z
@@ -226,6 +228,20 @@ void Terrain::render()
 float* Terrain::GetVertexTerrain()
 {
     return nullptr;
+}
+
+nlohmann::json Terrain::serialize() const
+{
+    nlohmann::json json_data;
+
+    json_data["num_rows"] = num_rows_;
+    json_data["num_cols"] = num_cols_;
+    json_data["height_mult"] = height_mult_;
+    json_data["size"] = size_;
+    json_data["is_centered"] = is_centered_;
+    json_data["use_perlin_noise"] = use_perlin_noise_;
+
+    return json_data;
 }
 
 

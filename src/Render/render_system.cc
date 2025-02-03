@@ -477,7 +477,7 @@ size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, TransformCompon
 
 }
 
-size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader, LightInfo li)
+size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader, LightInfo li, bool default_light)
 {
     auto lb_mesh = std::make_unique<Mesh>();
     lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
@@ -498,16 +498,31 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
     light_comp->light.light_info_.type_ = LightType::LT_Spot;
     light_comp->shader = light_shader;
-    light_comp->light.light_info_.pos_ = li.pos_;
-    light_comp->light.light_info_.dir_ = glm::vec3(0.0f, 0.0f, -1.0f);
-    light_comp->light.light_info_.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
-    light_comp->light.light_info_.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
-    light_comp->light.light_info_.linear_att = 0.7f;
-    light_comp->light.light_info_.quad_att_ = 1.8f;
-    light_comp->light.light_info_.constant_att_ = 1.0f;
-    light_comp->light.light_info_.shininess_ = 32.0f;
-    light_comp->light.light_info_.strength_ = 1.0f;
-    light_comp->light.light_info_.spot_angle_ = 20.0f;
+
+    if (default_light) {
+
+        light_comp->light.light_info_.pos_ = li.pos_;
+        light_comp->light.light_info_.dir_ = glm::vec3(0.0f, 0.0f, -1.0f);
+        light_comp->light.light_info_.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
+        light_comp->light.light_info_.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
+        light_comp->light.light_info_.linear_att = 0.7f;
+        light_comp->light.light_info_.quad_att_ = 1.8f;
+        light_comp->light.light_info_.constant_att_ = 1.0f;
+        light_comp->light.light_info_.shininess_ = 32.0f;
+        light_comp->light.light_info_.strength_ = 1.0f;
+        light_comp->light.light_info_.spot_angle_ = 20.0f;
+    }
+    else {
+        light_comp->light.light_info_.pos_ = li.pos_;
+        light_comp->light.light_info_.dir_ = li.dir_;
+        light_comp->light.light_info_.light_color_ = li.light_color_;
+        light_comp->light.light_info_.linear_att = li.linear_att;
+        light_comp->light.light_info_.quad_att_ = li.quad_att_;
+        light_comp->light.light_info_.constant_att_ = li.constant_att_;
+        light_comp->light.light_info_.shininess_ = li.shininess_;
+        light_comp->light.light_info_.strength_ = li.strength_;
+        light_comp->light.light_info_.spot_angle_ = li.spot_angle_;
+    }
 
     number_lights++;
     entity_++;
@@ -515,7 +530,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
     return entity_;
 }
 
-size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, LightInfo li)
+size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, LightInfo li, bool default_light)
 {
     auto lb_mesh = std::make_unique<Mesh>();
     lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
@@ -537,22 +552,35 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, Lig
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
     light_comp->light.light_info_.type_ = LightType::LT_Point;
     light_comp->shader = light_shader;
-    light_comp->light.light_info_.pos_ = li.pos_;
-    light_comp->light.light_info_.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
-    light_comp->light.light_info_.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
-    light_comp->light.light_info_.linear_att = 0.7f;
-    light_comp->light.light_info_.quad_att_ = 1.8f;
-    light_comp->light.light_info_.constant_att_ = 1.0f;
-    light_comp->light.light_info_.shininess_ = 32.0f;
-    light_comp->light.light_info_.strength_ = 1.0f;
 
+    if (default_light) {
+        light_comp->light.light_info_.pos_ = li.pos_;
+        light_comp->light.light_info_.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
+        light_comp->light.light_info_.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
+        light_comp->light.light_info_.linear_att = 0.7f;
+        light_comp->light.light_info_.quad_att_ = 1.8f;
+        light_comp->light.light_info_.constant_att_ = 1.0f;
+        light_comp->light.light_info_.shininess_ = 32.0f;
+        light_comp->light.light_info_.strength_ = 1.0f;
+    }
+    else {
+        light_comp->light.light_info_.pos_ = li.pos_;
+        light_comp->light.light_info_.light_color_ = li.light_color_;
+        light_comp->light.light_info_.ambient_color_ = li.ambient_color_;
+        light_comp->light.light_info_.linear_att = li.linear_att;
+        light_comp->light.light_info_.quad_att_ = li.quad_att_;
+        light_comp->light.light_info_.constant_att_ = li.constant_att_;
+        light_comp->light.light_info_.shininess_ = li.shininess_;
+        light_comp->light.light_info_.strength_ = li.strength_;
+    }
+    
     number_lights++;
     entity_++;
 
     return entity_;
 }
 
-size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light_shader, LightInfo li)
+size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light_shader, LightInfo li, bool default_light)
 {
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
@@ -563,14 +591,25 @@ size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light
     light_comp->light.light_info_.type_ = LightType::LT_Directional;
     light_comp->shader = light_shader;
 
-    light_comp->light.light_info_.dir_ = glm::normalize(glm::vec3(-1.0f, -1.0f, -0.5f));
-    light_comp->light.light_info_.light_color_ = glm::vec3(1.0f, 1.0f, 0.95f);
-    light_comp->light.light_info_.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
-    light_comp->light.light_info_.spec_color_ = glm::vec3(1.0f, 1.0f, 0.95f);
-    light_comp->light.light_info_.linear_att = 0.0f;
-    light_comp->light.light_info_.quad_att_ = 0.0f;
-    light_comp->light.light_info_.constant_att_ = 1.0f;
-    light_comp->light.light_info_.shininess_ = 32.0f;
+    if (default_light) {
+        light_comp->light.light_info_.dir_ = glm::normalize(glm::vec3(-1.0f, -1.0f, -0.5f));
+        light_comp->light.light_info_.light_color_ = glm::vec3(1.0f, 1.0f, 0.95f);
+        light_comp->light.light_info_.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
+        light_comp->light.light_info_.spec_color_ = glm::vec3(1.0f, 1.0f, 0.95f);
+        light_comp->light.light_info_.linear_att = 0.0f;
+        light_comp->light.light_info_.quad_att_ = 0.0f;
+        light_comp->light.light_info_.constant_att_ = 1.0f;
+        light_comp->light.light_info_.shininess_ = 32.0f;
+    }else{
+        light_comp->light.light_info_.dir_ = glm::normalize(li.dir_);
+        light_comp->light.light_info_.light_color_ = li.light_color_;
+        light_comp->light.light_info_.ambient_color_ = li.ambient_color_;
+        light_comp->light.light_info_.spec_color_ = li.spec_color_;
+        light_comp->light.light_info_.linear_att = li.linear_att;
+        light_comp->light.light_info_.quad_att_ = li.quad_att_;
+        light_comp->light.light_info_.constant_att_ = li.constant_att_;
+        light_comp->light.light_info_.shininess_ = li.shininess_;
+    }
 
     number_lights++;
     entity_++;

@@ -1,99 +1,7 @@
 {
  "Entities": [
   {
-   "Entity_id": 0
-  },
-  {
-   "Entity_id": 1,
-   "Light_component": {
-    "Shader": {
-     "Program": 6
-    },
-    "light": {
-     "Ambient_color": [
-      [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
-      ]
-     ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       -0.6666666865348816,
-       -0.6666666865348816,
-       -0.3333333432674408
-      ]
-     ],
-     "Light_color": [
-      [
-       1.0,
-       1.0,
-       0.949999988079071
-      ]
-     ],
-     "Linear_attenuation": [
-      0.0
-     ],
-     "Position": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Quadratic_attenuation": [
-      0.0
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular_color": [
-      [
-       1.0,
-       1.0,
-       0.949999988079071
-      ]
-     ],
-     "Spot_angle": [
-      0.0
-     ],
-     "Strength": [
-      0.0
-     ],
-     "Type": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 2,
+   "Entity_id": 0,
    "Render_component": {
     "Mesh": {
      "MaterialID": 7,
@@ -105,7 +13,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 17
+         "TextureID": 4
         }
        ]
       },
@@ -115,7 +23,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 18
+         "TextureID": 5
         }
        ]
       },
@@ -125,7 +33,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 19
+         "TextureID": 6
         }
        ]
       },
@@ -135,7 +43,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 20
+         "TextureID": 7
         }
        ]
       },
@@ -145,7 +53,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 21
+         "TextureID": 8
         }
        ]
       },
@@ -155,7 +63,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 22
+         "TextureID": 9
         }
        ]
       },
@@ -165,7 +73,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 23
+         "TextureID": 10
         }
        ]
       },
@@ -175,7 +83,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 24
+         "TextureID": 11
         }
        ]
       }
@@ -184,7 +92,7 @@
     },
     "Render_type": 1,
     "Shader": {
-     "Program": 6
+     "Program": 3
     },
     "Texture": {
      "TextureID": 0
@@ -210,69 +118,20 @@
    }
   },
   {
-   "Entity_id": 3
+   "Entity_id": 1
   },
   {
-   "Entity_id": 4
-  },
-  {
-   "Entity_id": 5,
-   "Render_component": {
-    "Render_type": 7,
-    "Shader": {
-     "Program": 6
-    },
-    "Terrain": {
-     "Texture": [
-      {
-       "TextureID": 28
-      }
-     ],
-     "height_mult": 0.0,
-     "is_centered": true,
-     "num_cols": 500,
-     "num_rows": 500,
-     "size": 0.0,
-     "use_perlin_noise": true
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 6
-  },
-  {
-   "Entity_id": 7,
+   "Entity_id": 2,
    "Light_component": {
     "Shader": {
-     "Program": 6
+     "Program": 3
     },
     "light": {
      "Ambient_color": [
       [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
+       0.0,
+       0.0,
+       0.0
       ]
      ],
      "Constant_attenuation": [
@@ -294,9 +153,9 @@
      ],
      "Light_color": [
       [
-       150.0,
-       150.0,
-       150.0
+       255.0,
+       255.0,
+       255.0
       ]
      ],
      "Linear_attenuation": [
@@ -346,7 +205,7 @@
     },
     "Render_type": 3,
     "Shader": {
-     "Program": 6
+     "Program": 3
     },
     "Texture": {
      "TextureID": 0
@@ -354,15 +213,197 @@
    },
    "Transform_component": {
     "Position": [
-        0.0,
-        5.0,
-        10.0
+     0.0,
+     5.0,
+     10.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 3
+  },
+  {
+   "Entity_id": 4,
+   "Render_component": {
+    "Render_type": 8,
+    "Shader": {
+     "Program": 3
+    },
+    "Sphere": {
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    },
+    "Texture": {
+     "TextureID": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     -7.602250099182129,
+     0.0,
+     0.0
     ],
     "Rotation": [
      0.0,
      0.0,
      0.0,
      1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 5,
+   "Render_component": {
+    "Cube": {
+     "cube_24v": false,
+     "cube_8v": true,
+     "size": 1.0
+    },
+    "Render_type": 9,
+    "Shader": {
+     "Program": 3
+    },
+    "Texture": {
+     "TextureID": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     7.57463264465332,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 6,
+   "Render_component": {
+    "Cube": {
+     "cube_24v": true,
+     "cube_8v": false,
+     "size": 1.0
+    },
+    "Render_type": 9,
+    "Shader": {
+     "Program": 3
+    },
+    "Texture": {
+     "TextureID": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     7.460690975189209,
+     3.1286211013793945,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 7,
+   "Render_component": {
+    "Quad": {
+     "size": 1.0
+    },
+    "Render_type": 10,
+    "Shader": {
+     "Program": 3
+    },
+    "Texture": {
+     "TextureID": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     -3.0097954273223877,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 8
+  },
+  {
+   "Entity_id": 9,
+   "Render_component": {
+    "Render_type": 7,
+    "Shader": {
+     "Program": 3
+    },
+    "Terrain": {
+     "height_mult": 1.0,
+     "is_centered": true,
+     "num_cols": 500,
+     "num_rows": 500,
+     "size": 1.0,
+     "use_perlin_noise": true
+    },
+    "Texture": {
+     "TextureID": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
     ],
     "Scale": [
      1.0,
