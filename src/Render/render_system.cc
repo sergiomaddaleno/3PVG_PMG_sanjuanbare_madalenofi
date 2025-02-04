@@ -112,8 +112,6 @@ void RenderSystem::setEntitiesUniformsToCalculateShadow(TransformComponent tc, S
     model = glm::scale(model, tc.scale);
 
     shader.setUniformValue(shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
-    
-
 }
 
 void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Camera cam)

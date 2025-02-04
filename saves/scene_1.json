@@ -5,25 +5,31 @@
   "Max_render_distance_": 400.0,
   "Min_render_distance": 0.10000000149011612,
   "Position": [
-   -16.975727081298828,
-   13.146544456481934,
-   17.530166625976563
+   -35.57376480102539,
+   11.789196968078613,
+   44.47338104248047
   ],
   "Scroll_speed": 10.0,
   "Sensitivity": 1.0,
   "Speed": 0.004999999888241291,
   "View_direction": [
-   0.2745594382286072,
-   -0.014551270753145218,
-   -0.9614600539207458
+   0.7114753127098083,
+   -0.13578392565250397,
+   -0.6894676089286804
   ]
  },
  "Entities": [
   {
-   "Entity_id": 0,
+   "Entity_id": 0
+  },
+  {
+   "Entity_id": 1
+  },
+  {
+   "Entity_id": 2,
    "Light_component": {
     "Shader": {
-     "Program": 6
+     "Program": 13
     },
     "light": {
      "Ambient_color": [
@@ -109,139 +115,19 @@
    }
   },
   {
-   "Entity_id": 1,
-   "Render_component": {
-    "Mesh": {
-     "MaterialID": 7,
-     "Mesh_path": "../assets/obj/Mario.obj",
-     "Meshes": [
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 3
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 4
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 5
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 6
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 7
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 8
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 9
-        }
-       ]
-      },
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 10
-        }
-       ]
-      }
-     ],
-     "Texture_folder": "../assets/textures/mario"
-    },
-    "Render_type": 1,
-    "Shader": {
-     "Program": 6
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 2
-  },
-  {
    "Entity_id": 3,
    "Render_component": {
     "Render_type": 7,
     "Shader": {
-     "Program": 6
+     "Program": 3
     },
     "Terrain": {
-     "height_mult": 0.0,
+     "height_mult": 1.0,
      "is_centered": true,
-     "num_cols": 10,
-     "num_rows": 10,
+     "num_cols": 500,
+     "num_rows": 500,
      "size": 1.0,
-     "use_perlin_noise": false
+     "use_perlin_noise": true
     },
     "Texture": {
      "TextureID": 0

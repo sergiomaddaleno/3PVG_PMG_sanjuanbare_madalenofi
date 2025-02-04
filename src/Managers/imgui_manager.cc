@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <optional>
 #include <string>
+#include <fstream>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -576,8 +577,15 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
                 di.window->toggleFullScreen(*di.input, Input::None, true);
             }
 
-            if (ImGui::MenuItem("Save Scene [CTRL + S]")) {
-                di.save_manager.saveToFile("../saves/scene_1.json", *di.ecs, di.cam);
+            if (ImGui::MenuItem("Save Scene [CTRL + S]") ||
+                (di.input->isKeyPressed(Input::CTRL) && di.input->isKeyPressed(Input::S))) {
+
+                if (current_scene_file.empty()) {
+                    di.save_manager.saveToFile("../saves/scene_0.json", *di.ecs, di.cam);
+                }
+                else {
+                    di.save_manager.saveToFile(current_scene_file, *di.ecs, di.cam);
+                }
             }
 
             if (ImGui::BeginMenu("Load Scene")) {
@@ -888,18 +896,20 @@ void ImGuiManager::ConsoleWindow(DataImgui& di)
 
 void ImGuiManager::LoadSceneWindow(DataImgui& di)
 {
-    ImGui::Begin("Load Sceneer");
+    ImGui::Begin("Load Scene");
 
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
     ImGui::Text("Drag and Drop json file");
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
     static std::string scene_file_name;
+    std::filesystem::path filePath;
+
     if (ImGui::Button(!scene_file_name.empty() ? scene_file_name.c_str() : ".json Drop here", { 120.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            std::filesystem::path filePath = (const wchar_t*)payload->Data;
+            filePath = (const wchar_t*)payload->Data;
             if (filePath.extension() == ".json") {
                 scene_file_name = filePath.filename().string();
             }
@@ -907,8 +917,13 @@ void ImGuiManager::LoadSceneWindow(DataImgui& di)
         ImGui::EndDragDropTarget();
     }
 
+    ImGui::Dummy(ImVec2(0.0f, 3.0f));
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
     if (ImGui::Button("Load Scene")) {
-        di.save_manager.loadFromFile(scene_file_name, *di.ecs, *di.render_system, di.cam);
+        current_scene_file = "../saves/" + scene_file_name;
+        di.save_manager.loadFromFile(current_scene_file, *di.ecs, *di.render_system, di.cam);
     }
 
     ImGui::End();

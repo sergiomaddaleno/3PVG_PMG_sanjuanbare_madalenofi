@@ -1,1 +1,17 @@
-null
+{
+    "Camera": {
+        "Aspect_ratio": 1.7769999504089355,
+        "Fov": 45.0,
+        "Max_render_distance_": 1000.0,
+        "Min_render_distance": 0.10000000149011612,
+        "Position": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Scroll_speed": 1.0,
+        "Sensitivity": 1.0,
+        "Speed": 0.004999999888241291
+    },
+    "Entities": []
+}
