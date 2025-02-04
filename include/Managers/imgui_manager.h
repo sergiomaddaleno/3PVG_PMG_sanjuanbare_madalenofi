@@ -72,6 +72,7 @@ public:
 
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di);
 
+    std::string current_scene_file;
 private:
     int selected_entity = -1;
 
@@ -95,7 +96,6 @@ private:
     bool none_render = false;
 
     bool load_scene = false;
-
 };
 
 #endif // IGM

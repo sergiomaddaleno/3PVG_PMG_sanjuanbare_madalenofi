@@ -210,10 +210,11 @@ void SaveManager::saveToFile(std::string filename, ECSManager& ecs, Camera& cam)
     if (file.is_open()) {
         file << j.dump(1);
         file.close();
-        std::cout << "ECS data saved to " << filename << std::endl;
+        
+        printf("Saving in %s\n", filename.c_str());
     }
     else {
-        std::cerr << "Unable to open file for writing: " << filename << std::endl;
+        printf("Unable to open file\n");
     }
 }
 
@@ -224,10 +225,11 @@ void SaveManager::loadFromFile(std::string filename, ECSManager& ecs, RenderSyst
         file >> j;
         file.close();
         deSerialize(j, ecs,rs, cam);
-        std::cout << "ECS data loaded from " << filename << std::endl;
+        
+        printf("Loaded from %s\n", filename.c_str());
     }
     else {
-        std::cerr << "Unable to open file for reading: " << filename << std::endl;
+        printf("Unable to open file\n");
     }
 }
 
@@ -237,12 +239,30 @@ void SaveManager::newFile()
     std::ofstream file(filename);
 
     if (file.is_open()) {
-        nlohmann::json j;
+        nlohmann::json defaultJson = {
+            {"Entities", nlohmann::json::array()},
+            {"Camera", {
+                {"Position", {0.0f, 0.0f, 0.0f}},
+                {"Fov", 45.0f},
+                {"Scroll_speed", 1.0f},
+                {"Sensitivity", 1.0f},
+                {"Speed", 0.005f},
+                {"Aspect_ratio", 1.777f},
+                {"Min_render_distance", 0.1f},
+                {"Max_render_distance_", 1000.0f}
+            }},
+        };
 
-        file << j.dump(1);
+        file << defaultJson.dump(4);
         file.close();
+
+        printf("New file created\n");
+    }
+    else {
+        printf("Unable to create file\n");
     }
 
     number_of_scenes++;
 }
+
 

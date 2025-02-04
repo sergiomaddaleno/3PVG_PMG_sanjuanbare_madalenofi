@@ -90,7 +90,7 @@ int main(int, char**) {
 
     render_system.setupEntities(ecs);
 
-    save_manager.loadFromFile("../saves/scene_1.json", ecs, render_system, cam);
+    save_manager.saveToFile("../saves/scene_0.json", ecs, cam);
 
 
     imgui_manager.Init(window->getWindow());
