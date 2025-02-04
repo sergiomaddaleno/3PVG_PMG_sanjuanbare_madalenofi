@@ -86,18 +86,18 @@ int main(int, char**) {
     //skybox.init();
     // ---
     
-    //postProcc.initData();
+    postProcc.initData();
 
     render_system.setupEntities(ecs);
 
     save_manager.loadFromFile("../saves/scene_1.json", ecs, render_system, cam);
 
-    //imgui_manager.Init(window->getWindow());
+    imgui_manager.Init(window->getWindow());
 
-    //data_imgui.ecs = &ecs;
-    //data_imgui.shader = entities_shader;
-    //data_imgui.render_system = &render_system;
-    //data_imgui.input = &input;
+    data_imgui.ecs = &ecs;
+    data_imgui.shader = entities_shader;
+    data_imgui.render_system = &render_system;
+    data_imgui.input = &input;
     //--
 
     double lastTime = window->getTime();
@@ -113,10 +113,10 @@ int main(int, char**) {
 
         g_window_width_ = window->getWidth();
         g_window_height_ = window->getHeight();
-        //postProcc.resize(g_window_width_, g_window_height_);
+        postProcc.resize(g_window_width_, g_window_height_);
 
         //--
-        //postProcc.beginRender();
+        postProcc.beginRender();
         cam.update(input, dt, g_window_width_, g_window_height_);
 
         //skybox.render(skybox.shader_, skybox.texture_, cam);
@@ -130,7 +130,7 @@ int main(int, char**) {
         data_imgui.window = &window.value();
         data_imgui.skybox = skybox;
 
-        //imgui_manager.Render(window->getWindow(), data_imgui);
+        imgui_manager.Render(window->getWindow(), data_imgui);
 
         if (window->closePressed()) done = true;
     }

@@ -202,7 +202,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 }
 
 
-void SaveManager::saveToFile(const char* filename, ECSManager& ecs, Camera& cam)
+void SaveManager::saveToFile(std::string filename, ECSManager& ecs, Camera& cam)
 {
     nlohmann::json j = serialize(ecs, cam);
     std::ofstream file(filename);
@@ -217,7 +217,7 @@ void SaveManager::saveToFile(const char* filename, ECSManager& ecs, Camera& cam)
     }
 }
 
-void SaveManager::loadFromFile(const char* filename, ECSManager& ecs, RenderSystem& rs, Camera& cam) {
+void SaveManager::loadFromFile(std::string filename, ECSManager& ecs, RenderSystem& rs, Camera& cam) {
     std::ifstream file(filename);
     if (file.is_open()) {
         nlohmann::json j;
@@ -229,5 +229,20 @@ void SaveManager::loadFromFile(const char* filename, ECSManager& ecs, RenderSyst
     else {
         std::cerr << "Unable to open file for reading: " << filename << std::endl;
     }
+}
+
+void SaveManager::newFile()
+{
+    std::string filename = "../saves/scene_" + std::to_string(number_of_scenes) + ".json";
+    std::ofstream file(filename);
+
+    if (file.is_open()) {
+        nlohmann::json j;
+
+        file << j.dump(1);
+        file.close();
+    }
+
+    number_of_scenes++;
 }
 

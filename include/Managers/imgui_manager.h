@@ -68,6 +68,7 @@ public:
     void FogWindow(DataImgui& di);
     void SkyboxWindow(DataImgui& di);
     void ConsoleWindow(DataImgui& di);
+    void LoadSceneWindow(DataImgui& di);
 
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di);
 
@@ -92,6 +93,8 @@ private:
     bool post_process_compiled = false;
     Effect current_effect = Effect::None;
     bool none_render = false;
+
+    bool load_scene = false;
 
 };
 

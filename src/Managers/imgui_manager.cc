@@ -184,6 +184,7 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     if (post_process_window) PostProcessWindow(di);
     if (skybox_window) SkyboxWindow(di);
     if (fog_window) FogWindow(di);
+    if (load_scene) LoadSceneWindow(di);
 
     di.post_proccessing->endRender();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -579,10 +580,15 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
                 di.save_manager.saveToFile("../saves/scene_1.json", *di.ecs, di.cam);
             }
 
-            if (ImGui::MenuItem("Load Scene")) {
-                di.save_manager.loadFromFile("../saves/scene_1.json", *di.ecs, *di.render_system, di.cam);
+            if (ImGui::BeginMenu("Load Scene")) {
+                ImGui::Checkbox("Load Scene Window", &load_scene);
+                ImGui::EndMenu();
             }
 
+            if (ImGui::MenuItem("New Scene")) {
+
+                di.save_manager.newFile();
+            }
             ImGui::EndMenu();
         }
 
@@ -876,6 +882,34 @@ void ImGuiManager::ConsoleWindow(DataImgui& di)
 {
     ImGui::Begin("Console");
 
+
+    ImGui::End();
+}
+
+void ImGuiManager::LoadSceneWindow(DataImgui& di)
+{
+    ImGui::Begin("Load Sceneer");
+
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    ImGui::Text("Drag and Drop json file");
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+    static std::string scene_file_name;
+    if (ImGui::Button(!scene_file_name.empty() ? scene_file_name.c_str() : ".json Drop here", { 120.0f, 40.0f })) {}
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+            std::filesystem::path filePath = (const wchar_t*)payload->Data;
+            if (filePath.extension() == ".json") {
+                scene_file_name = filePath.filename().string();
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    if (ImGui::Button("Load Scene")) {
+        di.save_manager.loadFromFile(scene_file_name, *di.ecs, *di.render_system, di.cam);
+    }
 
     ImGui::End();
 }
