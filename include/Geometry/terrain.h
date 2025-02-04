@@ -25,6 +25,7 @@ class Terrain {
 
   void bind();
   void render();
+  void renderShadow();
   float* GetVertexTerrain();
 
   //Save data

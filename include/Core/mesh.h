@@ -48,6 +48,8 @@ public:
     void bind();
     void renderElements();
 
+    void renderElementsShadow();
+
     Texture getTexture(int shape_index);
 
     //Save data

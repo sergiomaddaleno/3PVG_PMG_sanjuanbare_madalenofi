@@ -86,7 +86,7 @@ bool Texture::loadSkyboxTex(char* dds_file)
 void Texture::bind() const
 {
     if (textureID != 0) {
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, textureID);
     }
 }

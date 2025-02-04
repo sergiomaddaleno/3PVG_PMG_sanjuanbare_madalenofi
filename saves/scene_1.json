@@ -238,8 +238,8 @@
     "Terrain": {
      "height_mult": 0.0,
      "is_centered": true,
-     "num_cols": 10,
-     "num_rows": 10,
+     "num_cols": 50,
+     "num_rows": 50,
      "size": 1.0,
      "use_perlin_noise": false
     },

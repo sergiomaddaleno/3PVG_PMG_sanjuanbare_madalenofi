@@ -225,6 +225,16 @@ void Terrain::render()
     glBindVertexArray(0);
 }
 
+
+void Terrain::renderShadow()
+{
+    //tex.bind();
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, (num_cols_ * num_rows_) * 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
 float* Terrain::GetVertexTerrain()
 {
     return nullptr;

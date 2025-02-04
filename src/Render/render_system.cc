@@ -87,19 +87,17 @@ void RenderSystem::initEntities(ECSManager& ecs) {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
             float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
             glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
             glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-            glDrawBuffer(GL_NONE);
-            glReadBuffer(GL_NONE);
+
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         }
     }
-
-    depth_map.compile(fs_depthmap, vs_depthmap);
-    entities_shader2.compile(fs_entities2, vs_entities2);
 
     glUseProgram(0);
 }
@@ -111,9 +109,10 @@ void RenderSystem::setEntitiesUniformsToCalculateShadow(TransformComponent tc, S
     model = model * glm::mat4_cast(tc.rotation);
     model = glm::scale(model, tc.scale);
 
-    shader.setUniformValue(shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
-    
+  
 
+    shader.setUniformValue(shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
+   
 }
 
 void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Camera cam)
@@ -123,13 +122,20 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Cam
     model = model * glm::mat4_cast(tc.rotation);
     model = glm::scale(model, tc.scale);
 
-    float near_plane = 1.0f, far_plane = 70.5f;
-    glm::vec3 lightDirection = glm::normalize(glm::vec3((-0.2f, -1.0f, -0.3f)));
-    glm::vec3 lightPosition = -lightDirection * 10.0f;
+    float near_plane = 1.0f, far_plane = 100.5f;
+    float spotLightFOV = glm::radians(45.0f); // Ángulo de apertura del foco
 
-    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::vec3 lightPosition = glm::vec3(5.0f, 10.0f, 5.0f); // Posición de la luz
+    glm::vec3 lightDirection = glm::normalize(glm::vec3(-1.0f, -1.0f, -1.0f)); // Dirección de la luz
+
+    // Matriz de proyección perspectiva
+    glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)g_window_width_ / (float)g_window_height_, near_plane, far_plane);
+
+    // Matriz de vista (Mira desde la posición de la luz hacia la dirección deseada)
+    glm::mat4 lightView = glm::lookAt(lightPosition, lightPosition + lightDirection, glm::vec3(0.0f, 1.0f, 0.0f));
+
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
 
 
     glm::mat4 view = cam.getViewMatrix();
@@ -141,8 +147,7 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Cam
     shader.setUniformValue(shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
     shader.setUniformValue(shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
 
-    int tex_id = 0;
-    shader.setUniformValue(shader.getUniformLocation("u_texture"), Type::T_INT_1, &tex_id);
+  
 
     shader.setUniformValue(shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
     shader.setUniformValue(shader.getUniformLocation("u_density"), Type::T_FLOAT_1, &g_fog_density_);
@@ -155,29 +160,39 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Cam
 void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
    
 
-    float near_plane = 1.0f, far_plane = 70.5f;
-    glm::vec3 lightDirection = glm::normalize(glm::vec3((-0.2f, -1.0f, -0.3f)));
-    glm::vec3 lightPosition = -lightDirection * 10.0f; 
+    float near_plane = 1.0f, far_plane = 100.5f;
+    float spotLightFOV = glm::radians(45.0f); // Ángulo de apertura del foco
 
-    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::vec3 lightPosition = glm::vec3(5.0f, 10.0f, 5.0f); // Posición de la luz
+    glm::vec3 lightDirection = glm::normalize(glm::vec3(-1.0f, -1.0f, -1.0f)); // Dirección de la luz
+
+    // Matriz de proyección perspectiva
+    glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)g_window_width_ / (float)g_window_height_, near_plane, far_plane);
+
+    // Matriz de vista (Mira desde la posición de la luz hacia la dirección deseada)
+    glm::mat4 lightView = glm::lookAt(lightPosition, lightPosition + lightDirection, glm::vec3(0.0f, 1.0f, 0.0f));
+
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
 
     // Debug
 
     //glViewport(0, 0, g_window_width_, g_window_height_);
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    shader.useProgram();
+
+    shader.setUniformValue(shader.getUniformLocation("u_light_space"), Type::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
+    shader.setUniformValue(shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(lightView));
+    shader.setUniformValue(shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(lightProjection));
 
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    shader.useProgram();
-    shader.setUniformValue(shader.getUniformLocation("u_light_space"), Type::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
-    shader.setUniformValue(shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(lightView));
-    shader.setUniformValue(shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(lightProjection));
-
-   
     
 
     auto ri = ecs.getComponentList<RenderComponent>().begin();
@@ -199,11 +214,11 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
             case RenderType::RT_SpotLight:
             case RenderType::RT_PointLight:
                 for (auto& mesh : render_comp->mesh_->meshes) {
-                    render_comp->mesh_->renderElements();
+                    render_comp->mesh_->renderElementsShadow();
                 }
                 break;
             case RenderType::RT_Terrain:
-                render_comp->terrain_->render();
+                render_comp->terrain_->renderShadow();
                 break;
             case RenderType::RT_Sphere:
                 render_comp->sphere_->render();
@@ -230,7 +245,7 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
 
 void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
-    //renderShadowMap(ecs,shader,cam);
+    renderShadowMap(ecs,shader,cam);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     auto li = ecs.getComponentList<LightComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
@@ -246,16 +261,17 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
             auto& transform = *ti;
 
             // Light ---------------------------------------------------------------
-            shader.useProgram();
+           
 
             shader.setUniformValue(shader.getUniformLocation("u_number_lights"), Type::T_INT_1, &number_lights);
             shader.setUniformValue(shader.getUniformLocation("u_camera_position"), Type::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
             shader.setUniformValue(shader.getUniformLocation("u_ambient"), Type::T_FLOAT_3, &light_comp->light.global_ambient_color_);
 
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, depthMap);
+            int one = 0;
+            shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), Type::T_FLOAT_1, &one);
 
-            int one = 1;
-           
-            shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), Type::T_INT_1, &one);
 
             light_comp->light.setUniforms(shader, light_count);
 
@@ -274,7 +290,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
                     auto& transform_comp = *ti;
 
                     
-                    shader.useProgram();
+                    
 
                     setEntitiesUniforms(*transform_comp, shader, cam);
 

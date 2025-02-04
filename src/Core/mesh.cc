@@ -201,6 +201,21 @@ void Mesh::renderElements() {
     }
 }
 
+void Mesh::renderElementsShadow() {
+
+    for (auto& mesh : meshes) {
+
+       
+
+        if (!mesh.indices.empty()) {
+            glBindVertexArray(mesh.VAO);
+            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+        }
+
+    }
+}
+
 Texture Mesh::getTexture(int index)
 {
     if (index >= 0 && index < textures.size()) {

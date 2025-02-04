@@ -86,11 +86,12 @@ int main(int, char**) {
     //skybox.init();
     // ---
     
-    postProcc.initData();
+    //postProcc.initData();
 
     render_system.setupEntities(ecs);
 
     save_manager.loadFromFile("../saves/scene_1.json", ecs, render_system, cam);
+
 
     imgui_manager.Init(window->getWindow());
 
@@ -116,7 +117,7 @@ int main(int, char**) {
         postProcc.resize(g_window_width_, g_window_height_);
 
         //--
-        postProcc.beginRender();
+        //postProcc.beginRender();
         cam.update(input, dt, g_window_width_, g_window_height_);
 
         //skybox.render(skybox.shader_, skybox.texture_, cam);
@@ -125,12 +126,12 @@ int main(int, char**) {
 
         //--
 
-        data_imgui.cam = cam;
-        data_imgui.post_proccessing = &postProcc;
-        data_imgui.window = &window.value();
-        data_imgui.skybox = skybox;
-
-        imgui_manager.Render(window->getWindow(), data_imgui);
+        //data_imgui.cam = cam;
+        //data_imgui.post_proccessing = &postProcc;
+        //data_imgui.window = &window.value();
+        //data_imgui.skybox = skybox;
+        
+        //imgui_manager.Render(window->getWindow(), data_imgui);
 
         if (window->closePressed()) done = true;
     }
