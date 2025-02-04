@@ -50,6 +50,8 @@ public:
 	//call one time to create entites
 	void setupEntities(ECSManager& ecs);
 
+	void GenerateMaps(ECSManager& ecs);
+
 	//--
 
 	size_t createMesh(ECSManager &ecs, Shader& mesh_shader, std::string file, std::string textureFolder, 

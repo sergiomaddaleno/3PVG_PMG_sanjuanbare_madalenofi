@@ -360,3 +360,35 @@ files {
 	"deps/imGuizmo/*.h",
 	"deps/imGuizmo/*.cpp",
 }
+
+project"ProjectAI"
+
+kind "ConsoleApp"
+language "C++"
+targetdir "build/%{prj.name}/%{cfg.buildcfg}"
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo", "deps/Perlin"} 
+links "Motor"
+conan_config_exec("Debug")
+conan_config_exec("Release")
+conan_config_exec("RelWithDebInfo")
+debugargs { _MAIN_SCRIPT_DIR .. "/src" }
+files { 
+	"examples/AI_Example.cc",
+	"src/**",
+	"include/**",
+	"scripts/**",
+	"assets/**",
+
+	"deps/*.h",
+	"deps/imgui/*.h",
+	"deps/imgui/*.cpp",
+	"deps/Perlin/**",
+	"deps/imgui/backends/imgui_impl_glfw.h",
+	"deps/imgui/backends/imgui_impl_glfw.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3.h",
+	"deps/imgui/backends/imgui_impl_opengl3.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
+	"deps/imgui/*.cpp",
+	"deps/imGuizmo/*.h",
+	"deps/imGuizmo/*.cpp",
+}

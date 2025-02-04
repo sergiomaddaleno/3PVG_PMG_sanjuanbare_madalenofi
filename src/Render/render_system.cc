@@ -123,8 +123,19 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Cam
     model = model * glm::mat4_cast(tc.rotation);
     model = glm::scale(model, tc.scale);
 
+    float near_plane = 1.0f, far_plane = 70.5f;
+    glm::vec3 lightDirection = glm::normalize(glm::vec3((-0.2f, -1.0f, -0.3f)));
+    glm::vec3 lightPosition = -lightDirection * 10.0f;
+
+    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+
     glm::mat4 view = cam.getViewMatrix();
     glm::mat4 projection = cam.getProjectionMatrix();
+
+    shader.setUniformValue(shader.getUniformLocation("u_light_space"), Type::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
 
     shader.setUniformValue(shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
     shader.setUniformValue(shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
@@ -151,7 +162,6 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
     glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
     glm::mat4 lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-    glm::mat4 model = glm::mat4(1.0f);
 
     // Debug
 
@@ -220,8 +230,8 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
 
 void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
-    renderShadowMap(ecs,shader,cam);
-
+    //renderShadowMap(ecs,shader,cam);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     auto li = ecs.getComponentList<LightComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto liend = ecs.getComponentList<LightComponent>().end();
@@ -355,6 +365,7 @@ void RenderSystem::setupEntities(ECSManager& ecs)
     ecs.add_component_type<TransformComponent>();
     ecs.add_component_type<LightComponent>();
 }
+
 
 size_t RenderSystem::createMesh(ECSManager& ecs, Shader& mesh_shader, std::string file, std::string textureFolder, 
     TransformComponent tc)
