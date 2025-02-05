@@ -14,7 +14,7 @@
 
 Terrain::Terrain()
     : VAO(0), VBO(0), EBO(0),
-    num_rows_(0), num_cols_(0),
+    num_rows_(0), num_cols_(0), num_vertex_(0),
     height_mult_(0.0f), size_(0.0f),
     is_centered_(true), use_perlin_noise_(true) {
 }
@@ -32,10 +32,10 @@ void Terrain::init(const int num_cols, const int num_rows,
         is_centered_ = is_centered;
         use_perlin_noise_ = use_perlin_noise;
 
-        int num_vertex = (num_cols + 1) * (num_rows + 1);
-        std::vector<float> vertex_terrain(num_vertex * 3); // x, y, z
-        std::vector<float> normals_terrain(num_vertex * 3); // nx, ny, nz
-        std::vector<float> uv_terrain(num_vertex * 2); // u, v
+        num_vertex_ = (num_cols + 1) * (num_rows + 1);
+        vertex_terrain_.resize(num_vertex_ * 3); 
+        normals_terrain_.resize(num_vertex_ * 3);
+        uv_terrain_.resize(num_vertex_ * 2);
 
         int index = 0;
 
@@ -57,7 +57,7 @@ void Terrain::init(const int num_cols, const int num_rows,
                 if (use_perlin_noise) {
                     float perlin_x = (float)j;
                     float perlin_z = (float)i;
-                    height_value = SimplexNoise::noise(perlin_x, perlin_z);
+                    height_value = SimplexNoise::noise(perlin_x, perlin_z) * height_mult;
                 }
                 else {
                     if (height_map.getData() && i < height_map.getwidth() && j < height_map.getHeight()) {
@@ -77,9 +77,9 @@ void Terrain::init(const int num_cols, const int num_rows,
                 float x = is_centered ? (j * size) - center.x : j * size;
                 float z = is_centered ? (i * size) - center.z : i * size;
 
-                vertex_terrain[index * 3] = x;
-                vertex_terrain[index * 3 + 1] = height_value;
-                vertex_terrain[index * 3 + 2] = z;
+                vertex_terrain_[index * 3] = x;
+                vertex_terrain_[index * 3 + 1] = height_value;
+                vertex_terrain_[index * 3 + 2] = z;
 
                 index++;
             }
@@ -89,40 +89,40 @@ void Terrain::init(const int num_cols, const int num_rows,
         //Normales
         for (int i = 0; i <= num_cols; i++) {
             for (int j = 0; j <= num_rows; j++) {
-                glm::vec3 vertex = { vertex_terrain[index * 3], vertex_terrain[index * 3 + 1], vertex_terrain[index * 3 + 2] };
+                glm::vec3 vertex = { vertex_terrain_[index * 3], vertex_terrain_[index * 3 + 1], vertex_terrain_[index * 3 + 2] };
                 glm::vec3 vertexLeft, vertexRight, vertexUp, vertexDown;
 
                 if (i > 0) {
-                    vertexLeft = { vertex_terrain[index * 3 - ((num_rows + 1) * 3)] - vertex.x,
-                                   vertex_terrain[index * 3 - ((num_rows + 1) * 3) + 1] - vertex.y,
-                                   vertex_terrain[index * 3 - ((num_rows + 1) * 3) + 2] - vertex.z };
+                    vertexLeft = { vertex_terrain_[index * 3 - ((num_rows + 1) * 3)] - vertex.x,
+                                   vertex_terrain_[index * 3 - ((num_rows + 1) * 3) + 1] - vertex.y,
+                                   vertex_terrain_[index * 3 - ((num_rows + 1) * 3) + 2] - vertex.z };
                 }
                 else {
                     vertexLeft = { 0.0f, 0.0f, 0.0f };
                 }
 
                 if (i != num_cols) {
-                    vertexRight = { vertex_terrain[index * 3 + ((num_rows + 1) * 3)] - vertex.x,
-                                    vertex_terrain[index * 3 + ((num_rows + 1) * 3) + 1] - vertex.y,
-                                    vertex_terrain[index * 3 + ((num_rows + 1) * 3) + 2] - vertex.z };
+                    vertexRight = { vertex_terrain_[index * 3 + ((num_rows + 1) * 3)] - vertex.x,
+                                    vertex_terrain_[index * 3 + ((num_rows + 1) * 3) + 1] - vertex.y,
+                                    vertex_terrain_[index * 3 + ((num_rows + 1) * 3) + 2] - vertex.z };
                 }
                 else {
                     vertexRight = { 0.0f, 0.0f, 0.0f };
                 }
 
                 if (j != num_rows) {
-                    vertexUp = { vertex_terrain[index * 3 + 3] - vertex.x,
-                                 vertex_terrain[index * 3 + 3 + 1] - vertex.y,
-                                 vertex_terrain[index * 3 + 3 + 2] - vertex.z };
+                    vertexUp = { vertex_terrain_[index * 3 + 3] - vertex.x,
+                                 vertex_terrain_[index * 3 + 3 + 1] - vertex.y,
+                                 vertex_terrain_[index * 3 + 3 + 2] - vertex.z };
                 }
                 else {
                     vertexUp = { 0.0f, 0.0f, 0.0f };
                 }
 
                 if (j > 0) {
-                    vertexDown = { vertex_terrain[index * 3 - 3] - vertex.x,
-                                   vertex_terrain[index * 3 - 3 + 1] - vertex.y,
-                                   vertex_terrain[index * 3 - 3 + 2] - vertex.z };
+                    vertexDown = { vertex_terrain_[index * 3 - 3] - vertex.x,
+                                   vertex_terrain_[index * 3 - 3 + 1] - vertex.y,
+                                   vertex_terrain_[index * 3 - 3 + 2] - vertex.z };
                 }
                 else {
                     vertexDown = { 0.0f, 0.0f, 0.0f };
@@ -135,9 +135,9 @@ void Terrain::init(const int num_cols, const int num_rows,
 
                 glm::vec3 normal = glm::normalize(CrossRight + CrossUp + CrossLeft + CrossDown);
 
-                normals_terrain[index * 3] = normal.x;
-                normals_terrain[index * 3 + 1] = normal.y;
-                normals_terrain[index * 3 + 2] = normal.z;
+                normals_terrain_[index * 3] = normal.x;
+                normals_terrain_[index * 3 + 1] = normal.y;
+                normals_terrain_[index * 3 + 2] = normal.z;
 
                 index++;
             }
@@ -146,24 +146,24 @@ void Terrain::init(const int num_cols, const int num_rows,
         index = 0;
         for (int i = 0; i <= num_cols; i++) {
             for (int j = 0; j <= num_rows; j++) {
-                uv_terrain[index * 2] = 1.0f / (float)(num_cols)*j;
-                uv_terrain[index * 2 + 1] = 1.0f / (float)(num_rows)*i;
+                uv_terrain_[index * 2] = 1.0f / (float)(num_cols)*j;
+                uv_terrain_[index * 2 + 1] = 1.0f / (float)(num_rows)*i;
                 index++;
             }
         }
         
-        data_.reserve(8 * num_vertex);
-        for (int i = 0; i < num_vertex; i++) {
-            data_.push_back(vertex_terrain[i * 3]);
-            data_.push_back(vertex_terrain[i * 3 + 1]);
-            data_.push_back(vertex_terrain[i * 3 + 2]);
+        data_.reserve(8 * num_vertex_);
+        for (int i = 0; i < num_vertex_; i++) {
+            data_.push_back(vertex_terrain_[i * 3]);
+            data_.push_back(vertex_terrain_[i * 3 + 1]);
+            data_.push_back(vertex_terrain_[i * 3 + 2]);
 
-            data_.push_back(normals_terrain[i * 3]);
-            data_.push_back(normals_terrain[i * 3 + 1]);
-            data_.push_back(normals_terrain[i * 3 + 2]);
+            data_.push_back(normals_terrain_[i * 3]);
+            data_.push_back(normals_terrain_[i * 3 + 1]);
+            data_.push_back(normals_terrain_[i * 3 + 2]);
 
-            data_.push_back(uv_terrain[i * 2]);
-            data_.push_back(uv_terrain[i * 2 + 1]);
+            data_.push_back(uv_terrain_[i * 2]);
+            data_.push_back(uv_terrain_[i * 2 + 1]);
         }
 
         order_.reserve((num_cols * num_rows) * 6);
@@ -179,6 +179,13 @@ void Terrain::init(const int num_cols, const int num_rows,
                 order_.push_back(base_index + num_rows + 2);
             }
         }    
+
+        /*for (int i = 0; i < num_cols; i++) {
+            for (int j = 0; j < num_rows; j++) {
+            int index = i * num_rows + j;
+            printf("Vertex [%d, %d]: %f\n", i, j, GetVertexTerrain()[index]);
+            }
+        }*/
 }
 
 void Terrain::bind()
@@ -235,9 +242,9 @@ void Terrain::renderShadow()
     glBindVertexArray(0);
 }
 
-float* Terrain::GetVertexTerrain()
+const float* Terrain::GetVertexTerrain()
 {
-    return nullptr;
+    return vertex_terrain_.data();
 }
 
 nlohmann::json Terrain::serialize() const

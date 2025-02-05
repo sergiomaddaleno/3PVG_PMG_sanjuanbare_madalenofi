@@ -26,7 +26,8 @@ class Terrain {
   void bind();
   void render();
   void renderShadow();
-  float* GetVertexTerrain();
+
+  const float* GetVertexTerrain();
 
   //Save data
   nlohmann::json serialize() const;
@@ -38,6 +39,13 @@ class Terrain {
   int num_rows_, num_cols_;
   float height_mult_, size_;
   bool is_centered_, use_perlin_noise_;
+
+private:
+
+  int num_vertex_;
+  std::vector<float> vertex_terrain_;
+  std::vector<float> normals_terrain_;
+  std::vector<float> uv_terrain_;
 
   std::vector<int> order_;
   std::vector<float> data_;
