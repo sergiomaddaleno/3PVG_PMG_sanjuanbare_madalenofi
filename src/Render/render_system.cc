@@ -93,7 +93,8 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
             glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         }
@@ -157,14 +158,14 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Cam
 
 }
 
-void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
+void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam,LightComponent t) {
    
 
     float near_plane = 1.0f, far_plane = 100.5f;
-    float spotLightFOV = glm::radians(45.0f); // Ángulo de apertura del foco
+    float spotLightFOV = glm::radians(t.light.light_info_.spot_angle_); // Ángulo de apertura del foco
 
-    glm::vec3 lightPosition = glm::vec3(5.0f, 10.0f, 5.0f); // Posición de la luz
-    glm::vec3 lightDirection = glm::normalize(glm::vec3(-1.0f, -1.0f, -1.0f)); // Dirección de la luz
+    glm::vec3 lightPosition =t.light.light_info_.pos_; // Posición de la luz
+    glm::vec3 lightDirection = glm::normalize(t.light.light_info_.dir_); // Dirección de la luz
 
     // Matriz de proyección perspectiva
     glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)g_window_width_ / (float)g_window_height_, near_plane, far_plane);
@@ -180,8 +181,7 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
     //glViewport(0, 0, g_window_width_, g_window_height_);
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
+   
 
     shader.useProgram();
 
@@ -211,7 +211,7 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
-            case RenderType::RT_SpotLight:
+            //case RenderType::RT_SpotLight:
             case RenderType::RT_PointLight:
                 for (auto& mesh : render_comp->mesh_->meshes) {
                     render_comp->mesh_->renderElementsShadow();
@@ -234,7 +234,7 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
     }
 
     // Debug
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 1);
     glDrawBuffer(GL_BACK);
     glReadBuffer(GL_BACK);
     glViewport(0, 0, g_window_width_, g_window_height_);
@@ -245,7 +245,7 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
 
 void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
-    renderShadowMap(ecs,shader,cam);
+    
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     auto li = ecs.getComponentList<LightComponent>().begin();
@@ -260,11 +260,12 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
             auto& transform = *ti;
 
             // Light ---------------------------------------------------------------
-           
+            renderShadowMap(ecs, shader, cam,*light_comp);
+            shader.useProgram();
             shader.setUniformValue(shader.getUniformLocation("u_number_lights"), Type::T_INT_1, &number_lights);
             shader.setUniformValue(shader.getUniformLocation("u_camera_position"), Type::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
             shader.setUniformValue(shader.getUniformLocation("u_ambient"), Type::T_FLOAT_3, &light_comp->light.global_ambient_color_);
-
+            
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, depthMap);
             int one = 0;
@@ -291,7 +292,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:
-                    case RenderType::RT_SpotLight:
+                    //case RenderType::RT_SpotLight:
                     case RenderType::RT_PointLight:
                         for (auto& mesh : render_comp->mesh_->meshes) {
                             render_comp->mesh_->renderElements();
@@ -553,8 +554,8 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
 
     if (default_light) {
 
-        light_comp->light.light_info_.pos_ = li.pos_;
-        light_comp->light.light_info_.dir_ = glm::vec3(0.0f, 0.0f, -1.0f);
+        light_comp->light.light_info_.pos_ = glm::vec3(5.0f, 10.0f, 5.0f);
+        light_comp->light.light_info_.dir_ = glm::vec3(-1.0f, -1.0f, -1.0f);
         light_comp->light.light_info_.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
         light_comp->light.light_info_.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
         light_comp->light.light_info_.linear_att = 0.7f;
@@ -562,7 +563,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
         light_comp->light.light_info_.constant_att_ = 1.0f;
         light_comp->light.light_info_.shininess_ = 32.0f;
         light_comp->light.light_info_.strength_ = 1.0f;
-        light_comp->light.light_info_.spot_angle_ = 20.0f;
+        light_comp->light.light_info_.spot_angle_ = 45.0f;
     }
     else {
         light_comp->light.light_info_.pos_ = li.pos_;
