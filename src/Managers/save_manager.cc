@@ -219,8 +219,12 @@ void SaveManager::saveToFile(std::string filename, ECSManager& ecs, Camera& cam)
 }
 
 void SaveManager::loadFromFile(std::string filename, ECSManager& ecs, RenderSystem& rs, Camera& cam) {
+
     std::ifstream file(filename);
     if (file.is_open()) {
+
+        current_scene_file = filename;
+
         nlohmann::json j;
         file >> j;
         file.close();
@@ -263,6 +267,16 @@ void SaveManager::newFile()
     }
 
     number_of_scenes++;
+}
+
+glm::vec3 SaveManager::parseVec3(const nlohmann::json& j)
+{
+    return glm::vec3(j[0], j[1], j[2]);
+}
+
+glm::quat SaveManager::parseQuat(const nlohmann::json& j)
+{
+    return glm::quat(j[3], j[0], j[1], j[2]);
 }
 
 

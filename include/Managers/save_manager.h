@@ -21,19 +21,17 @@ public:
 
 	void saveToFile(std::string filename, ECSManager& ecs, Camera& cam);
 	void loadFromFile(std::string filename, ECSManager& ecs, RenderSystem& rs, Camera& cam);
-
 	void newFile();
 
-	glm::vec3 parseVec3(const nlohmann::json& j) {
-		return glm::vec3(j[0], j[1], j[2]);
-	}
+	std::string getCurrentScene() { return current_scene_file; }
+	void setCurrentScene(std::string scene_file) { current_scene_file = scene_file; }
 
-	glm::quat parseQuat(const nlohmann::json& j) {
-		return glm::quat(j[3], j[0], j[1], j[2]);
-	}
+	glm::vec3 parseVec3(const nlohmann::json& j);
+	glm::quat parseQuat(const nlohmann::json& j);
 
 private:
 
+	std::string current_scene_file;
 	int number_of_scenes = 0;
 
 	//---

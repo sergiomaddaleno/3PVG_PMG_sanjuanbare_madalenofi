@@ -146,7 +146,8 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Cam
     shader.setUniformValue(shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
     shader.setUniformValue(shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
 
-  
+    int tex_id = 1;
+    shader.setUniformValue(shader.getUniformLocation("u_texture"), Type::T_INT_1, &tex_id);
 
     shader.setUniformValue(shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
     shader.setUniformValue(shader.getUniformLocation("u_density"), Type::T_FLOAT_1, &g_fog_density_);
@@ -245,13 +246,12 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam) {
 void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
     renderShadowMap(ecs,shader,cam);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     auto li = ecs.getComponentList<LightComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto liend = ecs.getComponentList<LightComponent>().end();
     auto tiend = ecs.getComponentList<TransformComponent>().end();
-
-    
 
     int light_count = 0;
     for (; li != liend && ti != tiend; ++li, ++ti) {
@@ -261,7 +261,6 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
             // Light ---------------------------------------------------------------
            
-
             shader.setUniformValue(shader.getUniformLocation("u_number_lights"), Type::T_INT_1, &number_lights);
             shader.setUniformValue(shader.getUniformLocation("u_camera_position"), Type::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
             shader.setUniformValue(shader.getUniformLocation("u_ambient"), Type::T_FLOAT_3, &light_comp->light.global_ambient_color_);
@@ -287,9 +286,6 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
                 if (ri->has_value() && ti->has_value()) {
                     auto& render_comp = *ri;
                     auto& transform_comp = *ti;
-
-                    
-                    
 
                     setEntitiesUniforms(*transform_comp, shader, cam);
 

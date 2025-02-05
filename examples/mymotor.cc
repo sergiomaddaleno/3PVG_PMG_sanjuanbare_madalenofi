@@ -86,12 +86,11 @@ int main(int, char**) {
     //skybox.init();
     // ---
     
-    //postProcc.initData();
+    postProcc.initData();
 
     render_system.setupEntities(ecs);
 
-    save_manager.saveToFile("../saves/scene_0.json", ecs, cam);
-
+    save_manager.loadFromFile("../saves/main_scene.json", ecs, render_system, cam);
 
     imgui_manager.Init(window->getWindow());
 
@@ -126,10 +125,10 @@ int main(int, char**) {
 
         //--
 
-        //data_imgui.cam = cam;
-        //data_imgui.post_proccessing = &postProcc;
-        //data_imgui.window = &window.value();
-        //data_imgui.skybox = skybox;
+        data_imgui.cam = cam;
+        data_imgui.post_proccessing = &postProcc;
+        data_imgui.window = &window.value();
+        data_imgui.skybox = skybox;
         
         //imgui_manager.Render(window->getWindow(), data_imgui);
 
