@@ -11,6 +11,8 @@
 #include "Core/texture.h"
 #include "../Systems/ecs_manager.h"
 
+#include "../deps/nlohmann/json.hpp"
+
 static const glm::vec3 gMesh[] = {
   {-1.0f, -1.0f, -1.0f},
   {1.0f, -1.0f, -1.0f},
@@ -62,17 +64,22 @@ public:
 	~Skybox();
 
 	void loadSkyBox(const char* dds_file, const char* vertex_file, const char* fragment_file);
-	
-	void init();
 
+	void init();
 	void render(Camera cam = Camera());
+
+	nlohmann::json serialize() const;
+
+
+	std::string dds_file_;
+	std::string vertex_file_;
+	std::string fragment_file_;
+	float skybox_angle_;
 
 private:
 	
 	Shader shader_;
 	Texture texture_;
-
-	float skybox_angle;
 
 	GLuint VAO, VBO, EBO;
 };

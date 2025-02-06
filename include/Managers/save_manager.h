@@ -12,15 +12,16 @@ class ECSManager;
 class RenderSystem;
 class Shader;
 class Camera;
+class Skybox;
 
 class SaveManager {
 
 public:
-	nlohmann::json serialize(ECSManager& ecs, Camera& cam);
-	void deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera& cam);
+	nlohmann::json serialize(ECSManager& ecs, Camera& cam, Skybox& skybox);
+	void deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera& cam, Skybox& skybox);
 
-	void saveToFile(std::string filename, ECSManager& ecs, Camera& cam);
-	void loadFromFile(std::string filename, ECSManager& ecs, RenderSystem& rs, Camera& cam);
+	void saveToFile(std::string filename, ECSManager& ecs, Camera& cam, Skybox& skybox);
+	void loadFromFile(std::string filename, ECSManager& ecs, RenderSystem& rs, Camera& cam, Skybox& skybox);
 	void newFile();
 
 	std::string getCurrentScene() { return current_scene_file; }
@@ -54,6 +55,11 @@ private:
 	bool cube_24v = false;
 
 	float quad_size = 0.0f;
+
+	char* dds_file;
+	char* sb_vertex;
+	char* sb_fragment;
+	float skybox_angle;
 };
 
 

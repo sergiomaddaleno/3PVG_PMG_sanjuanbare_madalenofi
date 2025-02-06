@@ -5,17 +5,17 @@
   "Max_render_distance_": 400.0,
   "Min_render_distance": 0.10000000149011612,
   "Position": [
-   -16.975727081298828,
-   13.146544456481934,
-   17.530166625976563
+   -14.563441276550293,
+   14.538063049316406,
+   20.408796310424805
   ],
   "Scroll_speed": 10.0,
   "Sensitivity": 1.0,
   "Speed": 10.0,
   "View_direction": [
-   0.72906094789505,
-   -0.3394503593444824,
-   -0.5943430662155151
+   0.5234824419021606,
+   -0.21796803176403046,
+   -0.8236844539642334
   ]
  },
  "Entities": [
@@ -23,7 +23,96 @@
    "Entity_id": 0,
    "Light_component": {
     "Shader": {
-     "Program": 6
+     "Program": 9
+    },
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
+      ]
+     ],
+     "Light_color": [
+      [
+       0.699999988079071,
+       0.699999988079071,
+       0.699999988079071
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 1,
+   "Light_component": {
+    "Shader": {
+     "Program": 9
     },
     "light": {
      "Ambient_color": [
@@ -104,7 +193,7 @@
     },
     "Render_type": 3,
     "Shader": {
-     "Program": 6
+     "Program": 9
     },
     "Texture": {
      "TextureID": 0
@@ -120,7 +209,7 @@
      0.0,
      0.0,
      0.0,
-     1.0
+     0.0
     ],
     "Scale": [
      1.0,
@@ -130,22 +219,12 @@
    }
   },
   {
-   "Entity_id": 1,
+   "Entity_id": 2,
    "Render_component": {
     "Mesh": {
      "MaterialID": 7,
      "Mesh_path": "../assets/obj/Mario.obj",
      "Meshes": [
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": "",
-       "Textures": [
-        {
-         "TextureID": 3
-        }
-       ]
-      },
       {
        "MaterialID": 0,
        "Mesh_path": "",
@@ -215,13 +294,23 @@
          "TextureID": 10
         }
        ]
+      },
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": "",
+       "Textures": [
+        {
+         "TextureID": 11
+        }
+       ]
       }
      ],
      "Texture_folder": "../assets/textures/mario"
     },
     "Render_type": 1,
     "Shader": {
-     "Program": 6
+     "Program": 9
     },
     "Texture": {
      "TextureID": 0
@@ -247,11 +336,11 @@
    }
   },
   {
-   "Entity_id": 2,
+   "Entity_id": 3,
    "Render_component": {
     "Render_type": 7,
     "Shader": {
-     "Program": 6
+     "Program": 9
     },
     "Terrain": {
      "height_mult": 0.0,
@@ -284,5 +373,11 @@
     ]
    }
   }
- ]
+ ],
+ "Skybox": {
+  "Fragment_source": "../assets/shaders/skybox.fs",
+  "Skybox_file_path": "../assets/textures/skybox/sky.dds",
+  "Vertex_source": "../assets/shaders/skybox.vs",
+  "angle": -90.0
+ }
 }

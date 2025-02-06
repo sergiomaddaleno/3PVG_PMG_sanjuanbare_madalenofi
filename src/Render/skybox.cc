@@ -13,7 +13,11 @@
 #include <memory> 
 #include <iostream>
 
-Skybox::Skybox() : skybox_angle(-90.0f), VAO(0), VBO(0), EBO(0) {}
+Skybox::Skybox() : skybox_angle_(-90.0f), VAO(0), VBO(0), EBO(0),
+dds_file_("../assets/textures/skybox/sky.dds"), 
+vertex_file_("../assets/shaders/skybox.vs"), 
+fragment_file_("../assets/shaders/skybox.fs")
+{}
 
 Skybox::~Skybox()
 {
@@ -52,7 +56,7 @@ void Skybox::render(Camera cam) {
 
     glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix()));
     glm::mat4 projection = cam.getProjectionMatrix();
-    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle), glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle_), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::mat4 model = rotation;
 
     int tex_id = 1;
@@ -77,6 +81,10 @@ void Skybox::render(Camera cam) {
 
 void Skybox::loadSkyBox(const char* dds_file, const char* vertex_file, const char* fragment_file)
 {
+    dds_file_ = dds_file;
+    vertex_file_ = vertex_file;
+    fragment_file_ = fragment_file;
+
     char* loc_file = ReadFile(dds_file);
     char* loc_vert = ReadFile(vertex_file);
     char* loc_frag = ReadFile(fragment_file);
@@ -87,8 +95,20 @@ void Skybox::loadSkyBox(const char* dds_file, const char* vertex_file, const cha
 
     shader_.compile(loc_vert, loc_frag);
 
-    free(loc_file); 
+    free(loc_file);
     free(loc_vert);
     free(loc_frag);
+}
+
+nlohmann::json Skybox::serialize() const
+{
+    nlohmann::json json_data;
+
+    json_data["Skybox_file_path"] = dds_file_;
+    json_data["Vertex_source"] = vertex_file_;
+    json_data["Fragment_source"] = fragment_file_;
+    json_data["angle"] = skybox_angle_;
+
+    return json_data;
 }
 
