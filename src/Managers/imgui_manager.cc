@@ -186,6 +186,7 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     if (skybox_window) SkyboxWindow(di);
     if (fog_window) FogWindow(di);
     if (load_scene) LoadSceneWindow(di);
+    if (add_mesh_window) AddMeshWindow(di);
 
     di.post_proccessing->endRender();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -756,6 +757,14 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
 
                 ImGui::EndMenu();
             }
+            
+            if (ImGui::BeginMenu("Add Mesh")) {
+
+                ImGui::Checkbox(("Add mesh Window"), &add_mesh_window);
+                
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
@@ -980,6 +989,64 @@ void ImGuiManager::LoadSceneWindow(DataImgui& di)
     if (ImGui::Button("Load Scene")) {
         di.save_manager.setCurrentScene("../saves/" + scene_file_name); 
         di.save_manager.loadFromFile(di.save_manager.getCurrentScene(), *di.ecs, *di.render_system, di.cam);
+    }
+
+    ImGui::End();
+}
+
+void ImGuiManager::AddMeshWindow(DataImgui& di)
+{
+    ImGui::Begin("Add Mesh Window");
+
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    ImGui::Text("Drag and Drop obj file");
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+    static std::string obj_file_name;
+    static std::string texture_folder;
+
+    if (ImGui::Button(!obj_file_name.empty() ? obj_file_name.c_str() : ".obj Drop here")) {}
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+            std::filesystem::path filePath = (const wchar_t*)payload->Data;
+            if (filePath.extension() == ".obj") {
+                obj_file_name = filePath.filename().string();
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    if (ImGui::Button(!texture_folder.empty() ? texture_folder.c_str() : "Texture Folder Drop here")) {}
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+            std::filesystem::path filePath = (const wchar_t*)payload->Data;
+            if (std::filesystem::is_directory(filePath)) {
+                texture_folder = filePath.string();
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    ImGui::Dummy(ImVec2(0.0f, 3.0f));
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
+    if (ImGui::Button("Add Mesh")) {
+        
+        Shader newShader;
+        char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
+        char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
+        newShader.compile(loc_vs, loc_fs);
+
+        if (!obj_file_name.empty() && !texture_folder.empty()) {
+            di.render_system->createMesh(*di.ecs, newShader, "../assets/obj/" + obj_file_name, texture_folder);
+            di.render_system->initEntities(*di.ecs);
+
+            free(loc_vs);
+            free(loc_fs);
+        }
     }
 
     ImGui::End();

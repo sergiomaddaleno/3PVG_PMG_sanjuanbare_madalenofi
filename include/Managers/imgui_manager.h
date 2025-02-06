@@ -68,6 +68,7 @@ public:
     void SkyboxWindow(DataImgui& di);
     void ConsoleWindow(DataImgui& di);
     void LoadSceneWindow(DataImgui& di);
+    void AddMeshWindow(DataImgui& di);
 
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di);
 
@@ -91,9 +92,9 @@ private:
     Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
     bool post_process_compiled = false;
     Effect current_effect = Effect::None;
-    bool none_render = false;
 
     bool load_scene = false;
+    bool add_mesh_window = false;
 };
 
 #endif // IGM
