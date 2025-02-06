@@ -37,7 +37,7 @@ public:
 
 	void renderShadowMap(ECSManager& ecs, Shader shader, Camera cam, LightComponent t);
 
-	void setEntitiesUniforms(TransformComponent tc, Shader shader, Camera cam);
+	void setEntitiesUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
 	
 	//---------------------------------------------------------------
 	

@@ -49,8 +49,8 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
+            //case RenderType::RT_SpotLight:
             case RenderType::RT_PointLight:
-            case RenderType::RT_SpotLight:
                 render_comp->mesh_->bind();
                 break;
 
@@ -120,51 +120,49 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Lig
     
     if (light.light.light_info_.type_ == 1) {
         float near_plane = 1.0f, far_plane = 100.5f;
-        float spotLightFOV = glm::radians(light.light.light_info_.spot_angle_); // �ngulo de apertura del foco
+        float spotLightFOV = glm::radians(light.light.light_info_.spot_angle_);
 
-        glm::vec3 lightPosition = light.light.light_info_.pos_; // Posici�n de la luz
-        glm::vec3 lightDirection = glm::normalize(light.light.light_info_.dir_); // Direcci�n de la luz
+        glm::vec3 lightPosition = light.light.light_info_.pos_; 
+        glm::vec3 lightDirection = glm::normalize(light.light.light_info_.dir_);
 
-        // Matriz de proyecci�n perspectiva
         glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)g_window_width_ / (float)g_window_height_, near_plane, far_plane);
 
-        // Matriz de vista (Mira desde la posici�n de la luz hacia la direcci�n deseada)
         glm::mat4 lightView = glm::lookAt(lightPosition, lightPosition + lightDirection, glm::vec3(0.0f, 1.0f, 0.0f));
 
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 
 
-        shader.setUniformValue(shader.getUniformLocation("u_light_space"), Type::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
+        shader.setUniformValue(shader.getUniformLocation("u_light_space"), ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
 
-        shader.setUniformValue(shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
-        shader.setUniformValue(shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
-        shader.setUniformValue(shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
+        shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+        shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+        shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
         int tex_id = 1;
-        shader.setUniformValue(shader.getUniformLocation("u_texture"), Type::T_INT_1, &tex_id);
+        shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
 
-        shader.setUniformValue(shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
-        shader.setUniformValue(shader.getUniformLocation("u_density"), Type::T_FLOAT_1, &g_fog_density_);
-        shader.setUniformValue(shader.getUniformLocation("u_gradient"), Type::T_FLOAT_1, &g_fog_gradient_);
-        shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), Type::T_FLOAT_3, &g_sky_colour_);
+        shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &g_b_fog_);
+        shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &g_fog_density_);
+        shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &g_fog_gradient_);
+        shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &g_sky_colour_);
     }
 
     if (light.light.light_info_.type_ == 0) {
         
        
 
-        shader.setUniformValue(shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
-        shader.setUniformValue(shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
-        shader.setUniformValue(shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
+        shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+        shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+        shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
         int tex_id = 1;
-        shader.setUniformValue(shader.getUniformLocation("u_texture"), Type::T_INT_1, &tex_id);
+        shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
 
-        shader.setUniformValue(shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
-        shader.setUniformValue(shader.getUniformLocation("u_density"), Type::T_FLOAT_1, &g_fog_density_);
-        shader.setUniformValue(shader.getUniformLocation("u_gradient"), Type::T_FLOAT_1, &g_fog_gradient_);
-        shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), Type::T_FLOAT_3, &g_sky_colour_);
+        shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &g_b_fog_);
+        shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &g_fog_density_);
+        shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &g_fog_gradient_);
+        shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &g_sky_colour_);
     }
 
 
@@ -201,21 +199,15 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam,Li
 
         shader.useProgram();
 
-        shader.setUniformValue(shader.getUniformLocation("u_light_space"), Type::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
-        shader.setUniformValue(shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(lightView));
-        shader.setUniformValue(shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(lightProjection));
+        shader.setUniformValue(shader.getUniformLocation("u_light_space"), ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
+        shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(lightView));
+        shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));
     }
 
     if (t.light.light_info_.type_ == 0) {
         
 
     }
-
-    // Debug
-
-    //glViewport(0, 0, g_window_width_, g_window_height_);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
 
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -239,7 +231,7 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam,Li
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
-            case RenderType::RT_SpotLight:
+            //case RenderType::RT_SpotLight:
             case RenderType::RT_PointLight:
                 for (auto& mesh : render_comp->mesh_->meshes) {
                     render_comp->mesh_->renderElements(false);
@@ -293,7 +285,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
             int texture_unit = GL_TEXTURE0; 
             glActiveTexture(texture_unit);
             glBindTexture(GL_TEXTURE_2D, light_comp->depthMap);
-            shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), Type::T_FLOAT_1, &texture_unit);
+            shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_FLOAT_1, &texture_unit);
 
 
             light_comp->light.setUniforms(shader, light_count);
@@ -316,7 +308,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:
-                    case RenderType::RT_SpotLight:
+                    //case RenderType::RT_SpotLight:
                     case RenderType::RT_PointLight:
                         for (auto& mesh : render_comp->mesh_->meshes) {
                             render_comp->mesh_->renderElements();
