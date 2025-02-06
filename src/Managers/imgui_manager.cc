@@ -1044,6 +1044,9 @@ void ImGuiManager::AddMeshWindow(DataImgui& di)
             di.render_system->createMesh(*di.ecs, newShader, "../assets/obj/" + obj_file_name, texture_folder);
             di.render_system->initEntities(*di.ecs);
 
+            obj_file_name.clear();
+            texture_folder.clear();
+
             free(loc_vs);
             free(loc_fs);
         }
