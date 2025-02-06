@@ -35,6 +35,8 @@ public:
 
 	void setEntitiesUniformsToCalculateShadow(TransformComponent tc, Shader shader, Camera cam);
 
+	void setEntitiesUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
+
 	
 
 	void renderEntities(ECSManager& ecs, Shader shader, Camera cam = Camera());
@@ -43,7 +45,7 @@ public:
 
 	void renderMesh(ECSManager& ecs, Camera cam = Camera());
 
-	void setEntitiesUniforms(TransformComponent tc, Shader shader, Camera cam);
+	
 
 	void renderShadowMap(ECSManager& ecs, Shader shader, Camera cam, LightComponent t);
 	
