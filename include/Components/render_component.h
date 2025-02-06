@@ -32,6 +32,7 @@ enum RenderType {
 struct RenderComponent {
 
     std::unique_ptr<Mesh> mesh_;
+
     Triangle triangle_;
     std::unique_ptr<Terrain>terrain_;
     std::unique_ptr<Sphere>sphere_;

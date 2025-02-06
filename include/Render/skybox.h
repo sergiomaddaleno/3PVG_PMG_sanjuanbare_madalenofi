@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "Core/shader.h"
 #include "Core/texture.h"
+#include "../Systems/ecs_manager.h"
 
 static const glm::vec3 gMesh[] = {
   {-1.0f, -1.0f, -1.0f},
@@ -60,15 +61,17 @@ public:
 	Skybox();
 	~Skybox();
 
+	void loadSkyBox(const char* dds_file, const char* vertex_file, const char* fragment_file);
+	
 	void init();
 
-	void render(Shader shader, Texture texture, Camera cam);
-
-	Shader shader_;
-	Texture texture_;
+	void render(Camera cam = Camera());
 
 private:
 	
+	Shader shader_;
+	Texture texture_;
+
 	float skybox_angle;
 
 	GLuint VAO, VBO, EBO;

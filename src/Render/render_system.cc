@@ -49,7 +49,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
-            //case RenderType::RT_SpotLight:
+            case RenderType::RT_SpotLight:
             case RenderType::RT_PointLight:
                 render_comp->mesh_->bind();
                 break;
@@ -257,16 +257,19 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam,Li
     glDrawBuffer(GL_BACK);
     glReadBuffer(GL_BACK);
     glViewport(0, 0, g_window_width_, g_window_height_);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
 }
 
 void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     auto li = ecs.getComponentList<LightComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto liend = ecs.getComponentList<LightComponent>().end();
     auto tiend = ecs.getComponentList<TransformComponent>().end();
+
+    glEnable(GL_DEPTH_TEST);
+    shader.useProgram();
 
     int light_count = 0;
     for (; li != liend && ti != tiend; ++li, ++ti) {
@@ -335,6 +338,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
             }
         }
     }
+
     glUseProgram(0);
 }
 

@@ -470,14 +470,10 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             if (ImGui::Button("Compile")) {
                 Shader newShader;
-
                 newShader.compile(vertex_content, fragment_content);
 
                 if (vertex_file_name != "entities.vs" && fragment_file_name != "entities.fs") {
                     di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
-                }
-                else {
-                    di.ecs->get_component<RenderComponent>(selected_entity)->shader = di.shader;
                 }
 
                 vertex_file_name.clear();
@@ -485,7 +481,6 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
 
                 vertex_content = nullptr;
                 fragment_content = nullptr;
-          
             }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
         }
@@ -652,59 +647,117 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
             if (ImGui::BeginMenu("Add Geometry")) {
 
                 if (ImGui::MenuItem("Sphere")) {
-                    di.render_system->createSphere(loc_ecs, di.shader);
+                    Shader newShader;
+                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
+                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
+                    newShader.compile(loc_vs, loc_fs);
+
+                    di.render_system->createSphere(loc_ecs, newShader);
                     di.render_system->initEntities(loc_ecs);
+
+                    free(loc_vs);
+                    free(loc_fs);
                 }
 
                 if (ImGui::MenuItem("Cube 8v")) {
-                    di.render_system->createCube8v(loc_ecs, di.shader);
+                    Shader newShader;
+                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
+                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
+                    newShader.compile(loc_vs, loc_fs);
+
+                    di.render_system->createCube8v(loc_ecs, newShader);
                     di.render_system->initEntities(loc_ecs);
+
+                    free(loc_vs);
+                    free(loc_fs);
                 }
 
                 if (ImGui::MenuItem("Cube 24v")) {
-                    di.render_system->createCube24v(loc_ecs, di.shader);
+                    Shader newShader;
+                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
+                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
+                    newShader.compile(loc_vs, loc_fs);
+
+                    di.render_system->createCube24v(loc_ecs, newShader);
                     di.render_system->initEntities(loc_ecs);
+
+                    free(loc_vs);
+                    free(loc_fs);
                 }
 
                 if (ImGui::MenuItem("Quad")) {
-                    di.render_system->createQuad(loc_ecs, di.shader);
+                    Shader newShader;
+                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
+                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
+                    newShader.compile(loc_vs, loc_fs);
+
+                    di.render_system->createQuad(loc_ecs, newShader);
                     di.render_system->initEntities(loc_ecs);
+
+                    free(loc_vs);
+                    free(loc_fs);
                 }
 
                 if (ImGui::MenuItem("Terrain")) {
+                    Shader newShader;
+                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
+                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
+                    newShader.compile(loc_vs, loc_fs);
 
                     TransformComponent tc;
 
-                    di.render_system->createTerrain(loc_ecs, di.shader, tc, 500,500);
+                    di.render_system->createTerrain(loc_ecs, newShader, tc, 500, 500);
                     di.render_system->initEntities(loc_ecs);
+
+                    free(loc_vs);
+                    free(loc_fs);
                 }
 
                 ImGui::EndMenu();
             }
-            
+
             if (ImGui::BeginMenu("Add Light")) {
 
                 if (ImGui::MenuItem("Point Light")) {
-                    di.render_system->createPointLight(loc_ecs, di.shader);
+                    Shader newShader;
+                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
+                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
+                    newShader.compile(loc_vs, loc_fs);
+
+                    di.render_system->createPointLight(loc_ecs, newShader);
                     di.render_system->initEntities(loc_ecs);
                 }
 
                 if (ImGui::MenuItem("Spot Light")) {
-                    di.render_system->createSpotLight(loc_ecs, di.shader);
+                    Shader newShader;
+                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
+                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
+                    newShader.compile(loc_vs, loc_fs);
+
+                    di.render_system->createSpotLight(loc_ecs, newShader);
                     di.render_system->initEntities(loc_ecs);
+
+                    free(loc_vs);
+                    free(loc_fs);
                 }
 
                 if (ImGui::MenuItem("Directional Light")) {
-                   
-                    di.render_system->createDirectionalLight(loc_ecs, di.shader);
+                    Shader newShader;
+                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
+                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
+                    newShader.compile(loc_vs, loc_fs);
+
+                    di.render_system->createDirectionalLight(loc_ecs, newShader);
                     di.render_system->initEntities(loc_ecs);
+
+                    free(loc_vs);
+                    free(loc_fs);
                 }
 
                 ImGui::EndMenu();
             }
             ImGui::EndMenu();
         }
-
         ImGui::EndMenuBar();
     }
 
@@ -808,8 +861,8 @@ void ImGuiManager::PostProcessWindow(DataImgui& di)
             vertex_file_name.clear();
             fragment_file_name.clear();
 
-            vertex_content = nullptr;
-            fragment_content = nullptr;
+            free(vertex_content);
+            free(fragment_content);
         }
 
         ImGui::Dummy({ 0.0f, 5.0f });
@@ -850,9 +903,6 @@ void ImGuiManager::FogWindow(DataImgui& di)
     ImGui::End();
 }
 
-char* loc_vs_sky_box = (char*)ReadFile("../assets/shaders/skybox.vs");
-char* loc_fs_sky_box = (char*)ReadFile("../assets/shaders/skybox.fs");
-
 void ImGuiManager::SkyboxWindow(DataImgui& di)
 {
     ImGui::Begin("SkyBox");
@@ -862,7 +912,6 @@ void ImGuiManager::SkyboxWindow(DataImgui& di)
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
     static std::string skybox_file_name;
-    static char* skybox_content = nullptr;
     if (ImGui::Button(!skybox_file_name.empty() ? skybox_file_name.c_str() : "DDS Drop here", { 120.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
@@ -870,28 +919,25 @@ void ImGuiManager::SkyboxWindow(DataImgui& di)
             std::filesystem::path filePath = (const wchar_t*)payload->Data;
             if (filePath.extension() == ".dds") {
                 skybox_file_name = filePath.filename().string();
-                skybox_content = ReadFile(filePath.string().c_str());
             }
         }
         ImGui::EndDragDropTarget();
     }
 
-    if (skybox_content) {
+    ImGui::Dummy(ImVec2(0.0f, 3.0f));
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-        if (ImGui::Button("Compile")) {
-
-            Texture tex;
-
-            if (tex.loadSkyboxTex(skybox_content))  di.skybox.texture_ = tex.getTexture();
-
-            di.skybox.shader_.compile(loc_vs_sky_box, loc_fs_sky_box);
-
-            di.skybox.init();
-
-        }
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    if (ImGui::Button("Compile")) {
+        di.skybox->loadSkyBox(
+            ("../assets/textures/skybox/" + skybox_file_name).c_str(),
+            "../assets/shaders/skybox.vs",
+            "../assets/shaders/skybox.fs"
+        );
+        di.skybox->init();
     }
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    
 
     ImGui::End();
 }

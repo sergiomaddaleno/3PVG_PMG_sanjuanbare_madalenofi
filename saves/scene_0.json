@@ -1,0 +1,159 @@
+{
+ "Camera": {
+  "Aspect_ratio": 1.3333333730697632,
+  "Fov": 45.0,
+  "Max_render_distance_": 400.0,
+  "Min_render_distance": 0.10000000149011612,
+  "Position": [
+   -20.238618850708008,
+   15.915397644042969,
+   21.179344177246094
+  ],
+  "Scroll_speed": 10.0,
+  "Sensitivity": 1.0,
+  "Speed": 10.0,
+  "View_direction": [
+   0.6017699241638184,
+   -0.43044665455818176,
+   -0.6727470755577087
+  ]
+ },
+ "Entities": [
+  {
+   "Entity_id": 0
+  },
+  {
+   "Entity_id": 1
+  },
+  {
+   "Entity_id": 2
+  },
+  {
+   "Entity_id": 3
+  },
+  {
+   "Entity_id": 4,
+   "Light_component": {
+    "Shader": {
+     "Program": 13
+    },
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
+      ]
+     ],
+     "Light_color": [
+      [
+       0.699999988079071,
+       0.699999988079071,
+       0.699999988079071
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 5,
+   "Render_component": {
+    "Render_type": 8,
+    "Shader": {
+     "Program": 3
+    },
+    "Sphere": {
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    },
+    "Texture": {
+     "TextureID": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  }
+ ]
+}

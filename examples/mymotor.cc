@@ -36,31 +36,23 @@
 #include <../deps/glm/gtx/matrix_decompose.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
 
-std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
+struct GameData {
 
+};
 ImGuiManager imgui_manager;
-FrameBuffer fb;
-RenderSystem render_system;
 Camera cam;
-Skybox skybox;
-Texture skyboxTex;
-Terrain terrain;
-ECSManager ecs;
 PostProcessing postProcc;
-RenderComponent render_comp;
-TransformComponent transf_comp;
+ECSManager ecs;
+RenderSystem render_system;
+Skybox skybox;
 SaveManager save_manager;
 
 char* vs_entities = (char*)ReadFile("../assets/shaders/entities.vs");
 char* fs_entities = (char*)ReadFile("../assets/shaders/entities.fs");
 
-char* vs_sky_box = (char*)ReadFile("../assets/shaders/skybox.vs");
-char* fs_sky_box = (char*)ReadFile("../assets/shaders/skybox.fs");
-
 char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
-char* lua_file = ReadFile("../scripts/settings.lua");
 
-Shader light_shader, entities_shader; //entities shader has all
+Shader entities_shader; 
 
 auto e = ecs.create_entity();
 
@@ -72,17 +64,13 @@ int main(int, char**) {
     window->setResizeCallback();
     //window->setWindowIcon(window->getWindow(), "../assets/textures/images/AE.png");
 
-
     Input input{ window->getWindow() };
 
     // ---
 
     entities_shader.compile(vs_entities, fs_entities);
 
-    //Skybox
-    if (skyboxTex.loadSkyboxTex(dds_file)) skybox.texture_ = skyboxTex.getTexture();
-    skybox.shader_.compile(vs_sky_box, fs_sky_box);
-
+    skybox.loadSkyBox("../assets/textures/skybox/sky.dds", "../assets/shaders/skybox.vs", "../assets/shaders/skybox.fs");
     skybox.init();
     // ---
     
@@ -95,7 +83,6 @@ int main(int, char**) {
     imgui_manager.Init(window->getWindow());
 
     data_imgui.ecs = &ecs;
-    data_imgui.shader = entities_shader;
     data_imgui.render_system = &render_system;
     data_imgui.input = &input;
     data_imgui.save_manager = save_manager;
@@ -107,8 +94,8 @@ int main(int, char**) {
     float dt;
     double currentTime;
     while (!done) {
-        double currentTime = window->getTime(); // Obtener el tiempo actual
-        float dt = float(currentTime - lastTime); // Calcular delta time
+        double currentTime = window->getTime();
+        float dt = float(currentTime - lastTime);
 
         window->updateWindow();
         window->toggleFullScreen(input);
@@ -121,7 +108,7 @@ int main(int, char**) {
         cam.update(input, dt, g_window_width_, g_window_height_);
 
         
-        skybox.render(skybox.shader_, skybox.texture_, cam);
+        skybox.render(cam);
 
         render_system.renderEntities(ecs, entities_shader ,cam);
 
@@ -130,7 +117,7 @@ int main(int, char**) {
         data_imgui.cam = cam;
         data_imgui.post_proccessing = &postProcc;
         data_imgui.window = &window.value();
-        data_imgui.skybox = skybox;
+        data_imgui.skybox = &skybox;
         lastTime = currentTime; 
 
         imgui_manager.Render(window->getWindow(), data_imgui);
@@ -139,6 +126,7 @@ int main(int, char**) {
 
     }
 
+    
 
     return 0;
 }

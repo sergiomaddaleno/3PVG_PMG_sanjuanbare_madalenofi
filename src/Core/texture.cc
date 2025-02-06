@@ -39,13 +39,18 @@ bool Texture::loadTexture(const std::string& file_path) {
     return true;
 }
 
-bool Texture::loadSkyboxTex(char* dds_file)
+bool Texture::loadSkyboxTexture(const char* dds_file)
 {
     assert(dds_file[0] == 'D' && dds_file[1] == 'D' && dds_file[2] == 'S' && dds_file[3] == ' ');
     DDSHeader* head = (DDSHeader*)&dds_file[4];
     unsigned char* pixels = (unsigned char*)&head[1];
 
     //assert(GL_EXT_texture_compression_s3tc);
+
+    if (textureID != 0) {
+        glDeleteTextures(1, &textureID);
+        textureID = 0;
+    }
 
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -70,7 +75,7 @@ bool Texture::loadSkyboxTex(char* dds_file)
     unsigned int i;
     for (i = 0; i < head->mipMapCount; ++i) {
         glCompressedTexImage2D(GL_TEXTURE_2D, i, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, width, height, 0, size, pixels);
-        assert(glGetError() == GL_NO_ERROR);
+        //assert(glGetError() == GL_NO_ERROR);
 
         pixels += size;
         if (width > 4)  // En DXT las texturas no pueden ser menores a 8
@@ -89,4 +94,13 @@ void Texture::bind() const
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, textureID);
     }
+}
+
+nlohmann::json Texture::serialize() const
+{
+    nlohmann::json json_data;
+
+    json_data["TextureID"] = textureID;
+
+    return json_data;
 }

@@ -15,7 +15,6 @@
 #include "../Systems/ecs_manager.h"
 #include "Render/camera.h"
 
-
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
 #include "Components\light_component.h"

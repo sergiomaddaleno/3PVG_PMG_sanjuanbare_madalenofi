@@ -17,6 +17,9 @@ Skybox::Skybox() : skybox_angle(-90.0f), VAO(0), VBO(0), EBO(0) {}
 
 Skybox::~Skybox()
 {
+    if (VAO) glDeleteVertexArrays(1, &VAO);
+    if (VBO) glDeleteBuffers(1, &VBO);
+    if (EBO) glDeleteBuffers(1, &EBO);
 }
 
 void Skybox::init() {
@@ -40,12 +43,12 @@ void Skybox::init() {
     glBindVertexArray(0);
 }
 
-void Skybox::render(Shader shader, Texture texture, Camera cam) {
+void Skybox::render(Camera cam) {
     glDepthMask(GL_FALSE);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LEQUAL);
 
     glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix()));
     glm::mat4 projection = cam.getProjectionMatrix();
@@ -53,18 +56,13 @@ void Skybox::render(Shader shader, Texture texture, Camera cam) {
     glm::mat4 model = rotation;
 
     int tex_id = 1;
-    shader.useProgram();
+    shader_.useProgram();
 
-    texture.bind();
-    shader.setUniformValue(shader.getUniformLocation("skybox"), ValueType::T_INT_1, &tex_id);
-
-    unsigned int viewLoc = shader.getUniformLocation("view");
-    unsigned int projLoc = shader.getUniformLocation("projection");
-    unsigned int modelLoc = shader.getUniformLocation("model");
-
-    shader.setUniformValue(viewLoc, ValueType::T_MAT_4x4, &view[0][0]);
-    shader.setUniformValue(projLoc, ValueType::T_MAT_4x4, &projection[0][0]);
-    shader.setUniformValue(modelLoc, ValueType::T_MAT_4x4, &model[0][0]);
+    texture_.bind();
+    shader_.setUniformValue(shader_.getUniformLocation("skybox"), ValueType::T_INT_1, &tex_id);
+    shader_.setUniformValue(shader_.getUniformLocation("view"), ValueType::T_MAT_4x4, &view[0][0]);
+    shader_.setUniformValue(shader_.getUniformLocation("projection"), ValueType::T_MAT_4x4, &projection[0][0]);
+    shader_.setUniformValue(shader_.getUniformLocation("model"), ValueType::T_MAT_4x4, &model[0][0]);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, sizeof(gIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
@@ -75,5 +73,22 @@ void Skybox::render(Shader shader, Texture texture, Camera cam) {
     glCullFace(GL_BACK);
     glDisable(GL_CULL_FACE);
     glUseProgram(0);
+}
+
+void Skybox::loadSkyBox(const char* dds_file, const char* vertex_file, const char* fragment_file)
+{
+    char* loc_file = ReadFile(dds_file);
+    char* loc_vert = ReadFile(vertex_file);
+    char* loc_frag = ReadFile(fragment_file);
+
+    if (!texture_.loadSkyboxTexture(loc_file)) {
+        printf("Error in loading skybox\n");
+    }
+
+    shader_.compile(loc_vert, loc_frag);
+
+    free(loc_file); 
+    free(loc_vert);
+    free(loc_frag);
 }
 

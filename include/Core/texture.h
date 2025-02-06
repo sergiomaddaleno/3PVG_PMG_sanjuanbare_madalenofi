@@ -22,7 +22,7 @@ public:
 
     bool loadTexture(const std::string& file_path);
 
-    bool loadSkyboxTex(char* dds_file);
+    bool loadSkyboxTexture(const char* dds_file);
 
     void bind() const;
 
@@ -34,20 +34,8 @@ public:
     unsigned char* getData() const { return data_; }
     int getChannels() const { return channels; }
 
-    Texture getTexture() const {
-        Texture tex;
-        tex.textureID = this->textureID;
-        return tex;
-    }
-
     //Save data
-    nlohmann::json serialize() const {
-        nlohmann::json json_data;
-
-        json_data["TextureID"] = textureID;
-
-        return json_data;
-    }
+    nlohmann::json serialize() const;
 };
 
 #endif
