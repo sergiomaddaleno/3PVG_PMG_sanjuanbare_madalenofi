@@ -1,4 +1,4 @@
-#include <cmath>
+﻿#include <cmath>
 #include <vector>
 #include <algorithm>
 #include <optional>
@@ -107,8 +107,9 @@ int main(int, char**) {
     float dt;
     double currentTime;
     while (!done) {
-        currentTime = window->getTime();
-        dt = float(currentTime - lastTime);
+        double currentTime = window->getTime(); // Obtener el tiempo actual
+        float dt = float(currentTime - lastTime); // Calcular delta time
+
         window->updateWindow();
         window->toggleFullScreen(input);
 
@@ -116,7 +117,6 @@ int main(int, char**) {
         g_window_height_ = window->getHeight();
         postProcc.resize(g_window_width_, g_window_height_);
 
-        //--
         postProcc.beginRender();
         cam.update(input, dt, g_window_width_, g_window_height_);
 
@@ -131,11 +131,14 @@ int main(int, char**) {
         data_imgui.post_proccessing = &postProcc;
         data_imgui.window = &window.value();
         data_imgui.skybox = skybox;
-        
+        lastTime = currentTime; 
+
         imgui_manager.Render(window->getWindow(), data_imgui);
 
         if (window->closePressed()) done = true;
+
     }
+
 
     return 0;
 }

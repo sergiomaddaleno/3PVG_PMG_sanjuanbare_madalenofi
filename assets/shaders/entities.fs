@@ -113,7 +113,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     float bias = 0.005;
 
 
-    return (currentDepth - bias) > closestDepth ? 0.0 : 1.0;
+    return (currentDepth - bias) > closestDepth ? 1.0 : 5.0;
 }
 
 void main() {
@@ -125,7 +125,7 @@ void main() {
         float shadow = ShadowCalculation(FragPosLightSpace); 
 
         if (u_light[i].type_ == 0) {
-            final_light += DirectionalLight(u_light[i]) * shadow; 
+            final_light += DirectionalLight(u_light[i])/* shadow*/ ; 
         }
 
         if (u_light[i].type_ == 1) {

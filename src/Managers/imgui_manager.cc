@@ -372,7 +372,17 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
 
         ImGui::Dummy(ImVec2(10.0f, 15.0f));
 
-        if (di.ecs->has_component<TransformComponent>(selected_entity)) {
+        if (di.ecs->has_component<TransformComponent>(selected_entity)&& di.ecs->has_component<LightComponent>(selected_entity)) {
+            auto& light_comp = di.ecs->get_component<LightComponent>(selected_entity);
+
+            if (light_comp.has_value()) {
+                ImGui::DragFloat("Position X", &light_comp->light.light_info_.pos_.x, 0.1f, -1000.0f, 1000.0f);
+                ImGui::DragFloat("Position Y", &light_comp->light.light_info_.pos_.y, 0.1f, -1000.0f, 1000.0f);
+                ImGui::DragFloat("Position Z", &light_comp->light.light_info_.pos_.z, 0.1f, -1000.0f, 1000.0f);
+            }
+        }
+
+        if (di.ecs->has_component<TransformComponent>(selected_entity) && !di.ecs->has_component<LightComponent>(selected_entity)) {
             auto& transform = di.ecs->get_component<TransformComponent>(selected_entity);
 
             if (transform.has_value()) {

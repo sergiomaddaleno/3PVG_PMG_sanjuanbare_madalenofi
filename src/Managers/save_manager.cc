@@ -87,7 +87,8 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 
     Shader shader;
     shader.compile(vs_entities, fs_entities);
-
+    
+    rs.createDirectionalLight(ecs, shader);
     //-----------------------------------------------------------
 
     const auto& camera = j["Camera"]; 
@@ -125,7 +126,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             if (entity.contains("Light_component")) {
                 const auto& lc = entity["Light_component"]["light"];
 
-                li.pos_ = tc.position;
+                li.pos_ = parseVec3(lc["Position"][0]);
                 li.dir_ = parseVec3(lc["Direction"][0]);
                 li.diff_color_ = parseVec3(lc["Diffusion_color"][0]);
                 li.spec_color_ = parseVec3(lc["Specular_color"][0]);

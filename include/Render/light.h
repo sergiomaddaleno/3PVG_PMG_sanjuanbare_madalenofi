@@ -23,7 +23,7 @@ enum LightType {
 struct LightInfo {
 
     LightType type_;
-
+    
     // --
     glm::vec3 pos_;
     glm::vec3 dir_;

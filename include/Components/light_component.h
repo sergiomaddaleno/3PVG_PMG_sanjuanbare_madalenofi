@@ -13,7 +13,7 @@ struct LightComponent {
 	Light light;
 	Shader shader;
 	FrameBuffer shadow_map;
-
+	unsigned int depthMap;
 	// To save data
 	nlohmann::json serialize() {
 
