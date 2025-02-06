@@ -52,19 +52,19 @@ void Skybox::render(Shader shader, Texture texture, Camera cam) {
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::mat4 model = rotation;
 
-    float tex_id = 0.0f;
+    int tex_id = 1;
     shader.useProgram();
 
     texture.bind();
-    shader.setUniformValue(shader.getUniformLocation("skybox"), Type::T_INT_1, &tex_id);
+    shader.setUniformValue(shader.getUniformLocation("skybox"), ValueType::T_INT_1, &tex_id);
 
     unsigned int viewLoc = shader.getUniformLocation("view");
     unsigned int projLoc = shader.getUniformLocation("projection");
     unsigned int modelLoc = shader.getUniformLocation("model");
 
-    shader.setUniformValue(viewLoc, Type::T_MAT_4x4, &view[0][0]);
-    shader.setUniformValue(projLoc, Type::T_MAT_4x4, &projection[0][0]);
-    shader.setUniformValue(modelLoc, Type::T_MAT_4x4, &model[0][0]);
+    shader.setUniformValue(viewLoc, ValueType::T_MAT_4x4, &view[0][0]);
+    shader.setUniformValue(projLoc, ValueType::T_MAT_4x4, &projection[0][0]);
+    shader.setUniformValue(modelLoc, ValueType::T_MAT_4x4, &model[0][0]);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, sizeof(gIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);

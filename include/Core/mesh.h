@@ -46,30 +46,12 @@ public:
     void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
 
     void bind();
-    void renderElements();
-
-    void renderElementsShadow();
+    void renderElements(bool use_texture = true);
 
     Texture getTexture(int shape_index);
 
     //Save data
-    nlohmann::json serialize() const {
-        nlohmann::json json_data;
-
-        for (const auto& mesh : meshes) {
-            json_data["Meshes"].push_back(mesh.serialize());
-        }
-
-        for (const auto& texture : textures) {
-            json_data["Textures"].push_back(texture.serialize());
-        }
-
-        json_data["MaterialID"] = materialID;
-        json_data["Mesh_path"] = mesh_path;
-        json_data["Texture_folder"] = texture_folder;
-
-        return json_data;
-    }
+    nlohmann::json serialize() const;
 
     //--
 

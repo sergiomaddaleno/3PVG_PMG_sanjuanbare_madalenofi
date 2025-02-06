@@ -66,7 +66,7 @@ void Triangle::render(RenderComponent rc, TransformComponent tc, Camera cam)
     glm::mat4 mvp = projection * view * model;
 
     GLint mvpLocation = rc.shader.getUniformLocation("mvp");
-    rc.shader.setUniformValue(mvpLocation, Type::T_MAT_4x4, glm::value_ptr(mvp));
+    rc.shader.setUniformValue(mvpLocation, ValueType::T_MAT_4x4, glm::value_ptr(mvp));
 
     GLuint vpos_location = glGetAttribLocation(rc.shader.getProgram(), "a_position");
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);

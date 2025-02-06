@@ -122,6 +122,8 @@ files {
 	"include/**",
 	"scripts/**",
 	"assets/**",
+	"saves/**",
+	"premake5.lua",
 
 	"deps/*.h",
 	"deps/imgui/*.h",
@@ -154,6 +156,8 @@ files {
 	"include/**",
 	"scripts/**",
 	"assets/**",
+	"saves/**",
+	"premake5.lua",
 
 	"deps/*.h",
 	"deps/imgui/*.h",
@@ -186,6 +190,8 @@ files {
 	"include/**",
 	"scripts/**",
 	"assets/**",
+	"saves/**",
+	"premake5.lua",
 
 	"deps/*.h",
 	"deps/imgui/*.h",
@@ -218,6 +224,8 @@ files {
 	"include/**",
 	"scripts/**",
 	"assets/**",
+	"saves/**",
+	"premake5.lua",
 
 	"deps/*.h",
 	"deps/imgui/*.h",
@@ -250,6 +258,8 @@ files {
 	"include/**",
 	"scripts/**",
 	"assets/**",
+	"saves/**",
+	"premake5.lua",
 
 	"deps/*.h",
 	"deps/imgui/*.h",
@@ -282,6 +292,8 @@ files {
 	"include/**",
 	"scripts/**",
 	"assets/**",
+	"saves/**",
+	"premake5.lua",
 
 	"deps/*.h",
 	"deps/imgui/*.h",
@@ -314,6 +326,8 @@ files {
 	"include/**",
 	"scripts/**",
 	"assets/**",
+	"saves/**",
+	"premake5.lua",
 
 	"deps/*.h",
 	"deps/imgui/*.h",
@@ -346,6 +360,8 @@ files {
 	"include/**",
 	"scripts/**",
 	"assets/**",
+	"saves/**",
+	"premake5.lua",
 
 	"deps/*.h",
 	"deps/imgui/*.h",
@@ -378,6 +394,8 @@ files {
 	"include/**",
 	"scripts/**",
 	"assets/**",
+	"saves/**",
+	"premake5.lua",
 
 	"deps/*.h",
 	"deps/imgui/*.h",

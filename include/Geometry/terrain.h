@@ -23,9 +23,10 @@ class Terrain {
             const float height_mult = 1.0f, const float size = 1.0f,
             const bool is_centered = true, const bool use_perlin_noise = true);  //false for heightmap
 
+  void updateVertex();
+
   void bind();
-  void render();
-  void renderShadow();
+  void render(bool use_texture = true);
 
   const float* GetVertexTerrain();
 
@@ -39,6 +40,9 @@ class Terrain {
   int num_rows_, num_cols_;
   float height_mult_, size_;
   bool is_centered_, use_perlin_noise_;
+
+  float amplitude = 20.0f;
+  float frequency = 0.2f;
 
 private:
 

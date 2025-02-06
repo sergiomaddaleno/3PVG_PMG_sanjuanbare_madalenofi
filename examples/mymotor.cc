@@ -80,10 +80,10 @@ int main(int, char**) {
     entities_shader.compile(vs_entities, fs_entities);
 
     //Skybox
-    //if (skyboxTex.loadSkyboxTex(dds_file)) skybox.texture_ = skyboxTex.getTexture();
-    //skybox.shader_.compile(vs_sky_box, fs_sky_box);
+    if (skyboxTex.loadSkyboxTex(dds_file)) skybox.texture_ = skyboxTex.getTexture();
+    skybox.shader_.compile(vs_sky_box, fs_sky_box);
 
-    //skybox.init();
+    skybox.init();
     // ---
     
     postProcc.initData();
@@ -98,6 +98,7 @@ int main(int, char**) {
     data_imgui.shader = entities_shader;
     data_imgui.render_system = &render_system;
     data_imgui.input = &input;
+    data_imgui.save_manager = save_manager;
     //--
 
     double lastTime = window->getTime();
@@ -119,7 +120,8 @@ int main(int, char**) {
         postProcc.beginRender();
         cam.update(input, dt, g_window_width_, g_window_height_);
 
-        //skybox.render(skybox.shader_, skybox.texture_, cam);
+        
+        skybox.render(skybox.shader_, skybox.texture_, cam);
 
         render_system.renderEntities(ecs, entities_shader ,cam);
 

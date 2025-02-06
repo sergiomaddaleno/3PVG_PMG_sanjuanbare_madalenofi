@@ -67,15 +67,15 @@ void PostProcessing::render(Shader& shader, Effect effect)
     glUniform1i(screen_tex_loc, 0);
 
     switch (effect) {
-    case Effect::Grey: shader.setUniformValue(shader.getUniformLocation("u_grey"), Type::T_FLOAT_1, &grey_); break;
+    case Effect::Grey: shader.setUniformValue(shader.getUniformLocation("u_grey"), ValueType::T_FLOAT_1, &grey_); break;
 
-    case Effect::Negative: shader.setUniformValue(shader.getUniformLocation("u_negative"), Type::T_FLOAT_1, &negative_); break;
+    case Effect::Negative: shader.setUniformValue(shader.getUniformLocation("u_negative"), ValueType::T_FLOAT_1, &negative_); break;
 
-    case Effect::Waves: shader.setUniformValue(shader.getUniformLocation("u_waves"), Type::T_FLOAT_1, &waves_); break;
+    case Effect::Waves: shader.setUniformValue(shader.getUniformLocation("u_waves"), ValueType::T_FLOAT_1, &waves_); break;
 
-    case Effect::Blur: shader.setUniformValue(shader.getUniformLocation("u_blur"), Type::T_FLOAT_1, &blur_); break;
+    case Effect::Blur: shader.setUniformValue(shader.getUniformLocation("u_blur"), ValueType::T_FLOAT_1, &blur_); break;
 
-    case Effect::Kernel: shader.setUniformValue(shader.getUniformLocation("u_kernel_types"), Type::T_INT_1, &kernel_types_); break;
+    case Effect::Kernel: shader.setUniformValue(shader.getUniformLocation("u_kernel_ValueTypes"), ValueType::T_INT_1, &kernel_types_); break;
     
     }
     // -- 

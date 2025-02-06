@@ -188,7 +188,7 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     if (load_scene) LoadSceneWindow(di);
 
     di.post_proccessing->endRender();
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     GameWindow(di);
 

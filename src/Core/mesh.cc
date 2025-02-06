@@ -127,20 +127,20 @@ void Mesh::render(RenderComponent rc, TransformComponent tc, Camera cam)
         glm::mat4 mvp = projection * view * model;
 
         // For shaders ---
-        rc.shader.setUniformValue(rc.shader.getUniformLocation("mvp"), Type::T_MAT_4x4, glm::value_ptr(mvp));
-        rc.shader.setUniformValue(rc.shader.getUniformLocation("model"), Type::T_MAT_4x4, glm::value_ptr(model));
-        rc.shader.setUniformValue(rc.shader.getUniformLocation("view"), Type::T_MAT_4x4, glm::value_ptr(view));
-        rc.shader.setUniformValue(rc.shader.getUniformLocation("projection"), Type::T_MAT_4x4, glm::value_ptr(projection));
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("mvp"), ValueType::T_MAT_4x4, glm::value_ptr(mvp));
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
         // Texture
         float tex_id = 0.0f;
         rc.texture = mesh.getTexture(0);
         rc.texture.bind();
-        rc.shader.setUniformValue(rc.shader.getUniformLocation("texture1"), Type::T_INT_1, &tex_id);
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("texture1"), ValueType::T_INT_1, &tex_id);
         // ---
 
         // Fog
-        rc.shader.setUniformValue(rc.shader.getUniformLocation("u_fog"), Type::T_INT_1, &g_b_fog_);
+        rc.shader.setUniformValue(rc.shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &g_b_fog_);
 
 
         glBindVertexArray(rc.mesh_->VAO);
@@ -184,35 +184,17 @@ void Mesh::bind()
     }
 }
 
-void Mesh::renderElements() {
+void Mesh::renderElements(bool use_texture) {
     
     for (auto& mesh : meshes) {
         
-        if (!mesh.textures.empty()) {
+        if (use_texture || !mesh.textures.empty()) {
             mesh.textures[0].bind();
         }
 
-        if (!mesh.indices.empty()) {
-            glBindVertexArray(mesh.VAO);
-            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-        }
-        
-    }
-}
-
-void Mesh::renderElementsShadow() {
-
-    for (auto& mesh : meshes) {
-
-       
-
-        if (!mesh.indices.empty()) {
-            glBindVertexArray(mesh.VAO);
-            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-        }
-
+         glBindVertexArray(mesh.VAO);
+         glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
+         glBindVertexArray(0);
     }
 }
 
@@ -223,4 +205,23 @@ Texture Mesh::getTexture(int index)
     }
 
     return Texture();
+}
+
+nlohmann::json Mesh::serialize() const
+{
+    nlohmann::json json_data;
+
+    for (const auto& mesh : meshes) {
+        json_data["Meshes"].push_back(mesh.serialize());
+    }
+
+    for (const auto& texture : textures) {
+        json_data["Textures"].push_back(texture.serialize());
+    }
+
+    json_data["MaterialID"] = materialID;
+    json_data["Mesh_path"] = mesh_path;
+    json_data["Texture_folder"] = texture_folder;
+
+    return json_data;
 }

@@ -49,7 +49,7 @@ int Shader::getUniformLocation(const char* name) const {
 	return glGetUniformLocation(program_, name);
 }
 
-void Shader::setUniformValue(const int uniform_loc, const Type uniform_type, const void* data) const
+void Shader::setUniformValue(const int uniform_loc, const ValueType uniform_type, const void* data) const
 {
 	switch (uniform_type) {
 
@@ -78,4 +78,13 @@ void Shader::useProgram()
 GLuint Shader::getProgram()
 {
 	return program_;
+}
+
+nlohmann::json Shader::serialize() const
+{
+    nlohmann::json json_data;
+
+    json_data["Program"] = program_;
+
+    return json_data;
 }
