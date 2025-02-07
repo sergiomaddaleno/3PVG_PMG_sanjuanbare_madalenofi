@@ -579,10 +579,10 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
                 (di.input->isKeyPressed(Input::CTRL) && di.input->isKeyPressed(Input::S))) {
 
                 if (di.save_manager.getCurrentScene().empty()) {
-                    di.save_manager.saveToFile("../saves/scene_0.json", *di.ecs, di.cam);
+                    di.save_manager.saveToFile("../saves/scene_0.json", *di.ecs, di.cam, *di.skybox);
                 }
                 else {
-                    di.save_manager.saveToFile(di.save_manager.getCurrentScene(), *di.ecs, di.cam);
+                    di.save_manager.saveToFile(di.save_manager.getCurrentScene(), *di.ecs, di.cam, *di.skybox);
                 }
             }
 
@@ -980,7 +980,7 @@ void ImGuiManager::LoadSceneWindow(DataImgui& di)
 
     if (ImGui::Button("Load Scene")) {
         di.save_manager.setCurrentScene("../saves/" + scene_file_name); 
-        di.save_manager.loadFromFile(di.save_manager.getCurrentScene(), *di.ecs, *di.render_system, di.cam);
+        di.save_manager.loadFromFile(di.save_manager.getCurrentScene(), *di.ecs, *di.render_system, di.cam, *di.skybox);
     }
 
     ImGui::End();

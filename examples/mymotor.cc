@@ -79,7 +79,7 @@ int main(int, char**) {
 
     render_system.setupEntities(ecs);
 
-    save_manager.loadFromFile("../saves/main_scene.json", ecs, render_system, cam);
+    save_manager.loadFromFile("../saves/main_scene.json", ecs, render_system, cam, skybox);
 
     imgui_manager.Init(window->getWindow());
 

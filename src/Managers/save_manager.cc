@@ -5,6 +5,7 @@
 #include "Render/camera.h"
 #include "Core/mesh.h"
 #include "Render/light.h"
+#include "Render/skybox.h"
 
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
@@ -17,7 +18,7 @@
 #include <fstream>
 #include "utils.h"
 
-nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam)
+nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam, Skybox& skybox)
 {
     nlohmann::json j;
     j["Entities"] = nlohmann::json::array();
@@ -71,11 +72,13 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam)
 
     j["Camera"] = cam.serialize(); 
 
+    j["Skybox"] = skybox.serialize();
+
     return j;
 }
 
 
-void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera &cam) {
+void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera &cam, Skybox& skybox) {
 
     ecs.remove_entities();
     rs.number_lights = 0;
@@ -102,6 +105,18 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
     cam.setMinRenderDistance_(camera["Min_render_distance"]);
     cam.setMaxRenderDistance_(camera["Max_render_distance_"]);
     
+    //-----------------------------------------------------------
+    
+    const auto& skybox_ = j["Skybox"];
+
+    skybox.dds_file_ = skybox_["Skybox_file_path"];
+    skybox.vertex_file_ = skybox_["Vertex_source"];
+    skybox.fragment_file_ = skybox_["Fragment_source"];
+    skybox.skybox_angle_ = skybox_["angle"];
+
+    skybox.loadSkyBox(skybox.dds_file_.c_str(), skybox.vertex_file_.c_str(), skybox.fragment_file_.c_str());
+    skybox.init();
+
     //-----------------------------------------------------------
 
     for (const auto& entity : j["Entities"]) {
@@ -203,9 +218,9 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 }
 
 
-void SaveManager::saveToFile(std::string filename, ECSManager& ecs, Camera& cam)
+void SaveManager::saveToFile(std::string filename, ECSManager& ecs, Camera& cam, Skybox& skybox)
 {
-    nlohmann::json j = serialize(ecs, cam);
+    nlohmann::json j = serialize(ecs, cam, skybox);
     std::ofstream file(filename);
 
     if (file.is_open()) {
@@ -219,7 +234,7 @@ void SaveManager::saveToFile(std::string filename, ECSManager& ecs, Camera& cam)
     }
 }
 
-void SaveManager::loadFromFile(std::string filename, ECSManager& ecs, RenderSystem& rs, Camera& cam) {
+void SaveManager::loadFromFile(std::string filename, ECSManager& ecs, RenderSystem& rs, Camera& cam, Skybox& skybox) {
 
     std::ifstream file(filename);
     if (file.is_open()) {
@@ -229,7 +244,7 @@ void SaveManager::loadFromFile(std::string filename, ECSManager& ecs, RenderSyst
         nlohmann::json j;
         file >> j;
         file.close();
-        deSerialize(j, ecs,rs, cam);
+        deSerialize(j, ecs,rs, cam, skybox);
         
         printf("Loaded from %s\n", filename.c_str());
     }
@@ -256,6 +271,12 @@ void SaveManager::newFile()
                 {"Min_render_distance", 0.1f},
                 {"Max_render_distance_", 1000.0f}
             }},
+            {"Skybox", {
+                {"Fragment_source", "../assets/shaders/skybox.fs"},
+                {"Skybox_file_path", "../assets/textures/skybox/sky.dds"},
+                {"Vertex_source", "../assets/shaders/skybox.vs"},
+                {"angle", -90.0f }
+            }}
         };
 
         file << defaultJson.dump(4);
