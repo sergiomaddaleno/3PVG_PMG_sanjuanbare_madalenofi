@@ -191,7 +191,7 @@ void Mesh::renderElements(bool use_texture) {
         if (use_texture || !mesh.textures.empty()) {
             mesh.textures[0].bind();
         }
-
+        
          glBindVertexArray(mesh.VAO);
          glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
          glBindVertexArray(0);

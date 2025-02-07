@@ -49,10 +49,10 @@ SaveManager save_manager;
 
 char* vs_entities = (char*)ReadFile("../assets/shaders/entities.vs");
 char* fs_entities = (char*)ReadFile("../assets/shaders/entities.fs");
-
+char* vs_shadows = (char*)ReadFile("../assets/shaders/depth_map.vs");
 char* dds_file = ReadFile("../assets/textures/skybox/sky.dds");
 
-Shader entities_shader; 
+Shader entities_shader,shadow_shader; 
 
 auto e = ecs.create_entity();
 
@@ -69,6 +69,7 @@ int main(int, char**) {
     // ---
 
     entities_shader.compile(vs_entities, fs_entities);
+    shadow_shader.compile(vs_shadows, fs_entities);
 
     skybox.loadSkyBox("../assets/textures/skybox/sky.dds", "../assets/shaders/skybox.vs", "../assets/shaders/skybox.fs");
     skybox.init();
@@ -110,7 +111,7 @@ int main(int, char**) {
         
         skybox.render(cam);
 
-        render_system.renderEntities(ecs, entities_shader ,cam);
+        render_system.renderEntities(ecs, entities_shader,cam);
 
         //--
 

@@ -1,8 +1,9 @@
 
 #version 330 core
 
+const int kMaxLights = 50;
 uniform sampler2D u_texture;
-uniform sampler2D u_shadow_map;
+uniform sampler2D u_shadow_map[kMaxLights];
 
 uniform int u_number_lights;
 uniform vec3 u_camera_position;
@@ -18,9 +19,8 @@ in vec3 normal;
 in vec3 pos;
 in vec2 uv;
 in vec3 FragPos;
-in vec4 FragPosLightSpace;
+in vec4 FragPosLightSpace[3];
 
-const int kMaxLights = 50;
 
 struct LightInfo {
     int type_;
@@ -99,14 +99,14 @@ vec3 DirectionalLight(LightInfo lc) {
     return ambient + diffuse + specular;
 }
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+float ShadowCalculation(int i,vec4 fragPosLightSpace)
 {
     
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  
     projCoords = projCoords * 0.5 + 0.5; 
 
    
-    float closestDepth = texture(u_shadow_map, projCoords.xy).r;
+    float closestDepth = texture(u_shadow_map[i], projCoords.xy).r;
     float currentDepth = projCoords.z;
 
 
@@ -122,7 +122,7 @@ void main() {
 
    for (int i = 0; i < u_number_lights; ++i) {
 
-        float shadow = ShadowCalculation(FragPosLightSpace); 
+        float shadow = ShadowCalculation(i,FragPosLightSpace[i]); 
 
         if (u_light[i].type_ == 0) {
             final_light += DirectionalLight(u_light[i])/* shadow*/ ; 
