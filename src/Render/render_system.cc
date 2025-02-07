@@ -49,7 +49,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
-            //case RenderType::RT_SpotLight:
+            case RenderType::RT_SpotLight:
             case RenderType::RT_PointLight:
                 render_comp->mesh_->bind();
                 break;
@@ -231,14 +231,14 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam,Li
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
-            //case RenderType::RT_SpotLight:
+            case RenderType::RT_SpotLight:
             case RenderType::RT_PointLight:
                 for (auto& mesh : render_comp->mesh_->meshes) {
                     render_comp->mesh_->renderElements(false);
                 }
                 break;
             case RenderType::RT_Terrain:
-                render_comp->terrain_->render(false);
+                render_comp->terrain_->render();
                 break;
             case RenderType::RT_Sphere:
                 render_comp->sphere_->render();
@@ -314,10 +314,10 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:
-                    //case RenderType::RT_SpotLight:
+                    case RenderType::RT_SpotLight:
                     case RenderType::RT_PointLight:
                         for (auto& mesh : render_comp->mesh_->meshes) {
-                            render_comp->mesh_->renderElements();
+                            render_comp->mesh_->renderElements(false);
                         }
                         break;
                     case RenderType::RT_Terrain: {

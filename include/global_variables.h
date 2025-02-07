@@ -16,5 +16,6 @@ extern float g_fog_density_;
 extern float g_fog_gradient_;
 extern glm::vec3 g_sky_colour_;
 
+extern bool g_use_skybox_;
 
 #endif // GLOBALS_H

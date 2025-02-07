@@ -12,3 +12,5 @@ bool g_b_fog_ = false;
 float g_fog_density_ = 0.06f;
 float g_fog_gradient_ = 2.0f;
 glm::vec3 g_sky_colour_ = {0.5f, 0.5f, 0.5f};
+
+bool g_use_skybox_ = true;

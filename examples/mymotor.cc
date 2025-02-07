@@ -108,8 +108,9 @@ int main(int, char**) {
         postProcc.beginRender();
         cam.update(input, dt, g_window_width_, g_window_height_);
 
-        
-        skybox.render(cam);
+        if (g_use_skybox_) {
+            skybox.render(cam);
+        }
 
         render_system.renderEntities(ecs, entities_shader,cam);
 

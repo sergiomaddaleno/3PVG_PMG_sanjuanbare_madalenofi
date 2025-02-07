@@ -49,17 +49,14 @@ ImGuiManager::ImGuiManager()
     m_CurrentDirectory(m_BaseDirectory)
 {
 }
-
 ImGuiManager::~ImGuiManager() {
     Cleanup();
 }
-
 void ImGuiManager::Cleanup() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
-
 void ImGuiManager::SetImguiTheme() {
     ImGuiStyle& style = ImGui::GetStyle();
     ImVec4* colors = style.Colors;
@@ -204,6 +201,7 @@ void ImGuiManager::Render(GLFWwindow* window, DataImgui& di) {
     }
 }
 
+//--
 void ImGuiManager::ImguiWindow(GLFWwindow* window) {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
@@ -233,12 +231,22 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
         ImGuiID dock_left = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Left, 0.1f, nullptr, &dock_main);
         ImGuiID dock_right = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Right, 0.2f, nullptr, &dock_main);
         ImGuiID dock_bottom = ImGui::DockBuilderSplitNode(dock_main, ImGuiDir_Down, 0.2f, nullptr, &dock_main);
+        ImGuiID dock_bottom_left;
+        ImGuiID dock_bottom_right = ImGui::DockBuilderSplitNode(dock_bottom, ImGuiDir_Right, 0.5f, &dock_bottom_left, &dock_bottom);
+
 
         ImGui::DockBuilderDockWindow("Menu", dock_top);
         ImGui::DockBuilderDockWindow("Hierarchy", dock_left);
         ImGui::DockBuilderDockWindow("Inspector", dock_right);
         ImGui::DockBuilderDockWindow("ContentBrowser", dock_bottom);
-        ImGui::DockBuilderDockWindow("GameWindow", dock_main);
+        ImGui::DockBuilderDockWindow("GameWindow", dock_main); 
+
+        ImGui::DockBuilderDockWindow("PostProcess", dock_bottom_right);
+        ImGui::DockBuilderDockWindow("Fog", dock_bottom_right);
+        ImGui::DockBuilderDockWindow("SkyBox", dock_bottom_right);
+        ImGui::DockBuilderDockWindow("Console", dock_bottom_right);
+        ImGui::DockBuilderDockWindow("Load Scene", dock_bottom_right);
+        ImGui::DockBuilderDockWindow("Add Mesh", dock_bottom_right);
 
         ImGui::DockBuilderFinish(dockspace_id);
     }
@@ -764,6 +772,7 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
 
     ImGui::End();
 }
+//--
 
 void ImGuiManager::PostProcessWindow(DataImgui& di)
 {
@@ -988,7 +997,7 @@ void ImGuiManager::LoadSceneWindow(DataImgui& di)
 
 void ImGuiManager::AddMeshWindow(DataImgui& di)
 {
-    ImGui::Begin("Add Mesh Window");
+    ImGui::Begin("Add Mesh");
 
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
     ImGui::Text("Drag and Drop obj file");
@@ -1046,6 +1055,7 @@ void ImGuiManager::AddMeshWindow(DataImgui& di)
 
     ImGui::End();
 }
+//--
 
 void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di) {
 
