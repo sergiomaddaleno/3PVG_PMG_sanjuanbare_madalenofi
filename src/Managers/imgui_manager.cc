@@ -887,9 +887,7 @@ void ImGuiManager::FogWindow(DataImgui& di)
     ImGui::Begin("Fog");
 
     ImGui::Dummy({ 0.0f, 5.0f });
-
     ImGui::Checkbox("Activate", &g_b_fog_);
-
     ImGui::Dummy({ 0.0f, 5.0f });
 
     ImGui::DragFloat("Density", &g_fog_density_, 0.001f, 0.0f, 2.0f, "%.3f");
@@ -916,6 +914,10 @@ void ImGuiManager::FogWindow(DataImgui& di)
 void ImGuiManager::SkyboxWindow(DataImgui& di)
 {
     ImGui::Begin("SkyBox");
+
+    ImGui::Dummy({ 0.0f, 5.0f });
+    ImGui::Checkbox("Activate", &g_use_skybox_);
+    ImGui::Dummy({ 0.0f, 5.0f });
 
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
     ImGui::Text("Drag and Drop DDS file");
