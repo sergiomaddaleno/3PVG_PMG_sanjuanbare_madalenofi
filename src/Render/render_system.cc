@@ -238,7 +238,7 @@ void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam,Li
                 }
                 break;
             case RenderType::RT_Terrain:
-                render_comp->terrain_->render();
+                render_comp->terrain_->render(false);
                 break;
             case RenderType::RT_Sphere:
                 render_comp->sphere_->render();

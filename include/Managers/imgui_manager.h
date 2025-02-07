@@ -82,6 +82,11 @@ private:
     Texture m_FileIcon;
     Texture m_EntityIcon;
     Texture m_EntityLightBulbIcon;
+    Texture m_BackIcon;
+
+    float padding = 16.0f;
+    float thumbnailSize = 128.0f;
+    //--
 
     bool post_process_window = false;
     bool skybox_window = false;

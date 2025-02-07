@@ -57,86 +57,81 @@ void ImGuiManager::Cleanup() {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
+
 void ImGuiManager::SetImguiTheme() {
     ImGuiStyle& style = ImGui::GetStyle();
     ImVec4* colors = style.Colors;
 
-    // Background
-    colors[ImGuiCol_WindowBg] = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+    // Background and window colors
+    colors[ImGuiCol_WindowBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
     colors[ImGuiCol_ChildBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
     colors[ImGuiCol_PopupBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
 
-    // Borders
-    colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
-    colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-
     // Text
-    colors[ImGuiCol_Text] = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
+    colors[ImGuiCol_Text] = ImVec4(0.85f, 0.85f, 0.85f, 1.00f);
     colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
 
     // Headers
     colors[ImGuiCol_Header] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
-    colors[ImGuiCol_HeaderHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
-    colors[ImGuiCol_HeaderActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.26f, 0.26f, 1.00f);
 
     // Buttons
     colors[ImGuiCol_Button] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
-    colors[ImGuiCol_ButtonHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
-    colors[ImGuiCol_ButtonActive] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
 
-    // Frame background (e.g., input boxes, sliders)
+    // Frame background
     colors[ImGuiCol_FrameBg] = ImVec4(0.16f, 0.16f, 0.16f, 1.00f);
-    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.26f, 0.26f, 1.00f);
-    colors[ImGuiCol_FrameBgActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.26f, 0.26f, 1.00f);
 
     // Tabs
     colors[ImGuiCol_Tab] = ImVec4(0.13f, 0.13f, 0.13f, 1.00f);
-    colors[ImGuiCol_TabHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+    colors[ImGuiCol_TabHovered] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
     colors[ImGuiCol_TabActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
-    colors[ImGuiCol_TabUnfocused] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f); 
-    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f); 
 
     // Title bar
     colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-    colors[ImGuiCol_TitleBgActive] = ImVec4(0.20f, 0.45f, 0.20f, 1.00f);
-    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.05f, 0.05f, 0.05f, 1.00f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
 
     // Scrollbar
-    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f); 
-    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f); 
-    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f); 
-    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f); 
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
 
-    // Checkboxes, radio buttons, sliders
+    // Sliders and checkmarks
     colors[ImGuiCol_CheckMark] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-    colors[ImGuiCol_SliderGrab] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f); 
+    colors[ImGuiCol_SliderGrab] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
     colors[ImGuiCol_SliderGrabActive] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
 
     // Resize grips
     colors[ImGuiCol_ResizeGrip] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
-    colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
-    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+    colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
 
     // Separator
-    colors[ImGuiCol_Separator] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
-    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.43f, 0.43f, 0.50f, 0.75f);
-    colors[ImGuiCol_SeparatorActive] = ImVec4(0.43f, 0.43f, 0.50f, 1.00f);
+    colors[ImGuiCol_Separator] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+    colors[ImGuiCol_SeparatorActive] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
 
-    // Hover effects for hovered items
-    style.FrameRounding = 4.0f; 
-    style.WindowRounding = 5.0f; 
-    style.ChildRounding = 4.0f; 
+    // Docking
+    colors[ImGuiCol_DockingPreview] = ImVec4(0.25f, 0.25f, 0.25f, 0.90f);
+    colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
 
-    // Docking colors
-    colors[ImGuiCol_DockingPreview] = ImVec4(0.26f, 0.59f, 0.98f, 0.70f); 
-    colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+    // Hover effects for better clarity
+    style.FrameRounding = 6.0f;
+    style.WindowRounding = 4.0f;
+    style.ChildRounding = 4.0f;
+    style.ScrollbarRounding = 4.0f;
+    style.GrabRounding = 4.0f;
 
-    // Adjust separators for docking clarity
-    colors[ImGuiCol_Separator] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
-    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.43f, 0.43f, 0.43f, 1.00f); 
-    colors[ImGuiCol_SeparatorActive] = ImVec4(0.53f, 0.53f, 0.53f, 1.00f);
-
+    style.WindowPadding = ImVec2(8.0f, 8.0f);
+    style.ItemSpacing = ImVec2(8.0f, 6.0f);
 }
+
 
 void ImGuiManager::Init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
@@ -161,6 +156,7 @@ void ImGuiManager::Init(GLFWwindow* window) {
     m_FileIcon.loadTexture("../assets/textures/imgui/FileIcon.png");
     m_EntityIcon.loadTexture("../assets/textures/imgui/cube.png");
     m_EntityLightBulbIcon.loadTexture("../assets/textures/imgui/lb.png");
+    m_BackIcon.loadTexture("../assets/textures/imgui/back.png");
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -376,100 +372,45 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
     ImGui::Begin("Inspector");
 
     if (di.ecs->has_component<RenderComponent>(selected_entity)) {
+        if (ImGui::CollapsingHeader("Render Component", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-        Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.6f, 0.0f, 1.0f));
+            ImGui::Text("Change Shader");
+            ImGui::PopStyleColor();
 
-        ImGui::Dummy(ImVec2(10.0f, 15.0f));
+            static std::string vertex_file_name;
+            static char* vertex_content = nullptr;
+            if (ImGui::Button(!vertex_file_name.empty() ? std::string("" + vertex_file_name).c_str() : "VS Drop here", { 120.0f, 40.0f })) {}
 
-       
-
-        if (di.ecs->has_component<TransformComponent>(selected_entity)) {
-            auto& transform = di.ecs->get_component<TransformComponent>(selected_entity);
-
-            if (transform.has_value()) {
-                ImGui::DragFloat("Position X", &transform->position.x, 0.1f, -1000.0f, 1000.0f);
-                ImGui::DragFloat("Position Y", &transform->position.y, 0.1f, -1000.0f, 1000.0f);
-                ImGui::DragFloat("Position Z", &transform->position.z, 0.1f, -1000.0f, 1000.0f);
-            }
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 15.0f));
-
-        if (di.ecs->has_component<LightComponent>(selected_entity)) {
-            auto& light_component = di.ecs->get_component<LightComponent>(selected_entity);
-
-            if (light_component.has_value()) {
-
-                ImGui::Separator();
-
-                glm::vec3& light_color = light_component->light.light_info_.light_color_;
-
-                float color[3] = {
-                    light_color.r / 255.0f,
-                    light_color.g / 255.0f,
-                    light_color.b / 255.0f
-                };
-
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-                if (ImGui::ColorPicker3("Light Color", color)) {
-                    light_color.r = color[0] * 255.0f;
-                    light_color.g = color[1] * 255.0f;
-                    light_color.b = color[2] * 255.0f;
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                    std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                    if (filePath.extension() == ".vs") {
+                        vertex_file_name = filePath.filename().string();
+                        vertex_content = ReadFile(filePath.string().c_str());
+                    }
                 }
-
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-                ImGui::Text("Current Light Color: R: %.2f, G: %.2f, B: %.2f",
-                    light_color.r, light_color.g, light_color.b);
-
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+                ImGui::EndDragDropTarget();
             }
-        }
 
-        ImGui::Dummy(ImVec2(0.0f, 2.0f));
+            static std::string fragment_file_name;
+            static char* fragment_content = nullptr;
+            ImGui::SameLine();
+            if (ImGui::Button(!fragment_file_name.empty() ? std::string("" + fragment_file_name).c_str() : "FS Drop here", { 120.0f, 40.0f })) {}
 
-        // Change shader
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-        ImGui::Text("Drag and Drop Vertex and Fragment:");
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-        static std::string vertex_file_name;
-        static char* vertex_content = nullptr;
-        if (ImGui::Button(!vertex_file_name.empty() ? std::string("" + vertex_file_name).c_str() : "VS Drop here", { 120.0f, 40.0f })) {}
-
-        if (ImGui::BeginDragDropTarget()) {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                std::filesystem::path filePath = (const wchar_t*)payload->Data;
-                if (filePath.extension() == ".vs") {
-                    vertex_file_name = filePath.filename().string();
-                    vertex_content = ReadFile(filePath.string().c_str());
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                    std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                    if (filePath.extension() == ".fs") {
+                        fragment_file_name = filePath.filename().string();
+                        fragment_content = ReadFile(filePath.string().c_str());
+                    }
                 }
+                ImGui::EndDragDropTarget();
             }
-            ImGui::EndDragDropTarget();
-        }
-
-        static std::string fragment_file_name;
-        static char* fragment_content = nullptr;
-        ImGui::SameLine();
-        if (ImGui::Button(!fragment_file_name.empty() ? std::string("" + fragment_file_name).c_str() : "FS Drop here", { 120.0f, 40.0f })) {}
-
-        if (ImGui::BeginDragDropTarget()) {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                std::filesystem::path filePath = (const wchar_t*)payload->Data;
-                if (filePath.extension() == ".fs") {
-                    fragment_file_name = filePath.filename().string();
-                    fragment_content = ReadFile(filePath.string().c_str());
-                }
-            }
-            ImGui::EndDragDropTarget();
-        }
-
-        if (vertex_content && fragment_content) {
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
-            if (ImGui::Button("Compile")) {
+            if (ImGui::Button("Compile") && vertex_content && fragment_content) {
                 Shader newShader;
                 newShader.compile(vertex_content, fragment_content);
 
@@ -484,23 +425,183 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
                 fragment_content = nullptr;
             }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+        }
+    }
+
+    if (di.ecs->has_component<TransformComponent>(selected_entity)) {
+        auto& transf_comp = di.ecs->get_component<TransformComponent>(selected_entity);
+
+        if (ImGui::CollapsingHeader("Transform Component", ImGuiTreeNodeFlags_DefaultOpen)) {
+
+            Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
+
+            if (ImGui::BeginTable("TransformTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+                ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);
+                ImGui::TableSetupColumn("X", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Y", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Z", ImGuiTableColumnFlags_WidthStretch);
+
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("");
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+                ImGui::Text("X");
+                ImGui::PopStyleColor();
+
+                ImGui::TableSetColumnIndex(2);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+                ImGui::Text("Y");
+                ImGui::PopStyleColor();
+
+                ImGui::TableSetColumnIndex(3);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 1.0f, 1.0f)); 
+                ImGui::Text("Z");
+                ImGui::PopStyleColor();
+
+                auto DrawRow = [](const char* label, float& x, float& y, float& z, const char* id) {
+                    ImGui::TableNextRow();
+
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text(label);
+
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::DragFloat((std::string("##X") + id).c_str(), &x, 0.1f, -1000.0f, 1000.0f);
+
+                    ImGui::TableSetColumnIndex(2);
+                    ImGui::DragFloat((std::string("##Y") + id).c_str(), &y, 0.1f, -1000.0f, 1000.0f);
+
+                    ImGui::TableSetColumnIndex(3);
+                    ImGui::DragFloat((std::string("##Z") + id).c_str(), &z, 0.1f, -1000.0f, 1000.0f);
+                    };
+
+                DrawRow("Translation", transf_comp->position.x, transf_comp->position.y, transf_comp->position.z, "Translation");
+                DrawRow("Rotation", transf_comp->rotation.x, transf_comp->rotation.y, transf_comp->rotation.z, "Rotation");
+                DrawRow("Scale", transf_comp->scale.x, transf_comp->scale.y, transf_comp->scale.z, "Scale");
+
+                ImGui::EndTable();
+
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            }
+        }
+    }
+
+    if (di.ecs->has_component<LightComponent>(selected_entity)) {
+
+        if (ImGui::CollapsingHeader("Light Component", ImGuiTreeNodeFlags_DefaultOpen)) {
+            auto& light_comp = di.ecs->get_component<LightComponent>(selected_entity);
+
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.9f, 0.9f, 1.0f)); 
+            ImGui::Text("Position & Direction");
+            ImGui::PopStyleColor();
+
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            ImGui::SliderFloat3("Position", &light_comp->light.light_info_.pos_[0], -100.0f, 100.0f);
+            ImGui::SliderFloat3("Direction", &light_comp->light.light_info_.dir_[0], -1.0f, 1.0f);
+
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.3f, 1.0f)); 
+            ImGui::Text("Light Colors");
+            ImGui::PopStyleColor();
+
+            ImGui::ColorEdit3("Diffuse Color", &light_comp->light.light_info_.diff_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
+            ImGui::ColorEdit3("Specular Color", &light_comp->light.light_info_.spec_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
+            ImGui::ColorEdit3("Light Color", &light_comp->light.light_info_.light_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
+            ImGui::ColorEdit3("Ambient Color", &light_comp->light.light_info_.ambient_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
+
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.9f, 0.5f, 1.0f)); 
+            ImGui::Text("Attenuation");
+            ImGui::PopStyleColor();
+
+            ImGui::SliderFloat("Linear Attenuation", &light_comp->light.light_info_.linear_att, 0.0f, 1.0f);
+            ImGui::SliderFloat("Quadratic Attenuation", &light_comp->light.light_info_.quad_att_, 0.0f, 1.0f);
+            ImGui::SliderFloat("Constant Attenuation", &light_comp->light.light_info_.constant_att_, 0.0f, 1.0f);
+
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 0.7f, 1.0f, 1.0f)); 
+            ImGui::Text("Spotlight Settings");
+            ImGui::PopStyleColor();
+
+            ImGui::SliderFloat("Spotlight Angle", &light_comp->light.light_info_.spot_angle_, 0.0f, 180.0f);
+
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.8f, 1.0f, 1.0f));
+            ImGui::Text("Shininess & Strength");
+            ImGui::PopStyleColor();
+
+            ImGui::SliderFloat("Shininess", &light_comp->light.light_info_.shininess_, 1.0f, 128.0f);
+            ImGui::SliderFloat("Strength", &light_comp->light.light_info_.strength_, 0.0f, 10.0f);
+
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Components")) {
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
+        if (di.ecs->has_component<TransformComponent>(selected_entity)) {
+            ImGui::Text("Entity has Transform Component");
+        }
+        if (di.ecs->has_component<LightComponent>(selected_entity)) {
+            ImGui::Text("Entity has Light Component");
+        }
+        if (di.ecs->has_component<RenderComponent>(selected_entity)) {
+            ImGui::Text("Entity has Render Component");
         }
 
-        //----
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        if (ImGui::Button("Add Component")) {
+            ImGui::OpenPopup("ComponentPopup");
+        }
 
-        if (selected_entity && (ImGui::Button("Delete Entity") || selected_entity && di.input->isKeyPressed(Input::SUPR))) {
-            if (di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_PointLight
-                && di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_SpotLight) {
-                di.ecs->destroy_entity(selected_entity);
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
+        if (ImGui::BeginPopup("ComponentPopup")) {
+            if (ImGui::Selectable("Light Component")) {
+                if (!di.ecs->has_component<LightComponent>(selected_entity)) {
+                    di.ecs->add_component<LightComponent>(selected_entity);
+                }
+                else {
+                    ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Already has Light Component");
+                }
             }
-            else {
-                di.ecs->destroy_entity(selected_entity);
-                di.render_system->number_lights--;
+            if (ImGui::Selectable("Transform Component")) {
+                if (!di.ecs->has_component<TransformComponent>(selected_entity)) {
+                    di.ecs->add_component<TransformComponent>(selected_entity);
+                }
+                else {
+                    ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Already has Transform Component");
+                }
             }
+            if (ImGui::Selectable("Render Component")) {
+                if (!di.ecs->has_component<RenderComponent>(selected_entity)) {
+                    di.ecs->add_component<RenderComponent>(selected_entity);
+                }
+                else {
+                    ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Already has Render Component");
+                }
+            }
+            ImGui::EndPopup();
+        }
+    }
+
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+    if (selected_entity && (ImGui::Button("Delete Entity") || selected_entity && di.input->isKeyPressed(Input::SUPR))) {
+        if (di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_PointLight
+            && di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_SpotLight) {
+            di.ecs->destroy_entity(selected_entity);
+        }
+        else {
+            di.ecs->destroy_entity(selected_entity);
+            di.render_system->number_lights--;
         }
     }
 
@@ -512,14 +613,15 @@ void ImGuiManager::ContentBrowserWindow(DataImgui& di) {
 
     if (std::filesystem::canonical(m_CurrentDirectory) != std::filesystem::canonical(m_BaseDirectory))
     {
-        if (ImGui::Button("<-"))
+        if (ImGui::ImageButton("button", (ImTextureID)m_BackIcon.getID(), ImVec2(25.0f, 25.0f)))
         {
             m_CurrentDirectory = m_CurrentDirectory.parent_path();
         }
+
     }
 
-    static float padding = 16.0f;
-    static float thumbnailSize = 128.0f;
+    padding = 16.0f;
+    thumbnailSize = 90.0f;
     float cellSize = thumbnailSize + padding;
 
     float panelWidth = ImGui::GetContentRegionAvail().x;
@@ -1125,12 +1227,16 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
 
     if (ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoTitleBar)) {
         if (selected_entity >= 0) {
+            ImGui::Dummy({ 0.0f, 5.0f });
             if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
                 mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+            ImGui::SameLine();
             if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
                 mCurrentGizmoOperation = ImGuizmo::ROTATE;
+            ImGui::SameLine();
             if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
                 mCurrentGizmoOperation = ImGuizmo::SCALE;
+            ImGui::Dummy({ 0.0f, 5.0f });
         }
     }
     ImGui::End();
