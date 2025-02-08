@@ -5,17 +5,17 @@
   "Max_render_distance_": 400.0,
   "Min_render_distance": 0.10000000149011612,
   "Position": [
-   -14.563441276550293,
-   14.538063049316406,
-   20.408796310424805
+   -7.057459831237793,
+   16.696046829223633,
+   32.094730377197266
   ],
   "Scroll_speed": 10.0,
   "Sensitivity": 1.0,
   "Speed": 10.0,
   "View_direction": [
-   0.5234824419021606,
-   -0.21796803176403046,
-   -0.8236844539642334
+   0.29859262704849243,
+   -0.25754156708717346,
+   -0.9189748764038086
   ]
  },
  "Entities": [
@@ -109,114 +109,7 @@
    }
   },
   {
-   "Entity_id": 1,
-   "Light_component": {
-    "Shader": {
-     "Program": 9
-    },
-    "light": {
-     "Ambient_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       -1.0,
-       -1.0,
-       -1.0
-      ]
-     ],
-     "Light_color": [
-      [
-       150.0,
-       150.0,
-       150.0
-      ]
-     ],
-     "Linear_attenuation": [
-      0.699999988079071
-     ],
-     "Position": [
-      [
-       4.304547309875488,
-       9.711357116699219,
-       5.328983306884766
-      ]
-     ],
-     "Quadratic_attenuation": [
-      1.7999999523162842
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Spot_angle": [
-      45.0
-     ],
-     "Strength": [
-      1.0
-     ],
-     "Type": 1
-    }
-   },
-   "Render_component": {
-    "Mesh": {
-     "MaterialID": 0,
-     "Mesh_path": "../assets/obj/light_bulb.obj",
-     "Meshes": [
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": ""
-      }
-     ],
-     "Texture_folder": ""
-    },
-    "Render_type": 3,
-    "Shader": {
-     "Program": 9
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     4.304547309875488,
-     9.711357116699219,
-     5.328983306884766
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
+   "Entity_id": 1
   },
   {
    "Entity_id": 2,
@@ -365,6 +258,116 @@
      0.0,
      0.0,
      0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 4,
+   "Light_component": {
+    "Shader": {
+     "Program": 16
+    },
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.4729999899864197,
+       -1.0,
+       -1.0
+      ]
+     ],
+     "Light_color": [
+      [
+       150.0,
+       150.0,
+       150.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.699999988079071
+     ],
+     "Position": [
+      [
+       3.602632522583008,
+       9.767573356628418,
+       6.835798263549805
+      ]
+     ],
+     "Quadratic_attenuation": [
+      1.7999999523162842
+     ],
+     "Shininnes": [
+      32.0
+     ],
+     "Specular_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Spot_angle": [
+      45.0
+     ],
+     "Strength": [
+      1.0
+     ],
+     "Type": 1
+    }
+   },
+   "Render_component": {
+    "Mesh": {
+     "MaterialID": 0,
+     "Mesh_path": "../assets/obj/light_bulb.obj",
+     "Meshes": [
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": ""
+      }
+     ],
+     "Texture_folder": ""
+    },
+    "Render_type": 3,
+    "Shader": {
+     "Program": 16
+    },
+    "Texture": {
+     "TextureID": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     3.602632522583008,
+     9.767573356628418,
+     6.835798263549805
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
     ],
     "Scale": [
      1.0,

@@ -3,6 +3,7 @@
 #include "Render/render_system.h"
 #include "Core/mesh.h"
 #include "Render/camera.h"
+#include "Render/shadow_map.h"
 #include "Core/shader.h"
 #include "utils.h"
 #include "global_variables.h"
@@ -27,11 +28,6 @@
 
 RenderSystem::RenderSystem() {}
 RenderSystem::~RenderSystem() {}
-
-unsigned int depthMapFBO;
-
-
-const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
 
 void RenderSystem::initEntities(ECSManager& ecs) {
     auto ri = ecs.getComponentList<RenderComponent>().begin();
@@ -70,47 +66,31 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 render_comp->cube_->bind();
                 break;
             }
+
             auto li = ecs.getComponentList<LightComponent>().begin();
             auto ti = ecs.getComponentList<TransformComponent>().begin();
             auto liend = ecs.getComponentList<LightComponent>().end();
             auto tiend = ecs.getComponentList<TransformComponent>().end();
 
-            int light_count = 0;
-            glGenFramebuffers(1, &depthMapFBO);
+
             for (; li != liend && ti != tiend; ++li, ++ti) {
                 if (li->has_value() && ti->has_value()) {
                     auto& light_comp = *li;
                     auto& transform = *ti;
-                   
-                    glGenTextures(1, &light_comp->depthMap);
-                    glBindTexture(GL_TEXTURE_2D, light_comp->depthMap);
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-                    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-                    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-                    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, light_comp->depthMap, 0);
+                    light_comp->shadow_map_.initMultipleShadow();
+                    //light_comp->shadow_map_.initOneShadow();;
                 }
             }
-            glDrawBuffer(GL_NONE);
-            glReadBuffer(GL_NONE);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
         }
     }
 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glUseProgram(0);
 }
 
-
-void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, LightComponent light,Camera cam,int light_count)
+void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam)
 {
-   
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, tc.position);
     model = model * glm::mat4_cast(tc.rotation);
@@ -118,147 +98,18 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Lig
 
     glm::mat4 view = cam.getViewMatrix();
     glm::mat4 projection = cam.getProjectionMatrix();
-    
-    if (light.light.light_info_.type_ == 1) {
-        
 
-        shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
-        shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
-        shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
+    shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+    shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+    shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-        int tex_id = 1;
-        shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
-
-        shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &g_b_fog_);
-        shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &g_fog_density_);
-        shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &g_fog_gradient_);
-        shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &g_sky_colour_);
-    }
-
-    if (light.light.light_info_.type_ == 0) {
-        
-       
-
-        shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
-        shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
-        shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
-
-        int tex_id = 1;
-        shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
-
-        shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &g_b_fog_);
-        shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &g_fog_density_);
-        shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &g_fog_gradient_);
-        shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &g_sky_colour_);
-    }
-
-
-    
-
+    int tex_id = 1;
+    shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
 
     shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &g_b_fog_);
     shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &g_fog_density_);
     shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &g_fog_gradient_);
     shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &g_sky_colour_);
-}
-
-void RenderSystem::renderShadowMap(ECSManager& ecs, Shader shader, Camera cam,LightComponent t,int light_count) {
-   
-    
-
-    if (t.light.light_info_.type_ == 1) {
-        float near_plane = 1.0f, far_plane = 100.5f;
-        float spotLightFOV = glm::radians(t.light.light_info_.spot_angle_);
-
-        glm::vec3 lightPosition = t.light.light_info_.pos_;
-        glm::vec3 lightDirection = glm::normalize(t.light.light_info_.dir_);
-
-
-        glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)g_window_width_ / (float)g_window_height_, near_plane, far_plane);
-
-
-        glm::mat4 lightView = glm::lookAt(lightPosition, lightPosition + lightDirection, glm::vec3(0.0f, 1.0f, 0.0f));
-
-        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
-        glEnable(GL_DEPTH_TEST);
-
-        
-       
-        std::string uniformName = "u_light_space[" + std::to_string(light_count) + "]";
-        int locmatriz = shader.getUniformLocation(uniformName.c_str());
-        shader.setUniformValue(locmatriz, ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
-        
-        int shadow = 1;
-        shader.setUniformValue(shader.getUniformLocation("shadow"), ValueType::T_INT_1, &shadow);
-
-         uniformName = "lightView[" + std::to_string(light_count) + "]";
-        int locv = shader.getUniformLocation(uniformName.c_str());
-        shader.setUniformValue(locv, ValueType::T_MAT_4x4, glm::value_ptr(lightView));
-
-         uniformName = "lightProjection[" + std::to_string(light_count) + "]";
-        int locp = shader.getUniformLocation(uniformName.c_str());
-        shader.setUniformValue(locp, ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));
-
-        
-       
-    }
-
-    if (t.light.light_info_.type_ == 0) {
-        
-
-    }
-
-    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    auto ri = ecs.getComponentList<RenderComponent>().begin();
-    auto ti = ecs.getComponentList<TransformComponent>().begin();
-    auto riend = ecs.getComponentList<RenderComponent>().end();
-    auto tiend = ecs.getComponentList<TransformComponent>().end();
-
-    for (; ri != riend && ti != tiend; ++ri, ++ti) {
-        if (ri->has_value() && ti->has_value()) {
-            auto& render_comp = *ri;
-            auto& transform_comp = *ti;
-
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, transform_comp->position);
-            model = model * glm::mat4_cast(transform_comp->rotation);
-            model = glm::scale(model, transform_comp->scale);
-            shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
-
-            switch (render_comp->type_) {
-            case RenderType::RT_Mesh:
-            case RenderType::RT_SpotLight:
-            case RenderType::RT_PointLight:
-                for (auto& mesh : render_comp->mesh_->meshes) {
-                    render_comp->mesh_->renderElements(false);
-                }
-                break;
-            case RenderType::RT_Terrain:
-                render_comp->terrain_->render(false);
-                break;
-            case RenderType::RT_Sphere:
-                render_comp->sphere_->render();
-                break;
-            case RenderType::RT_Cube:
-                render_comp->cube_->render();
-                break;
-            case RenderType::RT_Quad:
-                render_comp->quad_->render();
-                break;
-            }
-        }
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 1);
-    glDrawBuffer(GL_BACK);
-    glReadBuffer(GL_BACK);
-    glViewport(0, 0, g_window_width_, g_window_height_);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
 }
 
 void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
@@ -277,26 +128,22 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
             auto& light_comp = *li;
             auto& transform = *ti;
 
-            
-             shader.setUniformValue(shader.getUniformLocation("lightIndex"), ValueType::T_INT_1, &light_count);
-             renderShadowMap(ecs, shader, cam, *light_comp, light_count);
-            
-            
+            light_comp->shadow_map_.render(ecs, shader, cam, *light_comp);
 
             // Light ---------------------------------------------------------------
-            
+            shader.useProgram();
             shader.setUniformValue(shader.getUniformLocation("u_number_lights"), ValueType::T_INT_1, &number_lights);
             shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
             shader.setUniformValue(shader.getUniformLocation("u_ambient"), ValueType::T_FLOAT_3, &light_comp->light.global_ambient_color_);
-            
-            int shadow = 0;
-            shader.setUniformValue(shader.getUniformLocation("shadow"), ValueType::T_INT_1, &shadow);
-            
 
+            light_comp->shadow_map_.bind();
+            light_comp->shadow_map_.addNewShadow(light_count);
+            int texture_unit = 0;
+            shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);
 
-            light_comp->light.setUniforms(shader, light_count,*light_comp);
+            light_comp->light.setUniforms(shader, light_count);
 
-            
+            light_count++;
 
             // ---------------------------------------------------------------
 
@@ -310,14 +157,14 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
                     auto& render_comp = *ri;
                     auto& transform_comp = *ti;
 
-                    setEntitiesUniforms(*transform_comp, shader, *light_comp,cam,light_count);
+                    setEntitiesUniforms(*transform_comp, shader, *light_comp, cam);
 
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:
-                    case RenderType::RT_SpotLight:
+                    //case RenderType::RT_SpotLight:
                     case RenderType::RT_PointLight:
                         for (auto& mesh : render_comp->mesh_->meshes) {
-                            render_comp->mesh_->renderElements(false);
+                            render_comp->mesh_->renderElements();
                         }
                         break;
                     case RenderType::RT_Terrain: {
@@ -339,7 +186,6 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
                     }
                 }
             }
-            light_count++;
         }
     }
 
@@ -354,7 +200,6 @@ void RenderSystem::setupEntities(ECSManager& ecs)
     ecs.add_component_type<TransformComponent>();
     ecs.add_component_type<LightComponent>();
 }
-
 
 size_t RenderSystem::createMesh(ECSManager& ecs, Shader& mesh_shader, std::string file, std::string textureFolder, 
     TransformComponent tc)
@@ -535,7 +380,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
     if (default_light) {
 
         light_comp->light.light_info_.pos_ = glm::vec3(0.0f, 0.0f, 0.0f);
-        light_comp->light.light_info_.dir_ = glm::vec3(-1.0f, -1.0f, -1.0f);
+        light_comp->light.light_info_.dir_ = glm::vec3(0.0f, -1.0f, -1.0f);
         light_comp->light.light_info_.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
         light_comp->light.light_info_.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
         light_comp->light.light_info_.linear_att = 0.7f;

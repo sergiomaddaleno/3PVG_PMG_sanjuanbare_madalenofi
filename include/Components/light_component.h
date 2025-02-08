@@ -4,7 +4,7 @@
 #include <memory>
 #include "../Core/shader.h"
 #include "../Render/light.h"
-#include "../Core/framebuffer.h"
+#include "Render/shadow_map.h"
 
 #include "../deps/nlohmann/json.hpp"
 
@@ -12,8 +12,8 @@ struct LightComponent {
 
 	Light light;
 	Shader shader;
-	FrameBuffer shadow_map;
-	unsigned int depthMap;
+	ShadowMap shadow_map_;
+
 	// To save data
 	nlohmann::json serialize() {
 
@@ -24,7 +24,6 @@ struct LightComponent {
 
 		return json_data;
 	}
-
 };
 
 #endif //LCP

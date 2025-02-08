@@ -2,6 +2,12 @@
 #include "Core/shader.h"
 #include "utils.h"
 
+Shader::Shader() : program_(0) {}
+
+Shader::~Shader()
+{
+}
+
 void Shader::compile(const char* vertex_src, const char* fragment_src)
 {
     if (program_ != 0) {

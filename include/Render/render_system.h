@@ -32,14 +32,10 @@ public:
 
 	void initEntities(ECSManager &ecs);
 
-
-	void setEntitiesUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam,int light_count);
-
-	void renderShadowMap(ECSManager& ecs, Shader shader, Camera cam, LightComponent t, int light_count);
+	void setEntitiesUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
 
 	void renderEntities(ECSManager& ecs, Shader shader, Camera cam);
 
-	
 	//---------------------------------------------------------------
 	
 	//call one time to create entites

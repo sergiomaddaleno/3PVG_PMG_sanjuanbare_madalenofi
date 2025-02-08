@@ -1,26 +1,4 @@
-
-#version 330 core
-
-const int kMaxLights = 50;
-uniform sampler2D u_texture;
-uniform sampler2D u_shadow_map[kMaxLights];
-
-uniform int u_number_lights;
-uniform vec3 u_camera_position;
-uniform vec3 u_ambient;
-
-uniform bool u_fog;
-uniform vec3 u_sky_colour;
-in float visibility;
-
-out vec4 FragColor;
-
-in vec3 normal;
-in vec3 pos;
-in vec2 uv;
-in vec3 FragPos;
-in vec4 FragPosLightSpace[3];
-
+#version 400 core
 
 struct LightInfo {
     int type_;
@@ -39,7 +17,27 @@ struct LightInfo {
     float spot_angle_;
 };
 
+const int kMaxLights = 50;
+
+uniform sampler2D u_texture;
+uniform sampler2DArray u_shadow_map;
+
 uniform LightInfo u_light[kMaxLights];
+uniform int u_number_lights;
+uniform vec3 u_camera_position;
+uniform vec3 u_ambient;
+
+uniform bool u_fog;
+uniform vec3 u_sky_colour;
+in float visibility;
+
+out vec4 FragColor;
+
+in vec3 normal;
+in vec3 pos;
+in vec2 uv;
+in vec3 FragPos;
+in vec4 FragPosLightSpace;//[kMaxLights];
 
 vec3 PointLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
@@ -99,20 +97,15 @@ vec3 DirectionalLight(LightInfo lc) {
     return ambient + diffuse + specular;
 }
 
-float ShadowCalculation(int i,vec4 fragPosLightSpace)
+float ShadowCalculation(vec4 fragPosLightSpace, int index)
 {
-    
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  
     projCoords = projCoords * 0.5 + 0.5; 
 
-   
-    float closestDepth = texture(u_shadow_map[i], projCoords.xy).r;
+    float closestDepth = texture(u_shadow_map, vec3(projCoords.xy, index)).r;
     float currentDepth = projCoords.z;
 
-
     float bias = 0.005;
-
-
     return (currentDepth - bias) > closestDepth ? 1.0 : 5.0;
 }
 
@@ -122,7 +115,7 @@ void main() {
 
    for (int i = 0; i < u_number_lights; ++i) {
 
-        float shadow = ShadowCalculation(i,FragPosLightSpace[i]); 
+        float shadow = ShadowCalculation(FragPosLightSpace, i); 
 
         if (u_light[i].type_ == 0) {
             final_light += DirectionalLight(u_light[i])/* shadow*/ ; 

@@ -62,13 +62,14 @@ class Light {
 
 public:
 
-    
+    Light();
+    ~Light();
 
     LightInfo light_info_;
     glm::vec3 global_ambient_color_{ 0.2f, 0.2, 0.2f };
+    int light_count = 0;
 
-
-    void setUniforms(Shader& shader, int light_count, LightComponent& light_comp);
+    void setUniforms(Shader& shader, int light_count);
 
     // Save data
     nlohmann::json serialize() const;

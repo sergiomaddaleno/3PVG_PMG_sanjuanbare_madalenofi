@@ -32,7 +32,8 @@ class Shader {
 
 public:
 
-	Shader() : program_(0) {}
+    Shader();
+    ~Shader();
 
 	void compile(const char* vertex_src, const char* fragment_src);
 

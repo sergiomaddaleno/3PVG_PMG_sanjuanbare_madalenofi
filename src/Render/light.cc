@@ -8,51 +8,58 @@
 #include <memory> 
 #include <iostream>
 
-void Light::setUniforms(Shader &shader, int light_count,LightComponent &light_comp)
+Light::Light()
 {
+}
 
-    if (light_count > 0) {
+Light::~Light()
+{
+}
+
+void Light::setUniforms(Shader& shader, int light_count)
+{
+    /*if (light_count > 0) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, light_comp.depthMap);
     }
-     std::string uniformName = "u_shadow_map[" + std::to_string(light_count+1) + "]";
-     int locshadow = shader.getUniformLocation(uniformName.c_str());
-     shader.setUniformValue(locshadow, ValueType::T_FLOAT_1, &light_comp.depthMap);
+    std::string uniformName = "u_shadow_map[" + std::to_string(light_count + 1) + "]";
+    int locshadow = shader.getUniformLocation(uniformName.c_str());
+    shader.setUniformValue(locshadow, ValueType::T_FLOAT_1, &light_comp.depthMap);*/
+
 
     int loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].type_").c_str());
     shader.setUniformValue(loc, ValueType::T_INT_1, &light_info_.type_);
 
-    loc =  shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].pos_").c_str());
-     shader.setUniformValue(loc, ValueType::T_FLOAT_3, & light_info_.pos_);
+    loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].pos_").c_str());
+    shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.pos_);
 
-     loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].dir_").c_str());
-     shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.dir_);
+    loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].dir_").c_str());
+    shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.dir_);
 
-     loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].light_color_").c_str());
-     shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.light_color_);
+    loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].light_color_").c_str());
+    shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.light_color_);
 
-     loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].ambient_color_").c_str());
-     shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.ambient_color_);
+    loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].ambient_color_").c_str());
+    shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.ambient_color_);
 
-     loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].linear_att_").c_str());
-     shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.linear_att);
+    loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].linear_att_").c_str());
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.linear_att);
 
-     loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].quad_att_").c_str());
-     shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.quad_att_);
+    loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].quad_att_").c_str());
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.quad_att_);
 
-     loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].constant_att_").c_str());
-     shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.constant_att_);
+    loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].constant_att_").c_str());
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.constant_att_);
 
-     loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].shininess_").c_str());
-     shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.shininess_);
+    loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].shininess_").c_str());
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.shininess_);
 
-     loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].strength_").c_str());
-     shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.strength_);
+    loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].strength_").c_str());
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.strength_);
 
-     loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].spot_angle_").c_str());
-     shader.setUniformValue(loc, ValueType::T_FLOAT_1, & light_info_.spot_angle_);
+    loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].spot_angle_").c_str());
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.spot_angle_);
 }
-
 nlohmann::json Light::serialize() const
 {
     nlohmann::json json_data;
