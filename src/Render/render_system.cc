@@ -10,6 +10,7 @@
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
 #include "Components\light_component.h"
+#include "Components\name_component.h"
 
 #include "Geometry/sphere.h"
 #include "Geometry/terrain.h"
@@ -191,6 +192,7 @@ void RenderSystem::setupEntities(ECSManager& ecs)
 {
     entity_ = ecs.create_entity();
 
+    ecs.add_component_type<NameComponent>();
     ecs.add_component_type<RenderComponent>();
     ecs.add_component_type<TransformComponent>();
     ecs.add_component_type<LightComponent>();
@@ -204,10 +206,13 @@ size_t RenderSystem::createMesh(ECSManager& ecs, Shader& mesh_shader, std::strin
         return -1;
     }
     
+    ecs.add_component<NameComponent>(entity_);
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
     //---
+
+    ecs.get_component<NameComponent>(entity_)->name = "Mesh [" + std::to_string(entity_mesh) + "]";
 
     auto& transform = ecs.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
@@ -219,6 +224,7 @@ size_t RenderSystem::createMesh(ECSManager& ecs, Shader& mesh_shader, std::strin
     ecs.get_component<RenderComponent>(entity_)->shader = mesh_shader;
 
     entity_++;
+    entity_mesh++;
 
     return entity_;
 }
@@ -232,10 +238,12 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader,
     auto terrain = std::make_unique<Terrain>();
     terrain->init(num_cols, num_rows, height_mult, size, is_centered, use_perlin_noise);
 
+    ecs.add_component<NameComponent>(entity_);
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
     //---
+    ecs.get_component<NameComponent>(entity_)->name = "Terrain [" + std::to_string(entity_terrain) + "]";
 
     auto& transform = ecs.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
@@ -247,6 +255,7 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader,
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
 
     entity_++;
+    entity_terrain++;
 
     return entity_;
 }
@@ -256,10 +265,13 @@ size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, TransformComp
     auto sphere = std::make_unique<Sphere>();
     sphere->init(false, size, num_heights_, num_revs_);
 
+    ecs.add_component<NameComponent>(entity_);
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
     //---
+
+    ecs.get_component<NameComponent>(entity_)->name = "Sphere [" + std::to_string(entity_sphere) + "]";
 
     auto& transform = ecs.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
@@ -271,6 +283,7 @@ size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, TransformComp
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
 
     entity_++;
+    entity_sphere++;
 
     return entity_;
 }
@@ -280,10 +293,12 @@ size_t RenderSystem::createCube8v(ECSManager& ecs, Shader& shader, TransformComp
     auto cube = std::make_unique<Cube>();
     cube->init8v(size);
 
+    ecs.add_component<NameComponent>(entity_);
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
     //---
+    ecs.get_component<NameComponent>(entity_)->name = "Cube8v [" + std::to_string(entity_cube8v) + "]";
 
     auto& transform = ecs.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
@@ -295,6 +310,7 @@ size_t RenderSystem::createCube8v(ECSManager& ecs, Shader& shader, TransformComp
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
 
     entity_++;
+    entity_cube8v++;
 
     return entity_;
 }
@@ -304,10 +320,12 @@ size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, TransformCom
     auto cube = std::make_unique<Cube>();
     cube->init24v(size);
 
+    ecs.add_component<NameComponent>(entity_);
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
     //---
+    ecs.get_component<NameComponent>(entity_)->name = "Cube24v [" + std::to_string(entity_cube24v) + "]";
 
     auto& transform = ecs.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
@@ -319,6 +337,7 @@ size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, TransformCom
     ecs.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
 
     entity_++;
+    entity_cube24v++;
 
     return entity_;
 }
@@ -328,10 +347,12 @@ size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, TransformCompon
     auto quad = std::make_unique<Quad>();
     quad->init(size);
 
+    ecs.add_component<NameComponent>(entity_);
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
 
     //---
+    ecs.get_component<NameComponent>(entity_)->name = "Quad [" + std::to_string(entity_quad) + "]";
 
     auto& transform = ecs.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
@@ -343,8 +364,7 @@ size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, TransformCompon
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
 
     entity_++;
-
-
+    entity_quad++;
 
     return entity_;
 
@@ -355,11 +375,13 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
     auto lb_mesh = std::make_unique<Mesh>();
     lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
 
+    ecs.add_component<NameComponent>(entity_);
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
 
     //---
+    ecs.get_component<NameComponent>(entity_)->name = "Spot Light [" + std::to_string(entity_spotlight) + "]";
 
     ecs.add_component<TransformComponent>(entity_)->position = li.pos_;
 
@@ -397,12 +419,9 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
         light_comp->light.light_info_.spot_angle_ = li.spot_angle_;
     }
 
-
     number_lights++;
     entity_++;
-
-    //renderEntities(ecs, light_shader);
-    
+    entity_spotlight++;
 
     return entity_;
 }
@@ -412,11 +431,13 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, Lig
     auto lb_mesh = std::make_unique<Mesh>();
     lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
 
+    ecs.add_component<NameComponent>(entity_);
     ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
 
     //---
+    ecs.get_component<NameComponent>(entity_)->name = "Point Light [" + std::to_string(entity_spotlight) + "]";
 
     ecs.get_component<TransformComponent>(entity_)->position = li.pos_;
 
@@ -453,21 +474,23 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, Lig
     
     number_lights++;
     entity_++;
-    //renderEntities(ecs, light_shader);
+    entity_pointlight++;
+
     return entity_;
 }
 
 size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light_shader, LightInfo li, bool default_light)
 {
-    ecs.add_component<TransformComponent>(entity_);
+    ecs.add_component<NameComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
+    ecs.add_component<TransformComponent>(entity_);
 
     // ----
+    ecs.get_component<NameComponent>(entity_)->name = "Directional Light [" + std::to_string(entity_dirlight) + "]";
 
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
     light_comp->light.light_info_.type_ = LightType::LT_Directional;
     light_comp->shader = light_shader;
-
   
     if (default_light) {
         light_comp->light.light_info_.dir_ = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
@@ -491,6 +514,7 @@ size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light
 
     number_lights++;
     entity_++;
+    entity_dirlight++;
     
     return entity_;
 }

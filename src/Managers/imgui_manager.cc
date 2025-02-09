@@ -5,6 +5,8 @@
 #include "Components/render_component.h"
 #include "Components/light_component.h"
 #include "Components/transform_component.h"
+#include "Components\name_component.h"
+
 #include "Managers/save_manager.h"
 #include "Core/window.h"
 #include "global_variables.h"
@@ -274,101 +276,54 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
     //--
     auto ri = loc_ecs->getComponentList<RenderComponent>().begin();
     auto ti = loc_ecs->getComponentList<TransformComponent>().begin();
+
     auto riend = loc_ecs->getComponentList<RenderComponent>().end();
     auto tiend = loc_ecs->getComponentList<TransformComponent>().end();
+
     auto li = loc_ecs->getComponentList<LightComponent>().begin();
     auto liend = loc_ecs->getComponentList<LightComponent>().end();
 
+    auto ni = loc_ecs->getComponentList<NameComponent>().begin();
+    auto niend = loc_ecs->getComponentList<NameComponent>().end();
+
     int entity_id = 0;
-    int entity_mesh = 0;
-    int entity_terrain = 0;
-    int entity_sphere = 0;
-    int entity_quad = 0;
-    int entity_cube = 0;
-    int entity_spotlight = 0;
-    int entity_pointlight = 0;
-    int entity_dirlight = 0;
+    
 
-    for (; ri != riend; ++ri, entity_id++) {
+    for (; ni != niend; ++ni, entity_id++) {
 
-        if (ri->has_value() && ri != riend) {
-            auto& render_comp = *ri;
+        if (ni->has_value() && ni != niend) {
+            auto& name_comp = *ni;
 
-            if ((render_comp->type_ != RenderType::RT_PointLight) && (render_comp->type_ != RenderType::RT_SpotLight)) {
-                ImGui::Image(m_EntityIcon.getID(), { 25.0f, 25.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-            }else {
-                ImGui::Image(m_EntityLightBulbIcon.getID(), { 23.0f, 23.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-            }
-            ImGui::SameLine();
-
-            switch (render_comp->type_) {
-            case RenderType::RT_Mesh:
-
-               if (ImGui::Selectable(("Mesh [" + std::to_string(entity_mesh++) + "]").c_str(), selected_entity == entity_id))
-                        selected_entity = entity_id;
-                break;
-
-            case RenderType::RT_Terrain:
-                if (ImGui::Selectable(("Terrain [" + std::to_string(entity_terrain++) + "]").c_str(), selected_entity == entity_id))
-                    selected_entity = entity_id;
-
-                break;
-
-            case RenderType::RT_Sphere:
-                if (ImGui::Selectable(("Sphere [" + std::to_string(entity_sphere++) + "]").c_str(), selected_entity == entity_id))
-                    selected_entity = entity_id;
-
-                break;
-
-            case RenderType::RT_Quad:
-                if (ImGui::Selectable(("Quad [" + std::to_string(entity_quad++) + "]").c_str(), selected_entity == entity_id))
-                    selected_entity = entity_id;
-
-                break;
-
-            case RenderType::RT_Cube:
-                if (ImGui::Selectable(("Cube [" + std::to_string(entity_cube++) + "]").c_str(), selected_entity == entity_id))
-                    selected_entity = entity_id;
-
-                break;
-
-            case RenderType::RT_PointLight:
-
-                if (ImGui::Selectable(("Point Light [" + std::to_string(entity_pointlight++) + "]").c_str(), selected_entity == entity_id))
-                    selected_entity = entity_id;
-                break;
-
-            case RenderType::RT_SpotLight:
-
-                if (ImGui::Selectable(("Spot Light [" + std::to_string(entity_spotlight++) + "]").c_str(), selected_entity == entity_id))
-                    selected_entity = entity_id;
-                break;
-            }
+            if (ImGui::Selectable(name_comp->name.c_str(), selected_entity == entity_id))
+                selected_entity = entity_id;
         }
     }
     
-    for (; li != liend; ++li, entity_id++) {
-
-        if (li->has_value() && li != liend) {
-            auto& light_comp = *li;
-
-            if (light_comp->light.light_info_.type_ == LightType::LT_Directional) {
-                ImGui::Image(m_EntityLightBulbIcon.getID(), { 23.0f, 23.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-                ImGui::SameLine();
-
-                if (ImGui::Selectable(("Directional Light [" + std::to_string(entity_dirlight++) + "]").c_str(), selected_entity == entity_id))
-                    selected_entity = entity_id;
-
-            }
-         }
-        
-    }
 
     ImGui::End();
 }
 
 void ImGuiManager::InspectorWindow(DataImgui& di) {
     ImGui::Begin("Inspector");
+
+    if (di.ecs->has_component<NameComponent>(selected_entity)) {
+        auto& name_comp = di.ecs->get_component<NameComponent>(selected_entity);
+
+        if (ImGui::CollapsingHeader("Name Component", ImGuiTreeNodeFlags_DefaultOpen)) {
+
+            ImGui::Dummy({ 0.0f, 3.0f });
+
+            static char buffer[40];
+            strncpy(buffer, name_comp->name.c_str(), sizeof(buffer));
+            buffer[sizeof(buffer) - 1] = '\0';
+
+            if (ImGui::InputText("##Name", buffer, sizeof(buffer))) {
+                name_comp->name = std::string(buffer);
+            }
+
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        }
+    }
 
     if (di.ecs->has_component<RenderComponent>(selected_entity)) {
         if (ImGui::CollapsingHeader("Render Component", ImGuiTreeNodeFlags_DefaultOpen)) {

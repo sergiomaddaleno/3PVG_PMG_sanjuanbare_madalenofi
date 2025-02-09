@@ -82,6 +82,16 @@ public:
 private:
 
 	size_t entity_ = 0;
+
+	int entity_mesh = 0;
+	int entity_terrain = 0;
+	int entity_sphere = 0;
+	int entity_cube8v = 0;
+	int entity_cube24v = 0;
+	int entity_quad = 0;
+	int entity_spotlight = 0;
+	int entity_pointlight = 0;
+	int entity_dirlight = 0;
 };
 
 #endif // RST
