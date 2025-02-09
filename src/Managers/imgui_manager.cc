@@ -280,7 +280,6 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
     auto liend = loc_ecs->getComponentList<LightComponent>().end();
 
     int entity_id = 0;
-
     int entity_mesh = 0;
     int entity_terrain = 0;
     int entity_sphere = 0;
@@ -305,43 +304,43 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
 
-               if (ImGui::Selectable(("Mesh " + std::to_string(entity_mesh++)).c_str(), selected_entity == entity_id))
+               if (ImGui::Selectable(("Mesh [" + std::to_string(entity_mesh++) + "]").c_str(), selected_entity == entity_id))
                         selected_entity = entity_id;
                 break;
 
             case RenderType::RT_Terrain:
-                if (ImGui::Selectable(("Terrain " + std::to_string(entity_terrain++)).c_str(), selected_entity == entity_id))
+                if (ImGui::Selectable(("Terrain [" + std::to_string(entity_terrain++) + "]").c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
 
                 break;
 
             case RenderType::RT_Sphere:
-                if (ImGui::Selectable(("Sphere " + std::to_string(entity_sphere++)).c_str(), selected_entity == entity_id))
+                if (ImGui::Selectable(("Sphere [" + std::to_string(entity_sphere++) + "]").c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
 
                 break;
 
             case RenderType::RT_Quad:
-                if (ImGui::Selectable(("Quad " + std::to_string(entity_quad++)).c_str(), selected_entity == entity_id))
+                if (ImGui::Selectable(("Quad [" + std::to_string(entity_quad++) + "]").c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
 
                 break;
 
             case RenderType::RT_Cube:
-                if (ImGui::Selectable(("Cube " + std::to_string(entity_cube++)).c_str(), selected_entity == entity_id))
+                if (ImGui::Selectable(("Cube [" + std::to_string(entity_cube++) + "]").c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
 
                 break;
 
             case RenderType::RT_PointLight:
 
-                if (ImGui::Selectable(("Point Light " + std::to_string(entity_spotlight++)).c_str(), selected_entity == entity_id))
+                if (ImGui::Selectable(("Point Light [" + std::to_string(entity_pointlight++) + "]").c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
                 break;
 
             case RenderType::RT_SpotLight:
 
-                if (ImGui::Selectable(("Spot Light " + std::to_string(entity_pointlight++)).c_str(), selected_entity == entity_id))
+                if (ImGui::Selectable(("Spot Light [" + std::to_string(entity_spotlight++) + "]").c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
                 break;
             }
@@ -357,7 +356,7 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
                 ImGui::Image(m_EntityLightBulbIcon.getID(), { 23.0f, 23.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
                 ImGui::SameLine();
 
-                if (ImGui::Selectable(("Directional Light " + std::to_string(entity_dirlight++)).c_str(), selected_entity == entity_id))
+                if (ImGui::Selectable(("Directional Light [" + std::to_string(entity_dirlight++) + "]").c_str(), selected_entity == entity_id))
                     selected_entity = entity_id;
 
             }
@@ -556,12 +555,18 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
         ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
         if (ImGui::Button("Add Component")) {
-            ImGui::OpenPopup("ComponentPopup");
+            ImGui::OpenPopup("AddComponentPopup");
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Delete Component")) {
+            ImGui::OpenPopup("DeleteComponentPopup");
         }
 
         ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-        if (ImGui::BeginPopup("ComponentPopup")) {
+        if (ImGui::BeginPopup("AddComponentPopup")) {
             if (ImGui::Selectable("Light Component")) {
                 if (!di.ecs->has_component<LightComponent>(selected_entity)) {
                     di.ecs->add_component<LightComponent>(selected_entity);
@@ -588,6 +593,27 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             }
             ImGui::EndPopup();
         }
+    
+        if (ImGui::BeginPopup("DeleteComponentPopup")) {
+            
+            if (di.ecs->has_component<RenderComponent>(selected_entity)) {
+                if (ImGui::Selectable("Render Component")) {
+                    di.ecs->delete_component<RenderComponent>(selected_entity);
+                }
+            }
+            if (di.ecs->has_component<TransformComponent>(selected_entity)) {
+                if (ImGui::Selectable("Transform Component")) {
+                    di.ecs->delete_component<TransformComponent>(selected_entity);
+                }
+            }
+            if (di.ecs->has_component<LightComponent>(selected_entity)) {
+                if (ImGui::Selectable("Light Component")) {
+                    di.ecs->delete_component<LightComponent>(selected_entity);
+                }
+            }
+            ImGui::EndPopup();
+        }
+
     }
 
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
@@ -596,7 +622,8 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
 
     if (selected_entity && (ImGui::Button("Delete Entity") || selected_entity && di.input->isKeyPressed(Input::SUPR))) {
         if (di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_PointLight
-            && di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_SpotLight) {
+            && di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_SpotLight
+            ) {
             di.ecs->destroy_entity(selected_entity);
         }
         else {

@@ -135,6 +135,22 @@ public:
 	}
 
 	template<typename T>
+	void delete_component(size_t entity) {
+		size_t hash = typeid(T).hash_code();
+
+		auto it = component_list_map_.find(hash);
+		if (it == component_list_map_.end()) {
+			return;
+		}
+
+		ComponentListDerived<T>* cld = static_cast<ComponentListDerived<T>*>(it->second.get());
+
+		if (entity < cld->component_list_.size()) {
+			cld->component_list_[entity] = std::nullopt;
+		}
+	}
+
+	template<typename T>
 	std::vector<std::optional<T>>& getComponentList() {
 		size_t hash = typeid(T).hash_code();
 		auto it = component_list_map_.find(hash);
