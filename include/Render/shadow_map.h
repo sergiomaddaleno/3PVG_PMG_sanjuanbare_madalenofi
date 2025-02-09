@@ -28,7 +28,7 @@ public:
 	void initOneShadow();
 	void initMultipleShadow();
 
-	void addNewShadow(int index);
+	void addNewShadow(int light_count);
 	void bind();
 
 	void render(ECSManager& ecs, Shader shader, Camera cam, LightComponent lc, int light_count);
@@ -37,7 +37,7 @@ public:
 	unsigned int depthMap = 0;
 
 	float near_plane = 1.0f, far_plane = 100.5f;
-	int multiple_shadows_ = 5;
+	int multiple_shadows_ = 2;
 	unsigned int shadow_width_ = 2048;
 	unsigned int shadow_height_ = 2048;
 

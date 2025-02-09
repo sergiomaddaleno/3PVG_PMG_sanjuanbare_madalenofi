@@ -16,6 +16,8 @@ const int kMaxLights = 50;
 const int kMaxShadows = 5;
 
 uniform mat4 u_light_space[kMaxShadows];
+//uniform u_light_view[kMaxShadows];
+//uniform u_light_projection[kMaxShadows];
 out vec4 FragPosLightSpace[kMaxShadows];
 
 out float visibility;
@@ -30,6 +32,7 @@ void main()
     
     for (int i = 0; i < kMaxShadows; i++) {
         FragPosLightSpace[i] = u_light_space[i] * vec4(FragPos, 1.0);
+        //gl_Position = u_light_projection[i] * u_light_view[i] * vec4(FragPos, 1.0);
     }
 
     gl_Position = projection * view * vec4(FragPos, 1.0);

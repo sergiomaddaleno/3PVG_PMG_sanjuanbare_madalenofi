@@ -79,9 +79,9 @@ void ShadowMap::initMultipleShadow()
     glReadBuffer(GL_NONE);
 }
 
-void ShadowMap::addNewShadow(int index) {
+void ShadowMap::addNewShadow(int light_count) {
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthMap, 0, index);
+    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthMap, 0, light_count);
 }
 
 void ShadowMap::bind()
@@ -105,6 +105,12 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
 
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(lightView));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));
+
+    /*loc = shader.getUniformLocation(("u_light_view[" + std::to_string(light_count) + "]").c_str());
+    shader.setUniformValue(loc, ValueType::T_MAT_4x4, glm::value_ptr(lightView));
+
+    loc = shader.getUniformLocation(("u_light_projection[" + std::to_string(light_count) + "]").c_str());
+    shader.setUniformValue(loc, ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));*/
 
     bind();
     addNewShadow(light_count);

@@ -38,53 +38,46 @@ char* ReadFile(const char* file_path) {
     return nullptr;
 }
 
-static char infoLog[512];
-#include <GL/glew.h>
-#include <iostream>
-#include <string>
-#include <cassert>
-
-void CheckGPUErrors(unsigned int code, const char* str, bool link) {
-   
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        std::string errorMessage;
-        switch (error) {
-        case GL_INVALID_ENUM: errorMessage = "GL_INVALID_ENUM"; break;
-        case GL_INVALID_VALUE: errorMessage = "GL_INVALID_VALUE"; break;
-        case GL_INVALID_OPERATION: errorMessage = "GL_INVALID_OPERATION"; break;
-        case GL_INVALID_FRAMEBUFFER_OPERATION: errorMessage = "GL_INVALID_FRAMEBUFFER_OPERATION"; break;
-        case GL_OUT_OF_MEMORY: errorMessage = "GL_OUT_OF_MEMORY"; break;
-        default: errorMessage = "Unknown OpenGL error"; break;
+void CheckGPUErrors(const char* file, int line) {
+    GLenum errorCode;
+    while ((errorCode = glGetError()) != GL_NO_ERROR) {
+        std::string error;
+        switch (errorCode) {
+        case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+        case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+        case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+        case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+        case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+        case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+        case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-        std::cerr << "[OpenGL Error] " << errorMessage << " at: " << str << std::endl;
+        std::cout << "OpenGL Error (" << error << ") | " << file << " (" << line << ")" << std::endl;
     }
+}
 
-   
-    int success = 0;
-    char infoLog[512] = { 0 };
+void CheckShaderErrors(GLuint shader, const char* shaderType)
+{
+    GLint success;
+    GLchar infoLog[1024];
 
-    if (link) {
-        glGetProgramiv(code, GL_LINK_STATUS, &success);
-        if (!success) {
-            glGetProgramInfoLog(code, sizeof(infoLog), nullptr, infoLog);
-            std::cerr << "[Program Link Error] " << infoLog << " at: " << str << std::endl;
-        }
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+        std::cout << "ERROR::SHADER::" << shaderType << "::COMPILATION_FAILED\n" << infoLog << std::endl;
+        assert(false);
     }
-    else {
-        glGetShaderiv(code, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            glGetShaderInfoLog(code, sizeof(infoLog), nullptr, infoLog);
-            std::cerr << "[Shader Compile Error] " << infoLog << " at: " << str << std::endl;
-        }
-    }
+}
 
-   
-    if (error != GL_NO_ERROR || !success) {
-        std::cerr << "OpenGL Error or Shader Compilation Failure occurred!" << std::endl;
-    }
+void CheckProgramErrors(GLuint program) {
+    GLint success;
+    GLchar infoLog[1024];
 
-   assert(error == GL_NO_ERROR && success);
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(program, 1024, NULL, infoLog);
+        std::cout << "ERROR::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        assert(false);
+    }
 }
 
 

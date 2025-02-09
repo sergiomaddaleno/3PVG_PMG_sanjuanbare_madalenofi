@@ -10,6 +10,11 @@
 
 char* ReadFile(const char* file_path = nullptr);
 
-void CheckGPUErrors(unsigned int code, const char* str, bool link);
+// usage example : CheckGPUErrors(__FILE__, __LINE__);
+void CheckGPUErrors(const char* file, int line);
+
+void CheckShaderErrors(GLuint shader, const char* shaderType);
+
+void CheckProgramErrors(GLuint program);
 
 #endif // UTILS
