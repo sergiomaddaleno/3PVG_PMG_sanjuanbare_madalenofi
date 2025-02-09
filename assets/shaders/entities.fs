@@ -18,9 +18,10 @@ struct LightInfo {
 };
 
 const int kMaxLights = 50;
+const int kMaxShadows = 5;
 
 uniform sampler2D u_texture;
-uniform sampler2DArray u_shadow_map;
+uniform sampler2DArrayShadow u_shadow_map;
 
 uniform LightInfo u_light[kMaxLights];
 uniform int u_number_lights;
@@ -37,7 +38,7 @@ in vec3 normal;
 in vec3 pos;
 in vec2 uv;
 in vec3 FragPos;
-in vec4 FragPosLightSpace;//[kMaxLights];
+in vec4 FragPosLightSpace[kMaxShadows];
 
 vec3 PointLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
@@ -99,14 +100,15 @@ vec3 DirectionalLight(LightInfo lc) {
 
 float ShadowCalculation(vec4 fragPosLightSpace, int index)
 {
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  
-    projCoords = projCoords * 0.5 + 0.5; 
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
 
-    float closestDepth = texture(u_shadow_map, vec3(projCoords.xy, index)).r;
     float currentDepth = projCoords.z;
-
     float bias = 0.005;
-    return (currentDepth - bias) > closestDepth ? 1.0 : 5.0;
+
+    vec4 shadowCoord = vec4(projCoords.xy, index, currentDepth - bias);
+
+    return texture(u_shadow_map, shadowCoord);
 }
 
 void main() {
@@ -115,7 +117,7 @@ void main() {
 
    for (int i = 0; i < u_number_lights; ++i) {
 
-        float shadow = ShadowCalculation(FragPosLightSpace, i); 
+        float shadow = ShadowCalculation(FragPosLightSpace[i], i);
 
         if (u_light[i].type_ == 0) {
             final_light += DirectionalLight(u_light[i])/* shadow*/ ; 

@@ -128,19 +128,14 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
             auto& light_comp = *li;
             auto& transform = *ti;
 
-            light_comp->shadow_map_.render(ecs, shader, cam, *light_comp);
+            light_comp->shadow_map_.render(ecs, shader, cam, *light_comp, light_count);
 
             // Light ---------------------------------------------------------------
             shader.useProgram();
             shader.setUniformValue(shader.getUniformLocation("u_number_lights"), ValueType::T_INT_1, &number_lights);
             shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
             shader.setUniformValue(shader.getUniformLocation("u_ambient"), ValueType::T_FLOAT_3, &light_comp->light.global_ambient_color_);
-
-            light_comp->shadow_map_.bind();
-            light_comp->shadow_map_.addNewShadow(light_count);
-            int texture_unit = 0;
-            shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);
-
+            
             light_comp->light.setUniforms(shader, light_count);
 
             light_count++;

@@ -18,15 +18,6 @@ Light::~Light()
 
 void Light::setUniforms(Shader& shader, int light_count)
 {
-    /*if (light_count > 0) {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, light_comp.depthMap);
-    }
-    std::string uniformName = "u_shadow_map[" + std::to_string(light_count + 1) + "]";
-    int locshadow = shader.getUniformLocation(uniformName.c_str());
-    shader.setUniformValue(locshadow, ValueType::T_FLOAT_1, &light_comp.depthMap);*/
-
-
     int loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].type_").c_str());
     shader.setUniformValue(loc, ValueType::T_INT_1, &light_info_.type_);
 

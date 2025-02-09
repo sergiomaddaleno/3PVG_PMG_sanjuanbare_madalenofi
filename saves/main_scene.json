@@ -13,9 +13,9 @@
   "Sensitivity": 1.0,
   "Speed": 10.0,
   "View_direction": [
-   0.29859262704849243,
-   -0.25754156708717346,
-   -0.9189748764038086
+   0.18720915913581848,
+   -0.2813638150691986,
+   -0.941162645816803
   ]
  },
  "Entities": [
@@ -109,10 +109,7 @@
    }
   },
   {
-   "Entity_id": 1
-  },
-  {
-   "Entity_id": 2,
+   "Entity_id": 1,
    "Render_component": {
     "Mesh": {
      "MaterialID": 7,
@@ -229,7 +226,7 @@
    }
   },
   {
-   "Entity_id": 3,
+   "Entity_id": 2,
    "Render_component": {
     "Render_type": 7,
     "Shader": {
@@ -267,17 +264,17 @@
    }
   },
   {
-   "Entity_id": 4,
+   "Entity_id": 3,
    "Light_component": {
     "Shader": {
-     "Program": 16
+     "Program": 9
     },
     "light": {
      "Ambient_color": [
       [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
+       0.0,
+       0.0,
+       0.0
       ]
      ],
      "Constant_attenuation": [
@@ -309,9 +306,119 @@
      ],
      "Position": [
       [
-       3.602632522583008,
+       3.611363410949707,
        9.767573356628418,
-       6.835798263549805
+       4.090096473693848
+      ]
+     ],
+     "Quadratic_attenuation": [
+      1.7999999523162842
+     ],
+     "Shininnes": [
+      32.0
+     ],
+     "Specular_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Spot_angle": [
+      45.0
+     ],
+     "Strength": [
+      1.0
+     ],
+     "Type": 1
+    }
+   },
+   "Render_component": {
+    "Mesh": {
+     "MaterialID": 0,
+     "Mesh_path": "../assets/obj/light_bulb.obj",
+     "Meshes": [
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": ""
+      }
+     ],
+     "Texture_folder": ""
+    },
+    "Render_type": 3,
+    "Shader": {
+     "Program": 9
+    },
+    "Texture": {
+     "TextureID": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     3.611363410949707,
+     9.767573356628418,
+     4.090096473693848
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 4,
+   "Light_component": {
+    "Shader": {
+     "Program": 16
+    },
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       0.8730000257492065,
+       -1.0,
+       -1.0
+      ]
+     ],
+     "Light_color": [
+      [
+       150.0,
+       150.0,
+       150.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.699999988079071
+     ],
+     "Position": [
+      [
+       -3.3124330043792725,
+       8.101665496826172,
+       6.387518882751465
       ]
      ],
      "Quadratic_attenuation": [
@@ -359,9 +466,9 @@
    },
    "Transform_component": {
     "Position": [
-     3.602632522583008,
-     9.767573356628418,
-     6.835798263549805
+     -3.3124330043792725,
+     8.101665496826172,
+     6.387518882751465
     ],
     "Rotation": [
      0.0,

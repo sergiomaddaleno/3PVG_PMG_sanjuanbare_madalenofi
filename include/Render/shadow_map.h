@@ -31,7 +31,7 @@ public:
 	void addNewShadow(int index);
 	void bind();
 
-	void render(ECSManager& ecs, Shader shader, Camera cam, LightComponent lc);
+	void render(ECSManager& ecs, Shader shader, Camera cam, LightComponent lc, int light_count);
 
 	unsigned int depthMapFBO = 0;
 	unsigned int depthMap = 0;

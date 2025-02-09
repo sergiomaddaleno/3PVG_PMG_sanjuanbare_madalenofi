@@ -82,16 +82,15 @@ void ShadowMap::initMultipleShadow()
 void ShadowMap::addNewShadow(int index) {
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthMap, 0, index);
-    glBindFramebuffer(GL_FRAMEBUFFER, 1);
 }
 
 void ShadowMap::bind()
 {
-    glActiveTexture(GL_TEXTURE0 /*+ index*/);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, depthMap);
 }
 
-void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponent lc) {
+void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponent lc, int light_count) {
 
     float spotLightFOV = glm::radians(lc.light.light_info_.spot_angle_);
     glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)g_window_width_ / (float)g_window_height_, near_plane, far_plane);
@@ -101,20 +100,16 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
 
     glEnable(GL_DEPTH_TEST);
     shader.useProgram();
-    shader.setUniformValue(shader.getUniformLocation("u_light_space"), ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
+    int loc = shader.getUniformLocation(("u_light_space[" + std::to_string(light_count) + "]").c_str());
+    shader.setUniformValue(loc, ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
+
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(lightView));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));
 
-    /*std::string uniformName = "u_light_space[" + std::to_string(light_count) + "]";
-    int locmatriz = shader.getUniformLocation(uniformName.c_str());
-    shader.setUniformValue(locmatriz, ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
-
-    int shadow = 1;
-    shader.setUniformValue(shader.getUniformLocation("shadow"), ValueType::T_INT_1, &shadow);
-
-    uniformName = "lightView[" + std::to_string(light_count) + "]";
-    int locv = shader.getUniformLocation(uniformName.c_str());
-    shader.setUniformValue(locv, ValueType::T_MAT_4x4, glm::value_ptr(lightView));*/
+    bind();
+    addNewShadow(light_count);
+    int texture_unit = 0;
+    shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);
 
     glViewport(0, 0, shadow_width_, shadow_height_);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
