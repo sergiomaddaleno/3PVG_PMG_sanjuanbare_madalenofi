@@ -81,7 +81,6 @@ private:
     Texture m_DirectoryIcon;
     Texture m_FileIcon;
     Texture m_EntityIcon;
-    Texture m_EntityLightBulbIcon;
     Texture m_BackIcon;
 
     float padding = 16.0f;

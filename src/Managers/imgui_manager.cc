@@ -64,76 +64,55 @@ void ImGuiManager::SetImguiTheme() {
     ImGuiStyle& style = ImGui::GetStyle();
     ImVec4* colors = style.Colors;
 
-    // Background and window colors
-    colors[ImGuiCol_WindowBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
-    colors[ImGuiCol_ChildBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-    colors[ImGuiCol_PopupBg] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+    // Fondo y ventanas
+    colors[ImGuiCol_WindowBg] = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.09f, 0.09f, 0.09f, 1.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.07f, 0.07f, 0.07f, 1.00f);
 
-    // Text
-    colors[ImGuiCol_Text] = ImVec4(0.85f, 0.85f, 0.85f, 1.00f);
+    // Texto
+    colors[ImGuiCol_Text] = ImVec4(0.80f, 0.80f, 0.80f, 1.00f);
     colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
 
     // Headers
-    colors[ImGuiCol_Header] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
-    colors[ImGuiCol_HeaderHovered] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
-    colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.26f, 0.26f, 1.00f);
+    colors[ImGuiCol_Header] = ImVec4(0.25f, 0.25f, 0.45f, 1.00f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
 
-    // Buttons
-    colors[ImGuiCol_Button] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
-    colors[ImGuiCol_ButtonHovered] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
-    colors[ImGuiCol_ButtonActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+    // Botones
+    colors[ImGuiCol_Button] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.45f, 0.45f, 0.45f, 1.00f);
 
-    // Frame background
-    colors[ImGuiCol_FrameBg] = ImVec4(0.16f, 0.16f, 0.16f, 1.00f);
-    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
-    colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.26f, 0.26f, 1.00f);
+    // Fondos de frames (para sliders, inputs, etc.)
+    colors[ImGuiCol_FrameBg] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
 
     // Tabs
-    colors[ImGuiCol_Tab] = ImVec4(0.13f, 0.13f, 0.13f, 1.00f);
-    colors[ImGuiCol_TabHovered] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
-    colors[ImGuiCol_TabActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+    colors[ImGuiCol_Tab] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+    colors[ImGuiCol_TabHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+    colors[ImGuiCol_TabActive] = ImVec4(0.25f, 0.25f, 0.45f, 1.00f);
 
-    // Title bar
-    colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-    colors[ImGuiCol_TitleBgActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
-    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
+    // Barra de título
+    colors[ImGuiCol_TitleBg] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
 
-    // Scrollbar
-    colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-    colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
-    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
-    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
-
-    // Sliders and checkmarks
-    colors[ImGuiCol_CheckMark] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
+    // Sliders y checkmarks
+    colors[ImGuiCol_CheckMark] = ImVec4(0.65f, 0.65f, 0.65f, 1.00f);
     colors[ImGuiCol_SliderGrab] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
     colors[ImGuiCol_SliderGrabActive] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
 
-    // Resize grips
-    colors[ImGuiCol_ResizeGrip] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
-    colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
-    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
-
-    // Separator
-    colors[ImGuiCol_Separator] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
-    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.30f, 0.30f, 0.30f, 1.00f);
-    colors[ImGuiCol_SeparatorActive] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
-
-    // Docking
-    colors[ImGuiCol_DockingPreview] = ImVec4(0.25f, 0.25f, 0.25f, 0.90f);
-    colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-
-    // Hover effects for better clarity
-    style.FrameRounding = 6.0f;
-    style.WindowRounding = 4.0f;
-    style.ChildRounding = 4.0f;
-    style.ScrollbarRounding = 4.0f;
-    style.GrabRounding = 4.0f;
+    style.FrameRounding = 0.1f;
+    style.WindowRounding = 0.1f;
+    style.ChildRounding = 0.1f;
+    style.ScrollbarRounding = 2.0f;
+    style.GrabRounding = 2.0f;
 
     style.WindowPadding = ImVec2(8.0f, 8.0f);
-    style.ItemSpacing = ImVec2(8.0f, 6.0f);
+    style.ItemSpacing = ImVec2(7.0f, 5.0f);
+    style.FramePadding = ImVec2(5.0f, 3.0f);
 }
-
 
 void ImGuiManager::Init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
@@ -144,6 +123,8 @@ void ImGuiManager::Init(GLFWwindow* window) {
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     SetImguiTheme();
+
+    io.Fonts->AddFontFromFileTTF("../assets/fonts/Roboto_Mono/RobotoMono-VariableFont_wght.ttf", 15.0f);
 
     // Initialize content browser
     fileDialog.SetTitle("File Browser");
@@ -157,7 +138,6 @@ void ImGuiManager::Init(GLFWwindow* window) {
     m_DirectoryIcon.loadTexture("../assets/textures/imgui/DirectoryIcon.png");
     m_FileIcon.loadTexture("../assets/textures/imgui/FileIcon.png");
     m_EntityIcon.loadTexture("../assets/textures/imgui/cube.png");
-    m_EntityLightBulbIcon.loadTexture("../assets/textures/imgui/lb.png");
     m_BackIcon.loadTexture("../assets/textures/imgui/back.png");
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -293,6 +273,11 @@ void ImGuiManager::HierarchyWindow(DataImgui& di) {
 
         if (ni->has_value() && ni != niend) {
             auto& name_comp = *ni;
+
+            ImGui::Image(m_EntityIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+            ImGui::SameLine();
+
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 4.0f);
 
             if (ImGui::Selectable(name_comp->name.c_str(), selected_entity == entity_id))
                 selected_entity = entity_id;
