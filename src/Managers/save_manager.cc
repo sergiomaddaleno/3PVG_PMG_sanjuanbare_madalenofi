@@ -10,6 +10,7 @@
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
 #include "Components\light_component.h"
+#include "Components/name_component.h"
 
 #include "global_variables.h"
 
@@ -26,15 +27,19 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam, Skybox& skyb
     auto ri = ecs.getComponentList<RenderComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto li = ecs.getComponentList<LightComponent>().begin();
+    auto ni = ecs.getComponentList<NameComponent>().begin();
 
     auto riend = ecs.getComponentList<RenderComponent>().end();
     auto tiend = ecs.getComponentList<TransformComponent>().end();
     auto liend = ecs.getComponentList<LightComponent>().end();
+    auto niend = ecs.getComponentList<NameComponent>().end();
 
     int counter = 0;
     size_t max_components = std::max({ ecs.getComponentList<RenderComponent>().size(),
-                                      ecs.getComponentList<TransformComponent>().size(),
-                                      ecs.getComponentList<LightComponent>().size() });
+      ecs.getComponentList<TransformComponent>().size(),
+      ecs.getComponentList<LightComponent>().size(),
+      ecs.getComponentList<NameComponent>().size()
+    });
 
     for (size_t i = 0; i < max_components; ++i) {
         nlohmann::json entity_json;
@@ -61,6 +66,13 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam, Skybox& skyb
             ++li;
         }
 
+        if (ni != niend) {
+            if (ni->has_value()) {
+                entity_json["Name_component"] = (*ni)->serialize();
+            }
+            ++ni;
+        }
+
         if (!entity_json.empty()) {
             j["Entities"].push_back(entity_json);
         }
@@ -82,6 +94,16 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 
     ecs.remove_entities();
     rs.number_lights = 0;
+
+    rs.entity_mesh = 0;
+    rs.entity_terrain = 0;
+    rs.entity_sphere = 0;
+    rs.entity_cube8v = 0;
+    rs.entity_cube24v = 0;
+    rs.entity_quad = 0;
+    rs.entity_spotlight = 0;
+    rs.entity_pointlight = 0;
+    rs.entity_dirlight = 0;
 
     //-----------------------------------------------------------
 
@@ -213,8 +235,21 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 break;
             }
         }
+
+        if (entity.contains("Name_component") && entity.contains("Entity_id")) {
+            int entity_id = entity["Entity_id"];
+            const auto& nc = entity["Name_component"];
+
+            if (ecs.has_component<NameComponent>(entity_id)) {
+                auto& name_comp = ecs.get_component<NameComponent>(entity_id);
+                name_comp->name = nc.value("Entity_name", "Unnamed");
+            }
+        }
     }
     rs.initEntities(ecs);
+
+    free(vs_entities);
+    free(fs_entities);
 }
 
 

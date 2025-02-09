@@ -79,10 +79,6 @@ public:
 	
 	int number_lights = 0;
 
-private:
-
-	size_t entity_ = 0;
-
 	int entity_mesh = 0;
 	int entity_terrain = 0;
 	int entity_sphere = 0;
@@ -92,6 +88,11 @@ private:
 	int entity_spotlight = 0;
 	int entity_pointlight = 0;
 	int entity_dirlight = 0;
+
+private:
+
+	size_t entity_ = 0;
+
 };
 
 #endif // RST

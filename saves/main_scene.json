@@ -13,9 +13,9 @@
   "Sensitivity": 1.0,
   "Speed": 10.0,
   "View_direction": [
-   0.18720915913581848,
-   -0.2813638150691986,
-   -0.941162645816803
+   1.0,
+   0.0,
+   0.0
   ]
  },
  "Entities": [
@@ -89,6 +89,9 @@
      "Type": 0
     }
    },
+   "Name_component": {
+    "Entity_name": "Directional Light [0]"
+   },
    "Transform_component": {
     "Position": [
      0.0,
@@ -110,6 +113,9 @@
   },
   {
    "Entity_id": 1,
+   "Name_component": {
+    "Entity_name": "Mesh 777"
+   },
    "Render_component": {
     "Mesh": {
      "MaterialID": 7,
@@ -227,6 +233,9 @@
   },
   {
    "Entity_id": 2,
+   "Name_component": {
+    "Entity_name": "Terrain....."
+   },
    "Render_component": {
     "Render_type": 7,
     "Shader": {
@@ -333,6 +342,9 @@
      "Type": 1
     }
    },
+   "Name_component": {
+    "Entity_name": "SpotLight Lerp "
+   },
    "Render_component": {
     "Mesh": {
      "MaterialID": 0,
@@ -364,7 +376,7 @@
      0.0,
      0.0,
      0.0,
-     1.0
+     0.0
     ],
     "Scale": [
      1.0,
@@ -377,14 +389,14 @@
    "Entity_id": 4,
    "Light_component": {
     "Shader": {
-     "Program": 16
+     "Program": 9
     },
     "light": {
      "Ambient_color": [
       [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
+       0.0,
+       0.0,
+       0.0
       ]
      ],
      "Constant_attenuation": [
@@ -443,6 +455,9 @@
      "Type": 1
     }
    },
+   "Name_component": {
+    "Entity_name": "Spot Light [1]"
+   },
    "Render_component": {
     "Mesh": {
      "MaterialID": 0,
@@ -458,7 +473,7 @@
     },
     "Render_type": 3,
     "Shader": {
-     "Program": 16
+     "Program": 9
     },
     "Texture": {
      "TextureID": 0
@@ -474,7 +489,7 @@
      0.0,
      0.0,
      0.0,
-     1.0
+     0.0
     ],
     "Scale": [
      1.0,

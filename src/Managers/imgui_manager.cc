@@ -298,12 +298,16 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
 
             ImGui::Dummy({ 0.0f, 3.0f });
 
-            static char buffer[40];
-            strncpy(buffer, name_comp->name.c_str(), sizeof(buffer));
-            buffer[sizeof(buffer) - 1] = '\0';
+            static char buffer[40] = { 0 };
+            if (!name_comp->name.empty()) {
+                strncpy(buffer, name_comp->name.c_str(), sizeof(buffer) - 1);
+                buffer[sizeof(buffer) - 1] = '\0';
+            }
 
             if (ImGui::InputText("##Name", buffer, sizeof(buffer))) {
-                name_comp->name = std::string(buffer);
+                if (strcmp(name_comp->name.c_str(), buffer) != 0 ) {
+                    name_comp->name = std::string(buffer);
+                }
             }
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
