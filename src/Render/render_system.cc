@@ -39,6 +39,8 @@ void RenderSystem::initEntities(ECSManager& ecs) {
     auto tiend = ecs.getComponentList<TransformComponent>().end();
     auto liend = ecs.getComponentList<LightComponent>().end();
 
+    glGenFramebuffers(1, &depthMapFBO);
+
     for (; ri != riend && ti != tiend; ++ri, ++ti) {
         if (ri->has_value() && ti->has_value()) {
             auto& render_comp = *ri;
@@ -79,7 +81,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                     auto& light_comp = *li;
                     auto& transform = *ti;
 
-                    light_comp->shadow_map_.initMultipleShadow();
+                    light_comp->shadow_map_.initMultipleShadow(depthMapFBO);
                     //light_comp->shadow_map_.initOneShadow();;
                 }
             }
@@ -138,6 +140,13 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
             shader.setUniformValue(shader.getUniformLocation("u_ambient"), ValueType::T_FLOAT_3, &light_comp->light.global_ambient_color_);
             
             light_comp->light.setUniforms(shader, light_count);
+
+            int texture_unit = 0;
+            shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D_ARRAY, light_comp->shadow_map_.depthMap);
+
+
 
             light_count++;
 
