@@ -5,92 +5,41 @@
   "Max_render_distance_": 400.0,
   "Min_render_distance": 0.10000000149011612,
   "Position": [
-   -7.057459831237793,
-   16.696046829223633,
-   32.094730377197266
+   -26.582828521728516,
+   16.68349838256836,
+   23.92270278930664
   ],
   "Scroll_speed": 10.0,
   "Sensitivity": 1.0,
   "Speed": 10.0,
   "View_direction": [
-   1.0,
-   0.0,
-   0.0
+   0.7429674863815308,
+   -0.3744276762008667,
+   -0.5548001527786255
   ]
  },
  "Entities": [
   {
    "Entity_id": 0,
-   "Light_component": {
+   "Name_component": {
+    "Entity_name": "Montaña"
+   },
+   "Render_component": {
+    "Render_type": 7,
     "Shader": {
      "Program": 9
     },
-    "light": {
-     "Ambient_color": [
-      [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
-      ]
-     ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       -0.18814417719841003,
-       -0.9407208561897278,
-       -0.28221628069877625
-      ]
-     ],
-     "Light_color": [
-      [
-       0.699999988079071,
-       0.699999988079071,
-       0.699999988079071
-      ]
-     ],
-     "Linear_attenuation": [
-      0.0
-     ],
-     "Position": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Quadratic_attenuation": [
-      0.0
-     ],
-     "Shininnes": [
-      34.0
-     ],
-     "Specular_color": [
-      [
-       1.0,
-       1.0,
-       0.949999988079071
-      ]
-     ],
-     "Spot_angle": [
-      0.0
-     ],
-     "Strength": [
-      0.0
-     ],
-     "Type": 0
+    "Terrain": {
+     "height_mult": 0.0,
+     "is_centered": true,
+     "num_cols": 50,
+     "num_rows": 50,
+     "size": 1.0,
+     "use_perlin_noise": true
+    },
+    "Texture": {
+     "TextureID": 0
     }
-   },
-   "Name_component": {
-    "Entity_name": "Directional Light [0]"
    },
    "Transform_component": {
     "Position": [
@@ -113,8 +62,121 @@
   },
   {
    "Entity_id": 1,
+   "Light_component": {
+    "Shader": {
+     "Program": 9
+    },
+    "light": {
+     "Ambient_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       0.0,
+       -1.0,
+       -1.0
+      ]
+     ],
+     "Light_color": [
+      [
+       150.0,
+       150.0,
+       150.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.699999988079071
+     ],
+     "Position": [
+      [
+       0.0,
+       9.981375694274902,
+       4.515786170959473
+      ]
+     ],
+     "Quadratic_attenuation": [
+      1.7999999523162842
+     ],
+     "Shininnes": [
+      32.0
+     ],
+     "Specular_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Spot_angle": [
+      45.0
+     ],
+     "Strength": [
+      1.0
+     ],
+     "Type": 1
+    }
+   },
    "Name_component": {
-    "Entity_name": "Mesh 777"
+    "Entity_name": "Spot "
+   },
+   "Render_component": {
+    "Mesh": {
+     "MaterialID": 0,
+     "Mesh_path": "../assets/obj/light_bulb.obj",
+     "Meshes": [
+      {
+       "MaterialID": 0,
+       "Mesh_path": "",
+       "Texture_folder": ""
+      }
+     ],
+     "Texture_folder": ""
+    },
+    "Render_type": 3,
+    "Shader": {
+     "Program": 9
+    },
+    "Texture": {
+     "TextureID": 0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     9.981375694274902,
+     4.515786170959473
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 2,
+   "Name_component": {
+    "Entity_name": "Super Mario 777"
    },
    "Render_component": {
     "Mesh": {
@@ -202,7 +264,7 @@
        ]
       }
      ],
-     "Texture_folder": "../assets/textures/mario"
+     "Texture_folder": "..\\assets\\textures\\mario"
     },
     "Render_type": 1,
     "Shader": {
@@ -217,273 +279,6 @@
      0.0,
      0.0,
      0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 2,
-   "Name_component": {
-    "Entity_name": "Terrain....."
-   },
-   "Render_component": {
-    "Render_type": 7,
-    "Shader": {
-     "Program": 9
-    },
-    "Terrain": {
-     "height_mult": 0.0,
-     "is_centered": true,
-     "num_cols": 30,
-     "num_rows": 30,
-     "size": 1.0,
-     "use_perlin_noise": true
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 3,
-   "Light_component": {
-    "Shader": {
-     "Program": 9
-    },
-    "light": {
-     "Ambient_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       -0.4729999899864197,
-       -1.0,
-       -1.0
-      ]
-     ],
-     "Light_color": [
-      [
-       150.0,
-       150.0,
-       150.0
-      ]
-     ],
-     "Linear_attenuation": [
-      0.699999988079071
-     ],
-     "Position": [
-      [
-       3.611363410949707,
-       9.767573356628418,
-       4.090096473693848
-      ]
-     ],
-     "Quadratic_attenuation": [
-      1.7999999523162842
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Spot_angle": [
-      45.0
-     ],
-     "Strength": [
-      1.0
-     ],
-     "Type": 1
-    }
-   },
-   "Name_component": {
-    "Entity_name": "SpotLight Lerp "
-   },
-   "Render_component": {
-    "Mesh": {
-     "MaterialID": 0,
-     "Mesh_path": "../assets/obj/light_bulb.obj",
-     "Meshes": [
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": ""
-      }
-     ],
-     "Texture_folder": ""
-    },
-    "Render_type": 3,
-    "Shader": {
-     "Program": 9
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     3.611363410949707,
-     9.767573356628418,
-     4.090096473693848
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 4,
-   "Light_component": {
-    "Shader": {
-     "Program": 9
-    },
-    "light": {
-     "Ambient_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       0.8730000257492065,
-       -1.0,
-       -1.0
-      ]
-     ],
-     "Light_color": [
-      [
-       150.0,
-       150.0,
-       150.0
-      ]
-     ],
-     "Linear_attenuation": [
-      0.699999988079071
-     ],
-     "Position": [
-      [
-       -3.3124330043792725,
-       8.101665496826172,
-       6.387518882751465
-      ]
-     ],
-     "Quadratic_attenuation": [
-      1.7999999523162842
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Spot_angle": [
-      45.0
-     ],
-     "Strength": [
-      1.0
-     ],
-     "Type": 1
-    }
-   },
-   "Name_component": {
-    "Entity_name": "Spot Light [1]"
-   },
-   "Render_component": {
-    "Mesh": {
-     "MaterialID": 0,
-     "Mesh_path": "../assets/obj/light_bulb.obj",
-     "Meshes": [
-      {
-       "MaterialID": 0,
-       "Mesh_path": "",
-       "Texture_folder": ""
-      }
-     ],
-     "Texture_folder": ""
-    },
-    "Render_type": 3,
-    "Shader": {
-     "Program": 9
-    },
-    "Texture": {
-     "TextureID": 0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     -3.3124330043792725,
-     8.101665496826172,
-     6.387518882751465
     ],
     "Rotation": [
      0.0,

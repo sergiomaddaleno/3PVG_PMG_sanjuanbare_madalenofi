@@ -509,6 +509,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             if (ImGui::Selectable("Light Component")) {
                 if (!di.ecs->has_component<LightComponent>(selected_entity)) {
                     di.ecs->add_component<LightComponent>(selected_entity);
+                    di.render_system->number_lights++;
                 }
                 else {
                     ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Already has Light Component");

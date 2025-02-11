@@ -94,6 +94,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 
     ecs.remove_entities();
     rs.number_lights = 0;
+    rs.entity_ = 0;
 
     rs.entity_mesh = 0;
     rs.entity_terrain = 0;
@@ -112,8 +113,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 
     Shader shader;
     shader.compile(vs_entities, fs_entities);
-    
-    //rs.createDirectionalLight(ecs, shader);
+
     //-----------------------------------------------------------
 
     const auto& camera = j["Camera"]; 
@@ -237,13 +237,14 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
         }
 
         if (entity.contains("Name_component")) {
+            
             auto ni = ecs.getComponentList<NameComponent>().begin();
             auto niend = ecs.getComponentList<NameComponent>().end();
-
             for (const auto& entity : j["Entities"]) {
                 if (entity.contains("Name_component")) {
                     const auto& nc = entity["Name_component"];
 
+                    
                     if (ni != niend) {
                         if (ni->has_value()) {
                             auto& name_comp = *ni;

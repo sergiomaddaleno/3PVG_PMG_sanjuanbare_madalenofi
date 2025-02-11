@@ -77,8 +77,9 @@ public:
 	size_t createDirectionalLight(ECSManager& ecs, const Shader& light_shader, 
 		LightInfo li = LightInfo(), bool default_light = true);
 	
+	//-----------------------
+
 	int number_lights = 0;
-	unsigned int depthMapFBO = 0;
 	int entity_mesh = 0;
 	int entity_terrain = 0;
 	int entity_sphere = 0;
@@ -89,10 +90,8 @@ public:
 	int entity_pointlight = 0;
 	int entity_dirlight = 0;
 
-private:
-
+	unsigned int depthMapFBO = 0;
 	size_t entity_ = 0;
-
 };
 
 #endif // RST
