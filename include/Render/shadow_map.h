@@ -26,7 +26,8 @@ public:
 	~ShadowMap();
 
 	void initOneShadow();
-	void initMultipleShadow();
+	void initMultipleShadow(unsigned int fbo);
+
 
 	void addNewShadow(int light_count);
 	void bind();

@@ -78,7 +78,7 @@ public:
 		LightInfo li = LightInfo(), bool default_light = true);
 	
 	int number_lights = 0;
-
+	unsigned int depthMapFBO = 0;
 	int entity_mesh = 0;
 	int entity_terrain = 0;
 	int entity_sphere = 0;

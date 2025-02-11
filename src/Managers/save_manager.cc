@@ -113,7 +113,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
     Shader shader;
     shader.compile(vs_entities, fs_entities);
     
-    rs.createDirectionalLight(ecs, shader);
+    //rs.createDirectionalLight(ecs, shader);
     //-----------------------------------------------------------
 
     const auto& camera = j["Camera"]; 
