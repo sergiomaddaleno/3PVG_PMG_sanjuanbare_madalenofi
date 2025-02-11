@@ -11,7 +11,7 @@
 #include <functional>
 #include <vector>
 #include <future>
-#include "..\Render\mesh.h"
+#include "..\Core\mesh.h"
 
 #include <thread>
 #include <queue>

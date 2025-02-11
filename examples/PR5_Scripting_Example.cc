@@ -1,5 +1,5 @@
 
-#include "window.h"
+#include "Core/window.h"
 #include "lua.hpp"
 
 #include <GL/glew.h>

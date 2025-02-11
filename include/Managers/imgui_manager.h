@@ -73,7 +73,7 @@ public:
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di);
 
 private:
-    int selected_entity = -1;
+    int selected_entity = 0;
 
     std::filesystem::path m_BaseDirectory;
     std::filesystem::path m_CurrentDirectory;

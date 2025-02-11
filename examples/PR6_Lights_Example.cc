@@ -10,12 +10,12 @@
 #include <string>
 #include <../deps/glm/glm.hpp>
 
-#include "window.h"
-#include "Render/mesh.h"
+#include "Core/window.h"
+#include "Core/mesh.h"
 #include "Render/render_system.h"
-#include "Render/shader.h"
+#include "Core/shader.h"
 #include "Render/camera.h"
-#include "input.h"
+#include "Core/input.h"
 #include "Systems/ecs_manager.h"
 #include "utils.h"
 #include "Components/light_component.h"
@@ -56,36 +56,36 @@ void ChangeLight(ECSManager& ecs) {
 
             std::string id = "##" + std::to_string(index);
 
-            if (light_comp.light_info.type_ == LightType::LT_Spot) {
+            if (light_comp.light.light_info_.type_ == LightType::LT_Spot) {
                 ImGui::Text(("Position" + id).c_str());
                 ImGui::DragFloat(("Xp" + id).c_str(), &tr_comp.position.x, 0.2f, -1000.0f, 100.0f, "%.3f");
                 ImGui::DragFloat(("Yp" + id).c_str(), &tr_comp.position.y, 0.2f, -100.0f, 100.0f, "%.3f");
                 ImGui::DragFloat(("Zp" + id).c_str(), &tr_comp.position.z, 0.2f, -100.0f, 100.0f, "%.3f");
 
                 ImGui::Text(("Angle" + id).c_str());
-                ImGui::DragFloat(("angle" + id).c_str(), &light_comp.light_info.spot_angle_, 0.2f, -1000.0f, 100.0f, "%.3f");
+                ImGui::DragFloat(("angle" + id).c_str(), &light_comp.light.light_info_.spot_angle_, 0.2f, -1000.0f, 100.0f, "%.3f");
 
                 ImGui::Text(("Direction" + id).c_str());
-                ImGui::DragFloat(("Xd" + id).c_str(), &light_comp.light_info.dir_.x, 0.2f, -1000.0f, 100.0f, "%.3f");
-                ImGui::DragFloat(("Yd" + id).c_str(), &light_comp.light_info.dir_.y, 0.2f, -100.0f, 100.0f, "%.3f");
-                ImGui::DragFloat(("Zd" + id).c_str(), &light_comp.light_info.dir_.z, 0.2f, -100.0f, 100.0f, "%.3f");
+                ImGui::DragFloat(("Xd" + id).c_str(), &light_comp.light.light_info_.dir_.x, 0.2f, -1000.0f, 100.0f, "%.3f");
+                ImGui::DragFloat(("Yd" + id).c_str(), &light_comp.light.light_info_.dir_.y, 0.2f, -100.0f, 100.0f, "%.3f");
+                ImGui::DragFloat(("Zd" + id).c_str(), &light_comp.light.light_info_.dir_.z, 0.2f, -100.0f, 100.0f, "%.3f");
 
                 ImGui::Text(("Light Color" + id).c_str());
-                ImGui::DragFloat(("Xc" + id).c_str(), &light_comp.light_info.light_color_.x, 0.2f, 0.0f, 255.0f, "%.3f");
-                ImGui::DragFloat(("Yc" + id).c_str(), &light_comp.light_info.light_color_.y, 0.2f, 0.0f, 255.0f, "%.3f");
-                ImGui::DragFloat(("Zc" + id).c_str(), &light_comp.light_info.light_color_.z, 0.2f, 0.0f, 255.0f, "%.3f");
+                ImGui::DragFloat(("Xc" + id).c_str(), &light_comp.light.light_info_.light_color_.x, 0.2f, 0.0f, 255.0f, "%.3f");
+                ImGui::DragFloat(("Yc" + id).c_str(), &light_comp.light.light_info_.light_color_.y, 0.2f, 0.0f, 255.0f, "%.3f");
+                ImGui::DragFloat(("Zc" + id).c_str(), &light_comp.light.light_info_.light_color_.z, 0.2f, 0.0f, 255.0f, "%.3f");
             }
 
-            if (light_comp.light_info.type_ == LightType::LT_Point) {
+            if (light_comp.light.light_info_.type_ == LightType::LT_Point) {
                 ImGui::Text(("Position2" + id).c_str());
                 ImGui::DragFloat(("Xp2" + id).c_str(), &tr_comp.position.x, 0.2f, -1000.0f, 100.0f, "%.3f");
                 ImGui::DragFloat(("Yp2" + id).c_str(), &tr_comp.position.y, 0.2f, -100.0f, 100.0f, "%.3f");
                 ImGui::DragFloat(("Zp2" + id).c_str(), &tr_comp.position.z, 0.2f, -100.0f, 100.0f, "%.3f");
 
                 ImGui::Text(("Light Color2" + id).c_str());
-                ImGui::DragFloat(("Xc2" + id).c_str(), &light_comp.light_info.light_color_.x, 0.2f, 0.0f, 255.0f, "%.3f");
-                ImGui::DragFloat(("Yc2" + id).c_str(), &light_comp.light_info.light_color_.y, 0.2f, 0.0f, 255.0f, "%.3f");
-                ImGui::DragFloat(("Zc2" + id).c_str(), &light_comp.light_info.light_color_.z, 0.2f, 0.0f, 255.0f, "%.3f");
+                ImGui::DragFloat(("Xc2" + id).c_str(), &light_comp.light.light_info_.light_color_.x, 0.2f, 0.0f, 255.0f, "%.3f");
+                ImGui::DragFloat(("Yc2" + id).c_str(), &light_comp.light.light_info_.light_color_.y, 0.2f, 0.0f, 255.0f, "%.3f");
+                ImGui::DragFloat(("Zc2" + id).c_str(), &light_comp.light.light_info_.light_color_.z, 0.2f, 0.0f, 255.0f, "%.3f");
             }
         }
     }
@@ -130,15 +130,11 @@ int main(int, char**) {
 
     // ---
 
-    if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
-        return -1;
-    }
-
     texture_shader.compile(vs_texture, fs_texture);
     light_shader.compile(vs_simple, fs_light);
     
     render_system.setupEntities(ecs);
-    render_system.createMesh(ecs, mario_mesh, light_shader);
+    render_system.createMesh(ecs, light_shader, "../assets/obj/Mario.obj", ".. / assets / textures / mario");
 
     render_system.createPointLight(ecs, light_shader);
     render_system.createSpotLight(ecs, light_shader);
@@ -159,7 +155,7 @@ int main(int, char**) {
 
         cam.update(input, dt, window->getWidth(), window->getHeight());
 
-        render_system.renderEntities(ecs, cam);
+        render_system.renderEntities(ecs, light_shader, cam);
 
         MyImGui(ecs);
 

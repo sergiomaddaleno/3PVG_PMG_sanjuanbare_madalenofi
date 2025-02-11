@@ -1,10 +1,10 @@
 
-#include "window.h"
+#include "Core/window.h"
 #include "Geometry/triangle.h"
-#include "Render/shader.h"
+#include "Core/shader.h"
 #include "Components/render_component.h"
 #include "Components/transform_component.h"
-#include "input.h"
+#include "Core/input.h"
 #include "utils.h"
 
 #include <GL/glew.h>

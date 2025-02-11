@@ -6,10 +6,10 @@
 #include <string>
 #include <../deps/glm/glm.hpp>
 
-#include "window.h"
-#include "Render/mesh.h"
+#include "Core/window.h"
+#include "Core/mesh.h"
 #include "Render/render_system.h"
-#include "input.h"
+#include "Core/input.h"
 #include "Systems/ecs_manager.h"
 
 #include "Components/render_component.h"
@@ -18,9 +18,9 @@
 
 #define M_PI 3.14159265358979323846
 
-std::shared_ptr<Mesh> teapot_mesh = std::make_shared<Mesh>();
-std::shared_ptr<Mesh> toad_mesh = std::make_shared<Mesh>();
-std::shared_ptr<Mesh> mario_mesh = std::make_shared<Mesh>();
+auto teapot_mesh = std::make_unique<Mesh>();
+auto toad_mesh = std::make_unique<Mesh>();
+auto mario_mesh = std::make_unique<Mesh>();
 
 RenderSystem render_system;
 ECSManager ecs;
@@ -65,7 +65,7 @@ int main(int, char**) {
     ecs.add_component<RenderComponent>(j);
     ecs.add_component<TransformComponent>(j);
     ecs.get_component<RenderComponent>(j)->type_ = RT_Mesh;
-    ecs.get_component<RenderComponent>(j)->mesh_ = mario_mesh;
+    ecs.get_component<RenderComponent>(j)->mesh_ = std::move(mario_mesh);
     ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
 
@@ -74,7 +74,7 @@ int main(int, char**) {
     ecs.add_component<RenderComponent>(j);
     ecs.add_component<TransformComponent>(j);
     ecs.get_component<RenderComponent>(j)->type_ = RT_Mesh;
-    ecs.get_component<RenderComponent>(j)->mesh_ = toad_mesh;
+    ecs.get_component<RenderComponent>(j)->mesh_ = std::move(toad_mesh);
     ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 2.0f, 0.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
 
@@ -83,7 +83,7 @@ int main(int, char**) {
         ecs.add_component<RenderComponent>(j);
         ecs.add_component<TransformComponent>(j);
         ecs.get_component<RenderComponent>(j)->type_ = RT_Mesh;
-        ecs.get_component<RenderComponent>(j)->mesh_ = teapot_mesh;
+        ecs.get_component<RenderComponent>(j)->mesh_ = std::move(teapot_mesh);
         ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.5f, 0.5f, 0.5f };
     }
 
@@ -118,7 +118,7 @@ int main(int, char**) {
         ecs.get_component<TransformComponent>(0)->moveEntity(input, dt);
         ecs.get_component<TransformComponent>(1)->moveEntity(input, dt);
 
-        render_system.renderMesh(ecs);
+        //render_system.renderMesh(ecs);
 
         if (window->closePressed()) done = true;
     }

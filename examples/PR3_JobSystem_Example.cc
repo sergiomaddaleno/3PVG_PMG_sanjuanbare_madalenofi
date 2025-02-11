@@ -1,8 +1,8 @@
 
-#include "window.h"
-#include "Render/mesh.h"
+#include "Core/window.h"
+#include "Core/mesh.h"
 #include "Systems/job_sistem.h"
-#include "input.h"
+#include "Core/input.h"
 #include "Components/render_component.h"
 #include "Components/transform_component.h"
 
@@ -24,7 +24,7 @@ std::vector<std::string> meshFiles = {
         "../assets/obj/Mario.obj",
 };
 
-std::shared_ptr<Mesh> mesh_ = std::make_shared<Mesh>();
+auto mesh_ = std::make_unique<Mesh>();
 std::future<std::unique_ptr<Mesh>> monetemesh;
 
 JobSystem jb;
@@ -65,7 +65,7 @@ int main(int, char**) {
         float dt = float(currentTime - lastTime);
         window->updateWindow();
 
-        rc.mesh_ = mesh_;
+        rc.mesh_ = std::move(mesh_);
 
         float time = (float)window->getTime() * 2;
         tc.rotation = glm::vec3{ 0.0f, time, 0.0f };
@@ -91,7 +91,7 @@ int main(int, char**) {
         }
 
         if (loadingNewMesh) {
-            std::shared_ptr<Mesh> loadedMesh = monetemesh.get();
+            std::unique_ptr<Mesh> loadedMesh = monetemesh.get();
             if (loadedMesh) {
 
                 mesh_ = std::move(loadedMesh);
