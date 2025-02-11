@@ -562,13 +562,15 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
 
     if (ImGui::Button("Delete Entity") ||  di.input->isKeyPressed(Input::SUPR)) {
         
-        if (di.ecs->get_component<LightComponent>(selected_entity)->light.light_info_.type_) {
+        if (di.ecs->has_component<NameComponent>(selected_entity)) {
+            
+            if (di.ecs->has_component<LightComponent>(selected_entity)) {
+                di.render_system->number_lights--;
+            }
+            
             di.ecs->destroy_entity(selected_entity);
-            di.render_system->number_lights--;
         }
-        else {
-            di.ecs->destroy_entity(selected_entity);
-        }
+
     }
 
     ImGui::End();
