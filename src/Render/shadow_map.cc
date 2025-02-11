@@ -142,14 +142,13 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
-            case RenderType::RT_SpotLight:
-            case RenderType::RT_PointLight:
+            
                 for (auto& mesh : render_comp->mesh_->meshes) {
-                    render_comp->mesh_->renderElements(false);
+                    render_comp->mesh_->renderElements();
                 }
                 break;
             case RenderType::RT_Terrain:
-                render_comp->terrain_->render(false);
+                render_comp->terrain_->render();
                 break;
             case RenderType::RT_Sphere:
                 render_comp->sphere_->render();
@@ -164,10 +163,11 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
         }
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 1);
+ glClear(GL_DEPTH_BUFFER_BIT);
+ glBindFramebuffer(GL_FRAMEBUFFER, 1);
     glDrawBuffer(GL_BACK);
     glReadBuffer(GL_BACK);
     glViewport(0, 0, g_window_width_, g_window_height_);
-    glClear(GL_DEPTH_BUFFER_BIT);
+   
 
 }

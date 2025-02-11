@@ -192,7 +192,7 @@ void Mesh::renderElements(bool use_texture) {
     
     for (auto& mesh : meshes) {
         
-        if (use_texture || !mesh.textures.empty()) {
+        if (!use_texture || !mesh.textures.empty()) {
             mesh.textures[0].bind();
         }
         

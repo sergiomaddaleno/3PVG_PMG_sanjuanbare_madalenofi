@@ -158,30 +158,6 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 renderType = rc.value("Render_type", -1);
             }
 
-            // Light data ------------------------------------------------------
-
-            if (entity.contains("Light_component")) {
-                const auto& lc = entity["Light_component"]["light"];
-
-                li.pos_ = parseVec3(lc["Position"][0]);
-                li.dir_ = parseVec3(lc["Direction"][0]);
-                li.diff_color_ = parseVec3(lc["Diffusion_color"][0]);
-                li.spec_color_ = parseVec3(lc["Specular_color"][0]);
-                li.light_color_ = parseVec3(lc["Light_color"][0]);
-                li.ambient_color_ = parseVec3(lc["Ambient_color"][0]);
-
-                li.linear_att = lc["Linear_attenuation"][0].get<float>();
-                li.quad_att_ = lc["Quadratic_attenuation"][0].get<float>();
-                li.constant_att_ = lc["Constant_attenuation"][0].get<float>();
-                li.shininess_ = lc["Shininnes"][0].get<float>();
-                li.strength_ = lc["Strength"][0].get<float>();
-                li.spot_angle_= lc["Spot_angle"][0].get<float>();
-
-                li.type_ = lc["Type"].get<LightType>();
-            }
-
-            // ---
-
             switch (renderType) {
             case RenderType::RT_Mesh: {
                 std::string mesh_path = entity["Render_component"]["Mesh"].value("Mesh_path", "");
@@ -206,7 +182,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 
                 break;
             }
-            case RenderType::RT_Sphere:{
+            case RenderType::RT_Sphere: {
                 const auto& sphere = entity["Render_component"]["Sphere"];
                 sphere_num_heights = sphere["num_heights"];
                 sphere_num_revs = sphere["num_revs"];
@@ -227,24 +203,60 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 
                 break;
             }
-            case RenderType::RT_PointLight:
+
+            }
+        }
+
+        // Light data ------------------------------------------------------
+
+        if (entity.contains("Light_component")) {
+            const auto& lc = entity["Light_component"]["light"];
+
+            li.pos_ = parseVec3(lc["Position"][0]);
+            li.dir_ = parseVec3(lc["Direction"][0]);
+            li.diff_color_ = parseVec3(lc["Diffusion_color"][0]);
+            li.spec_color_ = parseVec3(lc["Specular_color"][0]);
+            li.light_color_ = parseVec3(lc["Light_color"][0]);
+            li.ambient_color_ = parseVec3(lc["Ambient_color"][0]);
+
+            li.linear_att = lc["Linear_attenuation"][0].get<float>();
+            li.quad_att_ = lc["Quadratic_attenuation"][0].get<float>();
+            li.constant_att_ = lc["Constant_attenuation"][0].get<float>();
+            li.shininess_ = lc["Shininnes"][0].get<float>();
+            li.strength_ = lc["Strength"][0].get<float>();
+            li.spot_angle_ = lc["Spot_angle"][0].get<float>();
+
+            li.type_ = lc["Type"].get<LightType>();
+
+            // --
+
+            int lightType = -1;
+            lightType = lc.value("Type", -1);
+
+            switch (lightType) {
+            case LightType::LT_Spot: 
+                rs.createSpotLight(ecs, shader, li, false);
+                break;
+            case LightType::LT_Point: 
                 rs.createPointLight(ecs, shader, li, false);
                 break;
-            case RenderType::RT_SpotLight:
-                rs.createSpotLight(ecs, shader, li, false);
+            case LightType::LT_Directional: 
+                rs.createDirectionalLight(ecs, shader, li, false);
                 break;
             }
         }
 
+        // ---
+
         if (entity.contains("Name_component")) {
-            
+
             auto ni = ecs.getComponentList<NameComponent>().begin();
             auto niend = ecs.getComponentList<NameComponent>().end();
             for (const auto& entity : j["Entities"]) {
                 if (entity.contains("Name_component")) {
                     const auto& nc = entity["Name_component"];
 
-                    
+
                     if (ni != niend) {
                         if (ni->has_value()) {
                             auto& name_comp = *ni;
@@ -256,6 +268,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             }
         }
     }
+
     rs.initEntities(ecs);
 
     free(vs_entities);

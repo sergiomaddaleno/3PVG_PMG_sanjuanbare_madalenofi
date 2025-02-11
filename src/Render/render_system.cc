@@ -48,8 +48,6 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
-            case RenderType::RT_SpotLight:
-            case RenderType::RT_PointLight:
                 render_comp->mesh_->bind();
                 break;
 
@@ -166,8 +164,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:
-                    //case RenderType::RT_SpotLight:
-                    case RenderType::RT_PointLight:
+                    
                         for (auto& mesh : render_comp->mesh_->meshes) {
                             render_comp->mesh_->renderElements();
                         }
@@ -381,11 +378,7 @@ size_t RenderSystem::createQuad(ECSManager& ecs, Shader& shader, TransformCompon
 
 size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader, LightInfo li, bool default_light)
 {
-    auto lb_mesh = std::make_unique<Mesh>();
-    lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
-
     ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
 
@@ -393,10 +386,6 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
     ecs.get_component<NameComponent>(entity_)->name = "Spot Light [" + std::to_string(entity_spotlight) + "]";
 
     ecs.add_component<TransformComponent>(entity_)->position = li.pos_;
-
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_SpotLight;
-    ecs.get_component<RenderComponent>(entity_)->mesh_ = std::move(lb_mesh);
-    ecs.get_component<RenderComponent>(entity_)->shader = light_shader;
 
     // ----
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
@@ -437,11 +426,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
 
 size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, LightInfo li, bool default_light)
 {
-    auto lb_mesh = std::make_unique<Mesh>();
-    lb_mesh->loadOBJ("../assets/obj/light_bulb.obj");
-
     ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
     ecs.add_component<TransformComponent>(entity_);
     ecs.add_component<LightComponent>(entity_);
 
@@ -449,11 +434,6 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, Lig
     ecs.get_component<NameComponent>(entity_)->name = "Point Light [" + std::to_string(entity_spotlight) + "]";
 
     ecs.get_component<TransformComponent>(entity_)->position = li.pos_;
-
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_PointLight;
-    ecs.get_component<RenderComponent>(entity_)->mesh_ = std::move(lb_mesh);
-    ecs.get_component<RenderComponent>(entity_)->shader = light_shader;
-
     //--
 
     auto& light_comp = ecs.get_component<LightComponent>(entity_);

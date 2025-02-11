@@ -560,15 +560,14 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
     ImGui::Separator();
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-    if (selected_entity && (ImGui::Button("Delete Entity") || selected_entity && di.input->isKeyPressed(Input::SUPR))) {
-        if (di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_PointLight
-            && di.ecs->get_component<RenderComponent>(selected_entity)->type_ != RenderType::RT_SpotLight
-            ) {
+    if (ImGui::Button("Delete Entity") ||  di.input->isKeyPressed(Input::SUPR)) {
+        
+        if (di.ecs->get_component<LightComponent>(selected_entity)->light.light_info_.type_) {
             di.ecs->destroy_entity(selected_entity);
+            di.render_system->number_lights--;
         }
         else {
             di.ecs->destroy_entity(selected_entity);
-            di.render_system->number_lights--;
         }
     }
 
