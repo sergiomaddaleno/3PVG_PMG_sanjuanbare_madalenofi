@@ -2,9 +2,9 @@
 
 int g_window_width_ = 800;
 int g_window_height_ = 600;
-bool g_full_screen_ = true;
+bool g_full_screen_ = false;
 
-float g_fov_ = 125.0f;
+float g_fov_ = 45.0f;
 float g_min_render_distance_ = 0.1f;
 float g_max_render_distance_ = 400.0f;
 

@@ -25,6 +25,7 @@
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
+#include "misc/cpp/imgui_stdlib.h"
 #include "imgui_internal.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -295,23 +296,17 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
         auto& name_comp = di.ecs->get_component<NameComponent>(selected_entity);
 
         if (ImGui::CollapsingHeader("Name Component", ImGuiTreeNodeFlags_DefaultOpen)) {
-
             ImGui::Dummy({ 0.0f, 3.0f });
 
-            static char buffer[40] = { 0 };
-            if (!name_comp->name.empty()) {
-                strncpy(buffer, name_comp->name.c_str(), sizeof(buffer) - 1);
-                buffer[sizeof(buffer) - 1] = '\0';
-            }
+            if (name_comp->name.empty()) name_comp->name = "Entity"; 
 
-            if (ImGui::InputText("##Name", buffer, sizeof(buffer))) {
-                if (strcmp(name_comp->name.c_str(), buffer) != 0 ) {
-                    name_comp->name = std::string(buffer);
-                }
+            if (ImGui::InputText("##NameInput", &name_comp->name)) {
+                if (name_comp->name.empty()) name_comp->name = "Entity";
             }
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
         }
+
     }
 
     if (di.ecs->has_component<RenderComponent>(selected_entity)) {

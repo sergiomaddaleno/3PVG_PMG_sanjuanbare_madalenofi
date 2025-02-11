@@ -236,13 +236,22 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             }
         }
 
-        if (entity.contains("Name_component") && entity.contains("Entity_id")) {
-            int entity_id = entity["Entity_id"];
-            const auto& nc = entity["Name_component"];
+        if (entity.contains("Name_component")) {
+            auto ni = ecs.getComponentList<NameComponent>().begin();
+            auto niend = ecs.getComponentList<NameComponent>().end();
 
-            if (ecs.has_component<NameComponent>(entity_id)) {
-                auto& name_comp = ecs.get_component<NameComponent>(entity_id);
-                name_comp->name = nc.value("Entity_name", "Unnamed");
+            for (const auto& entity : j["Entities"]) {
+                if (entity.contains("Name_component")) {
+                    const auto& nc = entity["Name_component"];
+
+                    if (ni != niend) {
+                        if (ni->has_value()) {
+                            auto& name_comp = *ni;
+                            name_comp->name = nc["Entity_name"];
+                            ++ni;
+                        }
+                    }
+                }
             }
         }
     }
