@@ -31,6 +31,12 @@ RenderSystem::RenderSystem() {}
 RenderSystem::~RenderSystem() {}
 
 void RenderSystem::initEntities(ECSManager& ecs) {
+
+    char* vs_entities = (char*)ReadFile("../assets/shaders/entities.vs");
+    char* fs_entities = (char*)ReadFile("../assets/shaders/entities.fs");
+
+    shader.compile(vs_entities, fs_entities);
+
     auto ri = ecs.getComponentList<RenderComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto li = ecs.getComponentList<LightComponent>().begin();
@@ -114,6 +120,10 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
 
+    glBlendFunc(GL_ONE, GL_ZERO);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+
     bool light_first_pass = true; 
 
     auto li = ecs.getComponentList<LightComponent>().begin();
@@ -127,28 +137,15 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
             auto& light_comp = *li;
             auto& transform = *ti;
 
-            light_comp->shader.useProgram();
+            shader.useProgram();
 
-            // Shadow ------------
 
-            light_comp->shadow_map_.render(ecs, light_comp->shader, *light_comp);
+            light_comp->shadow_map_.render(ecs, shader, *light_comp);
 
-            // Light ------------
+   
 
-            if (light_first_pass) {
-                glBlendFunc(GL_ONE, GL_ZERO);
-                glDepthMask(GL_TRUE); 
-                glDepthFunc(GL_LEQUAL);
-                light_first_pass = false;
-            }
-            else {
-                glBlendFunc(GL_ONE, GL_ONE);
-                glDepthMask(GL_FALSE);
-                glDepthFunc(GL_EQUAL);
-            }
-
-            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
-            light_comp->light.setSingleUniforms(light_comp->shader);
+            shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
+            light_comp->light.setSingleUniforms(shader);
             
             // ---------------------------------------------------------------
 
@@ -162,9 +159,9 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     auto& render_comp = *ri;
                     auto& transform_comp = *ti;
 
-                    render_comp->shader.useProgram();
+                    shader.useProgram();
 
-                    setEntitiesUniforms(*transform_comp, render_comp->shader, *light_comp, cam);
+                    setEntitiesUniforms(*transform_comp, shader, *light_comp, cam);
 
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:
@@ -188,10 +185,11 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     }
                 }
             }
+            glBlendFunc(GL_ONE, GL_ONE);
+            
         }
     }
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
+    
     glDisable(GL_BLEND);
     glUseProgram(0);
 }

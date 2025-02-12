@@ -22,6 +22,7 @@
 class Mesh;
 class Shader;
 class Terrain;
+class Shader;
 
 class RenderSystem {
 
@@ -88,6 +89,8 @@ public:
 	int entity_spotlight = 0;
 	int entity_pointlight = 0;
 	int entity_dirlight = 0;
+
+	Shader shader;
 
 	size_t entity_ = 0;
 };
