@@ -818,8 +818,8 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
 
                 if (ImGui::MenuItem("Sphere")) {
                     Shader newShader;
-                    char* loc_vs = (char*)ReadFile("../assets/shaders/texture.vs");
-                    char* loc_fs = (char*)ReadFile("../assets/shaders/texture.fs");
+                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
+                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
                     newShader.compile(loc_vs, loc_fs);
 
                     di.render_system->createSphere(loc_ecs, newShader);
