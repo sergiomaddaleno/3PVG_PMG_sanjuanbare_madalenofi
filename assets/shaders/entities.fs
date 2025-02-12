@@ -119,7 +119,7 @@ void main() {
     }
     
     if (u_light.type_ == 1) {
-        final_light += SpotLight(u_light) /* shadow*/; 
+        final_light += SpotLight(u_light) * shadow; 
     }
     
     if (u_light.type_ == 2) {

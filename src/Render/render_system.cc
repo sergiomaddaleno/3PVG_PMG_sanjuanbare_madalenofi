@@ -73,7 +73,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 if (li->has_value()) {
                     auto& light_comp = *li;
 
-                    //light_comp->shadow_map_.initOneShadow();;
+                    light_comp->shadow_map_.init();;
                 }
             }
         }
@@ -107,11 +107,12 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Lig
 }
 
 void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
-
-    //glEnable(GL_DEPTH_TEST);
+    
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ZERO);
+
+    bool light_first_pass = true; 
 
     auto li = ecs.getComponentList<LightComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
@@ -125,18 +126,27 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
             auto& light_comp = *li;
             auto& transform = *ti;
 
-            //light_comp->shadow_map_.render(ecs, shader, cam, *light_comp);
+            // Shadow ------------
 
-            // Light ---------------------------------------------------------------
-            shader.useProgram();
+            light_comp->shadow_map_.render(ecs, shader, cam, *light_comp);
+
+            // Light ------------
+
+            if (light_first_pass) {
+                glBlendFunc(GL_ONE, GL_ZERO);
+                glDepthMask(GL_TRUE); 
+                glDepthFunc(GL_LEQUAL);
+                light_first_pass = false;
+            }
+            else {
+                glBlendFunc(GL_ONE, GL_ONE);
+                glDepthMask(GL_FALSE);
+                glDepthFunc(GL_EQUAL);
+            }
 
             shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
             light_comp->light.setSingleUniforms(shader);
-
-            /*int texture_unit = 0;
-            light_comp->shadow_map_.bind();
-            shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);*/
-
+            
             // ---------------------------------------------------------------
 
             auto ri = ecs.getComponentList<RenderComponent>().begin();
@@ -157,29 +167,25 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
                             render_comp->mesh_->renderElements();
                         }
                         break;
-                    case RenderType::RT_Terrain: {
+                    case RenderType::RT_Terrain:
                         render_comp->terrain_->render();
                         break;
-                    }
-                    case RenderType::RT_Sphere: {
+                    case RenderType::RT_Sphere:
                         render_comp->sphere_->render();
                         break;
-                    }
-                    case RenderType::RT_Cube: {
+                    case RenderType::RT_Cube:
                         render_comp->cube_->render();
                         break;
-                    }
-                    case RenderType::RT_Quad: {
+                    case RenderType::RT_Quad:
                         render_comp->quad_->render();
                         break;
                     }
-                    }
                 }
             }
-            glBlendFunc(GL_ONE, GL_ONE);
         }
     }
-
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
     glDisable(GL_BLEND);
     glUseProgram(0);
 }

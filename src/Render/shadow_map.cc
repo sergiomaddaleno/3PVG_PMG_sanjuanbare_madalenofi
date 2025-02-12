@@ -34,7 +34,7 @@ ShadowMap::~ShadowMap()
 {
 }
 
-void ShadowMap::initOneShadow()
+void ShadowMap::init()
 {
     glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthMap);
@@ -55,39 +55,11 @@ void ShadowMap::initOneShadow()
     glReadBuffer(GL_NONE);
 }
 
-void ShadowMap::initMultipleShadow(unsigned int fbo)
-{
-    depthMapFBO = fbo;
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, depthMap);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, shadow_width_, shadow_height_, multiple_shadows_, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-
-    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthMap, 0);
-
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-}
-
-void ShadowMap::addNewShadow(int light_count) {
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthMap, 0, light_count);
-}
 
 void ShadowMap::bind()
 {
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
 }
 
 void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponent lc) {
@@ -107,6 +79,10 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
 
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(lightView));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));
+
+    int texture_unit = 0;
+    shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);
+    bind();
 
     glViewport(0, 0, shadow_width_, shadow_height_);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -150,7 +126,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
         }
     }
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_DEPTH_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
 
     glDrawBuffer(GL_BACK);
