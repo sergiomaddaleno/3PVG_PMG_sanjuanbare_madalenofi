@@ -90,7 +90,6 @@ public:
 	int entity_pointlight = 0;
 	int entity_dirlight = 0;
 
-	unsigned int depthMapFBO = 0;
 	size_t entity_ = 0;
 };
 

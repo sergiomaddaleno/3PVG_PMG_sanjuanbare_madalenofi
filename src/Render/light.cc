@@ -16,7 +16,7 @@ Light::~Light()
 {
 }
 
-void Light::setUniforms(Shader& shader, int light_count)
+void Light::setArrayUniforms(Shader& shader, int light_count)
 {
     int loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].type_").c_str());
     shader.setUniformValue(loc, ValueType::T_INT_1, &light_info_.type_);
@@ -51,6 +51,45 @@ void Light::setUniforms(Shader& shader, int light_count)
     loc = shader.getUniformLocation(("u_light[" + std::to_string(light_count) + "].spot_angle_").c_str());
     shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.spot_angle_);
 }
+
+void Light::setSingleUniforms(Shader& shader)
+{
+    int loc = shader.getUniformLocation("u_light.type_");
+    shader.setUniformValue(loc, ValueType::T_INT_1, &light_info_.type_);
+
+    loc = shader.getUniformLocation("u_light.pos_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.pos_);
+
+    loc = shader.getUniformLocation("u_light.dir_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.dir_);
+
+    loc = shader.getUniformLocation("u_light.light_color_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.light_color_);
+
+    loc = shader.getUniformLocation("u_light.ambient_color_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_info_.ambient_color_);
+
+    loc = shader.getUniformLocation("u_light.linear_att_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.linear_att);
+
+    loc = shader.getUniformLocation("u_light.quad_att_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.quad_att_);
+
+    loc = shader.getUniformLocation("u_light.constant_att_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.constant_att_);
+
+    loc = shader.getUniformLocation("u_light.shininess_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.shininess_);
+
+    loc = shader.getUniformLocation("u_light.strength_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.strength_);
+
+    loc = shader.getUniformLocation("u_light.spot_angle_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &light_info_.spot_angle_);
+
+    //shader.setUniformValue(shader.getUniformLocation("u_ambient"), ValueType::T_FLOAT_3, &global_ambient_color_);
+}
+
 nlohmann::json Light::serialize() const
 {
     nlohmann::json json_data;

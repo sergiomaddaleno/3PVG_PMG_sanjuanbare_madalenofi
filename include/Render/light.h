@@ -23,8 +23,7 @@ enum LightType {
 struct LightInfo {
 
     LightType type_;
-    
-    // --
+
     glm::vec3 pos_;
     glm::vec3 dir_;
     glm::vec3 diff_color_;
@@ -67,13 +66,12 @@ public:
 
     LightInfo light_info_;
     glm::vec3 global_ambient_color_{ 0.2f, 0.2, 0.2f };
-    int light_count = 0;
 
-    void setUniforms(Shader& shader, int light_count);
+    void setSingleUniforms(Shader& shader);
+    void setArrayUniforms(Shader& shader, int light_count);
 
     // Save data
     nlohmann::json serialize() const;
-
 };
 
 #endif // LIT

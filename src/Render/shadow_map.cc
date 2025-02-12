@@ -90,7 +90,7 @@ void ShadowMap::bind()
     glBindTexture(GL_TEXTURE_2D_ARRAY, depthMap);
 }
 
-void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponent lc, int light_count) {
+void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponent lc) {
 
     float spotLightFOV = glm::radians(lc.light.light_info_.spot_angle_);
     glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)g_window_width_ / (float)g_window_height_, near_plane, far_plane);
@@ -100,25 +100,13 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
 
     glEnable(GL_DEPTH_TEST);
     shader.useProgram();
-    int loc = shader.getUniformLocation(("u_light_space[" + std::to_string(light_count) + "]").c_str());
-    shader.setUniformValue(loc, ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
+    shader.setUniformValue(shader.getUniformLocation("u_light_space"), ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
 
     glm::mat4 view = cam.getViewMatrix();
     glm::mat4 projection = cam.getProjectionMatrix();
 
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(lightView));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));
-
-    /*loc = shader.getUniformLocation(("u_light_view[" + std::to_string(light_count) + "]").c_str());
-    shader.setUniformValue(loc, ValueType::T_MAT_4x4, glm::value_ptr(lightView));
-
-    loc = shader.getUniformLocation(("u_light_projection[" + std::to_string(light_count) + "]").c_str());
-    shader.setUniformValue(loc, ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));*/
-
-    //bind();
-    addNewShadow(light_count);
-    //int texture_unit = 0;
-    //shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);
 
     glViewport(0, 0, shadow_width_, shadow_height_);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -142,7 +130,6 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
-            
                 for (auto& mesh : render_comp->mesh_->meshes) {
                     render_comp->mesh_->renderElements();
                 }
@@ -163,11 +150,10 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
         }
     }
 
- glClear(GL_DEPTH_BUFFER_BIT);
- glBindFramebuffer(GL_FRAMEBUFFER, 1);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, 1);
+
     glDrawBuffer(GL_BACK);
     glReadBuffer(GL_BACK);
     glViewport(0, 0, g_window_width_, g_window_height_);
-   
-
 }

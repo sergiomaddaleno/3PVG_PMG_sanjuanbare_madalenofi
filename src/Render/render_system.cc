@@ -39,8 +39,6 @@ void RenderSystem::initEntities(ECSManager& ecs) {
     auto tiend = ecs.getComponentList<TransformComponent>().end();
     auto liend = ecs.getComponentList<LightComponent>().end();
 
-    glGenFramebuffers(1, &depthMapFBO);
-
     for (; ri != riend && ti != tiend; ++ri, ++ti) {
         if (ri->has_value() && ti->has_value()) {
             auto& render_comp = *ri;
@@ -69,17 +67,12 @@ void RenderSystem::initEntities(ECSManager& ecs) {
             }
 
             auto li = ecs.getComponentList<LightComponent>().begin();
-            auto ti = ecs.getComponentList<TransformComponent>().begin();
             auto liend = ecs.getComponentList<LightComponent>().end();
-            auto tiend = ecs.getComponentList<TransformComponent>().end();
 
-
-            for (; li != liend && ti != tiend; ++li, ++ti) {
-                if (li->has_value() && ti->has_value()) {
+            for (; li != liend; ++li) {
+                if (li->has_value()) {
                     auto& light_comp = *li;
-                    auto& transform = *ti;
 
-                    light_comp->shadow_map_.initMultipleShadow(depthMapFBO);
                     //light_comp->shadow_map_.initOneShadow();;
                 }
             }
@@ -115,38 +108,34 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Lig
 
 void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
+    //glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ZERO);
+
     auto li = ecs.getComponentList<LightComponent>().begin();
     auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto liend = ecs.getComponentList<LightComponent>().end();
     auto tiend = ecs.getComponentList<TransformComponent>().end();
 
-    glEnable(GL_DEPTH_TEST);
     shader.useProgram();
 
-    int light_count = 0;
     for (; li != liend && ti != tiend; ++li, ++ti) {
         if (li->has_value() && ti->has_value()) {
             auto& light_comp = *li;
             auto& transform = *ti;
 
-            light_comp->shadow_map_.render(ecs, shader, cam, *light_comp, light_count);
+            //light_comp->shadow_map_.render(ecs, shader, cam, *light_comp);
 
             // Light ---------------------------------------------------------------
             shader.useProgram();
-            shader.setUniformValue(shader.getUniformLocation("u_number_lights"), ValueType::T_INT_1, &number_lights);
+
             shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
-            shader.setUniformValue(shader.getUniformLocation("u_ambient"), ValueType::T_FLOAT_3, &light_comp->light.global_ambient_color_);
-            
-            light_comp->light.setUniforms(shader, light_count);
+            light_comp->light.setSingleUniforms(shader);
 
-            int texture_unit = 0;
-            shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D_ARRAY, light_comp->shadow_map_.depthMap);
-
-
-
-            light_count++;
+            /*int texture_unit = 0;
+            light_comp->shadow_map_.bind();
+            shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);*/
 
             // ---------------------------------------------------------------
 
@@ -164,7 +153,6 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:
-                    
                         for (auto& mesh : render_comp->mesh_->meshes) {
                             render_comp->mesh_->renderElements();
                         }
@@ -188,9 +176,11 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
                     }
                 }
             }
+            glBlendFunc(GL_ONE, GL_ONE);
         }
     }
 
+    glDisable(GL_BLEND);
     glUseProgram(0);
 }
 
