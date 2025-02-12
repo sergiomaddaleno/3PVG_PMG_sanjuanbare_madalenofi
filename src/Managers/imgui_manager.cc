@@ -314,6 +314,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
 
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.6f, 0.0f, 1.0f));
             ImGui::Text("Change Shader");
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
             ImGui::PopStyleColor();
 
             static std::string vertex_file_name;
@@ -346,8 +347,8 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
                 }
                 ImGui::EndDragDropTarget();
             }
-
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
             if (ImGui::Button("Compile") && vertex_content && fragment_content) {
                 Shader newShader;
                 newShader.compile(vertex_content, fragment_content);
@@ -364,6 +365,112 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
+            // -----------------------------------------------------------------
+
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+            ImGui::Text("Geometry Dimensions");
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+            switch (di.ecs->get_component<RenderComponent>(selected_entity)->type_) {
+            case ::RT_Terrain:
+            {
+                auto& terrain = *di.ecs->get_component<RenderComponent>(selected_entity)->terrain_;
+
+                ImGui::InputInt("Number of Columns", &terrain.num_cols_);
+                ImGui::InputInt("Number of Rows", &terrain.num_rows_);
+                ImGui::SliderFloat("Height Multiplier", &terrain.height_mult_, 0.0f, 10.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
+                ImGui::SliderFloat("Size", &terrain.size_, 0.0f, 10.0f, "%.3f");
+                ImGui::Checkbox("Is Centered", &terrain.is_centered_);
+                ImGui::Checkbox("Use Perlin Noise", &terrain.use_perlin_noise_);
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                if (ImGui::Button("Apply Changes")) {
+                    terrain.init(terrain.num_cols_, terrain.num_rows_, terrain.height_mult_,
+                        terrain.size_, terrain.is_centered_, terrain.use_perlin_noise_);
+
+                    terrain.bind();
+                }
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                break;
+            }
+            case ::RT_Sphere:
+            {
+                auto& sphere = *di.ecs->get_component<RenderComponent>(selected_entity)->sphere_;
+
+                static int temp_num_heights = sphere.num_heights_;
+                static int temp_num_revs = sphere.num_revs_;
+                static float temp_size = sphere.size_;
+
+                ImGui::InputInt("Number of Heights", &temp_num_heights);
+                ImGui::InputInt("Number of Revolutions", &temp_num_revs);
+                ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                if (ImGui::Button("Apply Changes")) {
+                    sphere.init(temp_size, temp_num_heights, temp_num_revs);
+                    sphere.bind();
+                }
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                break;
+            }
+            case ::RT_Cube8v:
+            {
+                auto& cube = *di.ecs->get_component<RenderComponent>(selected_entity)->cube_;
+
+                static float temp_size = cube.size_;
+                ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                if (ImGui::Button("Apply Changes")) {
+                    cube.init8v(temp_size);
+                    cube.bind();
+                }
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                break;
+            }
+            case ::RT_Cube24v:
+            {
+                auto& cube = *di.ecs->get_component<RenderComponent>(selected_entity)->cube_;
+
+                static float temp_size = cube.size_;
+                ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                if (ImGui::Button("Apply Changes")) {
+                    cube.init24v(temp_size);
+                    cube.bind();
+                }
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                break;
+            }
+            case ::RT_Quad:
+            {
+                auto& quad = *di.ecs->get_component<RenderComponent>(selected_entity)->quad_;
+
+                static float temp_size = quad.size_;
+                ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                if (ImGui::Button("Apply Changes")) {
+                    quad.init(temp_size);
+                    quad.bind();
+                }
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                break;
+            }
+            }
         }
     }
 
@@ -509,7 +616,6 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             if (ImGui::Selectable("Light Component")) {
                 if (!di.ecs->has_component<LightComponent>(selected_entity)) {
                     di.ecs->add_component<LightComponent>(selected_entity);
-                    di.render_system->number_lights++;
                 }
                 else {
                     ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Already has Light Component");
@@ -563,11 +669,6 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
     if (ImGui::Button("Delete Entity") ||  di.input->isKeyPressed(Input::SUPR)) {
         
         if (di.ecs->has_component<NameComponent>(selected_entity)) {
-            
-            if (di.ecs->has_component<LightComponent>(selected_entity)) {
-                di.render_system->number_lights--;
-            }
-            
             di.ecs->destroy_entity(selected_entity);
         }
 
@@ -777,7 +878,7 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
 
                     TransformComponent tc;
 
-                    di.render_system->createTerrain(loc_ecs, newShader, tc, 500, 500);
+                    di.render_system->createTerrain(loc_ecs, newShader);
                     di.render_system->initEntities(loc_ecs);
 
                     free(loc_vs);

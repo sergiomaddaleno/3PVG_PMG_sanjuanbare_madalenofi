@@ -1,6 +1,5 @@
-
-#ifndef SHR
-#define SHR
+#ifndef __SHADER__
+#define __SHADER__
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -55,6 +54,4 @@ private:
 	GLuint program_;
 };
 
-
-
-#endif //SHR
+#endif //__SHADER__

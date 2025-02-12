@@ -1,5 +1,3 @@
-
-
 #ifndef __TERRAIN_H__
 #define __TERRAIN_H__ 1
 
@@ -58,6 +56,5 @@ private:
   Texture height_map;
 
 };
-
 
 #endif //__TERRAIN_H__

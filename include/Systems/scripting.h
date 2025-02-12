@@ -1,5 +1,5 @@
-#ifndef SCR
-#define SCR
+#ifndef __SCRIPTING__
+#define __SCRIPTING__
 
 #include <lua.hpp>
 
@@ -56,6 +56,6 @@ private:
 
 int multiply(lua_State* s);
 
-#endif // SCR
+#endif // __SCRIPTING__
 
 

@@ -1,6 +1,5 @@
-#ifndef JBS
-#define JBS
-
+#ifndef __JOB_SYSTEM__
+#define __JOB_SYSTEM__
 
 #include <memory>
 #include <iostream>
@@ -73,6 +72,6 @@ private:
     std::thread worker_; // Solo un hilo por simplicidad
 };
 
-#endif JBS
+#endif __JOB_SYSTEM__
 
 

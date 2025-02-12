@@ -16,7 +16,7 @@ class Sphere {
      Sphere();
     ~Sphere();
  
-  void init(bool sky = false, const float sphere_size = 1.0f, const int num_heights = 20, const int num_revs = 20);
+  void init(const float sphere_size = 1.0f, const int num_heights = 20, const int num_revs = 20);
 
   void bind();
   void render();
@@ -31,6 +31,13 @@ class Sphere {
   int num_heights_, num_revs_;
   float size_ = 0.0f;
   Texture tex;
+
+  // --
+
+  int num_vertex_;
+  std::vector<float> vertex_sphere_;
+  std::vector<float> normals_sphere_;
+  std::vector<float> uv_sphere_;
 
   std::vector<int> order_;
   std::vector<float> data_;

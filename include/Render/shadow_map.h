@@ -9,13 +9,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-//#include "Components\light_component.h"
-
-#include <../nlohmann/json.hpp>
-
 class ECSManager;
 class Shader;
-class Camera;
 struct LightComponent;
 
 class ShadowMap {
@@ -27,7 +22,7 @@ public:
 
 	void init();
 	void bind();
-	void render(ECSManager& ecs, Shader shader, Camera cam, LightComponent lc);
+	void render(ECSManager& ecs, Shader shader, LightComponent lc);
 
 	unsigned int depthMapFBO = 0;
 	unsigned int depthMap = 0;

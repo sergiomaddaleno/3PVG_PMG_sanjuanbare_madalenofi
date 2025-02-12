@@ -24,6 +24,9 @@ void Cube::init8v(const float cube_size) {
     size_ = cube_size;
     cube_8v_ = true;
     cube_24v_ = false;
+
+    data_.clear();
+    order_.clear();
    
     glm::vec3 positions[] = {
         {-size_, -size_, size_}, {-size_, +size_, size_}, {+size_, +size_, size_}, {+size_, -size_, size_},
@@ -73,6 +76,9 @@ void Cube::init24v(const float cube_size) {
     size_ = cube_size;
     cube_8v_ = false;
     cube_24v_ = true;
+
+    data_.clear();
+    order_.clear();
     
     glm::vec3 positions[] = {
         

@@ -1,6 +1,6 @@
 
-#ifndef RST
-#define RST
+#ifndef __RENDER_SYSTEM__
+#define __RENDER_SYSTEM__
 
 #include <optional>
 #include <string>
@@ -79,7 +79,6 @@ public:
 	
 	//-----------------------
 
-	int number_lights = 0;
 	int entity_mesh = 0;
 	int entity_terrain = 0;
 	int entity_sphere = 0;
@@ -93,4 +92,4 @@ public:
 	size_t entity_ = 0;
 };
 
-#endif // RST
+#endif // __RENDER_SYSTEM__

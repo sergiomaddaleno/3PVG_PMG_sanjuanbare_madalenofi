@@ -1,6 +1,6 @@
 
-#ifndef SKY
-#define SKY
+#ifndef __SKYBOX__
+#define __SKYBOX__
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -86,4 +86,4 @@ private:
 
 
 
-#endif //SKY
+#endif //__SKYBOX__

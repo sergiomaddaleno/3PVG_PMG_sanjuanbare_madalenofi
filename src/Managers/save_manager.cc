@@ -93,7 +93,6 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam, Skybox& skyb
 void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera &cam, Skybox& skybox) {
 
     ecs.remove_entities();
-    rs.number_lights = 0;
     rs.entity_ = 0;
 
     rs.entity_mesh = 0;
@@ -165,32 +164,34 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 rs.createMesh(ecs, shader, mesh_path, texture_folder, tc);
                 break;
             }
-            case RenderType::RT_Cube: {
+
+            case RenderType::RT_Cube8v:
+            case RenderType::RT_Cube24v: {
                 const auto& cube = entity["Render_component"]["Cube"];
                 cube_8v = cube["cube_8v"];
                 cube_24v = cube["cube_24v"];
                 cube_size = cube["size"];
                 if (cube_8v) rs.createCube8v(ecs, shader, tc, cube_size);
                 if (cube_24v) rs.createCube24v(ecs, shader, tc, cube_size);
-
                 break;
             }
+
             case RenderType::RT_Quad: {
                 const auto& quad = entity["Render_component"]["Quad"];
                 quad_size = quad["size"];
                 rs.createQuad(ecs, shader, tc, quad_size);
-
                 break;
             }
+
             case RenderType::RT_Sphere: {
                 const auto& sphere = entity["Render_component"]["Sphere"];
                 sphere_num_heights = sphere["num_heights"];
                 sphere_num_revs = sphere["num_revs"];
                 sphere_size = sphere["size"];
                 rs.createSphere(ecs, shader, tc, sphere_num_heights, sphere_num_revs, sphere_size);
-
                 break;
             }
+
             case RenderType::RT_Terrain: {
                 const auto& terrain = entity["Render_component"]["Terrain"];
                 terrain_num_rows = terrain["num_rows"];
@@ -199,11 +200,15 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 terrain_size = terrain["size"];
                 terrain_is_centered = terrain["is_centered"];
                 terrain_use_perlin_noise = terrain["use_perlin_noise"];
-                rs.createTerrain(ecs, shader, tc, terrain_num_cols, terrain_num_rows, terrain_height_mult, terrain_size, terrain_is_centered, terrain_use_perlin_noise);
-
+                rs.createTerrain(ecs, shader, tc,
+                    terrain_num_cols,
+                    terrain_num_rows,
+                    terrain_height_mult,
+                    terrain_size,
+                    terrain_is_centered,
+                    terrain_use_perlin_noise);
                 break;
             }
-
             }
         }
 

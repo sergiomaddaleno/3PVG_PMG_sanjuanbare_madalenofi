@@ -1,5 +1,5 @@
-#ifndef IGM
-#define IGM
+#ifndef __UI_MANAGER__
+#define __UI_MANAGER__
 
 #include <filesystem>
 
@@ -101,4 +101,4 @@ private:
     bool add_mesh_window = false;
 };
 
-#endif // IGM
+#endif // __UI_MANAGER__

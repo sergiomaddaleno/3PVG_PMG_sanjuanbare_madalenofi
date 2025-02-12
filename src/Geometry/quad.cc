@@ -22,6 +22,9 @@ Quad::~Quad()
 void Quad::init(const float quad_size) {
     size_ = quad_size;
 
+    data_.clear();
+    order_.clear();
+
     glm::vec3 positions[] = {
         {-size_, size_, 0.0f},
         {size_, size_, 0.0f},
@@ -36,7 +39,6 @@ void Quad::init(const float quad_size) {
     glm::vec2 uvs[] = {
         {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f}
     };
-
    
     data_.reserve(4 * 8); 
     for (int i = 0; i < 4; ++i) {
@@ -52,16 +54,12 @@ void Quad::init(const float quad_size) {
         data_.push_back(uvs[i].y);
     }
 
-   
     unsigned int order[] = {
         0, 2, 1, 
         2, 0, 3 
     };
 
     order_.assign(order, order + sizeof(order) / sizeof(order[0]));
-
-    
-    
 }
 
 void Quad::bind()

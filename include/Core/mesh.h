@@ -1,5 +1,5 @@
-#ifndef MSL
-#define MSL
+#ifndef __MESH__
+#define __MESH__
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -64,4 +64,4 @@ public:
     };   
 };
 
-#endif // MSL
+#endif // __MESH__

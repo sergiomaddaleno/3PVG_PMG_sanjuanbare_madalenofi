@@ -1,6 +1,6 @@
 
-#ifndef ECS
-#define ECS
+#ifndef __ECS_MANAGER__
+#define __ECS_MANAGER__
 
 #include <optional>
 #include <unordered_map>
@@ -213,7 +213,7 @@ private:
 
 };
 
-#endif // ECS
+#endif // __ECS_MANAGER__
 
 
 

@@ -7,6 +7,22 @@
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
 
+Triangle::Triangle(PointsTriangle t[3])
+{
+    for (int i = 0; i < 3; ++i) {
+        my_triangle[i] = t[i];
+    }
+}
+
+Triangle::~Triangle(){};
+
+Triangle::Triangle(const Triangle& other)
+{
+    for (int i = 0; i < 3; ++i) {
+        my_triangle[i] = other.my_triangle[i];
+    }
+}
+
 std::optional<Triangle> Triangle::make(float size_, Color color)
 {
     PointsTriangle t[3];
@@ -83,4 +99,6 @@ void Triangle::render(RenderComponent rc, TransformComponent tc, Camera cam)
 
     glUseProgram(0);
 }
+
+
 

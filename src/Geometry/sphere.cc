@@ -19,16 +19,22 @@ Sphere::~Sphere()
 {
 }
 
-void Sphere::init(bool sky, const float sphere_size, const int num_heights, const int num_revs) {
+void Sphere::init(const float sphere_size, const int num_heights, const int num_revs) {
    
     num_heights_ = num_heights;
     num_revs_ = num_revs;
     size_ = sphere_size;
 
-    int num_vertex = (num_heights + 1) * (num_revs + 1);
-    std::vector<float> vertex_sphere(num_vertex * 3); 
-    std::vector<float> normals_sphere(num_vertex * 3);
-    std::vector<float> uv_sphere(num_vertex * 2);
+    vertex_sphere_.clear();
+    normals_sphere_.clear();
+    uv_sphere_.clear();
+    order_.clear();
+    data_.clear();
+
+    num_vertex_ = (num_heights + 1) * (num_revs + 1);
+    vertex_sphere_.resize(num_vertex_ * 3);
+    normals_sphere_.resize(num_vertex_ * 3);
+    uv_sphere_.resize(num_vertex_ * 2);
 
     const float alpha = PI / num_heights;
     const float omega = (PI * 2.0f) / num_revs;
@@ -37,33 +43,33 @@ void Sphere::init(bool sky, const float sphere_size, const int num_heights, cons
    
     for (int i = 0; i <= num_heights; i++) {
         for (int j = 0; j <= num_revs; j++) {
-            vertex_sphere[index * 3] = cosf(omega * j) * cosf(alpha * i - 1.57f) * sphere_size;
-            vertex_sphere[index * 3 + 1] = sinf(alpha * i - 1.57f) * sphere_size;
-            vertex_sphere[index * 3 + 2] = sinf(omega * j) * cosf(alpha * i - 1.57f) * sphere_size;
+            vertex_sphere_[index * 3] = cosf(omega * j) * cosf(alpha * i - 1.57f) * sphere_size;
+            vertex_sphere_[index * 3 + 1] = sinf(alpha * i - 1.57f) * sphere_size;
+            vertex_sphere_[index * 3 + 2] = sinf(omega * j) * cosf(alpha * i - 1.57f) * sphere_size;
 
-            normals_sphere[index * 3] = cosf(omega * j) * cosf(alpha * i - 1.57f);
-            normals_sphere[index * 3 + 1] = sinf(alpha * i - 1.57f);
-            normals_sphere[index * 3 + 2] = sinf(omega * j) * cosf(alpha * i - 1.57f);
+            normals_sphere_[index * 3] = cosf(omega * j) * cosf(alpha * i - 1.57f);
+            normals_sphere_[index * 3 + 1] = sinf(alpha * i - 1.57f);
+            normals_sphere_[index * 3 + 2] = sinf(omega * j) * cosf(alpha * i - 1.57f);
 
-            uv_sphere[index * 2] = 1.0f / (float)num_heights * i;
-            uv_sphere[index * 2 + 1] = 1.0f / (float)num_revs * j;
+            uv_sphere_[index * 2] = 1.0f / (float)num_heights * i;
+            uv_sphere_[index * 2 + 1] = 1.0f / (float)num_revs * j;
 
             index++;
         }
     }
     
-    data_.reserve(8 * num_vertex);
-    for (int i = 0; i < num_vertex; i++) {
-        data_.push_back(vertex_sphere[i * 3]);
-        data_.push_back(vertex_sphere[i * 3 + 1]);
-        data_.push_back(vertex_sphere[i * 3 + 2]);
+    data_.reserve(8 * num_vertex_);
+    for (int i = 0; i < num_vertex_; i++) {
+        data_.push_back(vertex_sphere_[i * 3]);
+        data_.push_back(vertex_sphere_[i * 3 + 1]);
+        data_.push_back(vertex_sphere_[i * 3 + 2]);
 
-        data_.push_back(normals_sphere[i * 3]);
-        data_.push_back(normals_sphere[i * 3 + 1]);
-        data_.push_back(normals_sphere[i * 3 + 2]);
+        data_.push_back(normals_sphere_[i * 3]);
+        data_.push_back(normals_sphere_[i * 3 + 1]);
+        data_.push_back(normals_sphere_[i * 3 + 2]);
 
-        data_.push_back(uv_sphere[i * 2]);
-        data_.push_back(uv_sphere[i * 2 + 1]);
+        data_.push_back(uv_sphere_[i * 2]);
+        data_.push_back(uv_sphere_[i * 2 + 1]);
     }
     
     order_.reserve((num_heights * num_revs) * 6);

@@ -1,6 +1,5 @@
-
-#ifndef CAM
-#define CAM
+#ifndef __CAMERA__
+#define __CAMERA__
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -78,4 +77,4 @@ private:
 };
 
 
-#endif // CAM
+#endif // __CAMERA__

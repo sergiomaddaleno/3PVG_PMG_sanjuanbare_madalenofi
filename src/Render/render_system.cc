@@ -61,7 +61,9 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 render_comp->quad_->bind();
                 break;
 
-            case RenderType::RT_Cube:
+            case RenderType::RT_Cube8v:
+            case RenderType::RT_Cube24v:
+
                 render_comp->cube_->bind();
                 break;
             }
@@ -128,7 +130,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
 
             // Shadow ------------
 
-            light_comp->shadow_map_.render(ecs, shader, cam, *light_comp);
+            light_comp->shadow_map_.render(ecs, shader, *light_comp);
 
             // Light ------------
 
@@ -173,7 +175,8 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
                     case RenderType::RT_Sphere:
                         render_comp->sphere_->render();
                         break;
-                    case RenderType::RT_Cube:
+                    case RenderType::RT_Cube8v:
+                    case RenderType::RT_Cube24v:
                         render_comp->cube_->render();
                         break;
                     case RenderType::RT_Quad:
@@ -265,7 +268,7 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, Shader& shader,
 size_t RenderSystem::createSphere(ECSManager& ecs, Shader& shader, TransformComponent tc, int num_heights_, int num_revs_, float size)
 {
     auto sphere = std::make_unique<Sphere>();
-    sphere->init(false, size, num_heights_, num_revs_);
+    sphere->init(size, num_heights_, num_revs_);
 
     ecs.add_component<NameComponent>(entity_);
     ecs.add_component<RenderComponent>(entity_);
@@ -307,7 +310,7 @@ size_t RenderSystem::createCube8v(ECSManager& ecs, Shader& shader, TransformComp
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube;
+    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube8v;
     ecs.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
 
@@ -335,7 +338,7 @@ size_t RenderSystem::createCube24v(ECSManager& ecs, Shader& shader, TransformCom
     transform->scale = tc.scale;
 
     ecs.get_component<RenderComponent>(entity_)->shader = shader;
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube;
+    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube24v;
     ecs.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
 
     entity_++;
@@ -413,7 +416,6 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, const Shader& light_shader
         light_comp->light.light_info_.spot_angle_ = li.spot_angle_;
     }
 
-    number_lights++;
     entity_++;
     entity_spotlight++;
 
@@ -457,7 +459,6 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, Shader& light_shader, Lig
         light_comp->light.light_info_.strength_ = li.strength_;
     }
     
-    number_lights++;
     entity_++;
     entity_pointlight++;
 
@@ -497,7 +498,6 @@ size_t RenderSystem::createDirectionalLight(ECSManager& ecs, const Shader& light
         light_comp->light.light_info_.shininess_ = li.shininess_;
     }
 
-    number_lights++;
     entity_++;
     entity_dirlight++;
     

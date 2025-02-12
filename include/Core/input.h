@@ -1,5 +1,5 @@
-#ifndef INP
-#define INP
+#ifndef __INPUT__
+#define __INPUT__
 
 #include <optional>
 #include <string>
@@ -91,4 +91,4 @@ public:
     void resetScroll();
 };
 
-#endif
+#endif // __INPUT__

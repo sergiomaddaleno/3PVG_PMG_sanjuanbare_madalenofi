@@ -1,6 +1,6 @@
 
-#ifndef LIT
-#define LIT
+#ifndef __LIGHT__
+#define __LIGHT__
 
 #include <optional>
 #include <string>
@@ -74,4 +74,4 @@ public:
     nlohmann::json serialize() const;
 };
 
-#endif // LIT
+#endif // __LIGHT__

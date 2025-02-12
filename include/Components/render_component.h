@@ -1,31 +1,26 @@
-#ifndef RNC
-#define RNC
+#ifndef __RENDER_COMPONENT__
+#define __RENDER_COMPONENT__
 
 #include <memory>
-#include "../Geometry/triangle.h"
-#include "../Core/texture.h"
-#include "../Core/shader.h"
-#include "../Core/mesh.h"
+#include "Geometry/triangle.h"
+#include "Core/texture.h"
+#include "Core/shader.h"
+#include "Core/mesh.h"
 #include "Render/light.h"
-#include "../Geometry/terrain.h"
-#include "../Geometry/sphere.h"
-#include "../Geometry/cube.h"
-#include "../Geometry/quad.h"
+#include "Geometry/terrain.h"
+#include "Geometry/sphere.h"
+#include "Geometry/cube.h"
+#include "Geometry/quad.h"
 
 #include "../deps/nlohmann/json.hpp"
-
 
 enum RenderType {
     RT_Default,
     RT_Mesh,
-    RT_PointLight,
-    RT_SpotLight,
-    RT_Skybox,
-    RT_PostProcess,
-    RT_Transparent,
     RT_Terrain,
     RT_Sphere,
-    RT_Cube,
+    RT_Cube8v,
+    RT_Cube24v,
     RT_Quad,
 };
 
@@ -107,4 +102,4 @@ struct RenderComponent {
     {}
 };
 
-#endif
+#endif // __RENDER_COMPONENT__

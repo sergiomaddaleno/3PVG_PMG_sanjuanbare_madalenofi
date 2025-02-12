@@ -1,5 +1,5 @@
-#ifndef UTILS
-#define UTILS
+#ifndef __UTILS__
+#define __UTILS__
 
 #include <memory> 
 #include <iostream>
@@ -17,4 +17,4 @@ void CheckShaderErrors(GLuint shader, const char* shaderType);
 
 void CheckProgramErrors(GLuint program);
 
-#endif // UTILS
+#endif // __UTILS__

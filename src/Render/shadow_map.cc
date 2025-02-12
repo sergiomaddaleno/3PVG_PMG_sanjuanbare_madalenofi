@@ -24,9 +24,9 @@
 #include <memory> 
 #include <iostream>
 
-
-
-ShadowMap::ShadowMap()
+ShadowMap::ShadowMap() : depthMapFBO(0), depthMap(0), 
+    near_plane(1.0f), far_plane(200.0f), 
+    shadow_width_(2048), shadow_height_(2048)
 {
 }
 
@@ -55,14 +55,13 @@ void ShadowMap::init()
     glReadBuffer(GL_NONE);
 }
 
-
 void ShadowMap::bind()
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, depthMap);
 }
 
-void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponent lc) {
+void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
     float spotLightFOV = glm::radians(lc.light.light_info_.spot_angle_);
     glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)g_window_width_ / (float)g_window_height_, near_plane, far_plane);
@@ -73,9 +72,6 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
     glEnable(GL_DEPTH_TEST);
     shader.useProgram();
     shader.setUniformValue(shader.getUniformLocation("u_light_space"), ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
-
-    glm::mat4 view = cam.getViewMatrix();
-    glm::mat4 projection = cam.getProjectionMatrix();
 
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(lightView));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));
@@ -116,7 +112,8 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, Camera cam, LightComponen
             case RenderType::RT_Sphere:
                 render_comp->sphere_->render();
                 break;
-            case RenderType::RT_Cube:
+            case RenderType::RT_Cube8v:
+            case RenderType::RT_Cube24v:
                 render_comp->cube_->render();
                 break;
             case RenderType::RT_Quad:

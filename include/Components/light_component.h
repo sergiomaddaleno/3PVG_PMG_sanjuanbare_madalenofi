@@ -1,5 +1,5 @@
-#ifndef LCP
-#define LCP
+#ifndef __LIGHT_COMPONENT__
+#define __LIGHT_COMPONENT__
 
 #include <memory>
 #include "../Core/shader.h"
@@ -26,4 +26,4 @@ struct LightComponent {
 	}
 };
 
-#endif //LCP
+#endif //__LIGHT_COMPONENT__

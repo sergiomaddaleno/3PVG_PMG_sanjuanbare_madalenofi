@@ -1,5 +1,5 @@
-#ifndef TEX
-#define TEX
+#ifndef __TEXTURE__
+#define __TEXTURE__
 
 #include <string>
 #include <vector>
@@ -38,4 +38,4 @@ public:
     nlohmann::json serialize() const;
 };
 
-#endif
+#endif // __TEXTURE__

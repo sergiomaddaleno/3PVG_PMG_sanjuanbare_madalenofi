@@ -1,5 +1,5 @@
-#ifndef PP
-#define PP
+#ifndef __POST_PROCESS__
+#define __POST_PROCESS__
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -63,4 +63,4 @@ private:
 	GLuint rectVAO, rectVBO, RBO;
 };
 
-#endif // PP
+#endif // __POST_PROCESS__

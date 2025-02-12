@@ -1,5 +1,5 @@
-#ifndef SRC
-#define SRC
+#ifndef __SCRIPTING_COMPONENT__
+#define __SCRIPTING_COMPONENT__
 
 #include <memory>
 #include "Systems/scripting.h"
@@ -12,4 +12,4 @@ struct ScriptingComponent {
 	~ScriptingComponent(){}
 };
 
-#endif
+#endif // __SCRIPTING_COMPONENT__

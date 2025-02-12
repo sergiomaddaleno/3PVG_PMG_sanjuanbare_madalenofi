@@ -1,6 +1,6 @@
 
-#ifndef PR0
-#define PR0
+#ifndef __WINDOW__
+#define __WINDOW__
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -83,4 +83,4 @@ private:
 };
 
 
-#endif // PR0
+#endif // __WINDOW__

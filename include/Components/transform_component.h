@@ -1,5 +1,5 @@
-﻿#ifndef TRNS
-#define TRNS
+﻿#ifndef __TRANSFORM_COMPONENT__
+#define __TRANSFORM_COMPONENT__
 
 #include "Core/input.h"
 #include <../deps/glm/glm.hpp>
@@ -7,10 +7,6 @@
 #include <cmath>
 
 #include "../deps/nlohmann/json.hpp"
-
-#ifndef M_PI
-const float M_PI = 3.14159265358979323846f;
-#endif
 
 struct TransformComponent {
 
@@ -64,4 +60,4 @@ struct TransformComponent {
     }
 };
 
-#endif
+#endif // __TRANSFORM_COMPONENT__

@@ -32,6 +32,12 @@ void Terrain::init(const int num_cols, const int num_rows,
         is_centered_ = is_centered;
         use_perlin_noise_ = use_perlin_noise;
 
+        vertex_terrain_.clear();
+        normals_terrain_.clear();
+        uv_terrain_.clear();
+        order_.clear();
+        data_.clear();
+
         num_vertex_ = (num_cols + 1) * (num_rows + 1);
         vertex_terrain_.resize(num_vertex_ * 3); 
         normals_terrain_.resize(num_vertex_ * 3);
@@ -179,13 +185,6 @@ void Terrain::init(const int num_cols, const int num_rows,
                 order_.push_back(base_index + num_rows + 2);
             }
         }    
-
-        /*for (int i = 0; i < num_cols; i++) {
-            for (int j = 0; j < num_rows; j++) {
-            int index = i * num_rows + j;
-            printf("Vertex [%d, %d]: %f\n", i, j, GetVertexTerrain()[index]);
-            }
-        }*/
 }
 
 void Terrain::updateVertex()

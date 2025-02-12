@@ -1,6 +1,5 @@
-
-#ifndef PRT
-#define PRT
+#ifndef __TRIANGLE__
+#define __TRIANGLE__
 
 #include <optional>
 #include <string>
@@ -40,19 +39,9 @@ public:
 
 	// ---
 
-	Triangle(PointsTriangle t[3]) {
-		for (int i = 0; i < 3; ++i) {
-			my_triangle[i] = t[i];
-		}
-	}
-
-	Triangle(const Triangle& other) {
-        for (int i = 0; i < 3; ++i) {
-            my_triangle[i] = other.my_triangle[i];
-        }
-    }
-
-	~Triangle() {};
+	Triangle(PointsTriangle t[3]);
+	~Triangle();
+	Triangle(const Triangle& other);
 };
 
-#endif // PRT
+#endif // __TRIANGLE__
