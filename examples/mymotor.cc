@@ -109,7 +109,7 @@ int main(int, char**) {
             skybox.render(cam);
         }
 
-        render_system.renderEntities(ecs, entities_shader,cam);
+        render_system.renderEntities(ecs, cam);
 
         //--
 

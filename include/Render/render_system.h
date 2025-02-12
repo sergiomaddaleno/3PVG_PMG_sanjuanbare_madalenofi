@@ -34,7 +34,7 @@ public:
 
 	void setEntitiesUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
 
-	void renderEntities(ECSManager& ecs, Shader shader, Camera cam);
+	void renderEntities(ECSManager& ecs, Camera cam);
 
 	//---------------------------------------------------------------
 	

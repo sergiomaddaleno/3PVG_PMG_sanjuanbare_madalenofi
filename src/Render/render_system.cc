@@ -108,7 +108,7 @@ void RenderSystem::setEntitiesUniforms(TransformComponent tc, Shader shader, Lig
     shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &g_sky_colour_);
 }
 
-void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
+void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
     
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -121,16 +121,17 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
     auto liend = ecs.getComponentList<LightComponent>().end();
     auto tiend = ecs.getComponentList<TransformComponent>().end();
 
-    shader.useProgram();
 
     for (; li != liend && ti != tiend; ++li, ++ti) {
         if (li->has_value() && ti->has_value()) {
             auto& light_comp = *li;
             auto& transform = *ti;
 
+            light_comp->shader.useProgram();
+
             // Shadow ------------
 
-            light_comp->shadow_map_.render(ecs, shader, *light_comp);
+            light_comp->shadow_map_.render(ecs, light_comp->shader, *light_comp);
 
             // Light ------------
 
@@ -146,8 +147,8 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
                 glDepthFunc(GL_EQUAL);
             }
 
-            shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
-            light_comp->light.setSingleUniforms(shader);
+            light_comp->shader.setUniformValue(light_comp->shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
+            light_comp->light.setSingleUniforms(light_comp->shader);
             
             // ---------------------------------------------------------------
 
@@ -161,7 +162,9 @@ void RenderSystem::renderEntities(ECSManager& ecs, Shader shader, Camera cam) {
                     auto& render_comp = *ri;
                     auto& transform_comp = *ti;
 
-                    setEntitiesUniforms(*transform_comp, shader, *light_comp, cam);
+                    render_comp->shader.useProgram();
+
+                    setEntitiesUniforms(*transform_comp, render_comp->shader, *light_comp, cam);
 
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:

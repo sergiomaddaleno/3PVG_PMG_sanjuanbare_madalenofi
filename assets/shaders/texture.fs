@@ -1,18 +1,19 @@
 #version 330
 
-uniform sampler2D texture1;
+uniform sampler2D u_texture;
+
 uniform bool u_fog;
-vec3 skyColour = vec3(0.5, 0.5, 0.5);
+uniform vec3 u_sky_colour;
+in float visibility;
 
 out vec4 FragColor;
 in vec2 uv;
-in float visibility;
 
 void main()
 {
-    FragColor = texture(texture1, uv);
+    FragColor = texture(u_texture, uv);
 
     if(u_fog){
-        FragColor = mix(vec4(skyColour, 1.0), FragColor, visibility);
+        FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
     }
 }

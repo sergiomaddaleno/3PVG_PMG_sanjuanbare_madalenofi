@@ -353,9 +353,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
                 Shader newShader;
                 newShader.compile(vertex_content, fragment_content);
 
-                if (vertex_file_name != "entities.vs" && fragment_file_name != "entities.fs") {
-                    di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
-                }
+                di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
 
                 vertex_file_name.clear();
                 fragment_file_name.clear();
@@ -820,8 +818,8 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
 
                 if (ImGui::MenuItem("Sphere")) {
                     Shader newShader;
-                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
-                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
+                    char* loc_vs = (char*)ReadFile("../assets/shaders/texture.vs");
+                    char* loc_fs = (char*)ReadFile("../assets/shaders/texture.fs");
                     newShader.compile(loc_vs, loc_fs);
 
                     di.render_system->createSphere(loc_ecs, newShader);

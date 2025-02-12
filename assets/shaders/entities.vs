@@ -24,8 +24,13 @@ void main()
     uv = aTexCoord;
     normal = mat3(transpose(inverse(model))) * aNormal;
     FragPos = vec3(model * vec4(aPos, 1.0));
-
     FragPosLight = u_light_space * vec4(FragPos, 1.0);
+
+    vec4 world_pos = model * vec4(aPos, 1.0);
+    vec4 pos_relative_to_cam = view * world_pos;
+    float distance = length(pos_relative_to_cam.xyz);
+    visibility = exp(-pow((distance*u_density), u_gradient));
+    visibility = clamp(visibility, 0.0, 1.0);
 
     gl_Position = projection * view * vec4(FragPos, 1.0);
 

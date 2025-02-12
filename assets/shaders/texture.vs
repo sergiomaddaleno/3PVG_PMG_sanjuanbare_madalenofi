@@ -11,8 +11,8 @@ uniform mat4 projection;
 out vec2 uv;
 out float visibility;
 
-const float density = 0.06;
-const float gradient = 2.0;
+uniform float u_density = 0.06;
+uniform float u_gradient = 2.0;
 
 void main()
 {
@@ -20,7 +20,7 @@ void main()
     vec4 pos_relative_to_cam = view * world_pos;
 
     float distance = length(pos_relative_to_cam.xyz);
-    visibility = exp(-pow((distance*density), gradient));
+    visibility = exp(-pow((distance*u_density), u_gradient));
     visibility = clamp(visibility, 0.0, 1.0);
 
     uv = aTexCoord;

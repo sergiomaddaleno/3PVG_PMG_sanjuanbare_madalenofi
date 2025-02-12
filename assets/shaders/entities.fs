@@ -128,11 +128,10 @@ void main() {
 
    vec4 texture_color = texture(u_texture, uv);
    vec3 texture_and_light = texture_color.rgb * final_light;
-   //vec3 texture_and_light = texture_color.rgb;
     
    FragColor = vec4(texture_and_light, 1.0);
 
-   //if(u_fog){
-   //     FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
-   //}
+   if(u_fog){
+        FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
+   }
 }
