@@ -107,14 +107,6 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 
     //-----------------------------------------------------------
 
-    char* vs_entities = (char*)ReadFile("../assets/shaders/entities.vs");
-    char* fs_entities = (char*)ReadFile("../assets/shaders/entities.fs");
-
-    Shader shader;
-    shader.compile(vs_entities, fs_entities);
-
-    //-----------------------------------------------------------
-
     const auto& camera = j["Camera"]; 
 
     cam.setPosition(parseVec3(camera["Position"]));
@@ -123,8 +115,12 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
     cam.setSensitibity(camera["Sensitivity"]);
     cam.setSpeed(camera["Speed"]);
     cam.setAspectRatio(camera["Aspect_ratio"]);
-    cam.setMinRenderDistance_(camera["Min_render_distance"]);
-    cam.setMaxRenderDistance_(camera["Max_render_distance_"]);
+    cam.setNearCliPlane(camera["Near_clip_plane"]);
+    cam.setFarCliPlane(camera["Far_clip_plane"]);
+    cam.setNearCliPlane(camera["Near_clip_plane"]);
+    cam.setFarCliPlane(camera["Far_clip_plane"]);
+    cam.setOrthoWidth(camera["Ortho_width"]);
+    cam.setOrthoHeight(camera["Ortho_height"]);
     
     //-----------------------------------------------------------
     
@@ -161,7 +157,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             case RenderType::RT_Mesh: {
                 std::string mesh_path = entity["Render_component"]["Mesh"].value("Mesh_path", "");
                 std::string texture_folder = entity["Render_component"]["Mesh"].value("Texture_folder", "");
-                rs.createMesh(ecs, shader, mesh_path, texture_folder, tc);
+                rs.createMesh(ecs, mesh_path, texture_folder, tc);
                 break;
             }
 
@@ -171,15 +167,15 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 cube_8v = cube["cube_8v"];
                 cube_24v = cube["cube_24v"];
                 cube_size = cube["size"];
-                if (cube_8v) rs.createCube8v(ecs, shader, tc, cube_size);
-                if (cube_24v) rs.createCube24v(ecs, shader, tc, cube_size);
+                if (cube_8v) rs.createCube8v(ecs, tc, cube_size);
+                if (cube_24v) rs.createCube24v(ecs, tc, cube_size);
                 break;
             }
 
             case RenderType::RT_Quad: {
                 const auto& quad = entity["Render_component"]["Quad"];
                 quad_size = quad["size"];
-                rs.createQuad(ecs, shader, tc, quad_size);
+                rs.createQuad(ecs, tc, quad_size);
                 break;
             }
 
@@ -188,7 +184,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 sphere_num_heights = sphere["num_heights"];
                 sphere_num_revs = sphere["num_revs"];
                 sphere_size = sphere["size"];
-                rs.createSphere(ecs, shader, tc, sphere_num_heights, sphere_num_revs, sphere_size);
+                rs.createSphere(ecs, tc, sphere_num_heights, sphere_num_revs, sphere_size);
                 break;
             }
 
@@ -200,7 +196,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 terrain_size = terrain["size"];
                 terrain_is_centered = terrain["is_centered"];
                 terrain_use_perlin_noise = terrain["use_perlin_noise"];
-                rs.createTerrain(ecs, shader, tc,
+                rs.createTerrain(ecs, tc,
                     terrain_num_cols,
                     terrain_num_rows,
                     terrain_height_mult,
@@ -240,13 +236,13 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 
             switch (lightType) {
             case LightType::LT_Spot: 
-                rs.createSpotLight(ecs, shader, li, false);
+                rs.createSpotLight(ecs, li, false);
                 break;
             case LightType::LT_Point: 
-                rs.createPointLight(ecs, shader, li, false);
+                rs.createPointLight(ecs, li, false);
                 break;
             case LightType::LT_Directional: 
-                rs.createDirectionalLight(ecs, shader, li, false);
+                rs.createDirectionalLight(ecs, li, false);
                 break;
             }
         }
@@ -273,11 +269,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             }
         }
     }
-
     rs.initEntities(ecs);
-
-    free(vs_entities);
-    free(fs_entities);
 }
 
 
@@ -331,8 +323,11 @@ void SaveManager::newFile()
                 {"Sensitivity", 1.0f},
                 {"Speed", 0.005f},
                 {"Aspect_ratio", 1.777f},
-                {"Min_render_distance", 0.1f},
-                {"Max_render_distance_", 1000.0f}
+                {"Near_clip_plane", 0.1f},
+                {"Far_clip_plane", 1000.0f},
+                {"Ortho_width", 800.0f},
+                {"Ortho_height", 600.0f},
+
             }},
             {"Skybox", {
                 {"Fragment_source", "../assets/shaders/skybox.fs"},

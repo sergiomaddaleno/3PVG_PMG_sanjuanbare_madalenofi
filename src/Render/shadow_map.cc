@@ -63,10 +63,10 @@ void ShadowMap::bind()
 
 void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
-    float spotLightFOV = glm::radians(lc.light.light_info_.spot_angle_);
+    float spotLightFOV = glm::radians(lc.light.spot_angle_);
     glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)g_window_width_ / (float)g_window_height_, near_plane, far_plane);
 
-    glm::mat4 lightView = glm::lookAt(lc.light.light_info_.pos_, lc.light.light_info_.pos_ + lc.light.light_info_.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 lightView = glm::lookAt(lc.light.pos_, lc.light.pos_ + lc.light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
     glEnable(GL_DEPTH_TEST);
@@ -123,7 +123,6 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
         }
     }
 
-    //glClear(GL_DEPTH_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
 
     glDrawBuffer(GL_BACK);

@@ -55,7 +55,7 @@ void Skybox::render(Camera cam) {
     glEnable(GL_LEQUAL);
 
     glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix()));
-    glm::mat4 projection = cam.getProjectionMatrix();
+    glm::mat4 projection = cam.getPerspectiveMatrix();
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(skybox_angle_), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::mat4 model = rotation;
 

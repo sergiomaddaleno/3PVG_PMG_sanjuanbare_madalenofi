@@ -4,9 +4,12 @@ int g_window_width_ = 800;
 int g_window_height_ = 600;
 bool g_full_screen_ = true;
 
+float g_ortho_width_ = 800;
+float g_ortho_height_ = 600;
+
 float g_fov_ = 45.0f;
-float g_min_render_distance_ = 0.1f;
-float g_max_render_distance_ = 400.0f;
+float g_near_clip_plane_ = 0.1f;
+float g_far_clip_plane_ = 400.0f;
 
 bool g_b_fog_ = false;
 float g_fog_density_ = 0.06f;

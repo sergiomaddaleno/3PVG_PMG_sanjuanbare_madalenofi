@@ -30,7 +30,7 @@
 struct DataImgui {
     //Terrain terrain;
     //Triangle triangle;
-    Camera cam;
+    Camera* cam;
     //LightInfo light_info;
     PostProcessing* post_proccessing;
     ECSManager* ecs;

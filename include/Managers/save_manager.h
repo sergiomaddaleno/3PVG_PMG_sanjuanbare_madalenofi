@@ -37,7 +37,7 @@ private:
 
 	//---
 
-	LightInfo li;
+	Light li;
 
 	int terrain_num_rows = 0;
 	int terrain_num_cols = 0;

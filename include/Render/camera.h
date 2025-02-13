@@ -20,6 +20,9 @@ public:
 
 	void update(Input& input, const double dt, const int window_width = 800, const int window_height = 600);
 
+	glm::mat4 getPerspectiveMatrix() const;
+	glm::mat4 getOrthograficMatrix() const;
+
 	// ---
 
 	const float getSpeed() const {return speed_;}
@@ -31,24 +34,22 @@ public:
 	glm::vec3 getViewDir() const { return view_direction_; }
 	glm::vec3 getUp() const { return up_; }
 
-	//--
 	void setSpeed(const float speed){ speed_ = speed; }
 	void setSensitibity(const float sensitivity){ sensitivity_ = sensitivity; }
 	void setPosition(glm::vec3 position) {position_ = position;}
 	void setFov(float fov) { fov_ = fov; }
 	void setAspectRatio(float aspect_ratio) { aspect_ratio_ = aspect_ratio; }
-	void setMinRenderDistance_(float min_render_distance) { min_render_distance_ = min_render_distance; }
-	void setMaxRenderDistance_(float max_render_distance) { max_render_distance_ = max_render_distance; }
+	void setNearCliPlane(float near_clip_plane) { near_clip_plane_ = near_clip_plane; }
+	void setFarCliPlane(float far_clip_plane) { far_clip_plane_ = far_clip_plane; }
+	void setOrthoWidth(float ortho_width) { ortho_width_ = ortho_width; }
+	void setOrthoHeight(float ortho_height) { ortho_height_ = ortho_height; }
 
 	void setScrollSpeed(float scroll_speed) { scroll_speed_ = scroll_speed; }
 	void setViewDir(glm::vec3 view_direction) {view_direction_ = view_direction;}
 	void setUp(glm::vec3 up) { up_ = up; }
 
-	//--
 	glm::mat4 getViewMatrix() const;
 	void setViewMatrix(const glm::mat4 view);
-
-	glm::mat4 getProjectionMatrix() const;
 
 	//Save data
 	nlohmann::json serialize();
@@ -72,8 +73,11 @@ private:
 	float scroll_speed_;
 	float fov_;
 	float aspect_ratio_;
-	float min_render_distance_;
-	float max_render_distance_;
+
+	float near_clip_plane_;
+	float far_clip_plane_;
+	float ortho_width_;
+	float ortho_height_;
 };
 
 

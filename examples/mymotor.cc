@@ -47,12 +47,6 @@ RenderSystem render_system;
 Skybox skybox;
 SaveManager save_manager;
 
-char* vs_entities = (char*)ReadFile("../assets/shaders/entities.vs");
-char* fs_entities = (char*)ReadFile("../assets/shaders/entities.fs");
-char* vs_shadows = (char*)ReadFile("../assets/shaders/depth_map.vs");
-
-Shader entities_shader,shadow_shader; 
-
 auto e = ecs.create_entity();
 
 int main(int, char**) {
@@ -64,16 +58,11 @@ int main(int, char**) {
     //window->setWindowIcon(window->getWindow(), "../assets/textures/images/AE.png");
 
     Input input{ window->getWindow() };
-
-    // ---
-
-    entities_shader.compile(vs_entities, fs_entities);
-    shadow_shader.compile(vs_shadows, fs_entities);
-
     // ---
     
     postProcc.initData();
 
+    render_system.initShader("../assets/shaders/entities.vs", "../assets/shaders/entities.fs");
     render_system.setupEntities(ecs);
 
     save_manager.loadFromFile("../saves/main_scene.json", ecs, render_system, cam, skybox);
@@ -113,7 +102,7 @@ int main(int, char**) {
 
         //--
 
-        data_imgui.cam = cam;
+        data_imgui.cam = &cam;
         data_imgui.post_proccessing = &postProcc;
         data_imgui.window = &window.value();
         data_imgui.skybox = &skybox;

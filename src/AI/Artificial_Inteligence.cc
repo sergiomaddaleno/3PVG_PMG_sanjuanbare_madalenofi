@@ -1,5 +1,8 @@
 #include "AI/Artificial_Inteligence.h"
 
+#include <vector>
+#include <cstdlib>
+#include <ctime>
 
 AI::AI()
 {
@@ -9,18 +12,12 @@ AI::~AI()
 {
 }
 
-#include <vector>
-#include <cstdlib> // Para usar rand() y srand()
-#include <ctime>   // Para usar time() en la semilla aleatoria
-
 void AI::DrawGrid(ECSManager& ecs, int size, RenderSystem& rs, Shader shader)
 {
     float cubeSize = 1.25f;
     std::vector<glm::vec3> gridPositions; 
 
-    
-    rs.createDirectionalLight(ecs, shader);
-
+    rs.createDirectionalLight(ecs);
     
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
@@ -32,7 +29,7 @@ void AI::DrawGrid(ECSManager& ecs, int size, RenderSystem& rs, Shader shader)
             gridPositions.push_back(t.position);
 
            
-            rs.createCube24v(ecs, shader, t, 0.5f);
+            rs.createCube24v(ecs, t, 0.5f);
         }
     }
 
@@ -75,14 +72,14 @@ void AI::GenerateEntitiesAtPosition(ECSManager& ecs, RenderSystem& rs, Shader sh
         t.position.z = position.z;
 
         t.scale = glm::vec3(0.5f,0.5f,0.5f);
-        rs.createMesh(ecs, shader,url,url_tex ,t);
+        rs.createMesh(ecs,url,url_tex ,t);
     }
     else {
         TransformComponent t;
         t.position.x = position.x;
         t.position.y = position.y + 1.25f;
         t.position.z = position.z;
-        rs.createCube24v(ecs, shader, t, 0.5f);
+        rs.createCube24v(ecs, t, 0.5f);
 
     }
 

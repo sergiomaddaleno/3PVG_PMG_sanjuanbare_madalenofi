@@ -85,7 +85,7 @@ bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
 
 void Mesh::render(RenderComponent rc, TransformComponent tc, Camera cam)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    /*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
     for (auto& mesh : rc.mesh_->meshes) {
@@ -155,7 +155,7 @@ void Mesh::render(RenderComponent rc, TransformComponent tc, Camera cam)
         glDeleteBuffers(1, &rc.mesh_->VBO);
         glDeleteBuffers(1, &rc.mesh_->EBO);
     }
-
+    */
 }
 
 void Mesh::bind()

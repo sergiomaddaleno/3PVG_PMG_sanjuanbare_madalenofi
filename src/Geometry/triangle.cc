@@ -64,7 +64,7 @@ std::optional<Triangle> Triangle::make(float size_, Color color)
 
 void Triangle::render(RenderComponent rc, TransformComponent tc, Camera cam)
 {
-    GLuint vertex_buffer;
+    /*GLuint vertex_buffer;
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
@@ -97,7 +97,7 @@ void Triangle::render(RenderComponent rc, TransformComponent tc, Camera cam)
     glDisableVertexAttribArray(vpos_location);
     glDisableVertexAttribArray(vcol_location);
 
-    glUseProgram(0);
+    glUseProgram(0);*/
 }
 
 

@@ -35,7 +35,6 @@ struct RenderComponent {
     std::unique_ptr<Quad>quad_;
     std::unique_ptr<Light>light_;
 
-    Shader shader;
     Texture texture;
     RenderType type_;
 
@@ -53,7 +52,6 @@ struct RenderComponent {
         if (quad_) { json_data["Quad"] = quad_->serialize(); }
         if (light_) { json_data["Light"] = light_->serialize(); }
 
-        json_data["Shader"] = shader.serialize();
         json_data["Texture"] = texture.serialize();
         json_data["Render_type"] = (int)type_;
 
@@ -69,7 +67,6 @@ struct RenderComponent {
         cube_(nullptr),
         quad_(nullptr), 
         light_(nullptr),
-        shader(),
         texture(), 
         triangle_(triangle_.my_triangle),
         type_(RenderType::RT_Default)
@@ -97,7 +94,6 @@ struct RenderComponent {
         light_(other.light_ ? std::make_unique<Light>(*other.light_) : nullptr),
         triangle_(other.triangle_),
         texture(other.texture),
-        shader(other.shader),
         type_(other.type_)
     {}
 };

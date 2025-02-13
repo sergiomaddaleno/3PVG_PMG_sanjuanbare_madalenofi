@@ -25,16 +25,30 @@ Camera::Camera()
     sensitivity_(1.0f),
     fov_(g_fov_),
     aspect_ratio_((float)g_window_width_ / (float)g_window_height_),
-    min_render_distance_(g_min_render_distance_),
-    max_render_distance_(g_max_render_distance_),
+    near_clip_plane_(g_near_clip_plane_),
+    far_clip_plane_(g_far_clip_plane_),
+    ortho_width_(g_ortho_height_),
+    ortho_height_(600),
     scroll_speed_(10.0f),
     view_(initViewTarget())
 {}
 
-
 glm::mat4 Camera::initViewTarget()
 {
 	return glm::lookAt(position_, position_ + view_direction_, up_);
+}
+
+glm::mat4 Camera::getPerspectiveMatrix() const
+{
+    return glm::perspective(glm::radians(fov_), aspect_ratio_, near_clip_plane_, far_clip_plane_);
+}
+
+glm::mat4 Camera::getOrthograficMatrix() const
+{
+    float w_half = ortho_width_ / 2.0f;
+    float h_half = ortho_width_ / 2.0f;
+
+    return glm::ortho(-w_half, w_half, -h_half, h_half, near_clip_plane_, far_clip_plane_);
 }
 
 void Camera::update(Input& input, const double dt, const int window_width, const int window_height) {
@@ -68,8 +82,8 @@ void Camera::update(Input& input, const double dt, const int window_width, const
 
     view_ = initViewTarget();
 
-    glm::vec3 forward_vec = glm::normalize(view_direction_); // Direcci�n frontal normalizada
-    glm::vec3 right_vec = glm::normalize(glm::cross(forward_vec, up_)); // Direcci�n derecha normalizada
+    glm::vec3 forward_vec = glm::normalize(view_direction_);
+    glm::vec3 right_vec = glm::normalize(glm::cross(forward_vec, up_));
 
     // ----------------- Camera Movement
     if (input.isMouseButtonDown(Input::MouseButton::MOUSE_RIGHT)) {
@@ -116,11 +130,6 @@ glm::mat4 Camera::getViewMatrix() const {
     return view_;
 }
 
-glm::mat4 Camera::getProjectionMatrix() const
-{
-    return glm::perspective(glm::radians(fov_), aspect_ratio_, min_render_distance_, max_render_distance_);
-}
-
 nlohmann::json Camera::serialize()
 {
     nlohmann::json json_data;
@@ -132,8 +141,10 @@ nlohmann::json Camera::serialize()
     json_data["Scroll_speed"] = scroll_speed_;
     json_data["Fov"] = fov_;
     json_data["Aspect_ratio"] = aspect_ratio_;
-    json_data["Min_render_distance"] = min_render_distance_;
-    json_data["Max_render_distance_"] = max_render_distance_;
+    json_data["Near_clip_plane"] = near_clip_plane_;
+    json_data["Far_clip_plane"] = far_clip_plane_;
+    json_data["Ortho_width"] = ortho_width_;
+    json_data["Ortho_height"] = ortho_height_;
 
     return json_data;
 }

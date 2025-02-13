@@ -7,9 +7,12 @@ extern int g_window_width_;
 extern int g_window_height_;
 extern bool g_full_screen_;
 
+extern float g_ortho_width_;
+extern float g_ortho_height_;
+
 extern float g_fov_;
-extern float g_min_render_distance_;
-extern float g_max_render_distance_;
+extern float g_near_clip_plane_;
+extern float g_far_clip_plane_;
 
 extern bool g_b_fog_;
 extern float g_fog_density_;

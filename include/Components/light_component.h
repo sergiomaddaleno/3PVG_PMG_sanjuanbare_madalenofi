@@ -11,7 +11,6 @@
 struct LightComponent {
 
 	Light light;
-	Shader shader;
 	ShadowMap shadow_map_;
 
 	// To save data
@@ -20,7 +19,6 @@ struct LightComponent {
 		nlohmann::json json_data;
 
 		json_data["light"] = light.serialize();
-		json_data["Shader"] = shader.serialize();
 
 		return json_data;
 	}

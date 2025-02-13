@@ -318,7 +318,6 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             ImGui::PopStyleColor();
 
             static std::string vertex_file_name;
-            static char* vertex_content = nullptr;
             if (ImGui::Button(!vertex_file_name.empty() ? std::string("" + vertex_file_name).c_str() : "VS Drop here", { 120.0f, 40.0f })) {}
 
             if (ImGui::BeginDragDropTarget()) {
@@ -326,14 +325,12 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
                     std::filesystem::path filePath = (const wchar_t*)payload->Data;
                     if (filePath.extension() == ".vs") {
                         vertex_file_name = filePath.filename().string();
-                        vertex_content = ReadFile(filePath.string().c_str());
                     }
                 }
                 ImGui::EndDragDropTarget();
             }
 
             static std::string fragment_file_name;
-            static char* fragment_content = nullptr;
             ImGui::SameLine();
             if (ImGui::Button(!fragment_file_name.empty() ? std::string("" + fragment_file_name).c_str() : "FS Drop here", { 120.0f, 40.0f })) {}
 
@@ -342,24 +339,18 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
                     std::filesystem::path filePath = (const wchar_t*)payload->Data;
                     if (filePath.extension() == ".fs") {
                         fragment_file_name = filePath.filename().string();
-                        fragment_content = ReadFile(filePath.string().c_str());
                     }
                 }
                 ImGui::EndDragDropTarget();
             }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-            if (ImGui::Button("Compile") && vertex_content && fragment_content) {
-                Shader newShader;
-                newShader.compile(vertex_content, fragment_content);
-
-                di.ecs->get_component<RenderComponent>(selected_entity)->shader = newShader;
+            if (ImGui::Button("Compile")) {
+                
+                di.render_system->initShader("../assets/shaders/" + vertex_file_name, "../assets/shaders/" + fragment_file_name);
 
                 vertex_file_name.clear();
                 fragment_file_name.clear();
-
-                vertex_content = nullptr;
-                fragment_content = nullptr;
             }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
@@ -381,7 +372,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
                 ImGui::SliderFloat("Height Multiplier", &terrain.height_mult_, 0.0f, 10.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
                 ImGui::SliderFloat("Size", &terrain.size_, 0.0f, 10.0f, "%.3f");
                 ImGui::Checkbox("Is Centered", &terrain.is_centered_);
-                ImGui::Checkbox("Use Perlin Noise", &terrain.use_perlin_noise_);
+                ImGui::Checkbox("Perlin Noise / Heightmap", &terrain.use_perlin_noise_);
 
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
@@ -477,7 +468,7 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
 
         if (ImGui::CollapsingHeader("Transform Component", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-            Gizmo(di.cam.getViewMatrix(), di.cam.getProjectionMatrix(), selected_entity, di);
+            Gizmo(di.cam->getViewMatrix(), di.cam->getPerspectiveMatrix(), selected_entity, di);
 
             if (ImGui::BeginTable("TransformTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
                 ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);
@@ -543,42 +534,42 @@ void ImGuiManager::InspectorWindow(DataImgui& di) {
             ImGui::PopStyleColor();
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
-            ImGui::SliderFloat3("Position", &light_comp->light.light_info_.pos_[0], -100.0f, 100.0f);
-            ImGui::SliderFloat3("Direction", &light_comp->light.light_info_.dir_[0], -1.0f, 1.0f);
+            ImGui::SliderFloat3("Position", &light_comp->light.pos_[0], -100.0f, 100.0f);
+            ImGui::SliderFloat3("Direction", &light_comp->light.dir_[0], -1.0f, 1.0f);
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.3f, 1.0f)); 
             ImGui::Text("Light Colors");
             ImGui::PopStyleColor();
 
-            ImGui::ColorEdit3("Diffuse Color", &light_comp->light.light_info_.diff_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
-            ImGui::ColorEdit3("Specular Color", &light_comp->light.light_info_.spec_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
-            ImGui::ColorEdit3("Light Color", &light_comp->light.light_info_.light_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
-            ImGui::ColorEdit3("Ambient Color", &light_comp->light.light_info_.ambient_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
+            ImGui::ColorEdit3("Diffuse Color", &light_comp->light.diff_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
+            ImGui::ColorEdit3("Specular Color", &light_comp->light.spec_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
+            ImGui::ColorEdit3("Light Color", &light_comp->light.light_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
+            ImGui::ColorEdit3("Ambient Color", &light_comp->light.ambient_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.9f, 0.5f, 1.0f)); 
             ImGui::Text("Attenuation");
             ImGui::PopStyleColor();
 
-            ImGui::SliderFloat("Linear Attenuation", &light_comp->light.light_info_.linear_att, 0.0f, 1.0f);
-            ImGui::SliderFloat("Quadratic Attenuation", &light_comp->light.light_info_.quad_att_, 0.0f, 1.0f);
-            ImGui::SliderFloat("Constant Attenuation", &light_comp->light.light_info_.constant_att_, 0.0f, 1.0f);
+            ImGui::SliderFloat("Linear Attenuation", &light_comp->light.linear_att, 0.0f, 1.0f);
+            ImGui::SliderFloat("Quadratic Attenuation", &light_comp->light.quad_att_, 0.0f, 1.0f);
+            ImGui::SliderFloat("Constant Attenuation", &light_comp->light.constant_att_, 0.0f, 1.0f);
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 0.7f, 1.0f, 1.0f)); 
             ImGui::Text("Spotlight Settings");
             ImGui::PopStyleColor();
 
-            ImGui::SliderFloat("Spotlight Angle", &light_comp->light.light_info_.spot_angle_, 0.0f, 180.0f);
+            ImGui::SliderFloat("Spotlight Angle", &light_comp->light.spot_angle_, 0.0f, 180.0f);
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.8f, 1.0f, 1.0f));
             ImGui::Text("Shininess & Strength");
             ImGui::PopStyleColor();
 
-            ImGui::SliderFloat("Shininess", &light_comp->light.light_info_.shininess_, 1.0f, 128.0f);
-            ImGui::SliderFloat("Strength", &light_comp->light.light_info_.strength_, 0.0f, 10.0f);
+            ImGui::SliderFloat("Shininess", &light_comp->light.shininess_, 1.0f, 128.0f);
+            ImGui::SliderFloat("Strength", &light_comp->light.strength_, 0.0f, 10.0f);
 
         }
     }
@@ -756,10 +747,10 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
                 (di.input->isKeyPressed(Input::CTRL) && di.input->isKeyPressed(Input::S))) {
 
                 if (di.save_manager.getCurrentScene().empty()) {
-                    di.save_manager.saveToFile("../saves/scene_0.json", *di.ecs, di.cam, *di.skybox);
+                    di.save_manager.saveToFile("../saves/scene_0.json", *di.ecs, *di.cam, *di.skybox);
                 }
                 else {
-                    di.save_manager.saveToFile(di.save_manager.getCurrentScene(), *di.ecs, di.cam, *di.skybox);
+                    di.save_manager.saveToFile(di.save_manager.getCurrentScene(), *di.ecs, *di.cam, *di.skybox);
                 }
             }
 
@@ -817,70 +808,28 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
             if (ImGui::BeginMenu("Add Geometry")) {
 
                 if (ImGui::MenuItem("Sphere")) {
-                    Shader newShader;
-                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
-                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
-                    newShader.compile(loc_vs, loc_fs);
-
-                    di.render_system->createSphere(loc_ecs, newShader);
+                    di.render_system->createSphere(loc_ecs);
                     di.render_system->initEntities(loc_ecs);
-
-                    free(loc_vs);
-                    free(loc_fs);
                 }
 
                 if (ImGui::MenuItem("Cube 8v")) {
-                    Shader newShader;
-                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
-                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
-                    newShader.compile(loc_vs, loc_fs);
-
-                    di.render_system->createCube8v(loc_ecs, newShader);
+                    di.render_system->createCube8v(loc_ecs);
                     di.render_system->initEntities(loc_ecs);
-
-                    free(loc_vs);
-                    free(loc_fs);
                 }
 
                 if (ImGui::MenuItem("Cube 24v")) {
-                    Shader newShader;
-                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
-                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
-                    newShader.compile(loc_vs, loc_fs);
-
-                    di.render_system->createCube24v(loc_ecs, newShader);
+                    di.render_system->createCube24v(loc_ecs);
                     di.render_system->initEntities(loc_ecs);
-
-                    free(loc_vs);
-                    free(loc_fs);
                 }
 
                 if (ImGui::MenuItem("Quad")) {
-                    Shader newShader;
-                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
-                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
-                    newShader.compile(loc_vs, loc_fs);
-
-                    di.render_system->createQuad(loc_ecs, newShader);
+                    di.render_system->createQuad(loc_ecs);
                     di.render_system->initEntities(loc_ecs);
-
-                    free(loc_vs);
-                    free(loc_fs);
                 }
 
                 if (ImGui::MenuItem("Terrain")) {
-                    Shader newShader;
-                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
-                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
-                    newShader.compile(loc_vs, loc_fs);
-
-                    TransformComponent tc;
-
-                    di.render_system->createTerrain(loc_ecs, newShader);
+                    di.render_system->createTerrain(loc_ecs);
                     di.render_system->initEntities(loc_ecs);
-
-                    free(loc_vs);
-                    free(loc_fs);
                 }
 
                 ImGui::EndMenu();
@@ -889,39 +838,18 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
             if (ImGui::BeginMenu("Add Light")) {
 
                 if (ImGui::MenuItem("Point Light")) {
-                    Shader newShader;
-                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
-                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
-                    newShader.compile(loc_vs, loc_fs);
-
-                    di.render_system->createPointLight(loc_ecs, newShader);
+                    di.render_system->createPointLight(loc_ecs);
                     di.render_system->initEntities(loc_ecs);
                 }
 
                 if (ImGui::MenuItem("Spot Light")) {
-                    Shader newShader;
-                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
-                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
-                    newShader.compile(loc_vs, loc_fs);
-
-                    di.render_system->createSpotLight(loc_ecs, newShader);
+                    di.render_system->createSpotLight(loc_ecs);
                     di.render_system->initEntities(loc_ecs);
-
-                    free(loc_vs);
-                    free(loc_fs);
                 }
 
                 if (ImGui::MenuItem("Directional Light")) {
-                    Shader newShader;
-                    char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
-                    char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
-                    newShader.compile(loc_vs, loc_fs);
-
-                    di.render_system->createDirectionalLight(loc_ecs, newShader);
+                    di.render_system->createDirectionalLight(loc_ecs);
                     di.render_system->initEntities(loc_ecs);
-
-                    free(loc_vs);
-                    free(loc_fs);
                 }
 
                 ImGui::EndMenu();
@@ -936,6 +864,42 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
 
             ImGui::EndMenu();
         }
+
+        if (ImGui::BeginMenu("Camera")) {
+            
+            static float sensitivity = 1.0f; 
+            if (ImGui::SliderFloat("Sensitivity", &sensitivity, 0.1f, 1.0f)) {
+                di.cam->setSensitibity(sensitivity);
+            }
+
+            static float speed = 5.0f;
+            if (ImGui::SliderFloat("Speed", &speed, 0.1f, 20.0f)) {
+                di.cam->setSpeed(speed);
+            }
+
+            static float fov = 45.0f;
+            if (ImGui::SliderFloat("FOV", &fov, 1.0f, 120.0f)) {
+                di.cam->setFov(fov);
+            }
+
+            static float near_clip_plane = 0.1f;
+            if (ImGui::SliderFloat("Near Clip Plane", &near_clip_plane, 0.01f, 10.0f)) {
+                di.cam->setNearCliPlane(near_clip_plane);
+            }
+
+            static float far_clip_plane = 100.0f;
+            if (ImGui::SliderFloat("Far Clip Plane", &far_clip_plane, 10.0f, 1000.0f)) {
+                di.cam->setFarCliPlane(far_clip_plane);
+            }
+
+            static float scroll_speed = 1.0f;
+            if (ImGui::SliderFloat("Scroll Speed", &scroll_speed, 0.1f, 10.0f)) {
+                di.cam->setScrollSpeed(scroll_speed);
+            }
+
+            ImGui::EndMenu();
+        }
+
         ImGui::EndMenuBar();
     }
 
@@ -1160,7 +1124,7 @@ void ImGuiManager::LoadSceneWindow(DataImgui& di)
 
     if (ImGui::Button("Load Scene")) {
         di.save_manager.setCurrentScene("../saves/" + scene_file_name); 
-        di.save_manager.loadFromFile(di.save_manager.getCurrentScene(), *di.ecs, *di.render_system, di.cam, *di.skybox);
+        di.save_manager.loadFromFile(di.save_manager.getCurrentScene(), *di.ecs, *di.render_system, *di.cam, *di.skybox);
     }
 
     ImGui::End();
@@ -1207,20 +1171,12 @@ void ImGuiManager::AddMeshWindow(DataImgui& di)
 
     if (ImGui::Button("Add Mesh")) {
         
-        Shader newShader;
-        char* loc_vs = (char*)ReadFile("../assets/shaders/entities.vs");
-        char* loc_fs = (char*)ReadFile("../assets/shaders/entities.fs");
-        newShader.compile(loc_vs, loc_fs);
-
         if (!obj_file_name.empty() && !texture_folder.empty()) {
-            di.render_system->createMesh(*di.ecs, newShader, "../assets/obj/" + obj_file_name, texture_folder);
+            di.render_system->createMesh(*di.ecs, "../assets/obj/" + obj_file_name, texture_folder);
             di.render_system->initEntities(*di.ecs);
 
             obj_file_name.clear();
             texture_folder.clear();
-
-            free(loc_vs);
-            free(loc_fs);
         }
     }
 
@@ -1260,7 +1216,7 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
 
                 if (loc_ecs->has_component<LightComponent>(selected_entity)) {
                     auto& light_comp = loc_ecs->get_component<LightComponent>(selected_entity);
-                    light_comp->light.light_info_.pos_ = transform->position;
+                    light_comp->light.pos_ = transform->position;
                 }
 
                 glm::mat4 model = glm::mat4(1.0f);
