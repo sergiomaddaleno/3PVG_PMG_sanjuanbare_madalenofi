@@ -29,10 +29,11 @@ public:
 	const float getSensitivity() const {return sensitivity_;}
 	const glm::vec3 getPosition() const{return position_;}
 	const float getFov() const{return fov_;}
-
 	float getScrollSpeed() const { return scroll_speed_; }
 	glm::vec3 getViewDir() const { return view_direction_; }
 	glm::vec3 getUp() const { return up_; }
+	const float getNearCliPlane() { return near_clip_plane_; }
+	const float getFarCliPlane() { return far_clip_plane_; }
 
 	void setSpeed(const float speed){ speed_ = speed; }
 	void setSensitibity(const float sensitivity){ sensitivity_ = sensitivity; }

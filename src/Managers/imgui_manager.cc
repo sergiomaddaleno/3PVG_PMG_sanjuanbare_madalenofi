@@ -867,32 +867,32 @@ void ImGuiManager::TopBarWindow(DataImgui& di) {
 
         if (ImGui::BeginMenu("Camera")) {
             
-            static float sensitivity = 1.0f; 
+            static float sensitivity = di.cam->getSensitivity(); 
             if (ImGui::SliderFloat("Sensitivity", &sensitivity, 0.1f, 1.0f)) {
                 di.cam->setSensitibity(sensitivity);
             }
 
-            static float speed = 5.0f;
+            static float speed = di.cam->getSpeed();
             if (ImGui::SliderFloat("Speed", &speed, 0.1f, 20.0f)) {
                 di.cam->setSpeed(speed);
             }
 
-            static float fov = 45.0f;
+            static float fov = di.cam->getFov();
             if (ImGui::SliderFloat("FOV", &fov, 1.0f, 120.0f)) {
                 di.cam->setFov(fov);
             }
 
-            static float near_clip_plane = 0.1f;
+            static float near_clip_plane = di.cam->getNearCliPlane();
             if (ImGui::SliderFloat("Near Clip Plane", &near_clip_plane, 0.01f, 10.0f)) {
                 di.cam->setNearCliPlane(near_clip_plane);
             }
 
-            static float far_clip_plane = 100.0f;
+            static float far_clip_plane = di.cam->getFarCliPlane();
             if (ImGui::SliderFloat("Far Clip Plane", &far_clip_plane, 10.0f, 1000.0f)) {
                 di.cam->setFarCliPlane(far_clip_plane);
             }
 
-            static float scroll_speed = 1.0f;
+            static float scroll_speed = di.cam->getScrollSpeed();
             if (ImGui::SliderFloat("Scroll Speed", &scroll_speed, 0.1f, 10.0f)) {
                 di.cam->setScrollSpeed(scroll_speed);
             }

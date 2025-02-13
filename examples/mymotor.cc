@@ -8,10 +8,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Core/window.h"
-#include "Core/framebuffer.h"
-#include "Core/shader.h"
 #include "Core/input.h"
-#include "Core/mesh.h"
 #include "Render/render_system.h"
 #include "Render/camera.h"
 #include "Render/post_processing.h"
@@ -20,21 +17,8 @@
 #include "Managers/save_manager.h"
 #include "Managers/lua_manager.h"
 
-#include "Systems/ecs_manager.h"
-#include "Geometry/terrain.h"
 #include "global_variables.h"
 #include "utils.h"
-
-#include "Components/scripting_component.h"
-#include "Components/light_component.h"
-#include "Components/render_component.h"
-#include "Components/transform_component.h"
-
-#include <../deps/glm/glm.hpp>
-#include <../deps/glm/gtc/matrix_transform.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <../deps/glm/gtx/matrix_decompose.hpp>
-#include <../deps/glm/gtc/type_ptr.hpp>
 
 struct GameData {
 
