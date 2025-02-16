@@ -254,6 +254,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             li.shininess_ = lc["Shininnes"][0].get<float>();
             li.strength_ = lc["Strength"][0].get<float>();
             li.spot_angle_ = lc["Spot_angle"][0].get<float>();
+            li.spot_softness_ = lc["Spot_softness"][0].get<float>();
 
             li.type_ = lc["Type"].get<LightType>();
 

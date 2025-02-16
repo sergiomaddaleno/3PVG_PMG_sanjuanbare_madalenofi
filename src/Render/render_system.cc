@@ -143,7 +143,6 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
     auto liend = ecs.getComponentList<LightComponent>().end();
 
     shader.useProgram();
-    bool light_first_pass = true; 
 
     for (; li != liend; ++li) {
         if (li->has_value()) {
@@ -152,6 +151,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
             light_comp->shadow_map_.render(ecs, shader, *light_comp);
 
             shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
+            
             light_comp->light.setUniforms(shader);
             
             // ---------------------------------------------------------------
@@ -400,6 +400,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, Light li, bool default_lig
         light_comp->light.shininess_ = 32.0f;
         light_comp->light.strength_ = 1.0f;
         light_comp->light.spot_angle_ = 45.0f;
+        light_comp->light.spot_softness_ = 10.0f;
     }
     else {
         light_comp->light.pos_ = li.pos_;
@@ -411,6 +412,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, Light li, bool default_lig
         light_comp->light.shininess_ = li.shininess_;
         light_comp->light.strength_ = li.strength_;
         light_comp->light.spot_angle_ = li.spot_angle_;
+        light_comp->light.spot_softness_ = li.spot_softness_;
     }
 
     entity_++;

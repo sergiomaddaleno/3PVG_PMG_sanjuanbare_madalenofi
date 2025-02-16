@@ -589,7 +589,8 @@ void ImGuiManager::InspectorWindow() {
             ImGui::Text("Spotlight Settings");
             ImGui::PopStyleColor();
 
-            ImGui::SliderFloat("Spotlight Angle", &light_comp->light.spot_angle_, 0.0f, 180.0f);
+            ImGui::SliderFloat("Spot Angle", &light_comp->light.spot_angle_, 0.0f, 90.0f);
+            ImGui::SliderFloat("Spot Softness", &light_comp->light.spot_softness_, 0.0f, 90.0f);
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.8f, 1.0f, 1.0f));

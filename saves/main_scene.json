@@ -7,17 +7,17 @@
   "Ortho_height": 600.0,
   "Ortho_width": 600.0,
   "Position": [
-   -13.697672843933105,
-   18.23652458190918,
-   21.83353042602539
+   -6.070217132568359,
+   18.475231170654297,
+   24.660537719726563
   ],
   "Scroll_speed": 1.3370000123977661,
   "Sensitivity": 1.0,
   "Speed": 0.009999999776482582,
   "View_direction": [
-   0.5261430144309998,
-   -0.5326245427131653,
-   -0.6629363894462585
+   0.2014916092157364,
+   -0.43596068024635315,
+   -0.8771199584007263
   ]
  },
  "Entities": [
@@ -62,9 +62,9 @@
     "light": {
      "Ambient_color": [
       [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
+       0.0,
+       0.0,
+       0.0
       ]
      ],
      "Constant_attenuation": [
@@ -115,7 +115,10 @@
       ]
      ],
      "Spot_angle": [
-      45.0
+      31.45599937438965
+     ],
+     "Spot_softness": [
+      9.612000465393066
      ],
      "Strength": [
       1.0
@@ -136,7 +139,7 @@
      0.0,
      0.0,
      0.0,
-     1.0
+     0.0
     ],
     "Scale": [
      1.0,
@@ -161,7 +164,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 13
+         "TextureID": 4
         }
        ]
       },
@@ -171,7 +174,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 14
+         "TextureID": 5
         }
        ]
       },
@@ -181,7 +184,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 15
+         "TextureID": 6
         }
        ]
       },
@@ -191,7 +194,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 16
+         "TextureID": 7
         }
        ]
       },
@@ -201,7 +204,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 17
+         "TextureID": 8
         }
        ]
       },
@@ -211,7 +214,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 18
+         "TextureID": 9
         }
        ]
       },
@@ -221,7 +224,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 19
+         "TextureID": 10
         }
        ]
       },
@@ -231,7 +234,7 @@
        "Texture_folder": "",
        "Textures": [
         {
-         "TextureID": 20
+         "TextureID": 11
         }
        ]
       }
