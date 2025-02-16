@@ -6,7 +6,7 @@
 #include "Render/shadow_map.h"
 #include "Core/shader.h"
 #include "utils.h"
-#include "global_variables.h"
+#include "global_data.h"
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
 #include "Components\light_component.h"
@@ -25,25 +25,33 @@
 #include <memory> 
 #include <iostream>
 
-#define M_PI 3.14159265358979323846
+RenderSystem::RenderSystem()
+    : shader(),
+    entity_(0),
+    entity_mesh(0),
+    entity_terrain(0),
+    entity_sphere(0),
+    entity_cube8v(0),
+    entity_cube24v(0),
+    entity_quad(0),
+    entity_spotlight(0),
+    entity_pointlight(0),
+    entity_dirlight(0)
+{}
 
-RenderSystem::RenderSystem() {}
 RenderSystem::~RenderSystem() {}
 
 void RenderSystem::initEntities(ECSManager& ecs) {
 
     auto ri = ecs.getComponentList<RenderComponent>().begin();
-    auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto li = ecs.getComponentList<LightComponent>().begin();
 
     auto riend = ecs.getComponentList<RenderComponent>().end();
-    auto tiend = ecs.getComponentList<TransformComponent>().end();
     auto liend = ecs.getComponentList<LightComponent>().end();
 
-    for (; ri != riend && ti != tiend; ++ri, ++ti) {
-        if (ri->has_value() && ti->has_value()) {
+    for (; ri != riend; ++ri) {
+        if (ri->has_value()) {
             auto& render_comp = *ri;
-            auto& transform_comp = *ti;
 
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
@@ -115,10 +123,10 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     int tex_id = 1;
     shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
 
-    shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &g_b_fog_);
-    shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &g_fog_density_);
-    shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &g_fog_gradient_);
-    shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &g_sky_colour_);
+    shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &global.use_fog);
+    shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &global.fog_density);
+    shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &global.fog_gradient);
+    shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &global.sky_colour);
 }
 
 void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
@@ -132,17 +140,14 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
     glDepthFunc(GL_LEQUAL);
 
     auto li = ecs.getComponentList<LightComponent>().begin();
-    auto ti = ecs.getComponentList<TransformComponent>().begin();
     auto liend = ecs.getComponentList<LightComponent>().end();
-    auto tiend = ecs.getComponentList<TransformComponent>().end();
 
     shader.useProgram();
     bool light_first_pass = true; 
 
-    for (; li != liend && ti != tiend; ++li, ++ti) {
-        if (li->has_value() && ti->has_value()) {
+    for (; li != liend; ++li) {
+        if (li->has_value()) {
             auto& light_comp = *li;
-            auto& transform = *ti;
 
             light_comp->shadow_map_.render(ecs, shader, *light_comp);
 

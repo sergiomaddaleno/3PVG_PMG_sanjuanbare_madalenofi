@@ -78,17 +78,17 @@ public:
 	//-----------------------
 
 	Shader shader;
-	size_t entity_ = 0;
+	size_t entity_;
 
-	int entity_mesh = 0;
-	int entity_terrain = 0;
-	int entity_sphere = 0;
-	int entity_cube8v = 0;
-	int entity_cube24v = 0;
-	int entity_quad = 0;
-	int entity_spotlight = 0;
-	int entity_pointlight = 0;
-	int entity_dirlight = 0;
+	int entity_mesh;
+	int entity_terrain;
+	int entity_sphere;
+	int entity_cube8v;
+	int entity_cube24v;
+	int entity_quad;
+	int entity_spotlight;
+	int entity_pointlight;
+	int entity_dirlight;
 };
 
 #endif // __RENDER_SYSTEM__

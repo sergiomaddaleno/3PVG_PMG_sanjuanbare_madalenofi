@@ -1,10 +1,12 @@
 
-#ifndef __SAVE_MANAGER__
-#define __SAVE_MANAGER__
+#ifndef _SAVE_MANAGER_H_
+#define _SAVE_MANAGER_H_
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/quaternion.hpp>
 #include <vector>
+
+#include <../nlohmann/json.hpp>
 
 #include "Render/light.h"
 
@@ -17,6 +19,10 @@ class Skybox;
 class SaveManager {
 
 public:
+
+	SaveManager();
+	~SaveManager();
+
 	nlohmann::json serialize(ECSManager& ecs, Camera& cam, Skybox& skybox);
 	void deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera& cam, Skybox& skybox);
 
@@ -33,28 +39,28 @@ public:
 private:
 
 	std::string current_scene_file;
-	int number_of_scenes = 0;
+	int number_of_scenes;
 
 	//---
 
 	Light li;
 
-	int terrain_num_rows = 0;
-	int terrain_num_cols = 0;
-	float terrain_height_mult = 0.0f;
-	float terrain_size = 0.0f;
-	bool terrain_is_centered = true;
-	bool terrain_use_perlin_noise = true;
+	int terrain_num_rows;
+	int terrain_num_cols;
+	float terrain_height_mult;
+	float terrain_size;
+	bool terrain_is_centered;
+	bool terrain_use_perlin_noise;
 
-	int sphere_num_heights = 0;
-	int sphere_num_revs = 0;
-	float sphere_size = 0.0f;
+	int sphere_num_heights;
+	int sphere_num_revs;
+	float sphere_size;
 
-	float cube_size = 0.0f;
-	bool cube_8v = false;
-	bool cube_24v = false;
+	float cube_size;
+	bool cube_8v;
+	bool cube_24v;
 
-	float quad_size = 0.0f;
+	float quad_size;
 
 	char* dds_file;
 	char* sb_vertex;
@@ -63,4 +69,4 @@ private:
 };
 
 
-#endif //__SAVE_MANAGER__
+#endif //_SAVE_MANAGER_H_

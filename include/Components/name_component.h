@@ -1,7 +1,6 @@
 #ifndef __NAME_COMPONENT__
 #define __NAME_COMPONENT__
 
-#include <memory>
 #include <string>
 #include "../deps/nlohmann/json.hpp"
 
@@ -11,11 +10,8 @@ struct NameComponent {
 
 	// To save data
 	nlohmann::json serialize() {
-
 		nlohmann::json json_data;
-
 		json_data["Entity_name"] = name;
-
 		return json_data;
 	}
 };

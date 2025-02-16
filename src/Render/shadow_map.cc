@@ -14,7 +14,7 @@
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
 #include "Components\light_component.h"
-#include "global_variables.h"
+#include "global_data.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -64,7 +64,7 @@ void ShadowMap::bind()
 void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
     float spotLightFOV = glm::radians(lc.light.spot_angle_);
-    glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)g_window_width_ / (float)g_window_height_, near_plane, far_plane);
+    glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)global.window_width / (float)global.window_height, near_plane, far_plane);
 
     glm::mat4 lightView = glm::lookAt(lc.light.pos_, lc.light.pos_ + lc.light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
@@ -127,5 +127,5 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
     glDrawBuffer(GL_BACK);
     glReadBuffer(GL_BACK);
-    glViewport(0, 0, g_window_width_, g_window_height_);
+    glViewport(0, 0, global.window_width, global.window_height);
 }

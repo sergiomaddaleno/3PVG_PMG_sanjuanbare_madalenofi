@@ -30,7 +30,6 @@ private:
     GLuint FBColorTexture_;
     GLuint FBDepthTexture_;
 
-
     bool use_color_;
     bool use_depth_;
 };

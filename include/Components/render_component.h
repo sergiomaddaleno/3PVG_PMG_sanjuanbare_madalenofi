@@ -1,7 +1,6 @@
 #ifndef __RENDER_COMPONENT__
 #define __RENDER_COMPONENT__
 
-#include <memory>
 #include "Geometry/triangle.h"
 #include "Core/texture.h"
 #include "Core/shader.h"
@@ -15,27 +14,24 @@
 #include "../deps/nlohmann/json.hpp"
 
 enum RenderType {
-    RT_Default,
     RT_Mesh,
     RT_Terrain,
     RT_Sphere,
     RT_Cube8v,
     RT_Cube24v,
     RT_Quad,
+    RT_None
 };
 
 struct RenderComponent {
 
     std::unique_ptr<Mesh> mesh_;
-
     Triangle triangle_;
     std::unique_ptr<Terrain>terrain_;
     std::unique_ptr<Sphere>sphere_;
     std::unique_ptr<Cube>cube_;
     std::unique_ptr<Quad>quad_;
-    std::unique_ptr<Light>light_;
 
-    Texture texture;
     RenderType type_;
 
     // Save data
@@ -50,9 +46,7 @@ struct RenderComponent {
         if (sphere_) { json_data["Sphere"] = sphere_->serialize(); }
         if (cube_) { json_data["Cube"] = cube_->serialize(); }
         if (quad_) { json_data["Quad"] = quad_->serialize(); }
-        if (light_) { json_data["Light"] = light_->serialize(); }
 
-        json_data["Texture"] = texture.serialize();
         json_data["Render_type"] = (int)type_;
 
         return json_data;
@@ -66,10 +60,8 @@ struct RenderComponent {
         sphere_(nullptr), 
         cube_(nullptr),
         quad_(nullptr), 
-        light_(nullptr),
-        texture(), 
         triangle_(triangle_.my_triangle),
-        type_(RenderType::RT_Default)
+        type_(RenderType::RT_None)
     {}
     ~RenderComponent() {}
     
@@ -80,7 +72,6 @@ struct RenderComponent {
             sphere_ = other.sphere_ ? std::make_unique<Sphere>(*other.sphere_) : nullptr;
             cube_ = other.cube_ ? std::make_unique<Cube>(*other.cube_) : nullptr;
             quad_ = other.quad_ ? std::make_unique<Quad>(*other.quad_) : nullptr;
-            light_ = other.light_ ? std::make_unique<Light>(*other.light_) : nullptr;
         }
         return *this;
     }
@@ -91,9 +82,7 @@ struct RenderComponent {
         sphere_(other.sphere_ ? std::make_unique<Sphere>(*other.sphere_) : nullptr),
         cube_(other.cube_ ? std::make_unique<Cube>(*other.cube_) : nullptr),
         quad_(other.quad_ ? std::make_unique<Quad>(*other.quad_) : nullptr),
-        light_(other.light_ ? std::make_unique<Light>(*other.light_) : nullptr),
         triangle_(other.triangle_),
-        texture(other.texture),
         type_(other.type_)
     {}
 };

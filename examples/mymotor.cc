@@ -4,38 +4,16 @@
 #include <optional>
 #include <string>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
 #include "Core/window.h"
 #include "Core/input.h"
-#include "Render/render_system.h"
-#include "Render/camera.h"
-#include "Render/post_processing.h"
-#include "Render/skybox.h"
-#include "Managers/imgui_manager.h"
-#include "Managers/save_manager.h"
 #include "Managers/lua_manager.h"
 
-#include "global_variables.h"
+#include "global_data.h"
 #include "utils.h"
-
-struct GameData {
-
-};
-ImGuiManager imgui_manager;
-Camera cam;
-PostProcessing postProcc;
-ECSManager ecs;
-RenderSystem render_system;
-Skybox skybox;
-SaveManager save_manager;
-
-auto e = ecs.create_entity();
 
 int main(int, char**) {
 
-    auto window = Window::make(g_window_width_, g_window_height_, "Window ", g_full_screen_);
+    auto window = Window::make(global.window_width, global.window_height, "Atomic Engine", global.full_screen);
     window->setWindowActive();
     window->initGLEW();
     window->setResizeCallback();
@@ -43,27 +21,22 @@ int main(int, char**) {
 
     Input input{ window->getWindow() };
     // ---
-    
-    postProcc.initData();
 
-    render_system.initShader("../assets/shaders/entities.vs", "../assets/shaders/entities.fs");
-    render_system.setupEntities(ecs);
+    global.game_data.post_process.initData();
 
-    save_manager.loadFromFile("../saves/main_scene.json", ecs, render_system, cam, skybox);
+    global.game_data.render_system.initShader("../assets/shaders/entities.vs", "../assets/shaders/entities.fs");
+    global.game_data.render_system.setupEntities(global.game_data.ecs);
 
-    imgui_manager.Init(window->getWindow());
+    global.game_data.save_manager.loadFromFile("../saves/main_scene.json", global.game_data.ecs, global.game_data.render_system, global.game_data.cam, global.game_data.skybox);
 
-    data_imgui.ecs = &ecs;
-    data_imgui.render_system = &render_system;
-    data_imgui.input = &input;
-    data_imgui.save_manager = save_manager;
+    global.game_data.imgui_manager.Init(window->getWindow());
     //--
 
     double lastTime = window->getTime();
     bool done = false;
 
-    float dt;
-    double currentTime;
+    float dt = 0.0f;
+    double currentTime = 0.0f;
     while (!done) {
         double currentTime = window->getTime();
         float dt = float(currentTime - lastTime);
@@ -71,28 +44,22 @@ int main(int, char**) {
         window->updateWindow();
         window->toggleFullScreen(input);
 
-        g_window_width_ = window->getWidth();
-        g_window_height_ = window->getHeight();
-        postProcc.resize(g_window_width_, g_window_height_);
+        global.window_width = window->getWidth();
+        global.window_height = window->getHeight();
+        global.game_data.post_process.resize(global.window_width, global.window_height);
 
-        postProcc.beginRender();
-        cam.update(input, dt, g_window_width_, g_window_height_);
+        global.game_data.post_process.beginRender();
+        global.game_data.cam.update(input, dt, global.window_width, global.window_height);
 
-        if (g_use_skybox_) {
-            skybox.render(cam);
+        if (global.use_skybox) {
+            global.game_data.skybox.render(global.game_data.cam);
         }
 
-        render_system.renderEntities(ecs, cam);
+        global.game_data.render_system.renderEntities(global.game_data.ecs, global.game_data.cam);
 
         //--
 
-        data_imgui.cam = &cam;
-        data_imgui.post_proccessing = &postProcc;
-        data_imgui.window = &window.value();
-        data_imgui.skybox = &skybox;
-        lastTime = currentTime; 
-
-        imgui_manager.Render(window->getWindow(), data_imgui);
+        global.game_data.imgui_manager.Render(window->getWindow());
 
         if (window->closePressed()) done = true;
 

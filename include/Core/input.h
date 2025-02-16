@@ -50,7 +50,6 @@ private:
     static std::unordered_map<GLFWwindow*, Input*> input_map;
     static std::unordered_map<int, Keys> keyGLFW_map;
 
-
     double mouse_x, mouse_y;
     double scroll_x, scroll_y;
 

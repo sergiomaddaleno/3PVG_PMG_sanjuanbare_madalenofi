@@ -3,13 +3,14 @@
 #ifndef __QUAD_H__
 #define __QUAD_H__ 1
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include "Core/texture.h"
 #include <memory>
 #include <vector>
 
+#include "Core/texture.h"
 #include <../nlohmann/json.hpp>
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 class Quad {
  public:

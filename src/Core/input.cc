@@ -1,3 +1,4 @@
+
 #include "Core/input.h"
 
 std::unordered_map<GLFWwindow*, Input*> Input::input_map;
