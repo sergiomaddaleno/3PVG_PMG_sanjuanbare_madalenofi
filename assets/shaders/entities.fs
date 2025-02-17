@@ -45,7 +45,7 @@ vec3 PointLight(LightInfo lc) {
     float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
 
     float diffuseStrength = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = lc.diff_color_ * lc.light_color_ * diffuseStrength * attenuation * lc.strength_;
+    vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation;
 
     vec3 viewDir = normalize(u_camera_position - FragPos);
     vec3 reflectDir = reflect(-lightDir, normal);

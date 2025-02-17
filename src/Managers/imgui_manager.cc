@@ -639,7 +639,20 @@ void ImGuiManager::InspectorWindow() {
                     if (ImGui::Selectable(addComponents[i], addCurrentItem == i)) {
                         switch (i) {
                         case 0: global.game_data.ecs.add_component<TransformComponent>(selected_entity); break;
-                        case 1: global.game_data.ecs.add_component<LightComponent>(selected_entity); break;
+                        case 1: global.game_data.ecs.add_component<LightComponent>(selected_entity); 
+                        {
+                            auto& light_comp = global.game_data.ecs.get_component<LightComponent>(selected_entity);
+                            light_comp->light.type_ = LightType::LT_Point;
+                            light_comp->light.pos_ = global.game_data.ecs.get_component<TransformComponent>(selected_entity)->position;
+                            light_comp->light.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
+                            light_comp->light.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
+                            light_comp->light.linear_att = 0.7f;
+                            light_comp->light.quad_att_ = 1.8f;
+                            light_comp->light.constant_att_ = 1.0f;
+                            light_comp->light.shininess_ = 32.0f;
+                            light_comp->light.strength_ = 1.0f;
+                        }
+                        break;
                         case 2: global.game_data.ecs.add_component<RenderComponent>(selected_entity); break;
                         }
                         addCurrentItem = -1; 
@@ -668,7 +681,7 @@ void ImGuiManager::InspectorWindow() {
                         switch (i) {
                         case 0: global.game_data.ecs.delete_component<TransformComponent>(selected_entity); break;
                         case 1: global.game_data.ecs.delete_component<LightComponent>(selected_entity); break;
-                        case 2: global.game_data.ecs.delete_component<RenderComponent>(selected_entity); break;
+                        //case 2: global.game_data.ecs.delete_component<RenderComponent>(selected_entity); break;
                         }
                         deleteCurrentItem = -1; 
                     }
