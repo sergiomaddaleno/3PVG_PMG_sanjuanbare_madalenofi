@@ -23,8 +23,8 @@
 #include <iostream>
 
 ShadowMap::ShadowMap() : depthMapFBO(0), depthMap(0), 
-    near_plane(1.0f), far_plane(200.0f), 
-    shadow_width_(2048), shadow_height_(2048)
+    near_plane(1.0f), far_plane(1000.0f), directional_size_(100.0f),
+    shadow_width_(4098), shadow_height_(4098)
 {
 }
 
@@ -61,11 +61,54 @@ void ShadowMap::bind()
 
 void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
-    float spotLightFOV = glm::radians(lc.light.spot_angle_);
-    glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)global.window_width / (float)global.window_height, near_plane, far_plane);
+    glm::mat4 lightProjection;
+    glm::mat4 lightView;
+    glm::mat4 lightSpaceMatrix;
 
-    glm::mat4 lightView = glm::lookAt(lc.light.pos_, lc.light.pos_ + lc.light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+    switch(lc.light.type_) {
+    case LightType::LT_Spot: {
+
+
+        float spotLightFOV = glm::radians(lc.light.spot_angle_);
+        lightProjection = glm::perspective(spotLightFOV, (float)global.window_width / (float)global.window_height, near_plane, far_plane);
+
+        lightView = glm::lookAt(lc.light.pos_, lc.light.pos_ + lc.light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
+        lightSpaceMatrix = lightProjection * lightView;
+        break;
+    }
+    case LightType::LT_Directional:
+    {
+        lightProjection = glm::ortho(-directional_size_, directional_size_, -directional_size_, directional_size_, near_plane, far_plane);
+
+        lightView = glm::lookAt(-lc.light.dir_ * 10.0f,glm::vec3(0.0f),glm::vec3(0.0f, 1.0f, 0.0f));
+
+        lightSpaceMatrix = lightProjection * lightView;
+
+        break;
+    }
+    case LightType::LT_Point:
+    {
+        float aspect = 1.0f;
+        float fov = 90.0f;
+
+        std::vector<glm::mat4> shadowTransforms;
+        shadowTransforms.push_back(lightProjection *
+            glm::lookAt(lc.light.pos_, lc.light.pos_ + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+        shadowTransforms.push_back(lightProjection *
+            glm::lookAt(lc.light.pos_, lc.light.pos_ + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+        shadowTransforms.push_back(lightProjection *
+            glm::lookAt(lc.light.pos_, lc.light.pos_ + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+        shadowTransforms.push_back(lightProjection *
+            glm::lookAt(lc.light.pos_, lc.light.pos_ + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+        shadowTransforms.push_back(lightProjection *
+            glm::lookAt(lc.light.pos_, lc.light.pos_ + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+        shadowTransforms.push_back(lightProjection *
+            glm::lookAt(lc.light.pos_, lc.light.pos_ + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+
+        break;
+    }
+
+    }
 
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_FRONT);
