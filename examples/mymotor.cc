@@ -46,6 +46,9 @@ int main(int, char**) {
 
         global.window_width = window->getWidth();
         global.window_height = window->getHeight();
+
+        //global.ortho_width = window->getWidth();
+        //global.ortho_height = window->getHeight();
         global.game_data.post_process.resize(global.window_width, global.window_height);
 
         global.game_data.post_process.beginRender();

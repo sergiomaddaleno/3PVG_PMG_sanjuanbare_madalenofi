@@ -1,7 +1,5 @@
 
 #include "Render/shadow_map.h"
-#include "Render/camera.h"
-#include "Core/framebuffer.h"
 
 #include "Systems/ecs_manager.h"
 #include "Core/shader.h"
@@ -70,6 +68,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
     glEnable(GL_DEPTH_TEST);
+    glCullFace(GL_FRONT);
     shader.useProgram();
     shader.setUniformValue(shader.getUniformLocation("u_light_space"), ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix));
 
@@ -124,7 +123,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
-
+    glCullFace(GL_BACK);
     glDrawBuffer(GL_BACK);
     glReadBuffer(GL_BACK);
     glViewport(0, 0, global.window_width, global.window_height);

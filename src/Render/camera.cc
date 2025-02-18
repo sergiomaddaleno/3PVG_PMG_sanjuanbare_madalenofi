@@ -28,8 +28,8 @@ Camera::Camera()
     aspect_ratio_((float)global.window_width / (float)global.window_height),
     near_clip_plane_(global.near_clip_plane),
     far_clip_plane_(global.far_clip_plane),
-    ortho_width_(global.ortho_height),
-    ortho_height_(600),
+    ortho_width_(global.ortho_width),
+    ortho_height_(global.ortho_height),
     scroll_speed_(10.0f),
     view_(initViewTarget())
 {}
@@ -47,7 +47,7 @@ glm::mat4 Camera::getPerspectiveMatrix() const
 glm::mat4 Camera::getOrthograficMatrix() const
 {
     float w_half = ortho_width_ / 2.0f;
-    float h_half = ortho_width_ / 2.0f;
+    float h_half = ortho_height_ / 2.0f;
 
     return glm::ortho(-w_half, w_half, -h_half, h_half, near_clip_plane_, far_clip_plane_);
 }
