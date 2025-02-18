@@ -570,10 +570,73 @@ void ImGuiManager::InspectorWindow() {
             ImGui::Text("Light Colors");
             ImGui::PopStyleColor();
 
-            ImGui::ColorEdit3("Diffuse Color", &light_comp->light.diff_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
-            ImGui::ColorEdit3("Specular Color", &light_comp->light.spec_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
-            ImGui::ColorEdit3("Light Color", &light_comp->light.light_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
-            ImGui::ColorEdit3("Ambient Color", &light_comp->light.ambient_color_[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR);
+            
+
+            glm::vec3& diff_color_ = light_comp->light.diff_color_;
+
+            float diff[3] = {
+                diff_color_.r / 255.0f,
+                diff_color_.g / 255.0f,
+                diff_color_.b / 255.0f
+            };
+
+           
+            if (ImGui::ColorEdit3("Diffuse Color", diff, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_PickerHueWheel)) {
+                diff_color_.r = diff[0] * 255.0f;
+                diff_color_.g = diff[1] * 255.0f;
+                diff_color_.b = diff[2] * 255.0f;
+            }
+
+            
+
+            glm::vec3& spec_color_ = light_comp->light.spec_color_;
+
+            float spec[3] = {
+                spec_color_.r / 255.0f,
+                spec_color_.g / 255.0f,
+                spec_color_.b / 255.0f
+            };
+
+            
+            if (ImGui::ColorEdit3("Specular Color", spec, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_PickerHueWheel)) {
+                spec_color_.r = spec[0] * 255.0f;
+                spec_color_.g = spec[1] * 255.0f;
+                spec_color_.b = spec[2] * 255.0f;
+            }
+
+           
+            glm::vec3& light_color = light_comp->light.light_color_;
+
+            float color[3] = {
+                light_color.r / 255.0f,
+                light_color.g / 255.0f,
+                light_color.b / 255.0f
+            };
+
+           
+            if (ImGui::ColorEdit3("Light Color", color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_PickerHueWheel)) {
+                light_color.r = color[0] * 255.0f;
+                light_color.g = color[1] * 255.0f;
+                light_color.b = color[2] * 255.0f;
+            }
+
+          
+
+            glm::vec3& ambient_color_ = light_comp->light.ambient_color_;
+
+            float ambient[3] = {
+                ambient_color_.r / 255.0f,
+                ambient_color_.g / 255.0f,
+                ambient_color_.b / 255.0f
+            };
+
+           
+            if (ImGui::ColorEdit3("Ambient Color", ambient, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_PickerHueWheel)) {
+                ambient_color_.r = ambient[0] * 255.0f;
+                ambient_color_.g = ambient[1] * 255.0f;
+                ambient_color_.b = ambient[2] * 255.0f;
+            }
+
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.9f, 0.5f, 1.0f)); 
