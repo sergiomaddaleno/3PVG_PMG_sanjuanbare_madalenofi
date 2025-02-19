@@ -55,18 +55,29 @@ ImGuiManager::ImGuiManager()
     m_FileIcon(),
     m_EntityIcon(),
     m_BackIcon(),
+    m_ToolsIcon(),
+    m_CameraIcon(),
+    m_EditIcon(),
+    m_TransformIcon(),
+    m_SettingsIcon(),
+    m_TagIcon(),
+    m_LightIcon(),
+    m_RenderIcon(),
     padding(16.0f),
     thumbnailSize(128.0f),
     post_process_window(false),
     skybox_window(false),
     console_window(false),
     fog_window(false),
+    shadow_map_window(false),
     new_pp_shader(),
     grey_sh(),
     negative_sh(),
     waves_sh(),
     blur_sh(),
     kernel_sh(),
+    m_PuzzleIcon(),
+    m_DeleteIcon(),
     post_process_compiled(false),
     current_effect(Effect::None),
     load_scene(false),
@@ -161,6 +172,16 @@ void ImGuiManager::Init(GLFWwindow* window) {
     m_FileIcon.loadTexture("../assets/textures/imgui/FileIcon.png");
     m_EntityIcon.loadTexture("../assets/textures/imgui/cube.png");
     m_BackIcon.loadTexture("../assets/textures/imgui/back.png");
+    m_ToolsIcon.loadTexture("../assets/textures/imgui/tool.png");
+    m_CameraIcon.loadTexture("../assets/textures/imgui/camera.png");
+    m_TransformIcon.loadTexture("../assets/textures/imgui/transform.png");
+    m_SettingsIcon.loadTexture("../assets/textures/imgui/setting.png");
+    m_TagIcon.loadTexture("../assets/textures/imgui/tag.png");
+    m_LightIcon.loadTexture("../assets/textures/imgui/light.png");
+    m_RenderIcon.loadTexture("../assets/textures/imgui/render.png");
+    m_EditIcon.loadTexture("../assets/textures/imgui/edit.png");
+    m_PuzzleIcon.loadTexture("../assets/textures/imgui/puzzle.png");
+    m_DeleteIcon.loadTexture("../assets/textures/imgui/delete.png");
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -182,6 +203,7 @@ void ImGuiManager::Render(GLFWwindow* window) {
     if (post_process_window) PostProcessWindow();
     if (skybox_window) SkyboxWindow();
     if (fog_window) FogWindow();
+    if (shadow_map_window) ShadowMapWindow();
     if (load_scene) LoadSceneWindow();
     if (add_mesh_window) AddMeshWindow();
 
@@ -243,6 +265,7 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
 
         ImGui::DockBuilderDockWindow("PostProcess", dock_bottom_right);
         ImGui::DockBuilderDockWindow("Fog", dock_bottom_right);
+        ImGui::DockBuilderDockWindow("ShadowMap", dock_bottom_right);
         ImGui::DockBuilderDockWindow("SkyBox", dock_bottom_right);
         ImGui::DockBuilderDockWindow("Console", dock_bottom_right);
         ImGui::DockBuilderDockWindow("Load Scene", dock_bottom_right);
@@ -314,9 +337,15 @@ void ImGuiManager::InspectorWindow() {
     ImGui::Begin("Inspector");
 
     if (global.game_data.ecs.has_component<NameComponent>(selected_entity)) {
-        auto& name_comp = global.game_data.ecs.get_component<NameComponent>(selected_entity);
 
-        if (ImGui::CollapsingHeader("Name Component", ImGuiTreeNodeFlags_DefaultOpen)) {
+        bool open = ImGui::CollapsingHeader("##NameComponent", ImGuiTreeNodeFlags_DefaultOpen);
+        ImGui::SameLine();
+        ImGui::Image(m_TagIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Text("Name Component");
+
+        if (open) {
+            auto& name_comp = global.game_data.ecs.get_component<NameComponent>(selected_entity);
             ImGui::Dummy({ 0.0f, 3.0f });
 
             if (name_comp->name.empty()) name_comp->name = "Entity"; 
@@ -331,11 +360,24 @@ void ImGuiManager::InspectorWindow() {
     }
 
     if (global.game_data.ecs.has_component<TransformComponent>(selected_entity)) {
-        auto& transf_comp = global.game_data.ecs.get_component<TransformComponent>(selected_entity);
 
-        if (ImGui::CollapsingHeader("Transform Component", ImGuiTreeNodeFlags_DefaultOpen)) {
+        bool open = ImGui::CollapsingHeader("##TransformComponent", ImGuiTreeNodeFlags_DefaultOpen);
+        ImGui::SameLine();
+        ImGui::Image(m_TransformIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Text("Transform Component");
 
-            Gizmo(global.game_data.cam.getViewMatrix(), global.game_data.cam.getPerspectiveMatrix(), selected_entity);
+        if (open) {
+            auto& transf_comp = global.game_data.ecs.get_component<TransformComponent>(selected_entity);
+
+            if (global.game_data.cam.getUsePerspectiveMatrix()) {
+                ImGuizmo::SetOrthographic(false);
+                Gizmo(global.game_data.cam.getViewMatrix(), global.game_data.cam.getPerspectiveMatrix(), selected_entity);
+            }
+            else {
+                ImGuizmo::SetOrthographic(true);
+                Gizmo(global.game_data.cam.getViewMatrix(), global.game_data.cam.getOrthograficMatrix(), selected_entity);
+            }
 
             if (ImGui::BeginTable("TransformTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
                 ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);
@@ -390,7 +432,14 @@ void ImGuiManager::InspectorWindow() {
     }
 
     if (global.game_data.ecs.has_component<RenderComponent>(selected_entity)) {
-        if (ImGui::CollapsingHeader("Render Component", ImGuiTreeNodeFlags_DefaultOpen)) {
+
+        bool open = ImGui::CollapsingHeader("##RenderComponent", ImGuiTreeNodeFlags_DefaultOpen);
+        ImGui::SameLine();
+        ImGui::Image(m_RenderIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Text("Render Component");
+
+        if (open) {
 
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.6f, 0.0f, 1.0f));
             ImGui::Text("Change Shader");
@@ -552,7 +601,13 @@ void ImGuiManager::InspectorWindow() {
 
     if (global.game_data.ecs.has_component<LightComponent>(selected_entity)) {
 
-        if (ImGui::CollapsingHeader("Light Component", ImGuiTreeNodeFlags_DefaultOpen)) {
+        bool open = ImGui::CollapsingHeader("##LightComponent", ImGuiTreeNodeFlags_DefaultOpen);
+        ImGui::SameLine();
+        ImGui::Image(m_LightIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Text("Light Component");
+
+        if (open) {
             auto& light_comp = global.game_data.ecs.get_component<LightComponent>(selected_entity);
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
@@ -665,8 +720,16 @@ void ImGuiManager::InspectorWindow() {
 
         }
     }
+    
+    // ---
 
-    if (ImGui::CollapsingHeader("Components"), ImGuiTreeNodeFlags_DefaultOpen) {
+    bool open = ImGui::CollapsingHeader("##Components", ImGuiTreeNodeFlags_DefaultOpen);
+    ImGui::SameLine();
+    ImGui::Image(m_PuzzleIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+    ImGui::SameLine();
+    ImGui::Text("Components");
+
+    if (open) {
         ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
         ImGui::Text("Entity has:");
@@ -758,6 +821,9 @@ void ImGuiManager::InspectorWindow() {
     ImGui::Separator();
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
+    ImGui::Image(m_DeleteIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+    ImGui::SameLine();
+
     if (ImGui::Button("Delete Entity") /*|| global.game_data.input.isKeyPressed(Input::SUPR)*/) {
         
         if (global.game_data.ecs.has_component<NameComponent>(selected_entity)) {
@@ -840,6 +906,9 @@ void ImGuiManager::TopBarWindow() {
     static int curr_type_draw = 0; 
 
     if (ImGui::BeginMenuBar()) {
+
+        ImGui::Image(m_SettingsIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
         if (ImGui::BeginMenu("Settings")) {
             
             if (ImGui::MenuItem("Toggle Full Screen [F11]")) {
@@ -855,6 +924,8 @@ void ImGuiManager::TopBarWindow() {
                 else {
                     global.game_data.save_manager.saveToFile(global.game_data.save_manager.getCurrentScene(), global.game_data.ecs, global.game_data.cam, global.game_data.skybox);
                 }
+
+                AddConsoleMessage("Saving current scene");
             }
 
             if (ImGui::BeginMenu("Load Scene")) {
@@ -863,12 +934,15 @@ void ImGuiManager::TopBarWindow() {
             }
 
             if (ImGui::MenuItem("New Scene")) {
-
                 global.game_data.save_manager.newFile();
+                AddConsoleMessage("New scene created");
             }
+
             ImGui::EndMenu();
         }
 
+        ImGui::Image(m_EditIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
         if (ImGui::BeginMenu("Edit")) {
 
             if (ImGui::BeginMenu("Drawing Type")) {
@@ -888,8 +962,18 @@ void ImGuiManager::TopBarWindow() {
                 ImGui::EndMenu();
             }
 
+            if (ImGui::BeginMenu("Console")) {
+                ImGui::Checkbox("Console Window", &console_window);
+                ImGui::EndMenu();
+            }
+
             if (ImGui::BeginMenu("Post Proccess")) {
                 ImGui::Checkbox("Post Process Window", &post_process_window);
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Shadow map")) {
+                ImGui::Checkbox("Shadow map Window", &shadow_map_window);
                 ImGui::EndMenu();
             }
 
@@ -906,6 +990,8 @@ void ImGuiManager::TopBarWindow() {
             ImGui::EndMenu();
         }
 
+        ImGui::Image(m_ToolsIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
         if (ImGui::BeginMenu("Tools")) {
 
             if (ImGui::BeginMenu("Add Geometry")) {
@@ -913,26 +999,31 @@ void ImGuiManager::TopBarWindow() {
                 if (ImGui::MenuItem("Sphere")) {
                     global.game_data.render_system.createSphere(loc_ecs);
                     global.game_data.render_system.initEntities(loc_ecs);
+                    AddConsoleMessage("Sphere added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 8v")) {
                     global.game_data.render_system.createCube8v(loc_ecs);
                     global.game_data.render_system.initEntities(loc_ecs);
+                    AddConsoleMessage("Cube 8v added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 24v")) {
                     global.game_data.render_system.createCube24v(loc_ecs);
                     global.game_data.render_system.initEntities(loc_ecs);
+                    AddConsoleMessage("Cube 24v added to scene");
                 }
 
                 if (ImGui::MenuItem("Quad")) {
                     global.game_data.render_system.createQuad(loc_ecs);
                     global.game_data.render_system.initEntities(loc_ecs);
+                    AddConsoleMessage("Quad added to scene");
                 }
 
                 if (ImGui::MenuItem("Terrain")) {
                     global.game_data.render_system.createTerrain(loc_ecs);
                     global.game_data.render_system.initEntities(loc_ecs);
+                    AddConsoleMessage("Terrain Light added to scene");
                 }
 
                 ImGui::EndMenu();
@@ -943,16 +1034,19 @@ void ImGuiManager::TopBarWindow() {
                 if (ImGui::MenuItem("Point Light")) {
                     global.game_data.render_system.createPointLight(loc_ecs);
                     global.game_data.render_system.initEntities(loc_ecs);
+                    AddConsoleMessage("Point Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Spot Light")) {
                     global.game_data.render_system.createSpotLight(loc_ecs);
                     global.game_data.render_system.initEntities(loc_ecs);
+                    AddConsoleMessage("Spot Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Directional Light")) {
                     global.game_data.render_system.createDirectionalLight(loc_ecs);
                     global.game_data.render_system.initEntities(loc_ecs);
+                    AddConsoleMessage("Directional Light added to scene");
                 }
 
                 ImGui::EndMenu();
@@ -968,6 +1062,9 @@ void ImGuiManager::TopBarWindow() {
             ImGui::EndMenu();
         }
 
+        ImGui::Image(m_CameraIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Spacing();
         if (ImGui::BeginMenu("Camera")) {
             
             static float sensitivity = global.game_data.cam.getSensitivity();
@@ -998,6 +1095,25 @@ void ImGuiManager::TopBarWindow() {
             static float scroll_speed = global.game_data.cam.getScrollSpeed();
             if (ImGui::SliderFloat("Scroll Speed", &scroll_speed, 0.1f, 10.0f)) {
                 global.game_data.cam.setScrollSpeed(scroll_speed);
+            }
+
+            //--
+
+            static bool use_perspective = global.game_data.cam.getUsePerspectiveMatrix();
+            static bool use_orthographic = !use_perspective; 
+
+            if (ImGui::Checkbox("Perspective Projection", &use_perspective)) {
+                if (use_perspective) {
+                    use_orthographic = false;
+                    global.game_data.cam.setUsePerspectiveMatrix(true); 
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Checkbox("Orthographic Projection", &use_orthographic)) {
+                if (use_orthographic) {
+                    use_perspective = false;
+                    global.game_data.cam.setUsePerspectiveMatrix(false);
+                }
             }
 
             ImGui::EndMenu();
@@ -1097,6 +1213,8 @@ void ImGuiManager::PostProcessWindow()
             break;
         }
 
+        AddConsoleMessage("post process compiled");
+
         ImGui::Dummy({ 0.0f, 5.0f });
         ImGui::Separator();
         ImGui::Dummy({ 0.0f, 5.0f });
@@ -1147,6 +1265,51 @@ void ImGuiManager::FogWindow()
     ImGui::End();
 }
 
+void ImGuiManager::ShadowMapWindow()
+{
+    ImGui::Begin("ShadowMap");
+
+    auto li = global.game_data.ecs.getComponentList<LightComponent>().begin();
+    auto liend = global.game_data.ecs.getComponentList<LightComponent>().end();
+
+    for (; li != liend; ++li) {
+        if (li->has_value()) {
+            auto& light_comp = *li;
+
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+            float near_plane = light_comp->shadow_map_.near_plane;
+            if (ImGui::SliderFloat("Near Plane", &near_plane, 0.1f, 100.0f)) {
+                light_comp->shadow_map_.near_plane = near_plane;
+            }
+
+            float far_plane = light_comp->shadow_map_.far_plane;
+            if (ImGui::SliderFloat("Far Plane", &far_plane, 10.0f, 1000.0f)) {
+                light_comp->shadow_map_.far_plane = far_plane;
+            }
+
+            int shadow_width = light_comp->shadow_map_.shadow_width_;
+            int shadow_height = light_comp->shadow_map_.shadow_height_;
+            if (ImGui::SliderInt("Shadow Width", &shadow_width, 512, 8192)) {
+                light_comp->shadow_map_.shadow_width_ = shadow_width;
+            }
+            if (ImGui::SliderInt("Shadow Height", &shadow_height, 512, 8192)) {
+                light_comp->shadow_map_.shadow_height_ = shadow_height;
+            }
+
+            if (light_comp->light.type_ == LightType::LT_Directional) {
+                float directional_size = light_comp->shadow_map_.directional_size_;
+                if (ImGui::SliderFloat("Directional Size", &directional_size, 10.0f, 1000.0f)) {
+                    light_comp->shadow_map_.directional_size_ = directional_size;
+                }
+            }
+
+        }
+    }
+    ImGui::End();
+}
+
+
 void ImGuiManager::SkyboxWindow()
 {
     ImGui::Begin("SkyBox");
@@ -1183,6 +1346,9 @@ void ImGuiManager::SkyboxWindow()
             "../assets/shaders/skybox.fs"
         );
         global.game_data.skybox.init();
+
+        AddConsoleMessage(skybox_file_name + "compiled");
+
     }
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
     
@@ -1194,8 +1360,43 @@ void ImGuiManager::ConsoleWindow()
 {
     ImGui::Begin("Console");
 
+    const float footer_height = ImGui::GetFrameHeightWithSpacing() + 5.0f;
+    ImGui::BeginChild("ConsoleOutput", ImVec2(0, -footer_height), true, ImGuiWindowFlags_HorizontalScrollbar);
+
+    for (const auto& message : consoleMessages)
+    {
+        ImGui::TextUnformatted(message.c_str());
+    }
+
+    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+        ImGui::SetScrollHereY(1.0f);
+
+    ImGui::EndChild();
+
+    static char inputBuf[256] = "";
+    ImGuiInputTextFlags inputFlags = ImGuiInputTextFlags_EnterReturnsTrue;
+    if (ImGui::InputText("Input", inputBuf, IM_ARRAYSIZE(inputBuf), inputFlags))
+    {
+        if (inputBuf[0] != '\0')
+        {
+            AddConsoleMessage(inputBuf);
+        }
+        inputBuf[0] = '\0'; 
+        ImGui::SetKeyboardFocusHere(-1); 
+    }
 
     ImGui::End();
+}
+
+
+void ImGuiManager::AddConsoleMessage(const std::string& message)
+{
+    consoleMessages.push_back(message);
+
+    if (consoleMessages.size() > 1000)
+    {
+        consoleMessages.erase(consoleMessages.begin()); 
+    }
 }
 
 void ImGuiManager::LoadSceneWindow()
@@ -1230,6 +1431,8 @@ void ImGuiManager::LoadSceneWindow()
         global.game_data.save_manager.loadFromFile(global.game_data.save_manager.getCurrentScene(), 
             global.game_data.ecs, global.game_data.render_system, 
             global.game_data.cam, global.game_data.skybox);
+
+        AddConsoleMessage(scene_file_name + " loaded");
     }
 
     ImGui::End();
@@ -1279,6 +1482,8 @@ void ImGuiManager::AddMeshWindow()
         if (!obj_file_name.empty() && !texture_folder.empty()) {
             global.game_data.render_system.createMesh(global.game_data.ecs, "../assets/obj/" + obj_file_name, texture_folder);
             global.game_data.render_system.initEntities(global.game_data.ecs);
+
+            AddConsoleMessage(obj_file_name + "added to scene");
 
             obj_file_name.clear();
             texture_folder.clear();

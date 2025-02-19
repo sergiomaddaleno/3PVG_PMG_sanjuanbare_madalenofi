@@ -37,8 +37,7 @@ in vec3 FragPos;
 
 out vec4 FragColor;
 
-// ---
-
+// --- Lights
 vec3 PointLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
     float distance = length(lc.pos_ - FragPos);
@@ -79,7 +78,6 @@ vec3 SpotLight(LightInfo lc) {
     return ambient + diffuse + specular;
 }
 
-
 vec3 DirectionalLight(LightInfo lc) {
    
     vec3 light_dir = normalize(-lc.dir_);
@@ -97,7 +95,26 @@ vec3 DirectionalLight(LightInfo lc) {
     return ambient + diffuse + specular;
 }
 
-/*float ShadowCalculation(vec4 fragPosLightSpace)
+// --- Shadows
+
+//percentage-closer filtering
+float PCF(float currentDepth, float bias, vec3 projCoords){
+    float shadow = 0.0f;
+    vec2 texelSize = 1.0 / textureSize(u_shadow_map, 0);
+
+    for(int x=-1; x<=1; ++x){
+        for(int y=-1; y<1; ++y){
+            
+            float pcfDepth = texture(u_shadow_map, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 9.0;
+
+    return shadow;
+}
+
+float ShadowCalculation(vec4 fragPosLightSpace)
 {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  
     projCoords = projCoords * 0.5 + 0.5; 
@@ -107,40 +124,8 @@ vec3 DirectionalLight(LightInfo lc) {
 
     float bias = 0.0005;
 
-    return (currentDepth - bias) > closestDepth ? 0.0 : 1.0;
-}*/
-
-float ShadowCalculation(vec4 fragPosLightSpace)
-{
-    // Realizar la división de perspectiva
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    
-    // Transformar a [0,1] range
-    projCoords = projCoords * 0.5 + 0.5;
-    
-    // Obtener la profundidad actual del fragmento
-    float currentDepth = projCoords.z;
-    
-    // Parámetros para ajustar la calidad de la sombra
-    float bias = 0.0005;
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(u_shadow_map, 0);
-    
-    // Realizar PCF
-    for(int x = -1; x <= 1; ++x)
-    {
-        for(int y = -1; y <= 1; ++y)
-        {
-            float pcfDepth = texture(u_shadow_map, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
-        }    
-    }
-    
-    // Calcular el promedio
-    shadow /= 9.0;
-    
-    // Invertir el resultado para que 0.0 sea sombra completa y 1.0 sin sombra
-    return 1.0 - shadow;
+    //return (currentDepth - bias) > closestDepth ? 0.0 : 1.0;
+    return 1.0 - PCF(currentDepth, bias, projCoords);
 }
 
 void main() {
@@ -165,7 +150,6 @@ void main() {
     
    FragColor = vec4(texture_and_light, 1.0);
 
-   if(u_fog){
-        FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
-   }
+   if(u_fog) FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
+   
 }

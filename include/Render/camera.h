@@ -34,6 +34,7 @@ public:
 	glm::vec3 getUp() const { return up_; }
 	const float getNearCliPlane() { return near_clip_plane_; }
 	const float getFarCliPlane() { return far_clip_plane_; }
+	const bool getUsePerspectiveMatrix() { return use_perspective_matrix_; }
 
 	void setSpeed(const float speed){ speed_ = speed; }
 	void setSensitibity(const float sensitivity){ sensitivity_ = sensitivity; }
@@ -44,6 +45,7 @@ public:
 	void setFarCliPlane(float far_clip_plane) { far_clip_plane_ = far_clip_plane; }
 	void setOrthoWidth(float ortho_width) { ortho_width_ = ortho_width; }
 	void setOrthoHeight(float ortho_height) { ortho_height_ = ortho_height; }
+	void setUsePerspectiveMatrix(bool use_perspective_matrix) { use_perspective_matrix_ = use_perspective_matrix; }
 
 	void setScrollSpeed(float scroll_speed) { scroll_speed_ = scroll_speed; }
 	void setViewDir(glm::vec3 view_direction) {view_direction_ = view_direction;}
@@ -79,6 +81,8 @@ private:
 	float far_clip_plane_;
 	float ortho_width_;
 	float ortho_height_;
+
+	bool use_perspective_matrix_;
 };
 
 

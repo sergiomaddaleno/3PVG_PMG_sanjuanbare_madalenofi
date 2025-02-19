@@ -114,7 +114,13 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     model = glm::scale(model, tc.scale);
 
     glm::mat4 view = cam.getViewMatrix();
-    glm::mat4 projection = cam.getPerspectiveMatrix();
+    glm::mat4 projection;
+    if (cam.getUsePerspectiveMatrix()) {
+        projection = cam.getPerspectiveMatrix();
+    }
+    else {
+        projection = cam.getOrthograficMatrix();
+    }
 
     shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));

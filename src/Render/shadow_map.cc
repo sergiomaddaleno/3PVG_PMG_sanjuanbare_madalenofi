@@ -23,7 +23,7 @@
 #include <iostream>
 
 ShadowMap::ShadowMap() : depthMapFBO(0), depthMap(0), 
-    near_plane(1.0f), far_plane(1000.0f), directional_size_(100.0f),
+    near_plane(1.0f), far_plane(100.0f), directional_size_(50.0f),
     shadow_width_(4098), shadow_height_(4098)
 {
 }
@@ -68,8 +68,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
     switch(lc.light.type_) {
     case LightType::LT_Spot: {
 
-
-        float spotLightFOV = glm::radians(lc.light.spot_angle_);
+        float spotLightFOV = lc.light.spot_angle_ * 2.0f;
         lightProjection = glm::perspective(spotLightFOV, (float)global.window_width / (float)global.window_height, near_plane, far_plane);
 
         lightView = glm::lookAt(lc.light.pos_, lc.light.pos_ + lc.light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));

@@ -149,6 +149,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
     cam.setFarCliPlane(camera["Far_clip_plane"]);
     cam.setOrthoWidth(camera["Ortho_width"]);
     cam.setOrthoHeight(camera["Ortho_height"]);
+    cam.setUsePerspectiveMatrix(camera["Use_perspective_matrix"]);
     
     //-----------------------------------------------------------
     
@@ -356,6 +357,7 @@ void SaveManager::newFile()
                 {"Far_clip_plane", 1000.0f},
                 {"Ortho_width", 800.0f},
                 {"Ortho_height", 600.0f},
+                {"Use_perspective_matrix", false},
 
             }},
             {"Skybox", {

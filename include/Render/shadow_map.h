@@ -25,16 +25,15 @@ public:
 	void bind();
 	void render(ECSManager& ecs, Shader shader, LightComponent lc);
 
-	unsigned int depthMapFBO;
-	unsigned int depthMap;
-
 	float near_plane, far_plane;
 	unsigned int shadow_width_;
 	unsigned int shadow_height_;
 
 	float directional_size_;
 
-
+private:
+	unsigned int depthMapFBO;
+	unsigned int depthMap;
 };
 
 #endif // __SHADOW_MAP__

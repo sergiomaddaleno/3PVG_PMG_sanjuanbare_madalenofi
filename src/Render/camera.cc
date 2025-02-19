@@ -31,6 +31,7 @@ Camera::Camera()
     ortho_width_(global.ortho_width),
     ortho_height_(global.ortho_height),
     scroll_speed_(10.0f),
+    use_perspective_matrix_(true),
     view_(initViewTarget())
 {}
 
@@ -112,11 +113,23 @@ void Camera::update(Input& input, const double dt, const int window_width, const
 
     float scroll_delta = (float)input.getScrollY();
 
-    if (scroll_delta > 0.0f) {
-        position_ += view_direction_ * scroll_speed_;
+    if (use_perspective_matrix_) {
+        if (scroll_delta > 0.0f) {
+            position_ += view_direction_ * scroll_speed_;
+        }
+        if (scroll_delta < 0.0f) {
+            position_ -= view_direction_ * scroll_speed_;
+        }
     }
-    if (scroll_delta < 0.0f) {
-        position_ -= view_direction_ * scroll_speed_;
+    else {
+        if (scroll_delta > 0.0f) {
+            ortho_width_ *= 0.9f;
+            ortho_height_ *= 0.9f;
+        }
+        if (scroll_delta < 0.0f) {
+            ortho_width_ *= 1.1f;
+            ortho_height_ *= 1.1f;
+        }
     }
 
     input.resetScroll();
@@ -146,6 +159,7 @@ nlohmann::json Camera::serialize()
     json_data["Far_clip_plane"] = far_clip_plane_;
     json_data["Ortho_width"] = ortho_width_;
     json_data["Ortho_height"] = ortho_height_;
+    json_data["Use_perspective_matrix"] = use_perspective_matrix_;
 
     return json_data;
 }
