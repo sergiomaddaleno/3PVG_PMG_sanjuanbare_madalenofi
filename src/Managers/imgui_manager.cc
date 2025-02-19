@@ -871,6 +871,7 @@ void ImGuiManager::ContentBrowserWindow() {
         {
             std::filesystem::path relativePath(path);
             const wchar_t* itemPath = relativePath.c_str();
+            ImGui::Text("%s", filenameString.c_str());
             ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
             ImGui::EndDragDropSource();
         }
@@ -1483,7 +1484,7 @@ void ImGuiManager::AddMeshWindow()
             global.game_data.render_system.createMesh(global.game_data.ecs, "../assets/obj/" + obj_file_name, texture_folder);
             global.game_data.render_system.initEntities(global.game_data.ecs);
 
-            AddConsoleMessage(obj_file_name + "added to scene");
+            AddConsoleMessage(obj_file_name + " added to scene");
 
             obj_file_name.clear();
             texture_folder.clear();
