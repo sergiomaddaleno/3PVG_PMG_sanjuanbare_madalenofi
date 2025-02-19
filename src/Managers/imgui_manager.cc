@@ -606,21 +606,9 @@ void ImGuiManager::InspectorWindow() {
             auto& light_comp = global.game_data.ecs.get_component<LightComponent>(selected_entity);
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.9f, 0.9f, 1.0f)); 
-            ImGui::Text("Position & Direction");
-            ImGui::PopStyleColor();
-
-            ImGui::Dummy(ImVec2(0.0f, 5.0f));
-            ImGui::SliderFloat3("Position", &light_comp->light.pos_[0], -100.0f, 100.0f);
-            ImGui::SliderFloat3("Direction", &light_comp->light.dir_[0], -1.0f, 1.0f);
-
-            ImGui::Dummy(ImVec2(0.0f, 5.0f));
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.3f, 1.0f)); 
             ImGui::Text("Light Colors");
             ImGui::PopStyleColor();
-
-            
 
             glm::vec3& diff_color_ = light_comp->light.diff_color_;
 
@@ -630,14 +618,11 @@ void ImGuiManager::InspectorWindow() {
                 diff_color_.b / 255.0f
             };
 
-           
             if (ImGui::ColorEdit3("Diffuse Color", diff, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_PickerHueWheel)) {
                 diff_color_.r = diff[0] * 255.0f;
                 diff_color_.g = diff[1] * 255.0f;
                 diff_color_.b = diff[2] * 255.0f;
             }
-
-            
 
             glm::vec3& spec_color_ = light_comp->light.spec_color_;
 
@@ -646,14 +631,12 @@ void ImGuiManager::InspectorWindow() {
                 spec_color_.g / 255.0f,
                 spec_color_.b / 255.0f
             };
-
             
             if (ImGui::ColorEdit3("Specular Color", spec, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_PickerHueWheel)) {
                 spec_color_.r = spec[0] * 255.0f;
                 spec_color_.g = spec[1] * 255.0f;
                 spec_color_.b = spec[2] * 255.0f;
             }
-
            
             glm::vec3& light_color = light_comp->light.light_color_;
 
@@ -663,14 +646,11 @@ void ImGuiManager::InspectorWindow() {
                 light_color.b / 255.0f
             };
 
-           
             if (ImGui::ColorEdit3("Light Color", color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_PickerHueWheel)) {
                 light_color.r = color[0] * 255.0f;
                 light_color.g = color[1] * 255.0f;
                 light_color.b = color[2] * 255.0f;
             }
-
-          
 
             glm::vec3& ambient_color_ = light_comp->light.ambient_color_;
 
@@ -679,14 +659,12 @@ void ImGuiManager::InspectorWindow() {
                 ambient_color_.g / 255.0f,
                 ambient_color_.b / 255.0f
             };
-
            
             if (ImGui::ColorEdit3("Ambient Color", ambient, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_PickerHueWheel)) {
                 ambient_color_.r = ambient[0] * 255.0f;
                 ambient_color_.g = ambient[1] * 255.0f;
                 ambient_color_.b = ambient[2] * 255.0f;
             }
-
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.9f, 0.5f, 1.0f)); 
@@ -1195,15 +1173,10 @@ void ImGuiManager::PostProcessWindow()
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         if (use_grey) ImGui::DragFloat("Grey##1", &global.game_data.post_process.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
-
         if (use_negative)  ImGui::DragFloat("Negative##1", &global.game_data.post_process.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
-
         if (use_waves)  ImGui::DragFloat("Waves##1", &global.game_data.post_process.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
-
         if (use_blur) ImGui::DragFloat("Blur##1", &global.game_data.post_process.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
-
         if (use_kernel) ImGui::DragInt("Kernel types##1", &global.game_data.post_process.kernel_types_, 0.1f, 0, 2, "%d");
-
 
         ImGui::Dummy({ 0.0f, 5.0f });
         ImGui::Separator();
@@ -1534,6 +1507,7 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
                 if (loc_ecs.has_component<LightComponent>(selected_entity)) {
                     auto& light_comp = loc_ecs.get_component<LightComponent>(selected_entity);
                     light_comp->light.pos_ = transform->position;
+                    //light_comp->light.dir_ = transform->rotation * glm::vec3(0.0f, 0.0f, 1.0f);
                 }
 
                 glm::mat4 model = glm::mat4(1.0f);
