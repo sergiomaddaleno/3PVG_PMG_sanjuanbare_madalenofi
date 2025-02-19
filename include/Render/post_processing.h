@@ -22,15 +22,6 @@ static float rect_screen_vertices[] = {
 	-1.0f,  1.0f,  0.0f, 1.0f
 };
 
-enum Effect{
-	Grey,
-	Negative,
-	Waves,
-	Blur,
-	Kernel,
-	None,
-};
-
 class PostProcessing {
 public:
 
@@ -43,7 +34,7 @@ public:
 	
 	void endRender();
 
-	void render(Shader& shader, Effect effect);
+	void render(Shader& shader);
 
 	// --
 

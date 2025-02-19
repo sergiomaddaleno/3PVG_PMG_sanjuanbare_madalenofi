@@ -84,7 +84,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 if (li->has_value()) {
                     auto& light_comp = *li;
 
-                    light_comp->shadow_map_.init();;
+                    light_comp->shadow_map_.init();
                 }
             }
         }

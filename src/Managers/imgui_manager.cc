@@ -79,7 +79,6 @@ ImGuiManager::ImGuiManager()
     m_PuzzleIcon(),
     m_DeleteIcon(),
     post_process_compiled(false),
-    current_effect(Effect::None),
     load_scene(false),
     add_mesh_window(false)
 {}
@@ -379,55 +378,51 @@ void ImGuiManager::InspectorWindow() {
                 Gizmo(global.game_data.cam.getViewMatrix(), global.game_data.cam.getOrthograficMatrix(), selected_entity);
             }
 
-            if (ImGui::BeginTable("TransformTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
-                ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);
-                ImGui::TableSetupColumn("X", ImGuiTableColumnFlags_WidthStretch);
-                ImGui::TableSetupColumn("Y", ImGuiTableColumnFlags_WidthStretch);
-                ImGui::TableSetupColumn("Z", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-                ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0);
-                ImGui::Text("");
+            ImGui::Columns(4, "TransformColumns", true);
 
-                ImGui::TableSetColumnIndex(1);
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-                ImGui::Text("X");
-                ImGui::PopStyleColor();
+            ImGui::TextUnformatted(" ");            
+            ImGui::NextColumn();
 
-                ImGui::TableSetColumnIndex(2);
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
-                ImGui::Text("Y");
-                ImGui::PopStyleColor();
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "X"); 
+            ImGui::NextColumn();
 
-                ImGui::TableSetColumnIndex(3);
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 1.0f, 1.0f));
-                ImGui::Text("Z");
-                ImGui::PopStyleColor();
+            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Y"); 
+            ImGui::NextColumn();
 
-                auto DrawRow = [](const char* label, float& x, float& y, float& z, const char* id) {
-                    ImGui::TableNextRow();
+            ImGui::TextColored(ImVec4(0.0f, 0.0f, 1.0f, 1.0f), "Z");  
+            ImGui::NextColumn();
 
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::Text(label);
+            auto DrawRow = [&](const char* label, float& x, float& y, float& z, const char* id)
+                {
+                    ImGui::TextUnformatted(label);
+                    ImGui::NextColumn();
 
-                    ImGui::TableSetColumnIndex(1);
                     ImGui::DragFloat((std::string("##X") + id).c_str(), &x, 0.1f, -1000.0f, 1000.0f);
+                    ImGui::NextColumn();
 
-                    ImGui::TableSetColumnIndex(2);
                     ImGui::DragFloat((std::string("##Y") + id).c_str(), &y, 0.1f, -1000.0f, 1000.0f);
+                    ImGui::NextColumn();
 
-                    ImGui::TableSetColumnIndex(3);
                     ImGui::DragFloat((std::string("##Z") + id).c_str(), &z, 0.1f, -1000.0f, 1000.0f);
-                    };
+                    ImGui::NextColumn();
+                };
 
-                DrawRow("Translation", transf_comp->position.x, transf_comp->position.y, transf_comp->position.z, "Translation");
-                DrawRow("Rotation", transf_comp->rotation.x, transf_comp->rotation.y, transf_comp->rotation.z, "Rotation");
-                DrawRow("Scale", transf_comp->scale.x, transf_comp->scale.y, transf_comp->scale.z, "Scale");
+            DrawRow("Translation", transf_comp->position.x, transf_comp->position.y, transf_comp->position.z, "Translation");
 
-                ImGui::EndTable();
+            glm::vec3 euler_angles = glm::degrees(glm::eulerAngles(transf_comp->rotation));
+            DrawRow("Rotation   ", euler_angles.x, euler_angles.y, euler_angles.z, "Rotation");
+            transf_comp->rotation = glm::quat(glm::radians(euler_angles)); 
 
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
-            }
+            DrawRow("Scale      ", transf_comp->scale.x, transf_comp->scale.y, transf_comp->scale.z, "Scale");
+
+            ImGui::Columns(1);
+            ImGui::Spacing();
+            
+
         }
     }
 
@@ -1137,7 +1132,7 @@ void ImGuiManager::PostProcessWindow()
 
     static std::string vertex_file_name;
     static char* vertex_content = nullptr;
-    if (ImGui::Button(!vertex_file_name.empty() ? vertex_file_name.c_str() : "VS Drop here", { 120.0f, 40.0f })) {}
+    if (ImGui::Button(!vertex_file_name.empty() ? vertex_file_name.c_str() : "VS Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -1153,7 +1148,7 @@ void ImGuiManager::PostProcessWindow()
     static std::string fragment_file_name;
     static char* fragment_content = nullptr;
     ImGui::SameLine();
-    if (ImGui::Button(!fragment_file_name.empty() ? fragment_file_name.c_str() : "FS Drop here", { 120.0f, 40.0f })) {}
+    if (ImGui::Button(!fragment_file_name.empty() ? fragment_file_name.c_str() : "FS Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -1161,67 +1156,66 @@ void ImGuiManager::PostProcessWindow()
             if (filePath.extension() == ".fs") {
                 fragment_file_name = filePath.filename().string();
                 fragment_content = ReadFile(filePath.string().c_str());
-
-                if (fragment_file_name == "grey.fs") current_effect = Effect::Grey;
-                if (fragment_file_name == "negative.fs") current_effect = Effect::Negative;
-                if (fragment_file_name == "waves.fs") current_effect = Effect::Waves;
-                if (fragment_file_name == "blur.fs") current_effect = Effect::Blur;
-                if (fragment_file_name == "kernel.fs") current_effect = Effect::Kernel;
             }
         }
         ImGui::EndDragDropTarget();
     }
 
-    if (vertex_content && fragment_content) {
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-        if (ImGui::Button("Compile")) {
-            new_pp_shader.compile(vertex_content, fragment_content);
-            post_process_compiled = true;  
-        }
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+    if (ImGui::Button("Compile")) {
+        new_pp_shader.compile(vertex_content, fragment_content);
+        post_process_compiled = true;
+
+        AddConsoleMessage(vertex_file_name + " and " + fragment_file_name + " compiled");
     }
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
     if (post_process_compiled) {
+        global.game_data.post_process.render(new_pp_shader);
 
-        switch (current_effect) {
-        case Effect::Grey:
-            global.game_data.post_process.render(new_pp_shader, Effect::Grey);
-            ImGui::DragFloat("Grey", &global.game_data.post_process.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
-            break;
+        static bool use_grey = false;
+        static bool use_negative = false;
+        static bool use_waves = false;
+        static bool use_blur = false;
+        static bool use_kernel = false;
 
-        case Effect::Negative:
-            global.game_data.post_process.render(new_pp_shader, Effect::Negative);
-            ImGui::DragFloat("Negative", &global.game_data.post_process.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
-            break;
+        ImGui::Checkbox("Grey", &use_grey);
+        ImGui::SameLine();
+        ImGui::Checkbox("Negative", &use_negative);
+        ImGui::SameLine();
+        ImGui::Checkbox("Waves", &use_waves);
+        ImGui::SameLine();
+        ImGui::Checkbox("Blur", &use_blur);
+        ImGui::SameLine();
+        ImGui::Checkbox("Kernel", &use_kernel);
 
-        case Effect::Waves:
-            global.game_data.post_process.render(new_pp_shader, Effect::Waves);
-            ImGui::DragFloat("Waves", &global.game_data.post_process.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
-            break;
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-        case Effect::Blur:
-            global.game_data.post_process.render(new_pp_shader, Effect::Blur);
-            ImGui::DragFloat("Blur", &global.game_data.post_process.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
-            break;
+        if (use_grey) ImGui::DragFloat("Grey##1", &global.game_data.post_process.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
 
-        case Effect::Kernel:
-            global.game_data.post_process.render(new_pp_shader, Effect::Kernel);
-            ImGui::DragInt("Kernel types", &global.game_data.post_process.kernel_types_, 1, 0, 2, "%d");
-            break;
+        if (use_negative)  ImGui::DragFloat("Negative##1", &global.game_data.post_process.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
 
-        default:
-            global.game_data.post_process.render(new_pp_shader, Effect::None);
-            break;
-        }
+        if (use_waves)  ImGui::DragFloat("Waves##1", &global.game_data.post_process.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
 
-        AddConsoleMessage("post process compiled");
+        if (use_blur) ImGui::DragFloat("Blur##1", &global.game_data.post_process.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
+
+        if (use_kernel) ImGui::DragInt("Kernel types##1", &global.game_data.post_process.kernel_types_, 0.1f, 0, 2, "%d");
+
 
         ImGui::Dummy({ 0.0f, 5.0f });
         ImGui::Separator();
         ImGui::Dummy({ 0.0f, 5.0f });
 
-        if(ImGui::Button("Reset")){
+        if (ImGui::Button("Reset")) {
             post_process_compiled = false;
+            use_grey = false;
+            use_negative = false;
+            use_waves = false;
+            use_blur = false;
+            use_kernel = false;
 
             vertex_file_name.clear();
             fragment_file_name.clear();
@@ -1231,11 +1225,11 @@ void ImGuiManager::PostProcessWindow()
         }
 
         ImGui::Dummy({ 0.0f, 5.0f });
-
     }
 
     ImGui::End();
 }
+
 
 void ImGuiManager::FogWindow()
 {
@@ -1273,37 +1267,48 @@ void ImGuiManager::ShadowMapWindow()
     auto li = global.game_data.ecs.getComponentList<LightComponent>().begin();
     auto liend = global.game_data.ecs.getComponentList<LightComponent>().end();
 
-    for (; li != liend; ++li) {
-        if (li->has_value()) {
+    auto ni = global.game_data.ecs.getComponentList<NameComponent>().begin();
+    auto niend = global.game_data.ecs.getComponentList<NameComponent>().end();
+
+    for (; li != liend && ni != niend; ++li, ++ni) {
+        if (li->has_value() && ni->has_value()) {
             auto& light_comp = *li;
+            auto& name_comp = *ni;
 
-            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+            ImGui::Text(name_comp->name.c_str());
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-            float near_plane = light_comp->shadow_map_.near_plane;
-            if (ImGui::SliderFloat("Near Plane", &near_plane, 0.1f, 100.0f)) {
-                light_comp->shadow_map_.near_plane = near_plane;
-            }
+            static float near_plane = light_comp->shadow_map_.near_plane;
+            ImGui::SliderFloat(("Near Plane##" + name_comp->name).c_str(), &near_plane, 0.1f, 100.0f);
 
-            float far_plane = light_comp->shadow_map_.far_plane;
-            if (ImGui::SliderFloat("Far Plane", &far_plane, 10.0f, 1000.0f)) {
-                light_comp->shadow_map_.far_plane = far_plane;
-            }
+            static float far_plane = light_comp->shadow_map_.far_plane;
+            ImGui::SliderFloat(("Far Plane##" + name_comp->name).c_str(), &far_plane, 10.0f, 1000.0f);
 
-            int shadow_width = light_comp->shadow_map_.shadow_width_;
-            int shadow_height = light_comp->shadow_map_.shadow_height_;
-            if (ImGui::SliderInt("Shadow Width", &shadow_width, 512, 8192)) {
-                light_comp->shadow_map_.shadow_width_ = shadow_width;
-            }
-            if (ImGui::SliderInt("Shadow Height", &shadow_height, 512, 8192)) {
-                light_comp->shadow_map_.shadow_height_ = shadow_height;
-            }
+            static int shadow_width = light_comp->shadow_map_.shadow_width_;
+            static int shadow_height = light_comp->shadow_map_.shadow_height_;
+            ImGui::SliderInt(("Shadow Width##" + name_comp->name).c_str(), &shadow_width, 512, 8192);
+            ImGui::SliderInt(("Shadow Height##" + name_comp->name).c_str(), &shadow_height, 512, 8192);
 
+            static float directional_size = light_comp->shadow_map_.directional_size_;
             if (light_comp->light.type_ == LightType::LT_Directional) {
-                float directional_size = light_comp->shadow_map_.directional_size_;
-                if (ImGui::SliderFloat("Directional Size", &directional_size, 10.0f, 1000.0f)) {
-                    light_comp->shadow_map_.directional_size_ = directional_size;
-                }
+                ImGui::SliderFloat(("Directional Size##" + name_comp->name).c_str(), &directional_size, 10.0f, 1000.0f);
             }
+
+            ImGui::Dummy({ 0.0f, 5.0f });
+
+            if (ImGui::Button(("Apply Changes##" + name_comp->name).c_str())) {
+                light_comp->shadow_map_.near_plane = near_plane;
+                light_comp->shadow_map_.far_plane = far_plane;
+                light_comp->shadow_map_.shadow_width_ = shadow_width;
+                light_comp->shadow_map_.shadow_height_ = shadow_height;
+                light_comp->shadow_map_.directional_size_ = directional_size;
+
+                light_comp->shadow_map_.init();
+            }
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
         }
     }
@@ -1324,7 +1329,7 @@ void ImGuiManager::SkyboxWindow()
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
     static std::string skybox_file_name;
-    if (ImGui::Button(!skybox_file_name.empty() ? skybox_file_name.c_str() : "DDS Drop here", { 120.0f, 40.0f })) {}
+    if (ImGui::Button(!skybox_file_name.empty() ? skybox_file_name.c_str() : "DDS Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -1405,13 +1410,13 @@ void ImGuiManager::LoadSceneWindow()
     ImGui::Begin("Load Scene");
 
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
-    ImGui::Text("Drag and Drop json file");
+    ImGui::Text("Drag and Drop json file:");
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
     static std::string scene_file_name;
     std::filesystem::path filePath;
 
-    if (ImGui::Button(!scene_file_name.empty() ? scene_file_name.c_str() : ".json Drop here", { 120.0f, 40.0f })) {}
+    if (ImGui::Button(!scene_file_name.empty() ? scene_file_name.c_str() : ".json Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -1444,13 +1449,13 @@ void ImGuiManager::AddMeshWindow()
     ImGui::Begin("Add Mesh");
 
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
-    ImGui::Text("Drag and Drop obj file");
+    ImGui::Text("Drag and Drop obj file:");
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
     static std::string obj_file_name;
     static std::string texture_folder;
 
-    if (ImGui::Button(!obj_file_name.empty() ? obj_file_name.c_str() : ".obj Drop here")) {}
+    if (ImGui::Button(!obj_file_name.empty() ? obj_file_name.c_str() : ".obj Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -1462,7 +1467,8 @@ void ImGuiManager::AddMeshWindow()
         ImGui::EndDragDropTarget();
     }
 
-    if (ImGui::Button(!texture_folder.empty() ? texture_folder.c_str() : "Texture Folder Drop here")) {}
+    ImGui::SameLine();
+    if (ImGui::Button(!texture_folder.empty() ? texture_folder.c_str() : "Texture Folder Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {

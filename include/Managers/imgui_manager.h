@@ -9,8 +9,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-enum Effect;
-
 class ImGuiManager {
 public:
     ImGuiManager();
@@ -69,7 +67,6 @@ private:
     Shader new_pp_shader;
     Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
     bool post_process_compiled;
-    Effect current_effect;
 
     bool load_scene;
     bool add_mesh_window;
