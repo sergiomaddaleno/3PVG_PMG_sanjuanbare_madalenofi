@@ -68,6 +68,8 @@ architecture "x64"
 location "build"
 cppdialect "c++20"
 startproject "MyMotor"
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
+
 filter "configurations:Debug"
 defines { "DEBUG" }
 symbols "On"
@@ -94,15 +96,31 @@ kind "StaticLib"
 targetdir "build/%{cfg.buildcfg}"
 includedirs "include"
 conan_config_lib()
-pchheader "stdafx.hpp"
-pchsource "src/stdafx.cpp"
-forceincludes { "stdafx.hpp" }
 files {
+	"src/**",
+	"include/**",
+	"scripts/**",
+	"assets/**",
+
+	"deps/*.h",
+	"deps/imgui/*.h",
+	"deps/imgui/*.cpp",
+	"deps/imgui/misc/cpp/*.cpp",
+	"deps/imgui/misc/cpp/*.h",
+	"deps/Perlin/**",
+	"deps/imgui/backends/imgui_impl_glfw.h",
+	"deps/imgui/backends/imgui_impl_glfw.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3.h",
+	"deps/imgui/backends/imgui_impl_opengl3.cpp",
+	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
+	"deps/imgui/*.cpp",
+	"deps/imGuizmo/*.h",
+	"deps/imGuizmo/*.cpp",
 
 "premake5.lua",
 "src/build/conanfile.txt",
 "src/build/conan.lua",
-"src/stdafx.cpp", "src/stdafx.hpp",
+
 }
 -----
 project"PR0_Window"
@@ -117,28 +135,7 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
-	"examples/PR0_Window_Example.cc",
-	"src/**",
-	"include/**",
-	"scripts/**",
-	"assets/**",
-	"saves/**",
-	"premake5.lua",
-
-	"deps/*.h",
-	"deps/imgui/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/misc/cpp/*.cpp",
-	"deps/imgui/misc/cpp/*.h",
-	"deps/Perlin/**",
-	"deps/imgui/backends/imgui_impl_glfw.h",
-	"deps/imgui/backends/imgui_impl_glfw.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3.h",
-	"deps/imgui/backends/imgui_impl_opengl3.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
-	"deps/imgui/*.cpp",
-	"deps/imGuizmo/*.h",
-	"deps/imGuizmo/*.cpp",
+	"examples/PR0_Window_Example.cc"
 }
 ------
 project"MyMotor"
@@ -153,28 +150,7 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
-	"examples/mymotor.cc",
-	"src/**",
-	"include/**",
-	"scripts/**",
-	"assets/**",
-	"saves/**",
-	"premake5.lua",
-
-	"deps/*.h",
-	"deps/imgui/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/misc/cpp/*.cpp",
-	"deps/imgui/misc/cpp/*.h",
-	"deps/Perlin/**",
-	"deps/imgui/backends/imgui_impl_glfw.h",
-	"deps/imgui/backends/imgui_impl_glfw.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3.h",
-	"deps/imgui/backends/imgui_impl_opengl3.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
-	"deps/imgui/*.cpp",
-	"deps/imGuizmo/*.h",
-	"deps/imGuizmo/*.cpp",
+	"examples/mymotor.cc"
 }
 
 project"PR1_Triangle"
@@ -189,28 +165,7 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files {
-	"examples/PR1_Triangle_Example.cc",
-	"src/**",
-	"include/**",
-	"scripts/**",
-	"assets/**",
-	"saves/**",
-	"premake5.lua",
-
-	"deps/*.h",
-	"deps/imgui/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/misc/cpp/*.cpp",
-	"deps/imgui/misc/cpp/*.h",
-	"deps/Perlin/**",
-	"deps/imgui/backends/imgui_impl_glfw.h",
-	"deps/imgui/backends/imgui_impl_glfw.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3.h",
-	"deps/imgui/backends/imgui_impl_opengl3.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
-	"deps/imgui/*.cpp",
-	"deps/imGuizmo/*.h",
-	"deps/imGuizmo/*.cpp",
+	"examples/PR1_Triangle_Example.cc"
 }
 
 project"PR2_MeshLoad"
@@ -225,28 +180,7 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files {
-	"examples/PR2_MeshLoad_Example.cc",
-	"src/**",
-	"include/**",
-	"scripts/**",
-	"assets/**",
-	"saves/**",
-	"premake5.lua",
-
-	"deps/*.h",
-	"deps/imgui/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/misc/cpp/*.cpp",
-	"deps/imgui/misc/cpp/*.h",
-	"deps/Perlin/**",
-	"deps/imgui/backends/imgui_impl_glfw.h",
-	"deps/imgui/backends/imgui_impl_glfw.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3.h",
-	"deps/imgui/backends/imgui_impl_opengl3.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
-	"deps/imgui/*.cpp",
-	"deps/imGuizmo/*.h",
-	"deps/imGuizmo/*.cpp",
+	"examples/PR2_MeshLoad_Example.cc"
 }
 
 project"PR3_JobSystem"
@@ -261,28 +195,7 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files {
-	"examples/PR3_JobSystem_Example.cc",
-	"src/**",
-	"include/**",
-	"scripts/**",
-	"assets/**",
-	"saves/**",
-	"premake5.lua",
-
-	"deps/*.h",
-	"deps/imgui/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/misc/cpp/*.cpp",
-	"deps/imgui/misc/cpp/*.h",
-	"deps/Perlin/**",
-	"deps/imgui/backends/imgui_impl_glfw.h",
-	"deps/imgui/backends/imgui_impl_glfw.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3.h",
-	"deps/imgui/backends/imgui_impl_opengl3.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
-	"deps/imgui/*.cpp",
-	"deps/imGuizmo/*.h",
-	"deps/imGuizmo/*.cpp",
+	"examples/PR3_JobSystem_Example.cc"
 }
 
 project"PR4_ECSManager"
@@ -297,28 +210,7 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files {
-	"examples/PR4_ECSManager_Example.cc",
-	"src/**",
-	"include/**",
-	"scripts/**",
-	"assets/**",
-	"saves/**",
-	"premake5.lua",
-
-	"deps/*.h",
-	"deps/imgui/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/misc/cpp/*.cpp",
-	"deps/imgui/misc/cpp/*.h",
-	"deps/Perlin/**",
-	"deps/imgui/backends/imgui_impl_glfw.h",
-	"deps/imgui/backends/imgui_impl_glfw.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3.h",
-	"deps/imgui/backends/imgui_impl_opengl3.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
-	"deps/imgui/*.cpp",
-	"deps/imGuizmo/*.h",
-	"deps/imGuizmo/*.cpp",
+	"examples/PR4_ECSManager_Example.cc"
 }
 
 project"PR5_Scripting"
@@ -333,28 +225,7 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
-	"examples/PR5_Scripting_Example.cc",
-	"src/**",
-	"include/**",
-	"scripts/**",
-	"assets/**",
-	"saves/**",
-	"premake5.lua",
-
-	"deps/*.h",
-	"deps/imgui/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/misc/cpp/*.cpp",
-	"deps/imgui/misc/cpp/*.h",
-	"deps/Perlin/**",
-	"deps/imgui/backends/imgui_impl_glfw.h",
-	"deps/imgui/backends/imgui_impl_glfw.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3.h",
-	"deps/imgui/backends/imgui_impl_opengl3.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
-	"deps/imgui/*.cpp",
-	"deps/imGuizmo/*.h",
-	"deps/imGuizmo/*.cpp",
+	"examples/PR5_Scripting_Example.cc"
 }
 
 project"PR6_Lights"
@@ -369,28 +240,7 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
-	"examples/PR6_Lights_Example.cc",
-	"src/**",
-	"include/**",
-	"scripts/**",
-	"assets/**",
-	"saves/**",
-	"premake5.lua",
-
-	"deps/*.h",
-	"deps/imgui/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/misc/cpp/*.cpp",
-	"deps/imgui/misc/cpp/*.h",
-	"deps/Perlin/**",
-	"deps/imgui/backends/imgui_impl_glfw.h",
-	"deps/imgui/backends/imgui_impl_glfw.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3.h",
-	"deps/imgui/backends/imgui_impl_opengl3.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
-	"deps/imgui/*.cpp",
-	"deps/imGuizmo/*.h",
-	"deps/imGuizmo/*.cpp",
+	"examples/PR6_Lights_Example.cc"
 }
 
 project"ProjectAI"
@@ -405,26 +255,5 @@ conan_config_exec("Release")
 conan_config_exec("RelWithDebInfo")
 debugargs { _MAIN_SCRIPT_DIR .. "/src" }
 files { 
-	"examples/AI_Example.cc",
-	"src/**",
-	"include/**",
-	"scripts/**",
-	"assets/**",
-	"saves/**",
-	"premake5.lua",
-
-	"deps/*.h",
-	"deps/imgui/*.h",
-	"deps/imgui/*.cpp",
-	"deps/imgui/misc/cpp/*.cpp",
-	"deps/imgui/misc/cpp/*.h",
-	"deps/Perlin/**",
-	"deps/imgui/backends/imgui_impl_glfw.h",
-	"deps/imgui/backends/imgui_impl_glfw.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3.h",
-	"deps/imgui/backends/imgui_impl_opengl3.cpp",
-	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
-	"deps/imgui/*.cpp",
-	"deps/imGuizmo/*.h",
-	"deps/imGuizmo/*.cpp",
+	"examples/AI_Example.cc"
 }
