@@ -35,7 +35,6 @@ private:
     GLuint textureID;
 
     int width, height, channels;
-
     unsigned char* data_;
 };
 
