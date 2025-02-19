@@ -1507,7 +1507,7 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
                 if (loc_ecs.has_component<LightComponent>(selected_entity)) {
                     auto& light_comp = loc_ecs.get_component<LightComponent>(selected_entity);
                     light_comp->light.pos_ = transform->position;
-                    //light_comp->light.dir_ = transform->rotation * glm::vec3(0.0f, 0.0f, 1.0f);
+                    light_comp->light.dir_ = glm::mat3(transform->rotation) * glm::vec3(0.0f, 0.0f, 1.0f);
                 }
 
                 glm::mat4 model = glm::mat4(1.0f);
