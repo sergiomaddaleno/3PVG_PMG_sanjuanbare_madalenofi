@@ -605,6 +605,18 @@ void ImGuiManager::InspectorWindow() {
         if (open) {
             auto& light_comp = global.game_data.ecs.get_component<LightComponent>(selected_entity);
 
+            if (light_comp->light.type_ == LT_Directional) {
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.9f, 0.9f, 1.0f));
+                ImGui::Text("Directional direction");
+                ImGui::PopStyleColor();
+                ImGui::SliderAngle("X", &light_comp->light.dir_[0], -180.0f, 180.0f);
+                ImGui::SliderAngle("Y", &light_comp->light.dir_[1], -180.0f, 180.0f);
+                ImGui::SliderAngle("Z", &light_comp->light.dir_[2], -180.0f, 180.0f);
+
+            }
+
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.8f, 0.3f, 1.0f)); 
             ImGui::Text("Light Colors");
