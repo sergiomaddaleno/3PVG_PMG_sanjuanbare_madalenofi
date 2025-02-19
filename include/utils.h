@@ -5,8 +5,6 @@
 #include <iostream>
 #include <GL/glew.h> 
 #include <GLFW/glfw3.h>
-#include "../deps/dds.h"
-#include "../deps/glm/glm.hpp"
 
 char* ReadFile(const char* file_path = nullptr);
 

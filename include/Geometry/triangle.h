@@ -4,12 +4,11 @@
 #include <optional>
 #include <string>
 
+#include "Render/camera.h"
+#include <../deps/glm/glm.hpp>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include "Render/camera.h"
-
-#include <../deps/glm/glm.hpp>
 
 struct RenderComponent;
 struct TransformComponent;

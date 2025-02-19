@@ -3,7 +3,6 @@
 
 #include "Core/mesh.h"
 #include "Core/texture.h"
-#include "global_variables.h"
 #include "Components/render_component.h"
 #include "Components/transform_component.h"
 #include "utils.h"

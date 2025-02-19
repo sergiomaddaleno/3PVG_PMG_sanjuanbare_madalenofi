@@ -2,12 +2,9 @@
 #ifndef __WINDOW__
 #define __WINDOW__
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <optional>
 #include <string>
 #include <Core/input.h>
-#include "framebuffer.h"
 #include <../deps/glm/glm.hpp>
 
 class WindowSystem {
@@ -40,7 +37,7 @@ public:
 	//---
 	void colorWindow(const glm::vec4& Color);
 
-	void setWindowIcon(GLFWwindow* window, const char* path);
+	void setWindowIcon(GLFWwindow* window, std::string path);
 
 	void setResizeCallback();
 

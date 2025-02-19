@@ -1,47 +1,15 @@
-#ifndef __UI_MANAGER__
-#define __UI_MANAGER__
+#ifndef _UI_MANAGER_H_
+#define _UI_MANAGER_H_
 
-#include <filesystem>
+#include "Core/texture.h"
+#include "Core/shader.h"
+#include "utils.h"
+#include <../deps/glm/glm.hpp>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "Core/window.h"
-#include "Core/input.h"
-#include "Core/texture.h"
-#include "Core/shader.h"
-#include "Core/framebuffer.h"
-
-#include "Render/camera.h"
-#include "Render/post_processing.h"
-#include "Render/skybox.h"
-#include "Render/light.h"
-#include "Render/render_system.h"
-
-#include "Geometry/terrain.h"
-#include "Geometry/triangle.h"
-
-#include "Systems/ecs_manager.h"
-#include "save_manager.h"
-#include "utils.h"
-
-
-//Todo lo que quiero que se edite en imgui
-struct DataImgui {
-    //Terrain terrain;
-    //Triangle triangle;
-    Camera* cam;
-    //LightInfo light_info;
-    PostProcessing* post_proccessing;
-    ECSManager* ecs;
-    RenderSystem* render_system;
-    Window* window;
-    Input* input;
-    Skybox* skybox;
-    SaveManager save_manager;
-};
-
-static DataImgui data_imgui;
+enum Effect;
 
 class ImGuiManager {
 public:
@@ -49,7 +17,7 @@ public:
     ~ImGuiManager();
 
     void Init(GLFWwindow* window);
-    void Render(GLFWwindow* window, DataImgui &di);
+    void Render(GLFWwindow* window);
     void Cleanup();
 
     void SetImguiTheme();
@@ -57,23 +25,24 @@ public:
     // ---
 
     void ImguiWindow(GLFWwindow* window);
-    void GameWindow(DataImgui& di);
-    void HierarchyWindow(DataImgui& di);
-    void InspectorWindow(DataImgui& di);
-    void ContentBrowserWindow(DataImgui& di);
-    void TopBarWindow(DataImgui& di);
+    void GameWindow();
+    void HierarchyWindow();
+    void InspectorWindow();
+    void ContentBrowserWindow();
+    void TopBarWindow();
 
-    void PostProcessWindow(DataImgui& di);
-    void FogWindow(DataImgui& di);
-    void SkyboxWindow(DataImgui& di);
-    void ConsoleWindow(DataImgui& di);
-    void LoadSceneWindow(DataImgui& di);
-    void AddMeshWindow(DataImgui& di);
+    void PostProcessWindow();
+    void FogWindow();
+    void SkyboxWindow();
+    void ConsoleWindow();
+    void LoadSceneWindow();
+    void AddMeshWindow();
 
-    void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity, DataImgui& di);
+    void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity);
 
 private:
-    int selected_entity = 0;
+
+    int selected_entity;
 
     std::filesystem::path m_BaseDirectory;
     std::filesystem::path m_CurrentDirectory;
@@ -83,22 +52,23 @@ private:
     Texture m_EntityIcon;
     Texture m_BackIcon;
 
-    float padding = 16.0f;
-    float thumbnailSize = 128.0f;
+    float padding;
+    float thumbnailSize;
+    
     //--
 
-    bool post_process_window = false;
-    bool skybox_window = false;
-    bool console_window = false;
-    bool fog_window = false;
+    bool post_process_window;
+    bool skybox_window;
+    bool console_window;
+    bool fog_window;
 
     Shader new_pp_shader;
     Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
-    bool post_process_compiled = false;
-    Effect current_effect = Effect::None;
+    bool post_process_compiled;
+    Effect current_effect;
 
-    bool load_scene = false;
-    bool add_mesh_window = false;
+    bool load_scene;
+    bool add_mesh_window;
 };
 
-#endif // __UI_MANAGER__
+#endif // _UI_MANAGER_H_

@@ -4,7 +4,6 @@
 #include "Core/input.h"
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/quaternion.hpp>
-#include <cmath>
 
 #include "../deps/nlohmann/json.hpp"
 

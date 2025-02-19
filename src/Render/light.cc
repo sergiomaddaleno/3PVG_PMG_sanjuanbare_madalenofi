@@ -64,6 +64,9 @@ void Light::setUniforms(Shader& shader)
     loc = shader.getUniformLocation("u_light.spot_angle_");
     shader.setUniformValue(loc, ValueType::T_FLOAT_1, &spot_angle_);
 
+    loc = shader.getUniformLocation("u_light.spot_softness_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_1, &spot_softness_);
+
     //shader.setUniformValue(shader.getUniformLocation("u_ambient"), ValueType::T_FLOAT_3, &global_ambient_color_);
 }
 
@@ -86,6 +89,7 @@ nlohmann::json Light::serialize() const
     json_data["Shininnes"].push_back( shininess_);
     json_data["Strength"].push_back( strength_);
     json_data["Spot_angle"].push_back( spot_angle_);
+    json_data["Spot_softness"].push_back(spot_softness_);
 
     return json_data;
 }

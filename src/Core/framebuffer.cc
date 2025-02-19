@@ -97,8 +97,6 @@ GLuint FrameBuffer::captureWindowToTexture() {
     return captureTexture;
 }
 
-
-
 GLuint FrameBuffer::GetFBO() const
 {
     return FBO_;

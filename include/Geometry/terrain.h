@@ -1,16 +1,16 @@
 #ifndef __TERRAIN_H__
 #define __TERRAIN_H__ 1
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "Core/texture.h"
 
+#include "Core/texture.h"
 #include <../deps/glm/glm.hpp>
 #include <../nlohmann/json.hpp>
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 class Terrain {
  public:
@@ -20,8 +20,6 @@ class Terrain {
   void init(const int num_cols = 2, const int num_rows = 2, 
             const float height_mult = 1.0f, const float size = 1.0f,
             const bool is_centered = true, const bool use_perlin_noise = true);  //false for heightmap
-
-  void updateVertex();
 
   void bind();
   void render(bool use_texture = true);

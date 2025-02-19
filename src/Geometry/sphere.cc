@@ -8,7 +8,7 @@
 #include <../deps/glm/gtc/type_ptr.hpp>
 #include <../deps/glm/gtc/quaternion.hpp>
 
-#define PI 3.14159265359
+#define PI 3.14159265359f
 
 Sphere::Sphere()
     : VAO(0), VBO(0), EBO(0),
@@ -36,8 +36,8 @@ void Sphere::init(const float sphere_size, const int num_heights, const int num_
     normals_sphere_.resize(num_vertex_ * 3);
     uv_sphere_.resize(num_vertex_ * 2);
 
-    const float alpha = PI / num_heights;
-    const float omega = (PI * 2.0f) / num_revs;
+    const float alpha = PI / (float)num_heights;
+    const float omega = (PI * 2.0f) / (float)num_revs;
 
     int index = 0;
    

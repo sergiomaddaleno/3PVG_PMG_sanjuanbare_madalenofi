@@ -11,6 +11,7 @@
 
 class ECSManager;
 class Shader;
+class Camera;
 struct LightComponent;
 
 class ShadowMap {
@@ -24,12 +25,15 @@ public:
 	void bind();
 	void render(ECSManager& ecs, Shader shader, LightComponent lc);
 
-	unsigned int depthMapFBO = 0;
-	unsigned int depthMap = 0;
+	unsigned int depthMapFBO;
+	unsigned int depthMap;
 
-	float near_plane = 1.0f, far_plane = 200.5f;
-	unsigned int shadow_width_ = 2048;
-	unsigned int shadow_height_ = 2048;
+	float near_plane, far_plane;
+	unsigned int shadow_width_;
+	unsigned int shadow_height_;
+
+	float directional_size_;
+
 
 };
 

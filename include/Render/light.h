@@ -44,6 +44,7 @@ public:
     float shininess_;
     float strength_;
     float spot_angle_;
+    float spot_softness_;
 
     // Save data
     nlohmann::json serialize() const;

@@ -1,10 +1,10 @@
 #ifndef __SHADER__
 #define __SHADER__
 
+#include "../deps/nlohmann/json.hpp"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include "../deps/nlohmann/json.hpp"
 
 enum ValueType {
     T_NONE = 0x0,

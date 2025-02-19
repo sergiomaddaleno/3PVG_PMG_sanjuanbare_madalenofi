@@ -1,18 +1,17 @@
 #ifndef __MESH__
 #define __MESH__
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
 #include <string>
 #include <iostream>
 #include <vector>
 #include <../deps/glm/glm.hpp>
+#include "../deps/nlohmann/json.hpp"
 
 #include "texture.h"
 #include "Render/camera.h"
 
-#include "../deps/nlohmann/json.hpp"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 struct RenderComponent;
 struct TransformComponent;
@@ -27,6 +26,17 @@ class Mesh {
 
 public:
     
+    bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
+
+    void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
+
+    void bind();
+    void renderElements(bool use_texture = true);
+
+    Texture getTexture(int shape_index);
+
+    // ---
+
     std::vector<Vertex> vertices;
     std::vector<Mesh> meshes;
     std::vector<Texture> textures;
@@ -38,17 +48,6 @@ public:
     std::string texture_folder;
 
     GLuint VAO = 0, VBO = 0, EBO = 0;
-
-    //---
-
-    bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
-
-    void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
-
-    void bind();
-    void renderElements(bool use_texture = true);
-
-    Texture getTexture(int shape_index);
 
     //Save data
     nlohmann::json serialize() const;

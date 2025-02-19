@@ -15,6 +15,7 @@ struct LightInfo {
     float shininess_;
     float strength_;
     float spot_angle_;
+    float spot_softness_;
 };
 
 uniform sampler2D u_texture;
@@ -57,46 +58,46 @@ vec3 PointLight(LightInfo lc) {
 vec3 SpotLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
     float cutOff = cos(radians(lc.spot_angle_));
+    float outerCutOff = cos(radians(lc.spot_angle_ + lc.spot_softness_));
     float theta = dot(lightDir, normalize(-lc.dir_));
 
     float distance = length(lc.pos_ - FragPos);
     float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
 
-    if (theta > cutOff) {
-        float diffuseStrength = max(dot(lightDir, normal), 0.0);
-        vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation;
+    float intensity = smoothstep(outerCutOff, cutOff, theta);
 
-        vec3 viewDir = normalize(u_camera_position - FragPos);
-        vec3 reflectDir = reflect(-lightDir, normal);
-        float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
-        vec3 specular = specStrength * lc.light_color_ * attenuation;
+    float diffuseStrength = max(dot(lightDir, normal), 0.0);
+    vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation * intensity;
 
-        return diffuse + specular;
-    } else {
-        return lc.ambient_color_ * u_ambient;
-    }
+    vec3 viewDir = normalize(u_camera_position - FragPos);
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
+    vec3 specular = lc.spec_color_ * specStrength * attenuation * intensity;
+
+    vec3 ambient = lc.ambient_color_ * u_ambient * intensity;
+
+    return ambient + diffuse + specular;
 }
+
 
 vec3 DirectionalLight(LightInfo lc) {
    
     vec3 light_dir = normalize(-lc.dir_);
 
     float diff = max(dot(normal, light_dir), 0.0);
-    vec3 diffuse = diff * lc.light_color_;
+    vec3 diffuse = diff * lc.light_color_ * lc.diff_color_ * lc.strength_;
 
-    
     vec3 view_dir = normalize(u_camera_position - FragPos);
     vec3 reflect_dir = reflect(-light_dir, normal);
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), lc.shininess_);
     vec3 specular = spec * lc.spec_color_;
 
-    
     vec3 ambient = lc.ambient_color_ * lc.light_color_;
 
     return ambient + diffuse + specular;
 }
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+/*float ShadowCalculation(vec4 fragPosLightSpace)
 {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  
     projCoords = projCoords * 0.5 + 0.5; 
@@ -104,9 +105,42 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     float closestDepth = texture(u_shadow_map, projCoords.xy).r;
     float currentDepth = projCoords.z;
 
-    float bias = 0.005;
+    float bias = 0.0005;
 
     return (currentDepth - bias) > closestDepth ? 0.0 : 1.0;
+}*/
+
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    // Realizar la división de perspectiva
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    
+    // Transformar a [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    
+    // Obtener la profundidad actual del fragmento
+    float currentDepth = projCoords.z;
+    
+    // Parámetros para ajustar la calidad de la sombra
+    float bias = 0.0005;
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(u_shadow_map, 0);
+    
+    // Realizar PCF
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(u_shadow_map, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+        }    
+    }
+    
+    // Calcular el promedio
+    shadow /= 9.0;
+    
+    // Invertir el resultado para que 0.0 sea sombra completa y 1.0 sin sombra
+    return 1.0 - shadow;
 }
 
 void main() {
@@ -115,7 +149,7 @@ void main() {
     float shadow = ShadowCalculation(FragPosLight);
 
     if (u_light.type_ == 0) {
-        final_light += DirectionalLight(u_light)/* shadow*/ ; 
+        final_light += DirectionalLight(u_light) * shadow ; 
     }
     
     if (u_light.type_ == 1) {

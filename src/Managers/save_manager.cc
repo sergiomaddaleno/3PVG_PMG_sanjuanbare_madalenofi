@@ -12,12 +12,40 @@
 #include "Components\light_component.h"
 #include "Components/name_component.h"
 
-#include "global_variables.h"
+#include "global_data.h"
 
 #include <../nlohmann/json.hpp>
 #include <iostream>
 #include <fstream>
 #include "utils.h"
+
+SaveManager::SaveManager()
+    : current_scene_file(""),
+      number_of_scenes(0),
+      li(),
+      terrain_num_rows(0),
+      terrain_num_cols(0),
+      terrain_height_mult(0.0f),
+      terrain_size(0.0f),
+      terrain_is_centered(true),
+      terrain_use_perlin_noise(true),
+      sphere_num_heights(0),
+      sphere_num_revs(0),
+      sphere_size(0.0f),
+      cube_size(0.0f),
+      cube_8v(false),
+      cube_24v(false),
+      quad_size(0.0f),
+      dds_file(nullptr),
+      sb_vertex(nullptr),
+      sb_fragment(nullptr),
+      skybox_angle(0.0f)
+{}
+
+
+SaveManager::~SaveManager()
+{
+}
 
 nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam, Skybox& skybox)
 {
@@ -226,6 +254,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             li.shininess_ = lc["Shininnes"][0].get<float>();
             li.strength_ = lc["Strength"][0].get<float>();
             li.spot_angle_ = lc["Spot_angle"][0].get<float>();
+            li.spot_softness_ = lc["Spot_softness"][0].get<float>();
 
             li.type_ = lc["Type"].get<LightType>();
 

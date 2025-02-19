@@ -187,39 +187,6 @@ void Terrain::init(const int num_cols, const int num_rows,
         }    
 }
 
-void Terrain::updateVertex()
-{
-    float waveAmplitude = 2.0f; 
-    float waveFrequency = 0.2f; 
-    float waveSpeed = 2.0f; 
-
-    int index = 0;
-    for (int i = 0; i <= num_cols_; i++) {
-        for (int j = 0; j <= num_rows_; j++) {
-
-            float y = waveAmplitude * sinf(waveFrequency * glfwGetTime()) +
-                waveAmplitude * cosf(waveFrequency  * glfwGetTime());
-
-            vertex_terrain_[index * 3] = 0;
-            vertex_terrain_[index * 3 + 1] = y; 
-            vertex_terrain_[index * 3 + 2] = 0;
-
-            index++;
-        }
-    }
-
-    data_.clear();
-    for (int i = 0; i < num_vertex_; i++) {
-        data_.push_back(vertex_terrain_[i * 3]);
-        data_.push_back(vertex_terrain_[i * 3 + 1]);
-        data_.push_back(vertex_terrain_[i * 3 + 2]);
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, data_.size() * sizeof(float), data_.data());
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
 void Terrain::bind()
 {
     glGenBuffers(1, &VBO);

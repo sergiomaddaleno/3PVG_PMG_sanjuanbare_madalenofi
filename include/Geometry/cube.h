@@ -3,11 +3,12 @@
 #ifndef __CUBE_H__
 #define __CUBE_H__ 1
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include "Core/texture.h"
 #include <memory>
 #include <vector>
+#include "Core/texture.h"
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 class Cube {
  public:

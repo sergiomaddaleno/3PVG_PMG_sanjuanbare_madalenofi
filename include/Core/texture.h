@@ -3,18 +3,12 @@
 
 #include <string>
 #include <vector>
+#include "../deps/nlohmann/json.hpp"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "../deps/nlohmann/json.hpp"
-
 class Texture {
-private:
-    GLuint textureID;
-
-    int width, height, channels;
-
-    unsigned char* data_;
 
 public:
     Texture();
@@ -36,6 +30,13 @@ public:
 
     //Save data
     nlohmann::json serialize() const;
+
+private:
+    GLuint textureID;
+
+    int width, height, channels;
+
+    unsigned char* data_;
 };
 
 #endif // __TEXTURE__

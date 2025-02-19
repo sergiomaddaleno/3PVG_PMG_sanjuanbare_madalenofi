@@ -6,7 +6,8 @@ const float PI = 3.141592653589793f;
 #include "utils.h"
 #include "Core/input.h"
 #include "Core/window.h"
-#include "global_variables.h"
+
+#include "global_data.h"
 
 #include <../nlohmann/json.hpp>
 #include "../deps/glm/gtx/transform.hpp"
@@ -23,12 +24,12 @@ Camera::Camera()
     accum_mouse_offset_(0.0f, 0.0f),
     speed_(10.0f),
     sensitivity_(1.0f),
-    fov_(g_fov_),
-    aspect_ratio_((float)g_window_width_ / (float)g_window_height_),
-    near_clip_plane_(g_near_clip_plane_),
-    far_clip_plane_(g_far_clip_plane_),
-    ortho_width_(g_ortho_height_),
-    ortho_height_(600),
+    fov_(global.use_fog),
+    aspect_ratio_((float)global.window_width / (float)global.window_height),
+    near_clip_plane_(global.near_clip_plane),
+    far_clip_plane_(global.far_clip_plane),
+    ortho_width_(global.ortho_width),
+    ortho_height_(global.ortho_height),
     scroll_speed_(10.0f),
     view_(initViewTarget())
 {}
@@ -46,7 +47,7 @@ glm::mat4 Camera::getPerspectiveMatrix() const
 glm::mat4 Camera::getOrthograficMatrix() const
 {
     float w_half = ortho_width_ / 2.0f;
-    float h_half = ortho_width_ / 2.0f;
+    float h_half = ortho_height_ / 2.0f;
 
     return glm::ortho(-w_half, w_half, -h_half, h_half, near_clip_plane_, far_clip_plane_);
 }
@@ -109,7 +110,7 @@ void Camera::update(Input& input, const double dt, const int window_width, const
 
     // ----------------------------------------
 
-    float scroll_delta = input.getScrollY();
+    float scroll_delta = (float)input.getScrollY();
 
     if (scroll_delta > 0.0f) {
         position_ += view_direction_ * scroll_speed_;

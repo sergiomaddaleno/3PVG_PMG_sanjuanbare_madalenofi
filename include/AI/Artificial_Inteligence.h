@@ -14,14 +14,10 @@
 #include <string>       
 #include <algorithm>   
 
-
-
 class ECSManager;
 
 class AI {
 public:
-
-
 
     AI();
     ~AI();
@@ -33,9 +29,6 @@ public:
     std::vector<glm::vec3> FindShortestPath(const glm::vec3& start, const glm::vec3& end, int gridSize, const std::vector<std::vector<bool>>& obstacles);
 
     bool IsValidCell(int x, int z, int size, const std::vector<std::vector<bool>>& obstacles);
- 
-
-
 
 };
 

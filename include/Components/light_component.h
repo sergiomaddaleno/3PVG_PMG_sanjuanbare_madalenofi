@@ -1,8 +1,6 @@
 #ifndef __LIGHT_COMPONENT__
 #define __LIGHT_COMPONENT__
 
-#include <memory>
-#include "../Core/shader.h"
 #include "../Render/light.h"
 #include "Render/shadow_map.h"
 
@@ -15,11 +13,8 @@ struct LightComponent {
 
 	// To save data
 	nlohmann::json serialize() {
-
 		nlohmann::json json_data;
-
 		json_data["light"] = light.serialize();
-
 		return json_data;
 	}
 };
