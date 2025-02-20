@@ -45,11 +45,19 @@ void Texture::generate()
     glGenTextures(1, &textureID);
 }
 
-void Texture::bind() const
+void Texture::bind2D() const
 {
     if (textureID != 0) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, textureID);
+    }
+}
+
+void Texture::bindCubeMap() const
+{
+    if (textureID != 0) {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
     }
 }
 

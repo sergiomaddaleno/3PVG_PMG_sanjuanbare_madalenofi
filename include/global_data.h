@@ -10,18 +10,10 @@
 #include "Managers/save_manager.h"
 #include "Managers/imgui_manager.h"
 
-struct GameData {
-    Camera cam;
-    ECSManager ecs;
-    PostProcessing post_process;
-    RenderSystem render_system;
-    Skybox skybox;
-    SaveManager save_manager;
-    ImGuiManager imgui_manager;
-};
-
 class Globals {
 public:
+
+    //Variables
     int window_width = 800;
     int window_height = 600;
     bool full_screen = true;
@@ -40,7 +32,16 @@ public:
 
     bool use_skybox = true;
 
-    GameData game_data;
+    // -------------------------------------------------------------
+    
+    //Classes
+    Camera cam;
+    ECSManager ecs;
+    PostProcessing post_process;
+    RenderSystem render_system;
+    Skybox skybox;
+    SaveManager save_manager;
+    ImGuiManager imgui_manager;
 };
 
 extern Globals global;

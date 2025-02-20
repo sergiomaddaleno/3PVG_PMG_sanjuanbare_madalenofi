@@ -123,7 +123,7 @@ void Sphere::bind()
 
 void Sphere::render()
 {
-    tex.bind();
+    tex.bind2D();
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_heights_ * num_revs_) * 6, GL_UNSIGNED_INT, 0);

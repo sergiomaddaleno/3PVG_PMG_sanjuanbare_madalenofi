@@ -14,10 +14,12 @@ public:
     Texture();
     ~Texture();
 
-    bool loadTexture(const std::string& file_path);
     void generate();
-    void bind() const;
+    void bind2D() const;
+    void bindCubeMap() const;
     void deleteTexture();
+
+    bool loadTexture(const std::string& file_path);
 
     //--
     void setID(GLuint texID) { textureID = texID; }

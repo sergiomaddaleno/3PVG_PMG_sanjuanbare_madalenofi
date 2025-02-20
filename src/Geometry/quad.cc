@@ -98,7 +98,7 @@ void Quad::bind()
 
 void Quad::render()
 {
-    tex.bind();
+    tex.bind2D();
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

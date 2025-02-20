@@ -160,7 +160,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
     skybox.fragment_file_ = skybox_["Fragment_source"];
     skybox.skybox_angle_ = skybox_["angle"];
 
-    skybox.loadSkyBoxDDS(skybox.dds_file_.c_str(), skybox.vertex_file_.c_str(), skybox.fragment_file_.c_str());
+    skybox.loadDDS(skybox.dds_file_.c_str(), skybox.vertex_file_.c_str(), skybox.fragment_file_.c_str());
     skybox.init();
 
     //-----------------------------------------------------------
@@ -361,9 +361,9 @@ void SaveManager::newFile()
 
             }},
             {"Skybox", {
-                {"Fragment_source", "../assets/shaders/skybox.fs"},
+                {"Fragment_source", "../assets/shaders/skybox_dds.fs"},
                 {"Skybox_file_path", "../assets/textures/skybox/sky.dds"},
-                {"Vertex_source", "../assets/shaders/skybox.vs"},
+                {"Vertex_source", "../assets/shaders/skybox_dds.vs"},
                 {"angle", -90.0f }
             }}
         };

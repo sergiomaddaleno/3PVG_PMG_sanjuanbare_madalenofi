@@ -63,14 +63,19 @@ public:
 	Skybox();
 	~Skybox();
 
-	void loadSkyBoxDDS(const char* dds_file, const char* vertex_file, const char* fragment_file);
+	void loadDDS(const char* dds_file, const char* vertex_file, const char* fragment_file);
+	void loadCubeMap(std::vector<std::string> faces_files, const char* vertex_file, const char* fragment_file);
 
 	void init();
-	void render(Camera cam = Camera());
+
+	void renderDDS(Camera cam = Camera());
+	void renderCubeMap(Camera cam = Camera());
 
 	nlohmann::json serialize() const;
 
 	std::string dds_file_;
+	std::vector<std::string> faces_files_; //6 faces
+
 	std::string vertex_file_;
 	std::string fragment_file_;
 	float skybox_angle_;
@@ -81,7 +86,7 @@ private:
 	Shader shader_;
 	Texture texture_;
 
-	GLuint VAO, VBO, EBO;
+	GLuint cubeVAO, skyboxVAO, VBO, EBO;
 };
 
 

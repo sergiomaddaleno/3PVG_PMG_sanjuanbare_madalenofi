@@ -11,31 +11,32 @@
 #include <../deps/glm/gtc/type_ptr.hpp>
 
 #include "../deps/dds.h"
+#include "../deps/stb_image.h"
 #include <cassert>
 
 #include <memory> 
 #include <iostream>
 
-Skybox::Skybox() : skybox_angle_(-90.0f), VAO(0), VBO(0), EBO(0),
-dds_file_("../assets/textures/skybox/sky.dds"), 
-vertex_file_("../assets/shaders/skybox.vs"), 
-fragment_file_("../assets/shaders/skybox.fs")
+Skybox::Skybox() : skybox_angle_(-90.0f), cubeVAO(0), skyboxVAO(0), VBO(0), EBO(0),
+dds_file_(), 
+vertex_file_(), 
+fragment_file_()
 {}
 
 Skybox::~Skybox()
 {
-    if (VAO) glDeleteVertexArrays(1, &VAO);
+    if (skyboxVAO) glDeleteVertexArrays(1, &skyboxVAO);
     if (VBO) glDeleteBuffers(1, &VBO);
     if (EBO) glDeleteBuffers(1, &EBO);
 }
 
 void Skybox::init() {
 
-    glGenVertexArrays(1, &VAO);
+    glGenVertexArrays(1, &skyboxVAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
-    glBindVertexArray(VAO);
+    glBindVertexArray(skyboxVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(gMesh), gMesh, GL_STATIC_DRAW);
@@ -50,7 +51,7 @@ void Skybox::init() {
     glBindVertexArray(0);
 }
 
-void Skybox::render(Camera cam) {
+void Skybox::renderDDS(Camera cam) {
     glDepthMask(GL_FALSE);
 
     glEnable(GL_CULL_FACE);
@@ -65,13 +66,13 @@ void Skybox::render(Camera cam) {
     int tex_id = 1;
     shader_.useProgram();
 
-    texture_.bind();
+    texture_.bind2D();
     shader_.setUniformValue(shader_.getUniformLocation("skybox"), ValueType::T_INT_1, &tex_id);
     shader_.setUniformValue(shader_.getUniformLocation("view"), ValueType::T_MAT_4x4, &view[0][0]);
     shader_.setUniformValue(shader_.getUniformLocation("projection"), ValueType::T_MAT_4x4, &projection[0][0]);
     shader_.setUniformValue(shader_.getUniformLocation("model"), ValueType::T_MAT_4x4, &model[0][0]);
 
-    glBindVertexArray(VAO);
+    glBindVertexArray(skyboxVAO);
     glDrawElements(GL_TRIANGLES, sizeof(gIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
@@ -82,7 +83,37 @@ void Skybox::render(Camera cam) {
     glUseProgram(0);
 }
 
-void Skybox::loadSkyBoxDDS(const char* dds_file, const char* vertex_file, const char* fragment_file)
+void Skybox::renderCubeMap(Camera cam)
+{
+    glDepthMask(GL_FALSE);
+    glDepthFunc(GL_LEQUAL);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+
+    glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix()));
+    glm::mat4 projection = cam.getPerspectiveMatrix();
+
+    int tex_id = 1;
+    shader_.useProgram();
+
+    texture_.bindCubeMap();
+    shader_.setUniformValue(shader_.getUniformLocation("skybox"), ValueType::T_INT_1, &tex_id);
+    shader_.setUniformValue(shader_.getUniformLocation("view"), ValueType::T_MAT_4x4, &view[0][0]);
+    shader_.setUniformValue(shader_.getUniformLocation("projection"), ValueType::T_MAT_4x4, &projection[0][0]);
+
+    glBindVertexArray(skyboxVAO);
+    glDrawElements(GL_TRIANGLES, sizeof(gIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(0);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
+    glCullFace(GL_BACK);
+    glDisable(GL_CULL_FACE);
+    glUseProgram(0);
+}
+
+void Skybox::loadDDS(const char* dds_file, const char* vertex_file, const char* fragment_file)
 {
     dds_file_ = dds_file;
     vertex_file_ = vertex_file;
@@ -99,6 +130,44 @@ void Skybox::loadSkyBoxDDS(const char* dds_file, const char* vertex_file, const 
     shader_.compile(loc_vert, loc_frag);
 
     free(loc_file);
+    free(loc_vert);
+    free(loc_frag);
+}
+
+void Skybox::loadCubeMap(std::vector<std::string> faces_files, const char* vertex_file, const char* fragment_file)
+{
+    faces_files_ = faces_files;
+    vertex_file_ = vertex_file;
+    fragment_file_ = fragment_file;
+
+    char* loc_vert = ReadFile(vertex_file);
+    char* loc_frag = ReadFile(fragment_file);
+
+    shader_.compile(loc_vert, loc_frag);
+
+    // ---
+
+    texture_.generate();
+    texture_.bindCubeMap();
+
+    int width, height, channels;
+    for (unsigned int i = 0; i < faces_files.size(); ++i) {
+        unsigned char* data = stbi_load(faces_files[i].c_str(), &width, &height, &channels, 0);
+        if (data) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        }
+        else {
+            std::cerr << "Failed to load cubemap texture at path: " << faces_files[i] << std::endl;
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
     free(loc_vert);
     free(loc_frag);
 }
@@ -123,7 +192,7 @@ bool Skybox::loadDDSFile(const char* dds_file)
     }
 
     texture_.generate();
-    texture_.bind();
+    texture_.bind2D();
 
     // Esta es la configuracion tipica de "sampling" habitual, para cuando un poligono se ve lejos y cerca
 #ifdef FILTROS

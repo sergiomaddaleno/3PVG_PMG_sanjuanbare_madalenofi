@@ -206,7 +206,7 @@ void ImGuiManager::Render(GLFWwindow* window) {
     if (load_scene) LoadSceneWindow();
     if (add_mesh_window) AddMeshWindow();
 
-    global.game_data.post_process.endRender();
+    global.post_process.endRender();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     GameWindow();
@@ -280,7 +280,7 @@ void ImGuiManager::GameWindow() {
     ImGui::Begin("GameWindow", nullptr);
     ImVec2 content_avail = ImGui::GetContentRegionAvail();
 
-    GLuint captureTexture = global.game_data.post_process.frame_buffer_.GetColorTexture();
+    GLuint captureTexture = global.post_process.frame_buffer_.GetColorTexture();
 
     if (captureTexture) {
         ImVec2 uv0(0.0f, 1.0f);
@@ -295,7 +295,7 @@ void ImGuiManager::GameWindow() {
 void ImGuiManager::HierarchyWindow() {
     ImGui::Begin("Hierarchy", nullptr);
 
-    auto& loc_ecs = global.game_data.ecs;
+    auto& loc_ecs = global.ecs;
 
     //--
     auto ri = loc_ecs.getComponentList<RenderComponent>().begin();
@@ -335,7 +335,7 @@ void ImGuiManager::HierarchyWindow() {
 void ImGuiManager::InspectorWindow() {
     ImGui::Begin("Inspector");
 
-    if (global.game_data.ecs.has_component<NameComponent>(selected_entity)) {
+    if (global.ecs.has_component<NameComponent>(selected_entity)) {
 
         bool open = ImGui::CollapsingHeader("##NameComponent", ImGuiTreeNodeFlags_DefaultOpen);
         ImGui::SameLine();
@@ -344,7 +344,7 @@ void ImGuiManager::InspectorWindow() {
         ImGui::Text("Name Component");
 
         if (open) {
-            auto& name_comp = global.game_data.ecs.get_component<NameComponent>(selected_entity);
+            auto& name_comp = global.ecs.get_component<NameComponent>(selected_entity);
             ImGui::Dummy({ 0.0f, 3.0f });
 
             if (name_comp->name.empty()) name_comp->name = "Entity"; 
@@ -358,7 +358,7 @@ void ImGuiManager::InspectorWindow() {
 
     }
 
-    if (global.game_data.ecs.has_component<TransformComponent>(selected_entity)) {
+    if (global.ecs.has_component<TransformComponent>(selected_entity)) {
 
         bool open = ImGui::CollapsingHeader("##TransformComponent", ImGuiTreeNodeFlags_DefaultOpen);
         ImGui::SameLine();
@@ -367,15 +367,15 @@ void ImGuiManager::InspectorWindow() {
         ImGui::Text("Transform Component");
 
         if (open) {
-            auto& transf_comp = global.game_data.ecs.get_component<TransformComponent>(selected_entity);
+            auto& transf_comp = global.ecs.get_component<TransformComponent>(selected_entity);
 
-            if (global.game_data.cam.getUsePerspectiveMatrix()) {
+            if (global.cam.getUsePerspectiveMatrix()) {
                 ImGuizmo::SetOrthographic(false);
-                Gizmo(global.game_data.cam.getViewMatrix(), global.game_data.cam.getPerspectiveMatrix(), selected_entity);
+                Gizmo(global.cam.getViewMatrix(), global.cam.getPerspectiveMatrix(), selected_entity);
             }
             else {
                 ImGuizmo::SetOrthographic(true);
-                Gizmo(global.game_data.cam.getViewMatrix(), global.game_data.cam.getOrthograficMatrix(), selected_entity);
+                Gizmo(global.cam.getViewMatrix(), global.cam.getOrthograficMatrix(), selected_entity);
             }
 
             ImGui::Dummy(ImVec2(0.0f, 2.0f));
@@ -426,7 +426,7 @@ void ImGuiManager::InspectorWindow() {
         }
     }
 
-    if (global.game_data.ecs.has_component<RenderComponent>(selected_entity)) {
+    if (global.ecs.has_component<RenderComponent>(selected_entity)) {
 
         bool open = ImGui::CollapsingHeader("##RenderComponent", ImGuiTreeNodeFlags_DefaultOpen);
         ImGui::SameLine();
@@ -471,7 +471,7 @@ void ImGuiManager::InspectorWindow() {
 
             if (ImGui::Button("Compile")) {
                 
-                global.game_data.render_system.initShader("../assets/shaders/" + vertex_file_name, "../assets/shaders/" + fragment_file_name);
+                global.render_system.initShader("../assets/shaders/" + vertex_file_name, "../assets/shaders/" + fragment_file_name);
 
                 vertex_file_name.clear();
                 fragment_file_name.clear();
@@ -486,10 +486,10 @@ void ImGuiManager::InspectorWindow() {
             ImGui::Text("Geometry Dimensions");
             ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-            switch (global.game_data.ecs.get_component<RenderComponent>(selected_entity)->type_) {
+            switch (global.ecs.get_component<RenderComponent>(selected_entity)->type_) {
             case ::RT_Terrain:
             {
-                auto& terrain = *global.game_data.ecs.get_component<RenderComponent>(selected_entity)->terrain_;
+                auto& terrain = *global.ecs.get_component<RenderComponent>(selected_entity)->terrain_;
 
                 static int temp_num_cols = terrain.num_cols_;
                 static int temp_num_rows = terrain.num_rows_;
@@ -519,7 +519,7 @@ void ImGuiManager::InspectorWindow() {
             }
             case ::RT_Sphere:
             {
-                auto& sphere = *global.game_data.ecs.get_component<RenderComponent>(selected_entity)->sphere_;
+                auto& sphere = *global.ecs.get_component<RenderComponent>(selected_entity)->sphere_;
 
                 static int temp_num_heights = sphere.num_heights_;
                 static int temp_num_revs = sphere.num_revs_;
@@ -541,7 +541,7 @@ void ImGuiManager::InspectorWindow() {
             }
             case ::RT_Cube8v:
             {
-                auto& cube = *global.game_data.ecs.get_component<RenderComponent>(selected_entity)->cube_;
+                auto& cube = *global.ecs.get_component<RenderComponent>(selected_entity)->cube_;
 
                 static float temp_size = cube.size_;
                 ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
@@ -558,7 +558,7 @@ void ImGuiManager::InspectorWindow() {
             }
             case ::RT_Cube24v:
             {
-                auto& cube = *global.game_data.ecs.get_component<RenderComponent>(selected_entity)->cube_;
+                auto& cube = *global.ecs.get_component<RenderComponent>(selected_entity)->cube_;
 
                 static float temp_size = cube.size_;
                 ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
@@ -575,7 +575,7 @@ void ImGuiManager::InspectorWindow() {
             }
             case ::RT_Quad:
             {
-                auto& quad = *global.game_data.ecs.get_component<RenderComponent>(selected_entity)->quad_;
+                auto& quad = *global.ecs.get_component<RenderComponent>(selected_entity)->quad_;
 
                 static float temp_size = quad.size_;
                 ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
@@ -594,7 +594,7 @@ void ImGuiManager::InspectorWindow() {
         }
     }
 
-    if (global.game_data.ecs.has_component<LightComponent>(selected_entity)) {
+    if (global.ecs.has_component<LightComponent>(selected_entity)) {
 
         bool open = ImGui::CollapsingHeader("##LightComponent", ImGuiTreeNodeFlags_DefaultOpen);
         ImGui::SameLine();
@@ -603,7 +603,7 @@ void ImGuiManager::InspectorWindow() {
         ImGui::Text("Light Component");
 
         if (open) {
-            auto& light_comp = global.game_data.ecs.get_component<LightComponent>(selected_entity);
+            auto& light_comp = global.ecs.get_component<LightComponent>(selected_entity);
 
             if (light_comp->light.type_ == LT_Directional) {
                 ImGui::Dummy(ImVec2(0.0f, 5.0f));
@@ -720,16 +720,16 @@ void ImGuiManager::InspectorWindow() {
         ImGui::Text("Entity has:");
         ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-        if (global.game_data.ecs.has_component<TransformComponent>(selected_entity)) {
+        if (global.ecs.has_component<TransformComponent>(selected_entity)) {
             ImGui::Text("- Transform component");
         }
-        if (global.game_data.ecs.has_component<LightComponent>(selected_entity)) {
+        if (global.ecs.has_component<LightComponent>(selected_entity)) {
             ImGui::Text("- Light component");
         }
-        if (global.game_data.ecs.has_component<RenderComponent>(selected_entity)) {
+        if (global.ecs.has_component<RenderComponent>(selected_entity)) {
             ImGui::Text("- Render component");
         }
-        if (global.game_data.ecs.has_component<NameComponent>(selected_entity)) {
+        if (global.ecs.has_component<NameComponent>(selected_entity)) {
             ImGui::Text("- Name component");
         }
         ImGui::Dummy(ImVec2(0.0f, 3.0f));
@@ -741,20 +741,20 @@ void ImGuiManager::InspectorWindow() {
             for (int i = 0; i < IM_ARRAYSIZE(addComponents); i++) {
                 bool hasComponent = false;
                 switch (i) {
-                case 0: hasComponent = global.game_data.ecs.has_component<TransformComponent>(selected_entity); break;
-                case 1: hasComponent = global.game_data.ecs.has_component<LightComponent>(selected_entity); break;
-                case 2: hasComponent = global.game_data.ecs.has_component<RenderComponent>(selected_entity); break;
+                case 0: hasComponent = global.ecs.has_component<TransformComponent>(selected_entity); break;
+                case 1: hasComponent = global.ecs.has_component<LightComponent>(selected_entity); break;
+                case 2: hasComponent = global.ecs.has_component<RenderComponent>(selected_entity); break;
                 }
 
                 if (!hasComponent) {
                     if (ImGui::Selectable(addComponents[i], addCurrentItem == i)) {
                         switch (i) {
-                        case 0: global.game_data.ecs.add_component<TransformComponent>(selected_entity); break;
-                        case 1: global.game_data.ecs.add_component<LightComponent>(selected_entity); 
+                        case 0: global.ecs.add_component<TransformComponent>(selected_entity); break;
+                        case 1: global.ecs.add_component<LightComponent>(selected_entity); 
                         {
-                            auto& light_comp = global.game_data.ecs.get_component<LightComponent>(selected_entity);
+                            auto& light_comp = global.ecs.get_component<LightComponent>(selected_entity);
                             light_comp->light.type_ = LightType::LT_Point;
-                            light_comp->light.pos_ = global.game_data.ecs.get_component<TransformComponent>(selected_entity)->position;
+                            light_comp->light.pos_ = global.ecs.get_component<TransformComponent>(selected_entity)->position;
                             light_comp->light.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
                             light_comp->light.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
                             light_comp->light.linear_att = 0.7f;
@@ -764,7 +764,7 @@ void ImGuiManager::InspectorWindow() {
                             light_comp->light.strength_ = 1.0f;
                         }
                         break;
-                        case 2: global.game_data.ecs.add_component<RenderComponent>(selected_entity); break;
+                        case 2: global.ecs.add_component<RenderComponent>(selected_entity); break;
                         }
                         addCurrentItem = -1; 
                     }
@@ -782,17 +782,17 @@ void ImGuiManager::InspectorWindow() {
             for (int i = 0; i < IM_ARRAYSIZE(deleteComponents); i++) {
                 bool hasComponent = false;
                 switch (i) {
-                case 0: hasComponent = global.game_data.ecs.has_component<TransformComponent>(selected_entity); break;
-                case 1: hasComponent = global.game_data.ecs.has_component<LightComponent>(selected_entity); break;
-                case 2: hasComponent = global.game_data.ecs.has_component<RenderComponent>(selected_entity); break;
+                case 0: hasComponent = global.ecs.has_component<TransformComponent>(selected_entity); break;
+                case 1: hasComponent = global.ecs.has_component<LightComponent>(selected_entity); break;
+                case 2: hasComponent = global.ecs.has_component<RenderComponent>(selected_entity); break;
                 }
 
                 if (hasComponent) {
                     if (ImGui::Selectable(deleteComponents[i], deleteCurrentItem == i)) {
                         switch (i) {
-                        case 0: global.game_data.ecs.delete_component<TransformComponent>(selected_entity); break;
-                        case 1: global.game_data.ecs.delete_component<LightComponent>(selected_entity); break;
-                        //case 2: global.game_data.ecs.delete_component<RenderComponent>(selected_entity); break;
+                        case 0: global.ecs.delete_component<TransformComponent>(selected_entity); break;
+                        case 1: global.ecs.delete_component<LightComponent>(selected_entity); break;
+                        //case 2: global.ecs.delete_component<RenderComponent>(selected_entity); break;
                         }
                         deleteCurrentItem = -1; 
                     }
@@ -809,10 +809,10 @@ void ImGuiManager::InspectorWindow() {
     ImGui::Image(m_DeleteIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
     ImGui::SameLine();
 
-    if (ImGui::Button("Delete Entity") /*|| global.game_data.input.isKeyPressed(Input::SUPR)*/) {
+    if (ImGui::Button("Delete Entity") /*|| global.input.isKeyPressed(Input::SUPR)*/) {
         
-        if (global.game_data.ecs.has_component<NameComponent>(selected_entity)) {
-            global.game_data.ecs.destroy_entity(selected_entity);
+        if (global.ecs.has_component<NameComponent>(selected_entity)) {
+            global.ecs.destroy_entity(selected_entity);
         }
 
     }
@@ -888,7 +888,7 @@ void ImGuiManager::TopBarWindow() {
     ImGui::Begin("Menu", nullptr,
         ImGuiWindowFlags_MenuBar);
 
-    auto& loc_ecs = global.game_data.ecs;
+    auto& loc_ecs = global.ecs;
     static int curr_type_draw = 0; 
 
     if (ImGui::BeginMenuBar()) {
@@ -898,17 +898,17 @@ void ImGuiManager::TopBarWindow() {
         if (ImGui::BeginMenu("Settings")) {
             
             if (ImGui::MenuItem("Toggle Full Screen [F11]")) {
-                //global.game_data.window->toggleFullScreen(global.game_data.input, Input::None, true);
+                //global.window->toggleFullScreen(global.input, Input::None, true);
             }
 
             if (ImGui::MenuItem("Save Scene [CTRL + S]") /*||
-                (global.game_data.input.isKeyPressed(Input::CTRL) && global.game_data.input.isKeyPressed(Input::S))*/) {
+                (global.input.isKeyPressed(Input::CTRL) && global.input.isKeyPressed(Input::S))*/) {
 
-                if (global.game_data.save_manager.getCurrentScene().empty()) {
-                    global.game_data.save_manager.saveToFile("../saves/scene_0.json", global.game_data.ecs, global.game_data.cam, global.game_data.skybox);
+                if (global.save_manager.getCurrentScene().empty()) {
+                    global.save_manager.saveToFile("../saves/scene_0.json", global.ecs, global.cam, global.skybox);
                 }
                 else {
-                    global.game_data.save_manager.saveToFile(global.game_data.save_manager.getCurrentScene(), global.game_data.ecs, global.game_data.cam, global.game_data.skybox);
+                    global.save_manager.saveToFile(global.save_manager.getCurrentScene(), global.ecs, global.cam, global.skybox);
                 }
 
                 AddConsoleMessage("Saving current scene");
@@ -920,7 +920,7 @@ void ImGuiManager::TopBarWindow() {
             }
 
             if (ImGui::MenuItem("New Scene")) {
-                global.game_data.save_manager.newFile();
+                global.save_manager.newFile();
                 AddConsoleMessage("New scene created");
             }
 
@@ -983,32 +983,32 @@ void ImGuiManager::TopBarWindow() {
             if (ImGui::BeginMenu("Add Geometry")) {
 
                 if (ImGui::MenuItem("Sphere")) {
-                    global.game_data.render_system.createSphere(loc_ecs);
-                    global.game_data.render_system.initEntities(loc_ecs);
+                    global.render_system.createSphere(loc_ecs);
+                    global.render_system.initEntities(loc_ecs);
                     AddConsoleMessage("Sphere added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 8v")) {
-                    global.game_data.render_system.createCube8v(loc_ecs);
-                    global.game_data.render_system.initEntities(loc_ecs);
+                    global.render_system.createCube8v(loc_ecs);
+                    global.render_system.initEntities(loc_ecs);
                     AddConsoleMessage("Cube 8v added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 24v")) {
-                    global.game_data.render_system.createCube24v(loc_ecs);
-                    global.game_data.render_system.initEntities(loc_ecs);
+                    global.render_system.createCube24v(loc_ecs);
+                    global.render_system.initEntities(loc_ecs);
                     AddConsoleMessage("Cube 24v added to scene");
                 }
 
                 if (ImGui::MenuItem("Quad")) {
-                    global.game_data.render_system.createQuad(loc_ecs);
-                    global.game_data.render_system.initEntities(loc_ecs);
+                    global.render_system.createQuad(loc_ecs);
+                    global.render_system.initEntities(loc_ecs);
                     AddConsoleMessage("Quad added to scene");
                 }
 
                 if (ImGui::MenuItem("Terrain")) {
-                    global.game_data.render_system.createTerrain(loc_ecs);
-                    global.game_data.render_system.initEntities(loc_ecs);
+                    global.render_system.createTerrain(loc_ecs);
+                    global.render_system.initEntities(loc_ecs);
                     AddConsoleMessage("Terrain Light added to scene");
                 }
 
@@ -1018,20 +1018,20 @@ void ImGuiManager::TopBarWindow() {
             if (ImGui::BeginMenu("Add Light")) {
 
                 if (ImGui::MenuItem("Point Light")) {
-                    global.game_data.render_system.createPointLight(loc_ecs);
-                    global.game_data.render_system.initEntities(loc_ecs);
+                    global.render_system.createPointLight(loc_ecs);
+                    global.render_system.initEntities(loc_ecs);
                     AddConsoleMessage("Point Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Spot Light")) {
-                    global.game_data.render_system.createSpotLight(loc_ecs);
-                    global.game_data.render_system.initEntities(loc_ecs);
+                    global.render_system.createSpotLight(loc_ecs);
+                    global.render_system.initEntities(loc_ecs);
                     AddConsoleMessage("Spot Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Directional Light")) {
-                    global.game_data.render_system.createDirectionalLight(loc_ecs);
-                    global.game_data.render_system.initEntities(loc_ecs);
+                    global.render_system.createDirectionalLight(loc_ecs);
+                    global.render_system.initEntities(loc_ecs);
                     AddConsoleMessage("Directional Light added to scene");
                 }
 
@@ -1053,52 +1053,52 @@ void ImGuiManager::TopBarWindow() {
         ImGui::Spacing();
         if (ImGui::BeginMenu("Camera")) {
             
-            static float sensitivity = global.game_data.cam.getSensitivity();
+            static float sensitivity = global.cam.getSensitivity();
             if (ImGui::SliderFloat("Sensitivity", &sensitivity, 0.1f, 1.0f)) {
-                global.game_data.cam.setSensitibity(sensitivity);
+                global.cam.setSensitibity(sensitivity);
             }
 
-            static float speed = global.game_data.cam.getSpeed();
+            static float speed = global.cam.getSpeed();
             if (ImGui::SliderFloat("Speed", &speed, 0.01f, 30.0f)) {
-                global.game_data.cam.setSpeed(speed);
+                global.cam.setSpeed(speed);
             }
 
-            static float fov = global.game_data.cam.getFov();
+            static float fov = global.cam.getFov();
             if (ImGui::SliderFloat("FOV", &fov, 1.0f, 120.0f)) {
-                global.game_data.cam.setFov(fov);
+                global.cam.setFov(fov);
             }
 
-            static float near_clip_plane = global.game_data.cam.getNearCliPlane();
+            static float near_clip_plane = global.cam.getNearCliPlane();
             if (ImGui::SliderFloat("Near Clip Plane", &near_clip_plane, 0.01f, 10.0f)) {
-                global.game_data.cam.setNearCliPlane(near_clip_plane);
+                global.cam.setNearCliPlane(near_clip_plane);
             }
 
-            static float far_clip_plane = global.game_data.cam.getFarCliPlane();
+            static float far_clip_plane = global.cam.getFarCliPlane();
             if (ImGui::SliderFloat("Far Clip Plane", &far_clip_plane, 10.0f, 1000.0f)) {
-                global.game_data.cam.setFarCliPlane(far_clip_plane);
+                global.cam.setFarCliPlane(far_clip_plane);
             }
 
-            static float scroll_speed = global.game_data.cam.getScrollSpeed();
+            static float scroll_speed = global.cam.getScrollSpeed();
             if (ImGui::SliderFloat("Scroll Speed", &scroll_speed, 0.1f, 10.0f)) {
-                global.game_data.cam.setScrollSpeed(scroll_speed);
+                global.cam.setScrollSpeed(scroll_speed);
             }
 
             //--
 
-            static bool use_perspective = global.game_data.cam.getUsePerspectiveMatrix();
+            static bool use_perspective = global.cam.getUsePerspectiveMatrix();
             static bool use_orthographic = !use_perspective; 
 
             if (ImGui::Checkbox("Perspective Projection", &use_perspective)) {
                 if (use_perspective) {
                     use_orthographic = false;
-                    global.game_data.cam.setUsePerspectiveMatrix(true); 
+                    global.cam.setUsePerspectiveMatrix(true); 
                 }
             }
             ImGui::SameLine();
             if (ImGui::Checkbox("Orthographic Projection", &use_orthographic)) {
                 if (use_orthographic) {
                     use_perspective = false;
-                    global.game_data.cam.setUsePerspectiveMatrix(false);
+                    global.cam.setUsePerspectiveMatrix(false);
                 }
             }
 
@@ -1164,7 +1164,7 @@ void ImGuiManager::PostProcessWindow()
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
     if (post_process_compiled) {
-        global.game_data.post_process.render(new_pp_shader);
+        global.post_process.render(new_pp_shader);
 
         static bool use_grey = false;
         static bool use_negative = false;
@@ -1184,11 +1184,11 @@ void ImGuiManager::PostProcessWindow()
 
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-        if (use_grey) ImGui::DragFloat("Grey##1", &global.game_data.post_process.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
-        if (use_negative)  ImGui::DragFloat("Negative##1", &global.game_data.post_process.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
-        if (use_waves)  ImGui::DragFloat("Waves##1", &global.game_data.post_process.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
-        if (use_blur) ImGui::DragFloat("Blur##1", &global.game_data.post_process.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
-        if (use_kernel) ImGui::DragInt("Kernel types##1", &global.game_data.post_process.kernel_types_, 0.1f, 0, 2, "%d");
+        if (use_grey) ImGui::DragFloat("Grey##1", &global.post_process.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
+        if (use_negative)  ImGui::DragFloat("Negative##1", &global.post_process.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
+        if (use_waves)  ImGui::DragFloat("Waves##1", &global.post_process.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
+        if (use_blur) ImGui::DragFloat("Blur##1", &global.post_process.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
+        if (use_kernel) ImGui::DragInt("Kernel types##1", &global.post_process.kernel_types_, 0.1f, 0, 2, "%d");
 
         ImGui::Dummy({ 0.0f, 5.0f });
         ImGui::Separator();
@@ -1249,11 +1249,11 @@ void ImGuiManager::ShadowMapWindow()
 {
     ImGui::Begin("ShadowMap");
 
-    auto li = global.game_data.ecs.getComponentList<LightComponent>().begin();
-    auto liend = global.game_data.ecs.getComponentList<LightComponent>().end();
+    auto li = global.ecs.getComponentList<LightComponent>().begin();
+    auto liend = global.ecs.getComponentList<LightComponent>().end();
 
-    auto ni = global.game_data.ecs.getComponentList<NameComponent>().begin();
-    auto niend = global.game_data.ecs.getComponentList<NameComponent>().end();
+    auto ni = global.ecs.getComponentList<NameComponent>().begin();
+    auto niend = global.ecs.getComponentList<NameComponent>().end();
 
     for (; li != liend && ni != niend; ++li, ++ni) {
         if (li->has_value() && ni->has_value()) {
@@ -1331,12 +1331,12 @@ void ImGuiManager::SkyboxWindow()
     ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
     if (ImGui::Button("Compile")) {
-        global.game_data.skybox.loadSkyBoxDDS(
+        global.skybox.loadDDS(
             ("../assets/textures/skybox/" + skybox_file_name).c_str(),
-            "../assets/shaders/skybox.vs",
-            "../assets/shaders/skybox.fs"
+            "../assets/shaders/skybox_dds.vs",
+            "../assets/shaders/skybox_dds.fs"
         );
-        global.game_data.skybox.init();
+        global.skybox.init();
 
         AddConsoleMessage(skybox_file_name + "compiled");
 
@@ -1418,10 +1418,10 @@ void ImGuiManager::LoadSceneWindow()
     ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
     if (ImGui::Button("Load Scene")) {
-        global.game_data.save_manager.setCurrentScene("../saves/" + scene_file_name);
-        global.game_data.save_manager.loadFromFile(global.game_data.save_manager.getCurrentScene(), 
-            global.game_data.ecs, global.game_data.render_system, 
-            global.game_data.cam, global.game_data.skybox);
+        global.save_manager.setCurrentScene("../saves/" + scene_file_name);
+        global.save_manager.loadFromFile(global.save_manager.getCurrentScene(), 
+            global.ecs, global.render_system, 
+            global.cam, global.skybox);
 
         AddConsoleMessage(scene_file_name + " loaded");
     }
@@ -1472,8 +1472,8 @@ void ImGuiManager::AddMeshWindow()
     if (ImGui::Button("Add Mesh")) {
         
         if (!obj_file_name.empty() && !texture_folder.empty()) {
-            global.game_data.render_system.createMesh(global.game_data.ecs, "../assets/obj/" + obj_file_name, texture_folder);
-            global.game_data.render_system.initEntities(global.game_data.ecs);
+            global.render_system.createMesh(global.ecs, "../assets/obj/" + obj_file_name, texture_folder);
+            global.render_system.initEntities(global.ecs);
 
             AddConsoleMessage(obj_file_name + " added to scene");
 
@@ -1492,7 +1492,7 @@ void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int
     static bool useSnap = false;
     static float snap[3] = { 1.0f, 1.0f, 1.0f };
 
-    auto& loc_ecs = global.game_data.ecs;
+    auto& loc_ecs = global.ecs;
 
     ImGuizmo::BeginFrame();
     if (ImGui::Begin("GameWindow", nullptr, ImGuiWindowFlags_NoTitleBar)) {
