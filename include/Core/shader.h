@@ -36,6 +36,8 @@ public:
 
 	void compile(const char* vertex_src, const char* fragment_src);
 
+    void compileGeometryShader(const char* geometry_src);
+
 	bool isCompiled() const;
 
 	int getUniformLocation(const char* name) const;
