@@ -1,4 +1,4 @@
-#version 400 core
+#version 330 core
 
 struct LightInfo {
     int type_;
@@ -20,10 +20,13 @@ struct LightInfo {
 
 uniform sampler2D u_texture;
 uniform sampler2D u_shadow_map;
+uniform samplerCube depthMap;
 
 uniform LightInfo u_light;
 uniform vec3 u_camera_position;
 uniform vec3 u_ambient;
+uniform float far_plane;
+
 in vec4 FragPosLight;
 
 uniform bool u_fog;
@@ -36,6 +39,20 @@ in vec2 uv;
 in vec3 FragPos;
 
 out vec4 FragColor;
+
+float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
+    vec3 fragToLight = fragPos - lightPos;
+    float currentDepth = length(fragToLight); 
+
+    
+    float closestDepth = texture(depthMap, fragToLight).r;
+    closestDepth *= far_plane; 
+
+    float bias = 0.05; 
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+
+    return 1.0 - shadow; 
+}
 
 // --- Lights
 vec3 PointLight(LightInfo lc) {
@@ -51,7 +68,10 @@ vec3 PointLight(LightInfo lc) {
     float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
 
     vec3 specular = specStrength * lc.light_color_ * attenuation;
-    return diffuse + specular;
+
+    float shadow = ShadowCalculationPoint(FragPos, lc.pos_);
+
+    return (diffuse + specular) * shadow;
 }
 
 vec3 SpotLight(LightInfo lc) {
@@ -142,7 +162,7 @@ void main() {
     }
     
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light) * shadow;  
+        final_light += PointLight(u_light) ;  
     }
 
    vec4 texture_color = texture(u_texture, uv);

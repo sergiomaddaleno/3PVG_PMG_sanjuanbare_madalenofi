@@ -36,6 +36,30 @@ void Shader::compile(const char* vertex_src, const char* fragment_src)
     glDeleteShader(fragmentShader);
 }
 
+void Shader::compileGeometryShader(const char* geometry_src)
+{
+    if (program_ != 0) {
+        glUseProgram(0);
+        glDeleteProgram(program_);
+        program_ = 0;
+    }
+
+    
+    unsigned int geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+    glShaderSource(geometryShader, 1, &geometry_src, nullptr);
+    glCompileShader(geometryShader);
+    //CheckShaderErrors(geometryShader, "Geometry");
+
+    
+    program_ = glCreateProgram();
+    glAttachShader(program_, geometryShader);
+    glLinkProgram(program_);
+    //CheckProgramErrors(program_);
+
+   
+    glDeleteShader(geometryShader);
+}
+
 bool Shader::isCompiled() const
 {
 	GLint success;
