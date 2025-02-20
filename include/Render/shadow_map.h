@@ -22,6 +22,8 @@ public:
 	~ShadowMap();
 
 	void init();
+	void initCubeMap();
+
 	void bind();
 	void render(ECSManager& ecs, Shader shader, LightComponent lc);
 
@@ -34,6 +36,8 @@ public:
 private:
 	unsigned int depthMapFBO;
 	unsigned int depthMap;
+
+	unsigned int depthCubemap;
 };
 
 #endif // __SHADOW_MAP__

@@ -84,7 +84,14 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 if (li->has_value()) {
                     auto& light_comp = *li;
 
-                    light_comp->shadow_map_.init();
+                    switch (light_comp->light.type_) {
+                    case LightType::LT_Spot:
+                    case LightType::LT_Directional:
+                        light_comp->shadow_map_.init(); break;
+
+                    case LightType::LT_Point:
+                        light_comp->shadow_map_.initCubeMap(); break;
+                    }
                 }
             }
         }
@@ -92,7 +99,6 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glUseProgram(0);
-    
 }
 
 void RenderSystem::initShader(std::string vertrex_path, std::string fragment_path)

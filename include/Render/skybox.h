@@ -63,13 +63,12 @@ public:
 	Skybox();
 	~Skybox();
 
-	void loadSkyBox(const char* dds_file, const char* vertex_file, const char* fragment_file);
+	void loadSkyBoxDDS(const char* dds_file, const char* vertex_file, const char* fragment_file);
 
 	void init();
 	void render(Camera cam = Camera());
 
 	nlohmann::json serialize() const;
-
 
 	std::string dds_file_;
 	std::string vertex_file_;
@@ -77,6 +76,7 @@ public:
 	float skybox_angle_;
 
 private:
+	bool loadDDSFile(const char* dds_file);
 	
 	Shader shader_;
 	Texture texture_;

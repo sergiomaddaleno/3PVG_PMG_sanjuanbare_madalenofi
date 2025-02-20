@@ -160,7 +160,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
     skybox.fragment_file_ = skybox_["Fragment_source"];
     skybox.skybox_angle_ = skybox_["angle"];
 
-    skybox.loadSkyBox(skybox.dds_file_.c_str(), skybox.vertex_file_.c_str(), skybox.fragment_file_.c_str());
+    skybox.loadSkyBoxDDS(skybox.dds_file_.c_str(), skybox.vertex_file_.c_str(), skybox.fragment_file_.c_str());
     skybox.init();
 
     //-----------------------------------------------------------

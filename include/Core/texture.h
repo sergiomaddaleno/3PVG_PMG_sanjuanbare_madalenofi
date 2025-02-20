@@ -15,12 +15,12 @@ public:
     ~Texture();
 
     bool loadTexture(const std::string& file_path);
-
-    bool loadSkyboxTexture(const char* dds_file);
-
+    void generate();
     void bind() const;
+    void deleteTexture();
 
     //--
+    void setID(GLuint texID) { textureID = texID; }
 
     GLuint getID() const {return textureID;}
     int getwidth() const { return width; }

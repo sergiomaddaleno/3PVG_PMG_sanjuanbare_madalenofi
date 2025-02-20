@@ -1331,7 +1331,7 @@ void ImGuiManager::SkyboxWindow()
     ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
     if (ImGui::Button("Compile")) {
-        global.game_data.skybox.loadSkyBox(
+        global.game_data.skybox.loadSkyBoxDDS(
             ("../assets/textures/skybox/" + skybox_file_name).c_str(),
             "../assets/shaders/skybox.vs",
             "../assets/shaders/skybox.fs"
