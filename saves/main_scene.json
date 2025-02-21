@@ -297,9 +297,20 @@
   }
  ],
  "Skybox": {
-  "Fragment_source": "../assets/shaders/skybox_dds.fs",
-  "Skybox_file_path": "../assets/textures/skybox/sky.dds",
-  "Vertex_source": "../assets/shaders/skybox_dds.vs",
-  "angle": -90.0
- }
+        "Cubemap_file_paths": [
+            "../assets/textures/skybox/cubemap/nebulae/right.png",
+            "../assets/textures/skybox/cubemap/nebulae/left.png",
+            "../assets/textures/skybox/cubemap/nebulae/top.png",
+            "../assets/textures/skybox/cubemap/nebulae/bottom.png",
+            "../assets/textures/skybox/cubemap/nebulae/front.png",
+            "../assets/textures/skybox/cubemap/nebulae/back.png"
+        ],
+        "Cubemap_fragment_file": "../assets/shaders/skybox_cubemap.fs",
+        "Cubemap_vertex_file": "../assets/shaders/skybox_cubemap.vs",
+        "DDS_angle": -90.0,
+        "DDS_file_path": "../assets/textures/skybox/sky.dds",
+        "DDS_fragment_file": "../assets/shaders/skybox_dds.fs",
+        "DDS_vertex_file": "../assets/shaders/skybox_dds.vs",
+        "Use_cubemap": true
+    }
 }

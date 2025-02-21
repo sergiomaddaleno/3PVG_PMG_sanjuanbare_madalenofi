@@ -154,15 +154,26 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
     //-----------------------------------------------------------
     
     const auto& skybox_ = j["Skybox"];
+    skybox.use_cubemap = skybox_["Use_cubemap"];
 
-    skybox.dds_file_ = skybox_["Skybox_file_path"];
-    skybox.vertex_file_ = skybox_["Vertex_source"];
-    skybox.fragment_file_ = skybox_["Fragment_source"];
-    skybox.skybox_angle_ = skybox_["angle"];
+    skybox.dds_file_ = skybox_["DDS_file_path"];
+    skybox.dds_fragment_file_ = skybox_["DDS_fragment_file"];
+    skybox.dds_vertex_file_ = skybox_["DDS_vertex_file"];
+    skybox.dds_angle_ = skybox_["DDS_angle"];
 
-    skybox.loadDDS(skybox.dds_file_.c_str(), skybox.vertex_file_.c_str(), skybox.fragment_file_.c_str());
-    skybox.init();
+    skybox.faces_files_ = skybox_["Cubemap_file_paths"];
+    skybox.cubemap_vertex_file_ = skybox_["Cubemap_vertex_file"];
+    skybox.cubemap_fragment_file_ = skybox_["Cubemap_fragment_file"];
 
+    if (skybox.use_cubemap == true) {
+        skybox.loadCubeMap(skybox.faces_files_, skybox.cubemap_vertex_file_.c_str(), skybox.cubemap_fragment_file_.c_str());
+        skybox.initcubeMap();
+    }
+    else {
+        skybox.loadDDS(skybox.dds_file_.c_str(), skybox.dds_vertex_file_.c_str(), skybox.dds_fragment_file_.c_str());
+        skybox.initDDS();
+    }
+    
     //-----------------------------------------------------------
 
     for (const auto& entity : j["Entities"]) {
@@ -347,7 +358,7 @@ void SaveManager::newFile()
         nlohmann::json defaultJson = {
             {"Entities", nlohmann::json::array()},
             {"Camera", {
-                {"Position", {0.0f, 0.0f, 0.0f}},
+                {"Position", {0.0f, 0.0f, -10.0f}},
                 {"Fov", 45.0f},
                 {"Scroll_speed", 1.0f},
                 {"Sensitivity", 1.0f},
@@ -357,14 +368,25 @@ void SaveManager::newFile()
                 {"Far_clip_plane", 1000.0f},
                 {"Ortho_width", 800.0f},
                 {"Ortho_height", 600.0f},
-                {"Use_perspective_matrix", false},
+                {"Use_perspective_matrix", true},
 
             }},
-            {"Skybox", {
-                {"Fragment_source", "../assets/shaders/skybox_dds.fs"},
-                {"Skybox_file_path", "../assets/textures/skybox/sky.dds"},
-                {"Vertex_source", "../assets/shaders/skybox_dds.vs"},
-                {"angle", -90.0f }
+           {"Skybox", {
+                {"Use_cubemap", false},
+                {"DDS_file_path", "../assets/textures/skybox/sky.dds"},
+                {"DDS_vertex_file", "../assets/shaders/skybox_dds.vs"},
+                {"DDS_fragment_file", "../assets/shaders/skybox_dds.fs"},
+                {"DDS_angle", -90.0f},
+                {"Cubemap_vertex_file", "../assets/shaders/skybox_cubemap.vs"},
+                {"Cubemap_fragment_file", "../assets/shaders/skybox_cubemap.fs"},
+                {"Cubemap_file_paths", {
+                    "../assets/textures/skybox/cubemap/nebulae/right.png",
+                    "../assets/textures/skybox/cubemap/nebulae/left.png",
+                    "../assets/textures/skybox/cubemap/nebulae/top.png",
+                    "../assets/textures/skybox/cubemap/nebulae/bottom.png",
+                    "../assets/textures/skybox/cubemap/nebulae/front.png",
+                    "../assets/textures/skybox/cubemap/nebulae/back.png"
+                }}
             }}
         };
 

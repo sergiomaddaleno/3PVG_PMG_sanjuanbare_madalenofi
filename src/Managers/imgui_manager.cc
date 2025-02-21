@@ -448,7 +448,7 @@ void ImGuiManager::InspectorWindow() {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                     std::filesystem::path filePath = (const wchar_t*)payload->Data;
                     if (filePath.extension() == ".vs") {
-                        vertex_file_name = filePath.filename().string();
+                        vertex_file_name = filePath.string();
                     }
                 }
                 ImGui::EndDragDropTarget();
@@ -462,7 +462,7 @@ void ImGuiManager::InspectorWindow() {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                     std::filesystem::path filePath = (const wchar_t*)payload->Data;
                     if (filePath.extension() == ".fs") {
-                        fragment_file_name = filePath.filename().string();
+                        fragment_file_name = filePath.string();
                     }
                 }
                 ImGui::EndDragDropTarget();
@@ -1144,7 +1144,7 @@ void ImGuiManager::PostProcessWindow()
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
             std::filesystem::path filePath = (const wchar_t*)payload->Data;
             if (filePath.extension() == ".fs") {
-                fragment_file_name = filePath.filename().string();
+                fragment_file_name = filePath.string();
                 fragment_content = ReadFile(filePath.string().c_str());
             }
         }
@@ -1307,41 +1307,101 @@ void ImGuiManager::SkyboxWindow()
 
     ImGui::Dummy({ 0.0f, 5.0f });
     ImGui::Checkbox("Activate", &global.use_skybox);
+    ImGui::SameLine();
+    ImGui::Checkbox("Use Cubemap / DDS", &global.skybox.use_cubemap);
     ImGui::Dummy({ 0.0f, 5.0f });
 
-    ImGui::Dummy(ImVec2(0.0f, 5.0f));
-    ImGui::Text("Drag and Drop DDS file");
-    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    ImGui::Separator();
 
-    static std::string skybox_file_name;
-    if (ImGui::Button(!skybox_file_name.empty() ? skybox_file_name.c_str() : "DDS Drop here", { 200.0f, 40.0f })) {}
+    ImGui::Dummy({ 0.0f, 5.0f });
+    static bool temp_sb = global.skybox.use_cubemap;
+    ImGui::Checkbox("Compile Cubemap / DDS", &temp_sb);
+    ImGui::Dummy({ 0.0f, 5.0f });
 
-    if (ImGui::BeginDragDropTarget()) {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            std::filesystem::path filePath = (const wchar_t*)payload->Data;
-            if (filePath.extension() == ".dds") {
-                skybox_file_name = filePath.filename().string();
+    ImGui::Separator();
+    ImGui::Dummy({ 0.0f, 5.0f });
+
+    if (temp_sb) {
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        ImGui::Text("Drag and Drop 6 Cubemap files");
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        ImGui::Text("Use this order: right, left, top, bottom, front, back");
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+        static std::vector<std::string> cubemap_file_names(6);
+
+        for (int i = 0; i < 6; i++) {
+            ImGui::PushID(i);
+            if (ImGui::Button(!cubemap_file_names[i].empty() ? cubemap_file_names[i].c_str() : "Cubemap file", { 200.0f, 40.0f })) {}
+
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                    std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                    if (filePath.extension() == ".png" || filePath.extension() == ".jpg") {
+                        cubemap_file_names[i] = filePath.string();
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
+            ImGui::PopID();
+        }
+
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
+        if (ImGui::Button("Compile Cubemap")) {
+            if (std::all_of(cubemap_file_names.begin(), cubemap_file_names.end(), [](const std::string& s) { return !s.empty(); })) {
+                std::vector<std::string> full_paths;
+                for (const auto& file : cubemap_file_names) {
+                    full_paths.push_back(file);
+                }
+                global.skybox.loadCubeMap(
+                    full_paths,
+                    "../assets/shaders/skybox_cubemap.vs",
+                    "../assets/shaders/skybox_cubemap.fs"
+                );
+                global.skybox.initcubeMap();
+                AddConsoleMessage("Cubemap compiled");
             }
         }
-        ImGui::EndDragDropTarget();
     }
+    else {
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        ImGui::Text("Drag and Drop DDS file");
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-    ImGui::Dummy(ImVec2(0.0f, 3.0f));
-    ImGui::Separator();
-    ImGui::Dummy(ImVec2(0.0f, 3.0f));
+        static std::string skybox_file_name;
+        if (ImGui::Button(!skybox_file_name.empty() ? skybox_file_name.c_str() : "DDS Drop here", { 200.0f, 40.0f })) {}
 
-    if (ImGui::Button("Compile")) {
-        global.skybox.loadDDS(
-            ("../assets/textures/skybox/" + skybox_file_name).c_str(),
-            "../assets/shaders/skybox_dds.vs",
-            "../assets/shaders/skybox_dds.fs"
-        );
-        global.skybox.init();
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                if (filePath.extension() == ".dds") {
+                    skybox_file_name = filePath.string();
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
 
-        AddConsoleMessage(skybox_file_name + "compiled");
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
+        if (ImGui::Button("Compile DDS")) {
+            global.skybox.loadDDS(
+                (skybox_file_name).c_str(),
+                "../assets/shaders/skybox_dds.vs",
+                "../assets/shaders/skybox_dds.fs"
+            );
+            global.skybox.initDDS();
+
+            AddConsoleMessage(skybox_file_name + "compiled");
+
+        }
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
     }
-    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    
     
 
     ImGui::End();
@@ -1407,7 +1467,7 @@ void ImGuiManager::LoadSceneWindow()
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
             filePath = (const wchar_t*)payload->Data;
             if (filePath.extension() == ".json") {
-                scene_file_name = filePath.filename().string();
+                scene_file_name = filePath.string();
             }
         }
         ImGui::EndDragDropTarget();
@@ -1418,7 +1478,7 @@ void ImGuiManager::LoadSceneWindow()
     ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
     if (ImGui::Button("Load Scene")) {
-        global.save_manager.setCurrentScene("../saves/" + scene_file_name);
+        global.save_manager.setCurrentScene(scene_file_name);
         global.save_manager.loadFromFile(global.save_manager.getCurrentScene(), 
             global.ecs, global.render_system, 
             global.cam, global.skybox);
@@ -1472,7 +1532,7 @@ void ImGuiManager::AddMeshWindow()
     if (ImGui::Button("Add Mesh")) {
         
         if (!obj_file_name.empty() && !texture_folder.empty()) {
-            global.render_system.createMesh(global.ecs, "../assets/obj/" + obj_file_name, texture_folder);
+            global.render_system.createMesh(global.ecs, obj_file_name, texture_folder);
             global.render_system.initEntities(global.ecs);
 
             AddConsoleMessage(obj_file_name + " added to scene");
