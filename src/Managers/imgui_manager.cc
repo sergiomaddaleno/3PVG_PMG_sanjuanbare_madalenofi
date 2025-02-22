@@ -441,28 +441,32 @@ void ImGuiManager::InspectorWindow() {
             ImGui::Dummy(ImVec2(0.0f, 2.0f));
             ImGui::PopStyleColor();
 
+            static std::string vertex_file_path;
             static std::string vertex_file_name;
-            if (ImGui::Button(!vertex_file_name.empty() ? std::string("" + vertex_file_name).c_str() : "VS Drop here", { 120.0f, 40.0f })) {}
+            if (ImGui::Button(!vertex_file_path.empty() ? vertex_file_name.c_str() : ".vs Drop here", { 120.0f, 40.0f })) {}
 
             if (ImGui::BeginDragDropTarget()) {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                     std::filesystem::path filePath = (const wchar_t*)payload->Data;
                     if (filePath.extension() == ".vs") {
-                        vertex_file_name = filePath.string();
+                        vertex_file_path = filePath.string();
+                        vertex_file_name = filePath.filename().string();
                     }
                 }
                 ImGui::EndDragDropTarget();
             }
 
+            static std::string fragment_file_path;
             static std::string fragment_file_name;
             ImGui::SameLine();
-            if (ImGui::Button(!fragment_file_name.empty() ? std::string("" + fragment_file_name).c_str() : "FS Drop here", { 120.0f, 40.0f })) {}
+            if (ImGui::Button(!fragment_file_path.empty() ? fragment_file_name.c_str() : ".fs Drop here", { 120.0f, 40.0f })) {}
 
             if (ImGui::BeginDragDropTarget()) {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                     std::filesystem::path filePath = (const wchar_t*)payload->Data;
                     if (filePath.extension() == ".fs") {
-                        fragment_file_name = filePath.string();
+                        fragment_file_path = filePath.string();
+                        fragment_file_name = filePath.filename().string();
                     }
                 }
                 ImGui::EndDragDropTarget();
@@ -471,9 +475,11 @@ void ImGuiManager::InspectorWindow() {
 
             if (ImGui::Button("Compile")) {
                 
-                global.render_system.initShader("../assets/shaders/" + vertex_file_name, "../assets/shaders/" + fragment_file_name);
+                global.render_system.initShader(vertex_file_path, fragment_file_path);
 
+                vertex_file_path.clear();
                 vertex_file_name.clear();
+                fragment_file_path.clear();
                 fragment_file_name.clear();
             }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
@@ -1120,14 +1126,16 @@ void ImGuiManager::PostProcessWindow()
     ImGui::Text("Drag and Drop Vertex and Fragment:");
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
+    static std::string vertex_file_path;
     static std::string vertex_file_name;
     static char* vertex_content = nullptr;
-    if (ImGui::Button(!vertex_file_name.empty() ? vertex_file_name.c_str() : "VS Drop here", { 200.0f, 40.0f })) {}
+    if (ImGui::Button(!vertex_file_path.empty() ? vertex_file_name.c_str() : ".vs Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
             std::filesystem::path filePath = (const wchar_t*)payload->Data;
             if (filePath.extension() == ".vs") {
+                vertex_file_path = filePath.string();
                 vertex_file_name = filePath.filename().string();
                 vertex_content = ReadFile(filePath.string().c_str());
             }
@@ -1135,16 +1143,18 @@ void ImGuiManager::PostProcessWindow()
         ImGui::EndDragDropTarget();
     }
 
+    static std::string fragment_file_path;
     static std::string fragment_file_name;
     static char* fragment_content = nullptr;
     ImGui::SameLine();
-    if (ImGui::Button(!fragment_file_name.empty() ? fragment_file_name.c_str() : "FS Drop here", { 200.0f, 40.0f })) {}
+    if (ImGui::Button(!fragment_file_path.empty() ? fragment_file_name.c_str() : ".fs Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
             std::filesystem::path filePath = (const wchar_t*)payload->Data;
             if (filePath.extension() == ".fs") {
-                fragment_file_name = filePath.string();
+                fragment_file_path = filePath.string();
+                fragment_file_name = filePath.filename().string();
                 fragment_content = ReadFile(filePath.string().c_str());
             }
         }
@@ -1202,7 +1212,9 @@ void ImGuiManager::PostProcessWindow()
             use_blur = false;
             use_kernel = false;
 
+            vertex_file_path.clear();
             vertex_file_name.clear();
+            fragment_file_path.clear();
             fragment_file_name.clear();
 
             free(vertex_content);
@@ -1328,17 +1340,19 @@ void ImGuiManager::SkyboxWindow()
         ImGui::Text("Use this order: right, left, top, bottom, front, back");
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
+        static std::vector<std::string> cubemap_file_paths(6);
         static std::vector<std::string> cubemap_file_names(6);
 
         for (int i = 0; i < 6; i++) {
             ImGui::PushID(i);
-            if (ImGui::Button(!cubemap_file_names[i].empty() ? cubemap_file_names[i].c_str() : "Cubemap file", { 200.0f, 40.0f })) {}
+            if (ImGui::Button(!cubemap_file_paths[i].empty() ? cubemap_file_names[i].c_str() : "Cubemap file", { 200.0f, 40.0f })) {}
 
             if (ImGui::BeginDragDropTarget()) {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                     std::filesystem::path filePath = (const wchar_t*)payload->Data;
                     if (filePath.extension() == ".png" || filePath.extension() == ".jpg") {
-                        cubemap_file_names[i] = filePath.string();
+                        cubemap_file_paths[i] = filePath.string();
+                        cubemap_file_names[i] = filePath.filename().string();
                     }
                 }
                 ImGui::EndDragDropTarget();
@@ -1351,9 +1365,9 @@ void ImGuiManager::SkyboxWindow()
         ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
         if (ImGui::Button("Compile Cubemap")) {
-            if (std::all_of(cubemap_file_names.begin(), cubemap_file_names.end(), [](const std::string& s) { return !s.empty(); })) {
+            if (std::all_of(cubemap_file_paths.begin(), cubemap_file_paths.end(), [](const std::string& s) { return !s.empty(); })) {
                 std::vector<std::string> full_paths;
-                for (const auto& file : cubemap_file_names) {
+                for (const auto& file : cubemap_file_paths) {
                     full_paths.push_back(file);
                 }
                 global.skybox.loadCubeMap(
@@ -1363,22 +1377,27 @@ void ImGuiManager::SkyboxWindow()
                 );
                 global.skybox.initcubeMap();
                 AddConsoleMessage("Cubemap compiled");
+
+                //cubemap_file_paths.clear();
+                //cubemap_file_names.clear();
             }
         }
     }
     else {
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
-        ImGui::Text("Drag and Drop DDS file");
+        ImGui::Text("Drag and Drop .dds file");
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
+        static std::string skybox_file_path;
         static std::string skybox_file_name;
-        if (ImGui::Button(!skybox_file_name.empty() ? skybox_file_name.c_str() : "DDS Drop here", { 200.0f, 40.0f })) {}
+        if (ImGui::Button(!skybox_file_path.empty() ? skybox_file_name.c_str() : ".dds Drop here", { 200.0f, 40.0f })) {}
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                 std::filesystem::path filePath = (const wchar_t*)payload->Data;
                 if (filePath.extension() == ".dds") {
-                    skybox_file_name = filePath.string();
+                    skybox_file_path = filePath.string();
+                    skybox_file_name = filePath.filename().string();
                 }
             }
             ImGui::EndDragDropTarget();
@@ -1390,7 +1409,7 @@ void ImGuiManager::SkyboxWindow()
 
         if (ImGui::Button("Compile DDS")) {
             global.skybox.loadDDS(
-                (skybox_file_name).c_str(),
+                (skybox_file_path).c_str(),
                 "../assets/shaders/skybox_dds.vs",
                 "../assets/shaders/skybox_dds.fs"
             );
@@ -1398,6 +1417,8 @@ void ImGuiManager::SkyboxWindow()
 
             AddConsoleMessage(skybox_file_name + "compiled");
 
+            skybox_file_path.clear();
+            skybox_file_name.clear();
         }
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
     }
@@ -1458,16 +1479,17 @@ void ImGuiManager::LoadSceneWindow()
     ImGui::Text("Drag and Drop json file:");
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
+    static std::string scene_file_path;
     static std::string scene_file_name;
     std::filesystem::path filePath;
-
-    if (ImGui::Button(!scene_file_name.empty() ? scene_file_name.c_str() : ".json Drop here", { 200.0f, 40.0f })) {}
+    if (ImGui::Button(!scene_file_path.empty() ? scene_file_name.c_str() : ".json Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
             filePath = (const wchar_t*)payload->Data;
             if (filePath.extension() == ".json") {
-                scene_file_name = filePath.string();
+                scene_file_path = filePath.string();
+                scene_file_name = filePath.filename().string();
             }
         }
         ImGui::EndDragDropTarget();
@@ -1478,12 +1500,15 @@ void ImGuiManager::LoadSceneWindow()
     ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
     if (ImGui::Button("Load Scene")) {
-        global.save_manager.setCurrentScene(scene_file_name);
+        global.save_manager.setCurrentScene(scene_file_path);
         global.save_manager.loadFromFile(global.save_manager.getCurrentScene(), 
             global.ecs, global.render_system, 
             global.cam, global.skybox);
 
-        AddConsoleMessage(scene_file_name + " loaded");
+        AddConsoleMessage(scene_file_path + " loaded");
+
+        scene_file_path.clear();
+        scene_file_name.clear();
     }
 
     ImGui::End();
@@ -1497,15 +1522,17 @@ void ImGuiManager::AddMeshWindow()
     ImGui::Text("Drag and Drop obj file:");
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
+    static std::string obj_file_path;
     static std::string obj_file_name;
-    static std::string texture_folder;
-
-    if (ImGui::Button(!obj_file_name.empty() ? obj_file_name.c_str() : ".obj Drop here", { 200.0f, 40.0f })) {}
+    static std::string texture_folder_path;
+    static std::string texture_folder_name;
+    if (ImGui::Button(!obj_file_path.empty() ? obj_file_name.c_str() : ".obj Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
             std::filesystem::path filePath = (const wchar_t*)payload->Data;
             if (filePath.extension() == ".obj") {
+                obj_file_path = filePath.string();
                 obj_file_name = filePath.filename().string();
             }
         }
@@ -1513,13 +1540,14 @@ void ImGuiManager::AddMeshWindow()
     }
 
     ImGui::SameLine();
-    if (ImGui::Button(!texture_folder.empty() ? texture_folder.c_str() : "Texture Folder Drop here", { 200.0f, 40.0f })) {}
+    if (ImGui::Button(!texture_folder_path.empty() ? texture_folder_name.c_str() : "Texture Folder Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
             std::filesystem::path filePath = (const wchar_t*)payload->Data;
             if (std::filesystem::is_directory(filePath)) {
-                texture_folder = filePath.string();
+                texture_folder_path = filePath.string();
+                texture_folder_name = filePath.filename().string();
             }
         }
         ImGui::EndDragDropTarget();
@@ -1531,14 +1559,16 @@ void ImGuiManager::AddMeshWindow()
 
     if (ImGui::Button("Add Mesh")) {
         
-        if (!obj_file_name.empty() && !texture_folder.empty()) {
-            global.render_system.createMesh(global.ecs, obj_file_name, texture_folder);
+        if (!obj_file_path.empty() && !texture_folder_path.empty()) {
+            global.render_system.createMesh(global.ecs, obj_file_path, texture_folder_path);
             global.render_system.initEntities(global.ecs);
 
             AddConsoleMessage(obj_file_name + " added to scene");
 
+            obj_file_path.clear();
             obj_file_name.clear();
-            texture_folder.clear();
+            texture_folder_path.clear();
+            texture_folder_name.clear();
         }
     }
 

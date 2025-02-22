@@ -194,6 +194,7 @@ void Cube::bind()
 
 void Cube::render()
 {
+    tex.active();
     tex.bind2D();
 
     glBindVertexArray(VAO);

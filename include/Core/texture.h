@@ -15,6 +15,7 @@ public:
     ~Texture();
 
     void generate();
+    void active(unsigned int num = 1);
     void bind2D() const;
     void bindCubeMap() const;
     void deleteTexture();

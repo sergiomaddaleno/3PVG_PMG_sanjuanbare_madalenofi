@@ -222,9 +222,10 @@ void Terrain::bind()
     }
 }
 
-void Terrain::render(bool use_texture){
+void Terrain::render(){
 
-    if (use_texture) tex.bind2D();
+    tex.active();
+    tex.bind2D();
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_cols_ * num_rows_) * 6, GL_UNSIGNED_INT, 0);

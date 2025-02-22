@@ -45,10 +45,15 @@ void Texture::generate()
     glGenTextures(1, &textureID);
 }
 
+void Texture::active(unsigned int num) {
+    if (textureID != 0) {
+        glActiveTexture(GL_TEXTURE0 + num);
+    }
+}
+
 void Texture::bind2D() const
 {
     if (textureID != 0) {
-        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, textureID);
     }
 }
@@ -56,7 +61,6 @@ void Texture::bind2D() const
 void Texture::bindCubeMap() const
 {
     if (textureID != 0) {
-        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
     }
 }

@@ -83,10 +83,18 @@ void ShadowMap::initCubeMap()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void ShadowMap::active(unsigned int num)
+{
+    if (depthMap != 0) {
+        glActiveTexture(GL_TEXTURE0 + num);
+    }
+}
+
 void ShadowMap::bind()
 {
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
+    if (depthMap != 0) {
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+    }
 }
 
 void ShadowMap::renderSceneOneShadow(ECSManager& ecs, Shader shader, LightComponent lc) {
@@ -101,6 +109,7 @@ void ShadowMap::renderSceneOneShadow(ECSManager& ecs, Shader shader, LightCompon
 
     int texture_unit = 0;
     shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);
+    active();
     bind();
 
     glViewport(0, 0, shadow_width_, shadow_height_);

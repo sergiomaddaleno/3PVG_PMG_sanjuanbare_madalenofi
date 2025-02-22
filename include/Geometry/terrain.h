@@ -22,7 +22,7 @@ class Terrain {
             const bool is_centered = true, const bool use_perlin_noise = true);  //false for heightmap
 
   void bind();
-  void render(bool use_texture = true);
+  void render();
 
   const float* GetVertexTerrain();
 

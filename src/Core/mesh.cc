@@ -187,11 +187,12 @@ void Mesh::bind()
     }
 }
 
-void Mesh::renderElements(bool use_texture) {
+void Mesh::renderElements() {
     
     for (auto& mesh : meshes) {
         
-        if (!use_texture || !mesh.textures.empty()) {
+        if (!mesh.textures.empty()) {
+            mesh.textures[0].active();
             mesh.textures[0].bind2D();
         }
         

@@ -24,6 +24,7 @@ public:
 	void init();
 	void initCubeMap();
 
+	void active(unsigned int num = 0);
 	void bind();
 	void renderSceneOneShadow(ECSManager& ecs, Shader shader, LightComponent lc);
 	void renderSceneMultipleShadow(ECSManager& ecs, Shader shader, Shader GeomtryShader, LightComponent lc);

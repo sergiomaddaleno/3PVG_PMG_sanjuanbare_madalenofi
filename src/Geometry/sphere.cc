@@ -123,6 +123,7 @@ void Sphere::bind()
 
 void Sphere::render()
 {
+    tex.active();
     tex.bind2D();
 
     glBindVertexArray(VAO);

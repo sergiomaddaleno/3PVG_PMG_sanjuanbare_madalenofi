@@ -98,6 +98,7 @@ void Quad::bind()
 
 void Quad::render()
 {
+    tex.active();
     tex.bind2D();
 
     glBindVertexArray(VAO);
