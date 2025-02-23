@@ -1337,7 +1337,7 @@ void ImGuiManager::SkyboxWindow()
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
         ImGui::Text("Drag and Drop 6 Cubemap files");
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
-        ImGui::Text("Use this order: right, left, top, bottom, front, back");
+        ImGui::Text("Use this order: right, left, bottom, top, front, back");
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
         static std::vector<std::string> cubemap_file_paths(6);

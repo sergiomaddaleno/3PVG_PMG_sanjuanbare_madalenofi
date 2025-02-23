@@ -19,6 +19,7 @@ struct LightInfo {
 };
 
 uniform sampler2D u_texture;
+uniform int u_texture_count;
 uniform sampler2D u_shadow_map;
 uniform samplerCube depthMap;
 
@@ -40,20 +41,6 @@ in vec3 FragPos;
 
 out vec4 FragColor;
 
-float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
-    vec3 fragToLight = fragPos - lightPos;
-    float currentDepth = length(fragToLight); 
-
-    
-    float closestDepth = texture(depthMap, fragToLight).r;
-    closestDepth *= far_plane; 
-
-    float bias = 0.05; 
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-
-    return 1.0 - shadow; 
-}
-
 // --- Lights
 vec3 PointLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
@@ -69,9 +56,7 @@ vec3 PointLight(LightInfo lc) {
 
     vec3 specular = specStrength * lc.light_color_ * attenuation;
 
-    float shadow = ShadowCalculationPoint(FragPos, lc.pos_);
-
-    return (diffuse + specular) * shadow;
+    return (diffuse + specular);
 }
 
 vec3 SpotLight(LightInfo lc) {
@@ -148,10 +133,24 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     return 1.0 - PCF(currentDepth, bias, projCoords);
 }
 
+float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
+    vec3 fragToLight = fragPos - lightPos;
+    float currentDepth = length(fragToLight); 
+    
+    float closestDepth = texture(depthMap, fragToLight).r;
+    closestDepth *= far_plane; 
+
+    float bias = 0.05; 
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+
+    return 1.0 - shadow; 
+}
+
 void main() {
 
     vec3 final_light = u_ambient;
     float shadow = ShadowCalculation(FragPosLight);
+    //float shadow_pl = ShadowCalculationPoint(FragPosLight, u_light.pos_);
 
     if (u_light.type_ == 0) {
         final_light += DirectionalLight(u_light) * shadow ; 
@@ -162,7 +161,7 @@ void main() {
     }
     
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light) ;  
+        final_light += PointLight(u_light) * shadow;  
     }
 
    vec4 texture_color = texture(u_texture, uv);

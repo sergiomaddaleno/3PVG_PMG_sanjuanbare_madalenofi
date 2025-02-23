@@ -177,6 +177,7 @@ void Skybox::renderDDS(Camera cam) {
     int tex_id = 1;
     dds_shader.useProgram();
 
+    dds_texture_.active();
     dds_texture_.bind2D();
     dds_shader.setUniformValue(dds_shader.getUniformLocation("skybox"), ValueType::T_INT_1, &tex_id);
     dds_shader.setUniformValue(dds_shader.getUniformLocation("view"), ValueType::T_MAT_4x4, &view[0][0]);
@@ -204,6 +205,7 @@ void Skybox::renderCubeMap(Camera cam)
     int tex_id = 1;
     cubemap_shader.useProgram();
 
+    cubemap_texture_.active();
     cubemap_texture_.bindCubeMap();
     cubemap_shader.setUniformValue(cubemap_shader.getUniformLocation("skybox"), ValueType::T_INT_1, &tex_id);
     cubemap_shader.setUniformValue(cubemap_shader.getUniformLocation("view"), ValueType::T_MAT_4x4, &view[0][0]);

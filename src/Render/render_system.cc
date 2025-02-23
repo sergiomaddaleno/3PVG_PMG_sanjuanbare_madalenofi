@@ -49,6 +49,11 @@ void RenderSystem::initEntities(ECSManager& ecs) {
     auto riend = ecs.getComponentList<RenderComponent>().end();
     auto liend = ecs.getComponentList<LightComponent>().end();
 
+    /*std::vector<std::string> tex_paths = {
+    "../assets/textures/images/blue.png",
+    "../assets/textures/images/blue.png",
+    };*/
+
     for (; ri != riend; ++ri) {
         if (ri->has_value()) {
             auto& render_comp = *ri;
@@ -60,25 +65,25 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
             case RenderType::RT_Terrain:
                 render_comp->terrain_->bind();
+                render_comp->terrain_->setTexture("../assets/textures/images/grass.jpg");
                 break;
 
             case RenderType::RT_Sphere:
                 render_comp->sphere_->bind();
+                render_comp->sphere_->setTexture("../assets/textures/images/blue.png");
                 break;
 
             case RenderType::RT_Quad:
                 render_comp->quad_->bind();
+                render_comp->quad_->setTexture("../assets/textures/images/blue.png");
                 break;
 
             case RenderType::RT_Cube8v:
             case RenderType::RT_Cube24v:
-
                 render_comp->cube_->bind();
+                render_comp->cube_->setTexture("../assets/textures/images/blue.png");
                 break;
             }
-
-            auto li = ecs.getComponentList<LightComponent>().begin();
-            auto liend = ecs.getComponentList<LightComponent>().end();
 
             for (; li != liend; ++li) {
                 if (li->has_value()) {
@@ -183,21 +188,21 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:
                         for (auto& mesh : render_comp->mesh_->meshes) {
-                            render_comp->mesh_->renderElements();
+                            render_comp->mesh_->draw();
                         }
                         break;
                     case RenderType::RT_Terrain:
-                        render_comp->terrain_->render();
+                        render_comp->terrain_->draw();
                         break;
                     case RenderType::RT_Sphere:
-                        render_comp->sphere_->render();
+                        render_comp->sphere_->draw();
                         break;
                     case RenderType::RT_Cube8v:
                     case RenderType::RT_Cube24v:
-                        render_comp->cube_->render();
+                        render_comp->cube_->draw();
                         break;
                     case RenderType::RT_Quad:
-                        render_comp->quad_->render();
+                        render_comp->quad_->draw();
                         break;
                     }
                 }

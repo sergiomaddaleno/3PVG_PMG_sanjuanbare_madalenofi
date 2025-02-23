@@ -8,11 +8,15 @@
 #include <../deps/glm/gtc/type_ptr.hpp>
 #include <../deps/glm/gtc/quaternion.hpp>
 
+#include <vector>
+#include <iostream>
+
 #define PI 3.14159265359f
 
 Sphere::Sphere()
     : VAO(0), VBO(0), EBO(0),
-    num_heights_(0), num_revs_(0), size_(0.0f) {
+    num_heights_(0), num_revs_(0), size_(0.0f), 
+    texture_count_(0), num_vertex_(0){
 }
 
 Sphere::~Sphere()
@@ -115,22 +119,37 @@ void Sphere::bind()
     glBindVertexArray(0);
 
     //--
-
-    if (!  tex.loadTexture("../assets/textures/images/blue.png")) {
-        printf("Texture not found\n");
-    }
 }
 
-void Sphere::render()
+void Sphere::draw()
 {
-    tex.active();
-    tex.bind2D();
+    texture_.active();
+    texture_.bind2D();
+
+    /*int i = 0;
+    for (auto& tex : texture_) {
+        tex.active(i);
+        tex.bind2D();
+        i++;
+    }*/
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_heights_ * num_revs_) * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
+void Sphere::setTexture(std::string file_path)
+{
+    texture_.loadTexture(file_path);
+
+    /*texture_.clear();
+    for (auto& loc_text : files_path) {
+        Texture tempTexture;
+        tempTexture.loadTexture(loc_text);
+        texture_.push_back(tempTexture);
+    }
+    texture_count_ = (int)texture_.size();*/
+}
 
 float* Sphere::GetVertexSphere()
 {

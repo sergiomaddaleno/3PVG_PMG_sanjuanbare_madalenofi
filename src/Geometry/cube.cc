@@ -11,8 +11,9 @@
 Cube::Cube()
     : VAO(0), VBO(0), EBO(0),
     order_(), data_(),
-    tex(), size_(0.0f),
-    cube_8v_(false), cube_24v_(false) {
+    size_(0.0f),
+    cube_8v_(false), cube_24v_(false),
+    texture_count_(0){
 }
 
 Cube::~Cube()
@@ -184,22 +185,36 @@ void Cube::bind()
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
-
-    //-- 
-
-    if (!  tex.loadTexture("../assets/textures/images/blue.png")) {
-        printf("Texture not found\n");
-    }
 }
 
-void Cube::render()
+void Cube::draw()
 {
-    tex.active();
-    tex.bind2D();
+    texture_.active();
+    texture_.bind2D();
+
+    /*int i = 0;
+    for (auto& tex : texture_) {
+        tex.active(i);
+        tex.bind2D();
+        i++;
+    }*/
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+void Cube::setTexture(std::string file_path)
+{
+    texture_.loadTexture(file_path);
+
+    /*texture_.clear();
+    for (auto& loc_text : files_path) {
+        Texture tempTexture;
+        tempTexture.loadTexture(loc_text);
+        texture_.push_back(tempTexture);
+    }
+    texture_count_ = (int)texture_.size();*/
 }
 
 nlohmann::json Cube::serialize() const

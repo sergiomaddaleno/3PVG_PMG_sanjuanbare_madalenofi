@@ -12,7 +12,7 @@
 Quad::Quad()
     : VAO(0), VBO(0), EBO(0),
     order_(), data_(),
-    tex(), size_(0.0f) {
+    size_(0.0f), texture_count_(0){
 }
 
 Quad::~Quad()
@@ -88,18 +88,32 @@ void Quad::bind()
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
-
-    //--
-
-    if (!  tex.loadTexture("../assets/textures/images/blue.png")) {
-        printf("Texture not found\n");
-    }
 }
 
-void Quad::render()
+void Quad::setTexture(std::string file_path)
 {
-    tex.active();
-    tex.bind2D();
+    texture_.loadTexture(file_path);
+
+    /*texture_.clear();
+    for (auto& loc_text : files_path) {
+        Texture tempTexture;
+        tempTexture.loadTexture(loc_text);
+        texture_.push_back(tempTexture);
+    }
+    texture_count_ = (int)texture_.size();*/
+}
+
+void Quad::draw()
+{
+    texture_.active();
+    texture_.bind2D();
+
+    /*int i = 0;
+    for (auto& tex : texture_) {
+        tex.active(i);
+        tex.bind2D();
+        i++;
+    }*/
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

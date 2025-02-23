@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include "../deps/nlohmann/json.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -30,9 +29,6 @@ public:
     int getHeight() const { return height; }
     unsigned char* getData() const { return data_; }
     int getChannels() const { return channels; }
-
-    //Save data
-    nlohmann::json serialize() const;
 
 private:
     GLuint textureID;

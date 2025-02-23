@@ -22,7 +22,8 @@ class Terrain {
             const bool is_centered = true, const bool use_perlin_noise = true);  //false for heightmap
 
   void bind();
-  void render();
+  void draw();
+  void setTexture(std::string file_path);
 
   const float* GetVertexTerrain();
 
@@ -37,8 +38,8 @@ class Terrain {
   float height_mult_, size_;
   bool is_centered_, use_perlin_noise_;
 
-  float amplitude = 20.0f;
-  float frequency = 0.2f;
+  Texture texture_;
+  int texture_count_;
 
 private:
 
@@ -50,8 +51,7 @@ private:
   std::vector<int> order_;
   std::vector<float> data_;
 
-  Texture tex;
-  Texture height_map;
+  Texture height_map_;
 
 };
 

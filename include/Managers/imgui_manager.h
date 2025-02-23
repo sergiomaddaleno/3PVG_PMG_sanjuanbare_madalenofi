@@ -5,6 +5,7 @@
 #include "Core/shader.h"
 #include "utils.h"
 #include <../deps/glm/glm.hpp>
+#include <filesystem>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

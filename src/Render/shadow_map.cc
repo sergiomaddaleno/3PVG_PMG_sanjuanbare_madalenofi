@@ -24,7 +24,8 @@
 
 ShadowMap::ShadowMap() : depthMapFBO(0), depthMap(0), 
     near_plane(1.0f), far_plane(100.0f), directional_size_(50.0f),
-    shadow_width_(4098), shadow_height_(4098)
+    shadow_width_(4098), shadow_height_(4098),
+    depthCubemap(0), lightProjection(1.0f), lightView(1.0f), lightSpaceMatrix(1.0f)
 {
 }
 
@@ -58,7 +59,7 @@ void ShadowMap::init()
 void ShadowMap::initCubeMap()
 {
     char* vs_geometry = (char*)ReadFile("../assets/shaders/geometry.gs");
-    GeomtryShader.compileGeometryShader(vs_geometry);
+    geometry_.compileGeometry(vs_geometry);
 
     glGenTextures(1, &depthCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
@@ -135,21 +136,21 @@ void ShadowMap::renderSceneOneShadow(ECSManager& ecs, Shader shader, LightCompon
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
                 for (auto& mesh : render_comp->mesh_->meshes) {
-                    render_comp->mesh_->renderElements();
+                    render_comp->mesh_->draw();
                 }
                 break;
             case RenderType::RT_Terrain:
-                render_comp->terrain_->render();
+                render_comp->terrain_->draw();
                 break;
             case RenderType::RT_Sphere:
-                render_comp->sphere_->render();
+                render_comp->sphere_->draw();
                 break;
             case RenderType::RT_Cube8v:
             case RenderType::RT_Cube24v:
-                render_comp->cube_->render();
+                render_comp->cube_->draw();
                 break;
             case RenderType::RT_Quad:
-                render_comp->quad_->render();
+                render_comp->quad_->draw();
                 break;
             }
         }
@@ -201,21 +202,21 @@ void ShadowMap::renderSceneMultipleShadow(ECSManager& ecs, Shader shader, Shader
             switch (render_comp->type_) {
             case RenderType::RT_Mesh:
                 for (auto& mesh : render_comp->mesh_->meshes) {
-                    render_comp->mesh_->renderElements();
+                    render_comp->mesh_->draw();
                 }
                 break;
             case RenderType::RT_Terrain:
-                render_comp->terrain_->render();
+                render_comp->terrain_->draw();
                 break;
             case RenderType::RT_Sphere:
-                render_comp->sphere_->render();
+                render_comp->sphere_->draw();
                 break;
             case RenderType::RT_Cube8v:
             case RenderType::RT_Cube24v:
-                render_comp->cube_->render();
+                render_comp->cube_->draw();
                 break;
             case RenderType::RT_Quad:
-                render_comp->quad_->render();
+                render_comp->quad_->draw();
                 break;
             }
         }
@@ -275,9 +276,9 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, face, depthCubemap, 0);
 
             std::string uniformName = "shadowMatrices[" + std::to_string(i) + "]";
-            GeomtryShader.setUniformValue(GeomtryShader.getUniformLocation(uniformName.c_str()), ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix[i]));
+            geometry_.setUniformValue(geometry_.getUniformLocation(uniformName.c_str()), ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix[i]));
 
-            renderSceneMultipleShadow(ecs, shader, GeomtryShader,lc);
+            renderSceneMultipleShadow(ecs, shader, geometry_,lc);
         }
 
         break;

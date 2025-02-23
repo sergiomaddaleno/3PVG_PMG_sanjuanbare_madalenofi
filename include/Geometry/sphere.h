@@ -20,7 +20,8 @@ class Sphere {
   void init(const float sphere_size = 1.0f, const int num_heights = 20, const int num_revs = 20);
 
   void bind();
-  void render();
+  void draw();
+  void setTexture(std::string file_path);
   float* GetVertexSphere();
 
   //Save data
@@ -31,7 +32,7 @@ class Sphere {
 
   int num_heights_, num_revs_;
   float size_ = 0.0f;
-  Texture tex;
+  Texture texture_;
 
   // --
 
@@ -42,6 +43,8 @@ class Sphere {
 
   std::vector<int> order_;
   std::vector<float> data_;
+  int texture_count_;
+
 };
 
 

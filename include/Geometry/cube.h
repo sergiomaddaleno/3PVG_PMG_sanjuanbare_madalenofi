@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include "Core/texture.h"
+#include <../nlohmann/json.hpp>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -19,7 +20,8 @@ class Cube {
     void init24v(const float cube_size = 1.0f);
 
     void bind();
-    void render();
+    void draw();
+    void setTexture(std::string file_path);
 
     //Save data
     nlohmann::json serialize() const;
@@ -31,7 +33,9 @@ class Cube {
     float size_;
     bool cube_8v_;
     bool cube_24v_;
-    Texture tex;
+
+    Texture texture_;
+    int texture_count_;
 
     std::vector<int> order_;
     std::vector<float> data_;

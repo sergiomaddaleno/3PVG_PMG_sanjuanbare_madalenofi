@@ -20,7 +20,8 @@ class Quad {
    void init(const float quad_size = 1.0f);
 
    void bind();
-   void render();
+   void draw();
+   void setTexture(std::string file_path);
 
    //Save data
    nlohmann::json serialize() const;
@@ -30,7 +31,8 @@ class Quad {
   GLuint VAO, VBO, EBO;
 
   float size_;
-  Texture tex;
+  Texture texture_;
+  int texture_count_;
 
   std::vector<int> order_;
   std::vector<float> data_;

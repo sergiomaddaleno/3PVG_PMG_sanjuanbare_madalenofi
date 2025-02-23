@@ -16,7 +16,8 @@ Terrain::Terrain()
     : VAO(0), VBO(0), EBO(0),
     num_rows_(0), num_cols_(0), num_vertex_(0),
     height_mult_(0.0f), size_(0.0f),
-    is_centered_(true), use_perlin_noise_(true) {
+    is_centered_(true), use_perlin_noise_(true),
+    texture_count_(0){
 }
 
 Terrain::~Terrain() {}
@@ -46,7 +47,7 @@ void Terrain::init(const int num_cols, const int num_rows,
         int index = 0;
 
         if (!use_perlin_noise) {
-            height_map.loadTexture("../assets/textures/heightmaps/heightmap.png");
+            height_map_.loadTexture("../assets/textures/heightmaps/heightmap.png");
         }
 
         glm::vec3 center = { 0.0f, 0.0f, 0.0f };
@@ -66,12 +67,12 @@ void Terrain::init(const int num_cols, const int num_rows,
                     height_value = SimplexNoise::noise(perlin_x, perlin_z) * height_mult;
                 }
                 else {
-                    if (height_map.getData() && i < height_map.getwidth() && j < height_map.getHeight()) {
-                        int mapped_i = glm::clamp((int)((float)i / num_cols * height_map.getHeight()), 0, height_map.getHeight() - 1);
-                        int mapped_j = glm::clamp((int)((float)j / num_rows * height_map.getwidth()), 0, height_map.getwidth() - 1);
+                    if (height_map_.getData() && i < height_map_.getwidth() && j < height_map_.getHeight()) {
+                        int mapped_i = glm::clamp((int)((float)i / num_cols * height_map_.getHeight()), 0, height_map_.getHeight() - 1);
+                        int mapped_j = glm::clamp((int)((float)j / num_rows * height_map_.getwidth()), 0, height_map_.getwidth() - 1);
 
-                        unsigned char* texel = height_map.getData() + (mapped_j + height_map.getwidth() * mapped_i) * height_map.getChannels();
-                        unsigned char y = height_map.getChannels() >= 1 ? texel[0] : 0;
+                        unsigned char* texel = height_map_.getData() + (mapped_j + height_map_.getwidth() * mapped_i) * height_map_.getChannels();
+                        unsigned char y = height_map_.getChannels() >= 1 ? texel[0] : 0;
 
                         float yScale = 32.0f / 256.0f;
                         float yShift = 10.0f;
@@ -214,18 +215,32 @@ void Terrain::bind()
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
-
-    //---
-
-    if (!tex.loadTexture("../assets/textures/images/grass.jpg")) {
-        printf("Texture not found\n");
-    }
 }
 
-void Terrain::render(){
+void Terrain::setTexture(std::string file_path)
+{
+    texture_.loadTexture(file_path);
 
-    tex.active();
-    tex.bind2D();
+    /*texture_.clear();
+    for (auto& loc_text : files_path) {
+        Texture tempTexture;
+        tempTexture.loadTexture(loc_text);
+        texture_.push_back(tempTexture);
+    }
+    texture_count_ = (int)texture_.size();*/
+}
+
+void Terrain::draw(){
+
+    texture_.active();
+    texture_.bind2D();
+
+    /*int i = 0;
+    for (auto& tex : texture_) {
+        tex.active(i);
+        tex.bind2D();
+        i++;
+    }*/
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_cols_ * num_rows_) * 6, GL_UNSIGNED_INT, 0);

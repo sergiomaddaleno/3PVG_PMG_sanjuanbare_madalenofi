@@ -39,10 +39,9 @@ public:
 private:
 	unsigned int depthMapFBO;
 	unsigned int depthMap;
-
 	unsigned int depthCubemap;
 
-	Shader GeomtryShader;
+	Shader geometry_;
 
 	glm::mat4 lightProjection;
 	glm::mat4 lightView;

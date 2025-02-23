@@ -1,8 +1,6 @@
 #ifndef __SHADER__
 #define __SHADER__
 
-#include "../deps/nlohmann/json.hpp"
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -35,21 +33,15 @@ public:
     ~Shader();
 
 	void compile(const char* vertex_src, const char* fragment_src);
+    void compileGeometry(const char* geometry_src);
 
-    void compileGeometryShader(const char* geometry_src);
-
+	void useProgram();
 	bool isCompiled() const;
 
 	int getUniformLocation(const char* name) const;
-
 	void setUniformValue(const int uniform_loc, const ValueType uniform_type, const void* data) const;
 
-	void useProgram();
-
 	GLuint getProgram();
-
-    //Save data
-    nlohmann::json serialize() const;
 
 private:
 

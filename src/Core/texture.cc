@@ -73,11 +73,3 @@ void Texture::deleteTexture()
     }
 }
 
-nlohmann::json Texture::serialize() const
-{
-    nlohmann::json json_data;
-
-    json_data["TextureID"] = textureID;
-
-    return json_data;
-}

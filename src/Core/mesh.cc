@@ -187,18 +187,18 @@ void Mesh::bind()
     }
 }
 
-void Mesh::renderElements() {
+void Mesh::draw() {
     
     for (auto& mesh : meshes) {
         
         if (!mesh.textures.empty()) {
             mesh.textures[0].active();
             mesh.textures[0].bind2D();
+
+            glBindVertexArray(mesh.VAO);
+            glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
         }
-        
-         glBindVertexArray(mesh.VAO);
-         glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
-         glBindVertexArray(0);
     }
 }
 
@@ -215,15 +215,6 @@ nlohmann::json Mesh::serialize() const
 {
     nlohmann::json json_data;
 
-    for (const auto& mesh : meshes) {
-        json_data["Meshes"].push_back(mesh.serialize());
-    }
-
-    for (const auto& texture : textures) {
-        json_data["Textures"].push_back(texture.serialize());
-    }
-
-    json_data["MaterialID"] = materialID;
     json_data["Mesh_path"] = mesh_path;
     json_data["Texture_folder"] = texture_folder;
 

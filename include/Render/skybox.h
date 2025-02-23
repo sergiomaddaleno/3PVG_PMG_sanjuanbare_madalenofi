@@ -32,7 +32,7 @@ public:
 	bool use_cubemap;
 
 	//6 faces, use this order : 
-	//right, left, top, bottom, front, back
+	//right, left, bottom, top, front, back
 	std::vector<std::string> faces_files_; 
 	std::string cubemap_vertex_file_;
 	std::string cubemap_fragment_file_;

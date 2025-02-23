@@ -31,7 +31,7 @@ public:
     void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
 
     void bind();
-    void renderElements();
+    void draw();
 
     Texture getTexture(int shape_index);
 
