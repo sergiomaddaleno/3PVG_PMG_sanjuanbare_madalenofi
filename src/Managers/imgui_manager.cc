@@ -473,7 +473,7 @@ void ImGuiManager::InspectorWindow() {
             }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-            if (ImGui::Button("Compile")) {
+            if (ImGui::Button("Compile Shader")) {
                 
                 global.render_system.initShader(vertex_file_path, fragment_file_path);
 
@@ -489,12 +489,70 @@ void ImGuiManager::InspectorWindow() {
             ImGui::Separator();
             ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-            ImGui::Text("Geometry Dimensions");
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.3f, 0.0f, 1.0f));
+            ImGui::Text("Change Texture");
             ImGui::Dummy(ImVec2(0.0f, 2.0f));
+            ImGui::PopStyleColor();
+
+            static std::string texture_file_path;
+            static std::string texture_file_name;
+            if (ImGui::Button(!texture_file_path.empty() ? texture_file_name.c_str() : ".png / .jpg drop here", { 150.0f, 40.0f })) {}
+
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                    std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                    if ((filePath.extension() == ".png") || (filePath.extension() == ".jpg")) {
+                        texture_file_path = filePath.string();
+                        texture_file_name = filePath.filename().string();
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+            if (ImGui::Button("Compile Texture")) {
+                if (global.ecs.has_component<RenderComponent>(selected_entity)) {
+                    auto& render_comp = global.ecs.get_component<RenderComponent>(selected_entity);
+
+                    switch (render_comp->type_) {
+                    case RenderType::RT_Mesh:
+                        break;
+
+                    case RenderType::RT_Terrain:
+                        render_comp->terrain_->setTexture(texture_file_path);
+                        break;
+
+                    case RenderType::RT_Sphere:
+                        render_comp->sphere_->setTexture(texture_file_path);
+                        break;
+
+                    case RenderType::RT_Quad:
+                        render_comp->quad_->setTexture(texture_file_path);
+                        break;
+
+                    case RenderType::RT_Cube8v:
+                    case RenderType::RT_Cube24v:
+                        render_comp->cube_->setTexture(texture_file_path);
+                        break;
+                    }
+                }
+
+                texture_file_path.clear();
+                texture_file_name.clear();
+            }
+
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+            // -----------------------------------------------------------------   
 
             switch (global.ecs.get_component<RenderComponent>(selected_entity)->type_) {
             case ::RT_Terrain:
             {
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::Text("Terrain Dimensions");
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
                 auto& terrain = *global.ecs.get_component<RenderComponent>(selected_entity)->terrain_;
 
                 static int temp_num_cols = terrain.num_cols_;
@@ -525,6 +583,11 @@ void ImGuiManager::InspectorWindow() {
             }
             case ::RT_Sphere:
             {
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::Text("Sphere Dimensions");
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
                 auto& sphere = *global.ecs.get_component<RenderComponent>(selected_entity)->sphere_;
 
                 static int temp_num_heights = sphere.num_heights_;
@@ -547,8 +610,12 @@ void ImGuiManager::InspectorWindow() {
             }
             case ::RT_Cube8v:
             {
-                auto& cube = *global.ecs.get_component<RenderComponent>(selected_entity)->cube_;
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::Text("Cube8v Dimensions");
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
+                auto& cube = *global.ecs.get_component<RenderComponent>(selected_entity)->cube_;
                 static float temp_size = cube.size_;
                 ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
 
@@ -564,8 +631,12 @@ void ImGuiManager::InspectorWindow() {
             }
             case ::RT_Cube24v:
             {
-                auto& cube = *global.ecs.get_component<RenderComponent>(selected_entity)->cube_;
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::Text("Cube24v Dimensions");
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
+                auto& cube = *global.ecs.get_component<RenderComponent>(selected_entity)->cube_;
                 static float temp_size = cube.size_;
                 ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
 
@@ -581,6 +652,11 @@ void ImGuiManager::InspectorWindow() {
             }
             case ::RT_Quad:
             {
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::Text("Quad Dimensions");
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
                 auto& quad = *global.ecs.get_component<RenderComponent>(selected_entity)->quad_;
 
                 static float temp_size = quad.size_;

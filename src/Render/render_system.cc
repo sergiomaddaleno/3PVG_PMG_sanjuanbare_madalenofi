@@ -49,11 +49,6 @@ void RenderSystem::initEntities(ECSManager& ecs) {
     auto riend = ecs.getComponentList<RenderComponent>().end();
     auto liend = ecs.getComponentList<LightComponent>().end();
 
-    /*std::vector<std::string> tex_paths = {
-    "../assets/textures/images/blue.png",
-    "../assets/textures/images/blue.png",
-    };*/
-
     for (; ri != riend; ++ri) {
         if (ri->has_value()) {
             auto& render_comp = *ri;
@@ -65,23 +60,23 @@ void RenderSystem::initEntities(ECSManager& ecs) {
 
             case RenderType::RT_Terrain:
                 render_comp->terrain_->bind();
-                render_comp->terrain_->setTexture("../assets/textures/images/grass.jpg");
+                render_comp->terrain_->setTexture(render_comp->terrain_->texture_path_);
                 break;
 
             case RenderType::RT_Sphere:
                 render_comp->sphere_->bind();
-                render_comp->sphere_->setTexture("../assets/textures/images/blue.png");
+                render_comp->sphere_->setTexture(render_comp->sphere_->texture_path_);
                 break;
 
             case RenderType::RT_Quad:
                 render_comp->quad_->bind();
-                render_comp->quad_->setTexture("../assets/textures/images/blue.png");
+                render_comp->quad_->setTexture(render_comp->quad_->texture_path_);
                 break;
 
             case RenderType::RT_Cube8v:
             case RenderType::RT_Cube24v:
                 render_comp->cube_->bind();
-                render_comp->cube_->setTexture("../assets/textures/images/blue.png");
+                render_comp->cube_->setTexture(render_comp->cube_->texture_path_);
                 break;
             }
 
@@ -187,26 +182,51 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
 
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:
+                    {
+                        int use_texture = render_comp->mesh_->use_texture_;
+                        shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
                         for (auto& mesh : render_comp->mesh_->meshes) {
                             render_comp->mesh_->draw();
                         }
-                        break;
+                    }
+                    break;
+
                     case RenderType::RT_Terrain:
+                    {
+                        int use_texture = render_comp->terrain_->use_texture_;
+                        shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
                         render_comp->terrain_->draw();
-                        break;
+                    }
+                    break;
+
                     case RenderType::RT_Sphere:
+                    {
+                        int use_texture = render_comp->sphere_->use_texture_;
+                        shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
                         render_comp->sphere_->draw();
-                        break;
+                    }
+                    break;
+
                     case RenderType::RT_Cube8v:
                     case RenderType::RT_Cube24v:
+                    {
+                        int use_texture = render_comp->cube_->use_texture_;
+                        shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
                         render_comp->cube_->draw();
-                        break;
+                    }
+                    break;
+
                     case RenderType::RT_Quad:
+                    {
+                        int use_texture = render_comp->quad_->use_texture_;
+                        shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
                         render_comp->quad_->draw();
-                        break;
+                    }
+                    break;
                     }
                 }
             }
+
             glBlendFunc(GL_ONE, GL_ONE);
         }
     }

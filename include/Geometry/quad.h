@@ -32,7 +32,8 @@ class Quad {
 
   float size_;
   Texture texture_;
-  int texture_count_;
+  bool use_texture_;
+  std::string texture_path_;
 
   std::vector<int> order_;
   std::vector<float> data_;

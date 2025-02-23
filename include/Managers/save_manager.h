@@ -51,16 +51,20 @@ private:
 	float terrain_size;
 	bool terrain_is_centered;
 	bool terrain_use_perlin_noise;
+	std::string terrain_tex_path;
 
 	int sphere_num_heights;
 	int sphere_num_revs;
 	float sphere_size;
+	std::string sphere_tex_path;
 
 	float cube_size;
 	bool cube_8v;
 	bool cube_24v;
+	std::string cube_tex_path;
 
 	float quad_size;
+	std::string quad_tex_path;
 
 	char* dds_file;
 	char* sb_vertex;

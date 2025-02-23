@@ -25,6 +25,8 @@ struct Vertex {
 class Mesh {
 
 public:
+    Mesh();
+    ~Mesh();
     
     bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
 
@@ -40,6 +42,7 @@ public:
     std::vector<Vertex> vertices;
     std::vector<Mesh> meshes;
     std::vector<Texture> textures;
+    bool use_texture_;
 
     std::vector<unsigned int> indices;
     int materialID;
@@ -47,20 +50,10 @@ public:
     std::string mesh_path;
     std::string texture_folder;
 
-    GLuint VAO = 0, VBO = 0, EBO = 0;
+    GLuint VAO, VBO, EBO;
 
     //Save data
     nlohmann::json serialize() const;
-
-    //--
-
-    Mesh() : VAO(0), VBO(0), EBO(0), materialID(0){};
-
-    ~Mesh() {
-        if (VAO != 0) glDeleteVertexArrays(1, &VAO);
-        if (VBO != 0) glDeleteBuffers(1, &VBO);
-        if (EBO != 0) glDeleteBuffers(1, &EBO);
-    };   
 };
 
 #endif // __MESH__

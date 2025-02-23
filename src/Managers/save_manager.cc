@@ -209,6 +209,10 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 cube_size = cube["size"];
                 if (cube_8v) rs.createCube8v(ecs, tc, cube_size);
                 if (cube_24v) rs.createCube24v(ecs, tc, cube_size);
+
+                cube_tex_path = cube["Texture_path"];
+                auto& render_comp = global.ecs.get_component<RenderComponent>(entity["Entity_id"].get<int>());
+                render_comp->cube_->setTexture(cube_tex_path);
                 break;
             }
 
@@ -216,6 +220,10 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 const auto& quad = entity["Render_component"]["Quad"];
                 quad_size = quad["size"];
                 rs.createQuad(ecs, tc, quad_size);
+
+                quad_tex_path = quad["Texture_path"];
+                auto& render_comp = global.ecs.get_component<RenderComponent>(entity["Entity_id"].get<int>());
+                render_comp->quad_->setTexture(quad_tex_path);
                 break;
             }
 
@@ -224,7 +232,12 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 sphere_num_heights = sphere["num_heights"];
                 sphere_num_revs = sphere["num_revs"];
                 sphere_size = sphere["size"];
+                sphere_size = sphere["size"];
                 rs.createSphere(ecs, tc, sphere_num_heights, sphere_num_revs, sphere_size);
+
+                sphere_tex_path = sphere["Texture_path"];
+                auto& render_comp = global.ecs.get_component<RenderComponent>(entity["Entity_id"].get<int>());
+                render_comp->sphere_->setTexture(sphere_tex_path);
                 break;
             }
 
@@ -236,6 +249,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 terrain_size = terrain["size"];
                 terrain_is_centered = terrain["is_centered"];
                 terrain_use_perlin_noise = terrain["use_perlin_noise"];
+
                 rs.createTerrain(ecs, tc,
                     terrain_num_cols,
                     terrain_num_rows,
@@ -243,6 +257,10 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                     terrain_size,
                     terrain_is_centered,
                     terrain_use_perlin_noise);
+
+                terrain_tex_path = terrain["Texture_path"];
+                auto& render_comp = global.ecs.get_component<RenderComponent>(entity["Entity_id"].get<int>());
+                render_comp->terrain_->setTexture(terrain_tex_path);
                 break;
             }
             }
@@ -312,7 +330,6 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
     }
     rs.initEntities(ecs);
 }
-
 
 void SaveManager::saveToFile(std::string filename, ECSManager& ecs, Camera& cam, Skybox& skybox)
 {

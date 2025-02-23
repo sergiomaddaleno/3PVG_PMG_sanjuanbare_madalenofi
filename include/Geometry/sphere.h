@@ -31,7 +31,7 @@ class Sphere {
   GLuint VAO, VBO, EBO;
 
   int num_heights_, num_revs_;
-  float size_ = 0.0f;
+  float size_;
   Texture texture_;
 
   // --
@@ -43,7 +43,8 @@ class Sphere {
 
   std::vector<int> order_;
   std::vector<float> data_;
-  int texture_count_;
+  std::string texture_path_;
+  bool use_texture_;
 
 };
 

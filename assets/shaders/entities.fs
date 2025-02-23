@@ -19,7 +19,7 @@ struct LightInfo {
 };
 
 uniform sampler2D u_texture;
-uniform int u_texture_count;
+uniform bool u_use_texture;
 uniform sampler2D u_shadow_map;
 uniform samplerCube depthMap;
 
@@ -164,11 +164,18 @@ void main() {
         final_light += PointLight(u_light) * shadow;  
     }
 
-   vec4 texture_color = texture(u_texture, uv);
-   vec3 texture_and_light = texture_color.rgb * final_light;
-    
-   FragColor = vec4(texture_and_light, 1.0);
+   vec3 color;
+   if (u_use_texture) {
+       vec4 texture_color = texture(u_texture, uv);
+       color = texture_color.rgb;
+   }else{
+       color = vec3(0.0f, 0.0f, 1.0f);
+   }
 
-   if(u_fog) FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
+    vec3 final_color = color * final_light;
+    
+    FragColor = vec4(final_color, 1.0);
+
+    if(u_fog) FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
    
 }

@@ -13,7 +13,7 @@ Cube::Cube()
     order_(), data_(),
     size_(0.0f),
     cube_8v_(false), cube_24v_(false),
-    texture_count_(0){
+    use_texture_(true), texture_path_("../assets/textures/images/blue.png") {
 }
 
 Cube::~Cube()
@@ -82,47 +82,29 @@ void Cube::init24v(const float cube_size) {
     order_.clear();
     
     glm::vec3 positions[] = {
-        
         {-size_, +size_, +size_}, {+size_, +size_, +size_}, {+size_, -size_, +size_}, {-size_, -size_, +size_},
-        
         {+size_, +size_, +size_}, {+size_, +size_, -size_}, {+size_, -size_, -size_}, {+size_, -size_, +size_},
-       
         {+size_, +size_, -size_}, {-size_, +size_, -size_}, {-size_, -size_, -size_}, {+size_, -size_, -size_},
-       
         {-size_, +size_, -size_}, {-size_, +size_, +size_}, {-size_, -size_, +size_}, {-size_, -size_, -size_},
-       
         {-size_, +size_, -size_}, {+size_, +size_, -size_}, {+size_, +size_, +size_}, {-size_, +size_, +size_},
-       
         {-size_, -size_, +size_}, {+size_, -size_, +size_}, {+size_, -size_, -size_}, {-size_, -size_, -size_},
     };
    
     glm::vec3 normals[] = {
-        
         {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f},
-       
         {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f},
-        
         {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f},
-        
         {-1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f},
-       
         {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f},
-       
         {0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, -1.0f, 0.0f},
     };
     
     glm::vec2 uvs[] = {
-       
         {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f},
-        
         {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f},
-        
         {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f},
-       
         {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f},
-        
         {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f},
-       
         {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f},
     };
    
@@ -143,18 +125,12 @@ void Cube::init24v(const float cube_size) {
     unsigned int order[] = {
       
         0, 2, 1, 2, 0, 3,
-      
         4, 6, 5, 6, 4, 7,
-        
         8, 10, 9, 10, 8, 11,
-        
         12, 14, 13, 14, 12, 15,
-       
         16, 18, 17, 18, 16, 19,
-       
         20, 22, 21, 22, 20, 23
     };
-
    
     order_.assign(order, order + sizeof(order) / sizeof(order[0]));
 }
@@ -202,10 +178,13 @@ void Cube::draw()
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Cube::setTexture(std::string file_path)
 {
+    texture_path_ = file_path;
+
     texture_.loadTexture(file_path);
 
     /*texture_.clear();
@@ -224,6 +203,7 @@ nlohmann::json Cube::serialize() const
     json_data["size"] = size_;
     json_data["cube_8v"] = cube_8v_;
     json_data["cube_24v"] = cube_24v_;
+    json_data["Texture_path"] = texture_path_;
 
     return json_data;
 }

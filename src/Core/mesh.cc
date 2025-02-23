@@ -16,6 +16,17 @@
 #pragma warning(push)
 #include "../deps/stb_image.h"
 
+Mesh::Mesh() : VAO(0), VBO(0), EBO(0), materialID(0),
+use_texture_(true){}
+
+Mesh::~Mesh()
+{
+    if (VAO != 0) glDeleteVertexArrays(1, &VAO);
+    if (VBO != 0) glDeleteBuffers(1, &VBO);
+    if (EBO != 0) glDeleteBuffers(1, &EBO);
+};
+
+
 bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
 {
     tinyobj::attrib_t attrib;
@@ -192,12 +203,16 @@ void Mesh::draw() {
     for (auto& mesh : meshes) {
         
         if (!mesh.textures.empty()) {
-            mesh.textures[0].active();
-            mesh.textures[0].bind2D();
+
+            if (use_texture_) {
+                mesh.textures[0].active();
+                mesh.textures[0].bind2D();
+            }
 
             glBindVertexArray(mesh.VAO);
             glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
     }
 }

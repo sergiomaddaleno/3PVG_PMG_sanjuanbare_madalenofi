@@ -12,7 +12,8 @@
 Quad::Quad()
     : VAO(0), VBO(0), EBO(0),
     order_(), data_(),
-    size_(0.0f), texture_count_(0){
+    size_(0.0f), use_texture_(true),
+    texture_path_("../assets/textures/images/blue.png") {
 }
 
 Quad::~Quad()
@@ -92,6 +93,7 @@ void Quad::bind()
 
 void Quad::setTexture(std::string file_path)
 {
+    texture_path_ = file_path;
     texture_.loadTexture(file_path);
 
     /*texture_.clear();
@@ -118,6 +120,7 @@ void Quad::draw()
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 nlohmann::json Quad::serialize() const
@@ -125,6 +128,7 @@ nlohmann::json Quad::serialize() const
     nlohmann::json json_data;
 
     json_data["size"] = size_;
+    json_data["Texture_path"] = texture_path_;
 
     return json_data;
 }

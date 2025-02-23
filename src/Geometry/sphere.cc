@@ -16,7 +16,8 @@
 Sphere::Sphere()
     : VAO(0), VBO(0), EBO(0),
     num_heights_(0), num_revs_(0), size_(0.0f), 
-    texture_count_(0), num_vertex_(0){
+    num_vertex_(0), use_texture_(true),
+    texture_path_("../assets/textures/images/blue.png"){
 }
 
 Sphere::~Sphere()
@@ -123,8 +124,10 @@ void Sphere::bind()
 
 void Sphere::draw()
 {
-    texture_.active();
-    texture_.bind2D();
+    if (use_texture_) {
+        texture_.active();
+        texture_.bind2D();
+    }
 
     /*int i = 0;
     for (auto& tex : texture_) {
@@ -136,10 +139,13 @@ void Sphere::draw()
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_heights_ * num_revs_) * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Sphere::setTexture(std::string file_path)
 {
+    texture_path_ = file_path;
+
     texture_.loadTexture(file_path);
 
     /*texture_.clear();
@@ -163,6 +169,7 @@ nlohmann::json Sphere::serialize() const
     json_data["num_heights"] = num_heights_;
     json_data["num_revs"] = num_revs_;
     json_data["size"] = size_;
+    json_data["Texture_path"] = texture_path_;
 
     return json_data;
 }

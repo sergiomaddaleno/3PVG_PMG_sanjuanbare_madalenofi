@@ -39,7 +39,8 @@ class Terrain {
   bool is_centered_, use_perlin_noise_;
 
   Texture texture_;
-  int texture_count_;
+  bool use_texture_;
+  std::string texture_path_;
 
 private:
 

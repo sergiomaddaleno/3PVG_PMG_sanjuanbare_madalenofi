@@ -17,7 +17,7 @@ Terrain::Terrain()
     num_rows_(0), num_cols_(0), num_vertex_(0),
     height_mult_(0.0f), size_(0.0f),
     is_centered_(true), use_perlin_noise_(true),
-    texture_count_(0){
+    use_texture_(true), texture_path_("../assets/textures/images/grass.jpg") {
 }
 
 Terrain::~Terrain() {}
@@ -219,6 +219,8 @@ void Terrain::bind()
 
 void Terrain::setTexture(std::string file_path)
 {
+    texture_path_ = file_path;
+
     texture_.loadTexture(file_path);
 
     /*texture_.clear();
@@ -245,6 +247,7 @@ void Terrain::draw(){
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_cols_ * num_rows_) * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 const float* Terrain::GetVertexTerrain()
@@ -262,6 +265,7 @@ nlohmann::json Terrain::serialize() const
     json_data["size"] = size_;
     json_data["is_centered"] = is_centered_;
     json_data["use_perlin_noise"] = use_perlin_noise_;
+    json_data["Texture_path"] = texture_path_;
 
     return json_data;
 }
