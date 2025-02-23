@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Core/texture.h"
+#include "Geometry/wave.h"
 #include <../deps/glm/glm.hpp>
 #include <../nlohmann/json.hpp>
 
@@ -41,6 +42,8 @@ class Terrain {
   Texture texture_;
   bool use_texture_;
   std::string texture_path_;
+
+  GerstnerWave wave_;
 
 private:
 

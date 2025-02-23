@@ -7,18 +7,18 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -19.990324020385742,
-   16.507266998291016,
-   -21.10540008544922
+   -9.26977252960205,
+   12.40716552734375,
+   -13.789644241333008
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.004999999888241291,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.5071271061897278,
-   -0.3257271945476532,
-   0.7979497909545898
+   0.309638649225235,
+   -0.299465537071228,
+   0.9024656414985657
   ]
  },
  "Entities": [
@@ -64,12 +64,12 @@
     "Render_type": 1,
     "Terrain": {
      "Texture_path": "../assets\\textures\\imgui\\back.png",
-     "height_mult": 0.0,
+     "height_mult": 0.061000000685453415,
      "is_centered": true,
      "num_cols": 50,
      "num_rows": 50,
      "size": 1.0,
-     "use_perlin_noise": true
+     "use_perlin_noise": false
     }
    },
    "Transform_component": {
@@ -174,7 +174,7 @@
      0.0,
      0.0,
      0.0,
-     1.0
+     0.0
     ],
     "Scale": [
      1.0,

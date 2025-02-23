@@ -233,22 +233,19 @@ void Terrain::setTexture(std::string file_path)
 }
 
 void Terrain::draw(){
+    //wave_.update(vertex_terrain_, glfwGetTime() * 0.001);
+    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //glBufferSubData(GL_ARRAY_BUFFER, 0, data_.size() * sizeof(float), data_.data()); // Update buffer
 
     texture_.active();
     texture_.bind2D();
-
-    /*int i = 0;
-    for (auto& tex : texture_) {
-        tex.active(i);
-        tex.bind2D();
-        i++;
-    }*/
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_cols_ * num_rows_) * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
+
 
 const float* Terrain::GetVertexTerrain()
 {
