@@ -68,7 +68,7 @@ architecture "x64"
 location "build"
 cppdialect "c++20"
 startproject "MyMotor"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
+includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo", "deps/Perlin"} 
 
 filter "configurations:Debug"
 defines { "DEBUG" }
@@ -128,7 +128,6 @@ project"PR0_Window"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
@@ -143,7 +142,6 @@ project"MyMotor"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo", "deps/Perlin"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
@@ -158,7 +156,6 @@ project"PR1_Triangle"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
@@ -173,7 +170,6 @@ project"PR2_MeshLoad"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
@@ -188,7 +184,6 @@ project"PR3_JobSystem"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
@@ -203,7 +198,6 @@ project"PR4_ECSManager"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
@@ -218,7 +212,6 @@ project"PR5_Scripting"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
@@ -233,7 +226,6 @@ project"PR6_Lights"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
@@ -248,7 +240,6 @@ project"ProjectAI"
 kind "ConsoleApp"
 language "C++"
 targetdir "build/%{prj.name}/%{cfg.buildcfg}"
-includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo", "deps/Perlin"} 
 links "Motor"
 conan_config_exec("Debug")
 conan_config_exec("Release")
