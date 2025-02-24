@@ -1,0 +1,219 @@
+{
+ "Camera": {
+  "Aspect_ratio": 1.7769999504089355,
+  "Far_clip_plane": 1000.0,
+  "Fov": 45.0,
+  "Near_clip_plane": 0.10000000149011612,
+  "Ortho_height": 600.0,
+  "Ortho_width": 800.0,
+  "Position": [
+   -4.22482442855835,
+   21.840213775634766,
+   38.8819580078125
+  ],
+  "Scroll_speed": 1.0,
+  "Sensitivity": 1.0,
+  "Speed": 0.004999999888241291,
+  "Use_perspective_matrix": true,
+  "View_direction": [
+   -0.05917620286345482,
+   -0.3050139546394348,
+   -0.9505075812339783
+  ]
+ },
+ "Entities": [
+  {
+   "Entity_id": 0,
+   "Name_component": {
+    "Entity_name": "Sphere [0]"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../assets\\textures\\toad\\ChTX_003_kinopio_eye_01_cl.png",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     5.944305419921875,
+     3.5534310340881348,
+     1.9470515251159668
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 1,
+   "Name_component": {
+    "Entity_name": "Terrain [0]"
+   },
+   "Render_component": {
+    "Render_type": 1,
+    "Terrain": {
+     "Texture_path": "../assets\\textures\\imgui\\back.png",
+     "height_mult": 0.0,
+     "is_centered": true,
+     "num_cols": 50,
+     "num_rows": 50,
+     "size": 1.0,
+     "use_perlin_noise": true
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.7934001684188843,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 2,
+   "Name_component": {
+    "Entity_name": "Cube8v [0]"
+   },
+   "Render_component": {
+    "Cube": {
+     "Texture_path": "../assets\\textures\\apple\\red.jpg",
+     "cube_24v": false,
+     "cube_8v": true,
+     "size": 1.0
+    },
+    "Render_type": 3
+   },
+   "Transform_component": {
+    "Position": [
+     -4.9718427658081055,
+     3.3636176586151123,
+     1.166322946548462
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 3,
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
+      ]
+     ],
+     "Light_color": [
+      [
+       8.026415824890137,
+       8.025612831115723,
+       8.025612831115723
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Spot_softness": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   },
+   "Name_component": {
+    "Entity_name": "Directional Light [0]"
+   }
+  }
+ ],
+ "Skybox": {
+  "Cubemap_file_paths": [
+   "..\\assets\\textures\\skybox\\cubemap\\nebulae\\right.png",
+   "..\\assets\\textures\\skybox\\cubemap\\nebulae\\left.png",
+   "..\\assets\\textures\\skybox\\cubemap\\nebulae\\bottom.png",
+   "..\\assets\\textures\\skybox\\cubemap\\nebulae\\top.png",
+   "..\\assets\\textures\\skybox\\cubemap\\nebulae\\front.png",
+   "..\\assets\\textures\\skybox\\cubemap\\nebulae\\back.png"
+  ],
+  "Cubemap_fragment_file": "../assets/shaders/skybox_cubemap.fs",
+  "Cubemap_vertex_file": "../assets/shaders/skybox_cubemap.vs",
+  "DDS_angle": -90.0,
+  "DDS_file_path": "../assets/textures/skybox/sky.dds",
+  "DDS_fragment_file": "../assets/shaders/skybox_dds.fs",
+  "DDS_vertex_file": "../assets/shaders/skybox_dds.vs",
+  "Use_cubemap": true
+ }
+}
