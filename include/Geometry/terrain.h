@@ -5,8 +5,8 @@
 #include <memory>
 #include <vector>
 
-#include "Core/texture.h"
 #include "Geometry/wave.h"
+#include "Core/texture.h"
 #include <../deps/glm/glm.hpp>
 #include <../nlohmann/json.hpp>
 

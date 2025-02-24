@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include "Core/texture.h"
+#include "Geometry/wave.h"
 #include <../nlohmann/json.hpp>
 
 #include <GL/glew.h>
@@ -33,6 +34,8 @@ class Cube {
     float size_;
     bool cube_8v_;
     bool cube_24v_;
+
+    GerstnerWave wave_;
 
     Texture texture_;
     bool use_texture_;

@@ -1,32 +1,26 @@
 
 #include "Geometry/wave.h"
-#include <math.h>
+#include "Core/shader.h"
 
-#define PI 3.14159265359f
-#define PI_2 PI * 2.0f
-
-GerstnerWave::GerstnerWave()
-    : amplitude_(2.0f), wavelength_(1.0f), frequency_(1.0f), direction_(glm::vec3(1.0f, 0.0f, 0.0f)) {}
-
-
-void GerstnerWave::update(std::vector<float>& terrain_vertices, float time)
+GerstnerWave::GerstnerWave() : time_(0.0f), amplitude_(0.2f),
+wave_length_(2.0f), speed_(1.0f), direction_({ 1.0f, 0.5f }), use_wave_(false)
 {
-    int vertexCount = terrain_vertices.size() / 3;
-
-    float k = PI_2 / wavelength_;
-    float omega = PI_2 * frequency_;
-
-    for (int i = 0; i < vertexCount; i++) {
-        float x = terrain_vertices[i * 8 + 0];
-        float z = terrain_vertices[i * 8 + 2];
-
-        float wave = amplitude_ * sinf(k * (x * direction_.x + z * direction_.y) + omega * time);
-
-        terrain_vertices[i * 8 + 1] = wave;
-    }
 }
 
+GerstnerWave::~GerstnerWave()
+{
+}
 
+void GerstnerWave::setUniforms(Shader& shader)
+{
+	if (use_wave_) {
+		float time_ = glfwGetTime();
 
-
-
+		shader.setUniformValue(shader.getUniformLocation("u_use_wave"), ValueType::T_FLOAT_1, &use_wave_);
+		shader.setUniformValue(shader.getUniformLocation("u_time"), ValueType::T_FLOAT_1, &time_);
+		shader.setUniformValue(shader.getUniformLocation("u_wave_amplitude"), ValueType::T_FLOAT_1, &amplitude_);
+		shader.setUniformValue(shader.getUniformLocation("u_wave_length"), ValueType::T_FLOAT_1, &wave_length_);
+		shader.setUniformValue(shader.getUniformLocation("u_wave_speed"), ValueType::T_FLOAT_1, &speed_);
+		shader.setUniformValue(shader.getUniformLocation("u_wave_direction"), ValueType::T_FLOAT_2, &direction_);
+	}
+}

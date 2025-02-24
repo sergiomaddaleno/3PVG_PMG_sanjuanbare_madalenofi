@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Core/texture.h"
+#include "Geometry/wave.h"
 #include <../nlohmann/json.hpp>
 
 #include <GL/glew.h>
@@ -34,6 +35,8 @@ class Quad {
   Texture texture_;
   bool use_texture_;
   std::string texture_path_;
+
+  GerstnerWave wave_;
 
   std::vector<int> order_;
   std::vector<float> data_;

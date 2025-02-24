@@ -4,17 +4,22 @@
 
 #include <../deps/glm/glm.hpp>
 
-class GerstnerWave {
+class Shader;
+
+class GerstnerWave{
+
 public:
     GerstnerWave();
+    ~GerstnerWave();
 
-    void update(std::vector<float>& terrain_vertices, float time);
+    void setUniforms(Shader& shader);
 
-private:
+    float time_;
     float amplitude_;
-    float wavelength_;
-    float frequency_;
-    glm::vec3 direction_;
+    float wave_length_;
+    float speed_;
+    glm::vec2 direction_;
+    bool use_wave_;
 };
 
 #endif // __WAVE__

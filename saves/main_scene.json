@@ -7,18 +7,18 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -9.26977252960205,
-   12.40716552734375,
-   -13.789644241333008
+   -4.22482442855835,
+   21.840213775634766,
+   38.8819580078125
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.004999999888241291,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.309638649225235,
-   -0.299465537071228,
-   0.9024656414985657
+   -0.05917620286345482,
+   -0.3050139546394348,
+   -0.9505075812339783
   ]
  },
  "Entities": [
@@ -38,9 +38,9 @@
    },
    "Transform_component": {
     "Position": [
-     -0.11935527622699738,
-     4.351772308349609,
-     0.0
+     5.944305419921875,
+     3.5534310340881348,
+     1.9470515251159668
     ],
     "Rotation": [
      0.0,
@@ -64,12 +64,12 @@
     "Render_type": 1,
     "Terrain": {
      "Texture_path": "../assets\\textures\\imgui\\back.png",
-     "height_mult": 0.061000000685453415,
+     "height_mult": 0.0,
      "is_centered": true,
      "num_cols": 50,
      "num_rows": 50,
      "size": 1.0,
-     "use_perlin_noise": false
+     "use_perlin_noise": true
     }
    },
    "Transform_component": {
@@ -93,98 +93,6 @@
   },
   {
    "Entity_id": 2,
-   "Light_component": {
-    "light": {
-     "Ambient_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       0.0,
-       0.0,
-       1.0
-      ]
-     ],
-     "Light_color": [
-      [
-       150.0,
-       150.0,
-       150.0
-      ]
-     ],
-     "Linear_attenuation": [
-      0.699999988079071
-     ],
-     "Position": [
-      [
-       -1.7024133205413818,
-       9.745570182800293,
-       -8.478619575500488
-      ]
-     ],
-     "Quadratic_attenuation": [
-      1.7999999523162842
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Spot_angle": [
-      45.0
-     ],
-     "Spot_softness": [
-      10.0
-     ],
-     "Strength": [
-      1.0
-     ],
-     "Type": 1
-    }
-   },
-   "Name_component": {
-    "Entity_name": "Spot Light [0]"
-   },
-   "Transform_component": {
-    "Position": [
-     -1.7024133205413818,
-     9.745570182800293,
-     -8.478619575500488
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 3,
    "Name_component": {
     "Entity_name": "Cube8v [0]"
    },
@@ -200,7 +108,7 @@
    "Transform_component": {
     "Position": [
      -4.9718427658081055,
-     3.9865448474884033,
+     3.3636176586151123,
      1.166322946548462
     ],
     "Rotation": [
@@ -214,6 +122,80 @@
      1.0,
      1.0
     ]
+   }
+  },
+  {
+   "Entity_id": 3,
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
+      ]
+     ],
+     "Light_color": [
+      [
+       8.026415824890137,
+       8.025612831115723,
+       8.025612831115723
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Spot_softness": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   },
+   "Name_component": {
+    "Entity_name": "Directional Light [0]"
    }
   }
  ],

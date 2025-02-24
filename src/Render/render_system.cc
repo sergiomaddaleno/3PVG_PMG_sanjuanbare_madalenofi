@@ -196,6 +196,8 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         int use_texture = render_comp->terrain_->use_texture_;
                         shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
                         render_comp->terrain_->draw();
+
+                        render_comp->terrain_->wave_.setUniforms(shader);
                     }
                     break;
 
@@ -204,6 +206,8 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         int use_texture = render_comp->sphere_->use_texture_;
                         shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
                         render_comp->sphere_->draw();
+
+                        render_comp->sphere_->wave_.setUniforms(shader);
                     }
                     break;
 
@@ -213,6 +217,8 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         int use_texture = render_comp->cube_->use_texture_;
                         shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
                         render_comp->cube_->draw();
+
+                        render_comp->cube_->wave_.setUniforms(shader);
                     }
                     break;
 
@@ -221,12 +227,13 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                         int use_texture = render_comp->quad_->use_texture_;
                         shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
                         render_comp->quad_->draw();
+
+                        render_comp->quad_->wave_.setUniforms(shader);
                     }
                     break;
                     }
                 }
             }
-
             glBlendFunc(GL_ONE, GL_ONE);
         }
     }

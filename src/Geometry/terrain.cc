@@ -233,9 +233,6 @@ void Terrain::setTexture(std::string file_path)
 }
 
 void Terrain::draw(){
-    //wave_.update(vertex_terrain_, glfwGetTime() * 0.001);
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    //glBufferSubData(GL_ARRAY_BUFFER, 0, data_.size() * sizeof(float), data_.data()); // Update buffer
 
     texture_.active();
     texture_.bind2D();

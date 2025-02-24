@@ -172,10 +172,10 @@ void main() {
        color = vec3(0.0f, 0.0f, 1.0f);
    }
 
-    vec3 final_color = color * final_light;
-    
-    FragColor = vec4(final_color, 1.0);
+   vec3 final_color = color * final_light;
+   
+   FragColor = vec4(final_color, 1.0);
 
-    if(u_fog) FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
+   if(u_fog) FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
    
 }

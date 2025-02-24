@@ -13,7 +13,8 @@ Cube::Cube()
     order_(), data_(),
     size_(0.0f),
     cube_8v_(false), cube_24v_(false),
-    use_texture_(true), texture_path_("../assets/textures/images/blue.png") {
+    use_texture_(true), texture_path_("../assets/textures/images/blue.png")
+{
 }
 
 Cube::~Cube()

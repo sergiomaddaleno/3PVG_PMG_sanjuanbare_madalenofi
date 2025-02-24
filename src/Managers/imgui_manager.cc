@@ -544,7 +544,7 @@ void ImGuiManager::InspectorWindow() {
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
             // -----------------------------------------------------------------   
-
+            
             switch (global.ecs.get_component<RenderComponent>(selected_entity)->type_) {
             case ::RT_Terrain:
             {
@@ -673,6 +673,33 @@ void ImGuiManager::InspectorWindow() {
                 break;
             }
             }
+        
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+           
+            // -----------------------------------------------------------------   
+
+            switch (global.ecs.get_component<RenderComponent>(selected_entity)->type_) {
+            case ::RT_Terrain:
+                {
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.378f, 0.547f, 0.902f, 1.0f));
+                ImGui::Text("Wave Options");
+                ImGui::PopStyleColor();
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                auto& terrain = *global.ecs.get_component<RenderComponent>(selected_entity)->terrain_;
+                ImGui::Checkbox("Use Wave Effect", &terrain.wave_.use_wave_);
+
+                ImGui::SliderFloat("Amplitude", &terrain.wave_.amplitude_, 0.0f, 1.0f);
+                ImGui::SliderFloat("Length", &terrain.wave_.wave_length_, 0.1f, 10.0f);
+                ImGui::SliderFloat("Speed", &terrain.wave_.speed_, 0.1f, 5.0f);
+
+                ImGui::SliderFloat("Direction X", &terrain.wave_.direction_.x, -1.0f, 1.0f);
+                ImGui::SliderFloat("Direction Y", &terrain.wave_.direction_.y, -1.0f, 1.0f);
+                }
+                break;
+            }
         }
     }
 
@@ -693,9 +720,9 @@ void ImGuiManager::InspectorWindow() {
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.9f, 0.9f, 1.0f));
                 ImGui::Text("Directional direction");
                 ImGui::PopStyleColor();
-                ImGui::SliderAngle("X", &light_comp->light.dir_[0], -180.0f, 180.0f);
-                ImGui::SliderAngle("Y", &light_comp->light.dir_[1], -180.0f, 180.0f);
-                ImGui::SliderAngle("Z", &light_comp->light.dir_[2], -180.0f, 180.0f);
+                ImGui::SliderAngle("X", &light_comp->light.dir_[0], -57.0f, 57.0f);
+                ImGui::SliderAngle("Y", &light_comp->light.dir_[1], -57.0f, 57.0f);
+                ImGui::SliderAngle("Z", &light_comp->light.dir_[2], -57.0f, 57.0f);
 
             }
 

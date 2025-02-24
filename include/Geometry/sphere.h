@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Core/texture.h"
+#include "Geometry/wave.h"
 #include <../nlohmann/json.hpp>
 
 #include <GL/glew.h>
@@ -34,6 +35,7 @@ class Sphere {
   float size_;
   Texture texture_;
 
+  GerstnerWave wave_;
   // --
 
   int num_vertex_;
