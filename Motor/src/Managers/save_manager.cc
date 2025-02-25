@@ -117,7 +117,6 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam, Skybox& skyb
     return j;
 }
 
-
 void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera &cam, Skybox& skybox) {
 
     ecs.remove_entities();
@@ -331,9 +330,9 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
     rs.initEntities(ecs);
 }
 
-void SaveManager::saveToFile(std::string filename, ECSManager& ecs, Camera& cam, Skybox& skybox)
+void SaveManager::saveToFile(std::string filename)
 {
-    nlohmann::json j = serialize(ecs, cam, skybox);
+    nlohmann::json j = serialize(global.ecs, global.cam, global.skybox);
     std::ofstream file(filename);
 
     if (file.is_open()) {
@@ -347,7 +346,7 @@ void SaveManager::saveToFile(std::string filename, ECSManager& ecs, Camera& cam,
     }
 }
 
-void SaveManager::loadFromFile(std::string filename, ECSManager& ecs, RenderSystem& rs, Camera& cam, Skybox& skybox) {
+void SaveManager::loadFromFile(std::string filename) {
 
     std::ifstream file(filename);
     if (file.is_open()) {
@@ -357,7 +356,7 @@ void SaveManager::loadFromFile(std::string filename, ECSManager& ecs, RenderSyst
         nlohmann::json j;
         file >> j;
         file.close();
-        deSerialize(j, ecs,rs, cam, skybox);
+        deSerialize(j, global.ecs, global.render_system, global.cam, global.skybox);
         
         printf("Loaded from %s\n", filename.c_str());
     }
@@ -379,7 +378,7 @@ void SaveManager::newFile()
                 {"Fov", 45.0f},
                 {"Scroll_speed", 1.0f},
                 {"Sensitivity", 1.0f},
-                {"Speed", 0.005f},
+                {"Speed", 0.05f},
                 {"Aspect_ratio", 1.777f},
                 {"Near_clip_plane", 0.1f},
                 {"Far_clip_plane", 1000.0f},

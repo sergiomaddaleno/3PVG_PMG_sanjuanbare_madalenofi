@@ -95,7 +95,7 @@ files {
 	"src/**",
 	"include/**",
 	"scripts/**",
-	"assets/**",
+	"stages/**",
 
 	"deps/*.h",
 	"deps/imgui/*.h",

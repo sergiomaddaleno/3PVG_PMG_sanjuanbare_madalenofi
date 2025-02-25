@@ -20,17 +20,8 @@ int main(int, char**) {
     //window->setWindowIcon(window->getWindow(), "../assets/textures/images/AE.png");
 
     Input input{ window->getWindow() };
-    // ---
-
-    global.post_process.initData();
-
-    global.render_system.initShader("../stages/assets/shaders/entities.vs", "../stages/assets/shaders/entities.fs");
-    global.render_system.setupEntities(global.ecs);
-
-    global.save_manager.loadFromFile("../stages/saves/main_scene.json", global.ecs, global.render_system, global.cam, global.skybox);
 
     global.imgui_manager.Init(window->getWindow());
-    //--
 
     float dt = 0.0f;
     double currentTime = 0.0f;
@@ -46,18 +37,7 @@ int main(int, char**) {
         global.window_width = window->getWidth();
         global.window_height = window->getHeight();
 
-        //--
-
-        global.post_process.resize(global.window_width, global.window_height);
-
-        global.post_process.beginRender();
         global.cam.update(input, dt, global.window_width, global.window_height);
-
-        if (global.use_skybox) global.skybox.render(global.cam);
-
-        global.render_system.renderEntities(global.ecs, global.cam);
-
-        //--
 
         global.imgui_manager.Render(window->getWindow());
 

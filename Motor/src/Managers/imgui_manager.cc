@@ -172,6 +172,15 @@ void ImGuiManager::Init(GLFWwindow* window) {
     m_PlayIcon.loadTexture("../stages/assets/textures/imgui/play.png");
     m_StopIcon.loadTexture("../stages/assets/textures/imgui/stop.png");
 
+    //---
+    global.post_process.initData();
+
+    global.render_system.initShader("../stages/assets/shaders/entities.vs", "../stages/assets/shaders/entities.fs");
+    global.render_system.setupEntities(global.ecs);
+
+    global.save_manager.loadFromFile("../stages/saves/main_scene.json");
+    //---
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
@@ -181,6 +190,16 @@ void ImGuiManager::Render(GLFWwindow* window) {
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
+
+    //---
+    global.post_process.resize(global.window_width, global.window_height);
+
+    global.post_process.beginRender();
+
+    if (global.use_skybox) global.skybox.render(global.cam);
+
+    global.render_system.renderEntities(global.ecs, global.cam);
+    //---
 
     ImguiWindow(window);
 
@@ -198,10 +217,12 @@ void ImGuiManager::Render(GLFWwindow* window) {
         if (load_scene) LoadSceneWindow();
         if (add_mesh_window) AddMeshWindow();
     }
-        global.post_process.endRender();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    global.post_process.endRender();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     GameWindow();
+
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -1043,10 +1064,10 @@ void ImGuiManager::TopBarWindow() {
                 (global.input.isKeyPressed(Input::CTRL) && global.input.isKeyPressed(Input::S))*/) {
 
                 if (global.save_manager.getCurrentScene().empty()) {
-                    global.save_manager.saveToFile("../stages/saves/scene_0.json", global.ecs, global.cam, global.skybox);
+                    global.save_manager.saveToFile("../stages/saves/scene_0.json");
                 }
                 else {
-                    global.save_manager.saveToFile(global.save_manager.getCurrentScene(), global.ecs, global.cam, global.skybox);
+                    global.save_manager.saveToFile(global.save_manager.getCurrentScene());
                 }
 
                 AddConsoleMessage("Saving current scene");
@@ -1638,9 +1659,7 @@ void ImGuiManager::LoadSceneWindow()
 
     if (ImGui::Button("Load Scene")) {
         global.save_manager.setCurrentScene(scene_file_path);
-        global.save_manager.loadFromFile(global.save_manager.getCurrentScene(), 
-            global.ecs, global.render_system, 
-            global.cam, global.skybox);
+        global.save_manager.loadFromFile(global.save_manager.getCurrentScene());
 
         AddConsoleMessage(scene_file_path + " loaded");
 

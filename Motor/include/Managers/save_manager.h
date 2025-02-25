@@ -22,12 +22,9 @@ public:
 
 	SaveManager();
 	~SaveManager();
-
-	nlohmann::json serialize(ECSManager& ecs, Camera& cam, Skybox& skybox);
-	void deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera& cam, Skybox& skybox);
-
-	void saveToFile(std::string filename, ECSManager& ecs, Camera& cam, Skybox& skybox);
-	void loadFromFile(std::string filename, ECSManager& ecs, RenderSystem& rs, Camera& cam, Skybox& skybox);
+	
+	void saveToFile(std::string filename);
+	void loadFromFile(std::string filename);
 	void newFile();
 
 	std::string getCurrentScene() { return current_scene_file; }
@@ -37,6 +34,9 @@ public:
 	glm::quat parseQuat(const nlohmann::json& j);
 
 private:
+
+	nlohmann::json serialize(ECSManager& ecs, Camera& cam, Skybox& skybox);
+	void deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera& cam, Skybox& skybox);
 
 	std::string current_scene_file;
 	int number_of_scenes;
