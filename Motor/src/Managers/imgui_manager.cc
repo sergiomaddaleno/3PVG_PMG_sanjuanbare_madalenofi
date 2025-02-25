@@ -1568,8 +1568,8 @@ void ImGuiManager::SkyboxWindow()
         if (ImGui::Button("Compile DDS")) {
             global.skybox.loadDDS(
                 (skybox_file_path).c_str(),
-                "../assets/shaders/skybox_dds.vs",
-                "../assets/shaders/skybox_dds.fs"
+                "../stages/assets/shaders/skybox_dds.vs",
+                "../stages/assets/shaders/skybox_dds.fs"
             );
             global.skybox.initDDS();
 

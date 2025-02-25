@@ -47,7 +47,7 @@ void Terrain::init(const int num_cols, const int num_rows,
         int index = 0;
 
         if (!use_perlin_noise) {
-            height_map_.loadTexture("../assets/textures/heightmaps/heightmap.png");
+            height_map_.loadTexture("../stages/assets/textures/heightmaps/heightmap.png");
         }
 
         glm::vec3 center = { 0.0f, 0.0f, 0.0f };
