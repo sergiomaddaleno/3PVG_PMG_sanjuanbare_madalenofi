@@ -51,19 +51,6 @@ ImGuiManager::ImGuiManager()
     : selected_entity(0),
     m_BaseDirectory("../"),
     m_CurrentDirectory(m_BaseDirectory),
-    m_DirectoryIcon(),
-    m_FileIcon(),
-    m_EntityIcon(),
-    m_BackIcon(),
-    m_ToolsIcon(),
-    m_CameraIcon(),
-    m_EditIcon(),
-    m_TransformIcon(),
-    m_SettingsIcon(),
-    m_TagIcon(),
-    m_LightIcon(),
-    m_RenderIcon(),
-    m_PlayIcon(),
     padding(16.0f),
     thumbnailSize(128.0f),
     post_process_window(false),
@@ -183,6 +170,7 @@ void ImGuiManager::Init(GLFWwindow* window) {
     m_PuzzleIcon.loadTexture("../stages/assets/textures/imgui/puzzle.png");
     m_DeleteIcon.loadTexture("../stages/assets/textures/imgui/delete.png");
     m_PlayIcon.loadTexture("../stages/assets/textures/imgui/play.png");
+    m_StopIcon.loadTexture("../stages/assets/textures/imgui/stop.png");
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -195,21 +183,23 @@ void ImGuiManager::Render(GLFWwindow* window) {
     ImGui::NewFrame();
 
     ImguiWindow(window);
-    HierarchyWindow();
-    InspectorWindow();
-    ContentBrowserWindow();
-    TopBarWindow();
 
-    if (console_window) ConsoleWindow();
-    if (post_process_window) PostProcessWindow();
-    if (skybox_window) SkyboxWindow();
-    if (fog_window) FogWindow();
-    if (shadow_map_window) ShadowMapWindow();
-    if (load_scene) LoadSceneWindow();
-    if (add_mesh_window) AddMeshWindow();
+    if (!global.is_playing) {
+        HierarchyWindow();
+        InspectorWindow();
+        ContentBrowserWindow();
+        TopBarWindow();
 
-    global.post_process.endRender();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (console_window) ConsoleWindow();
+        if (post_process_window) PostProcessWindow();
+        if (skybox_window) SkyboxWindow();
+        if (fog_window) FogWindow();
+        if (shadow_map_window) ShadowMapWindow();
+        if (load_scene) LoadSceneWindow();
+        if (add_mesh_window) AddMeshWindow();
+    }
+        global.post_process.endRender();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     GameWindow();
 
@@ -228,17 +218,36 @@ void ImGuiManager::Render(GLFWwindow* window) {
 void ImGuiManager::ImguiWindow(GLFWwindow* window) {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
+    if (global.is_playing) {
+        ImGui::SetNextWindowPos(viewport->WorkPos);
+        ImGui::SetNextWindowSize(viewport->WorkSize);
+        ImGui::SetNextWindowViewport(viewport->ID);
+
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoBringToFrontOnFocus |
+            ImGuiWindowFlags_NoNavFocus;
+
+        ImGui::Begin("Main", nullptr, window_flags);
+        ImGui::End();
+        return;
+    }
+
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
     ImGui::SetNextWindowViewport(viewport->ID);
 
-    ImGuiWindowFlags dockspace_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+    ImGuiWindowFlags dockspace_flags = ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoBringToFrontOnFocus |
+        ImGuiWindowFlags_NoNavFocus |
+        ImGuiWindowFlags_NoTitleBar;
 
-    ImGui::Begin("MainDockspace_", nullptr, dockspace_flags);
+    ImGui::Begin("Main", nullptr, dockspace_flags);
 
-    ImGuiID dockspace_id = ImGui::GetID("MainDockspace_");
+    ImGuiID dockspace_id = ImGui::GetID("Main");
+
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f));
 
     static bool initialized = false;
@@ -257,13 +266,11 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
         ImGuiID dock_bottom_left;
         ImGuiID dock_bottom_right = ImGui::DockBuilderSplitNode(dock_bottom, ImGuiDir_Right, 0.5f, &dock_bottom_left, &dock_bottom);
 
-
         ImGui::DockBuilderDockWindow("Menu", dock_top);
         ImGui::DockBuilderDockWindow("Hierarchy", dock_left);
         ImGui::DockBuilderDockWindow("Inspector", dock_right);
         ImGui::DockBuilderDockWindow("ContentBrowser", dock_bottom);
-        ImGui::DockBuilderDockWindow("GameWindow", dock_main); 
-
+        ImGui::DockBuilderDockWindow("GameWindow", dock_main);
         ImGui::DockBuilderDockWindow("PostProcess", dock_bottom_right);
         ImGui::DockBuilderDockWindow("Fog", dock_bottom_right);
         ImGui::DockBuilderDockWindow("ShadowMap", dock_bottom_right);
@@ -279,29 +286,41 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
 }
 
 void ImGuiManager::GameWindow() {
-    if (ImGui::Begin("GameWindow", nullptr)) {
-        ImVec2 window_size = ImGui::GetContentRegionAvail();
-        ImVec2 button_size = { 20.0f, 20.0f };
+    ImVec2 button_size = { 20.0f, 20.0f };
+    ImVec2 button_pos;
 
-        ImVec2 button_pos = {(window_size.x - button_size.x) * 0.5f, 0.0f };
-
-        ImGui::SetCursorPos(button_pos);
-
-        if (ImGui::ImageButton("Play", (ImTextureID)m_PlayIcon.getID(), { 20.0f, 20.0f }, { 0, 1 }, { 1, 0 })) {
-            global.is_playing = !global.is_playing;
-        }
-
-        GLuint captureTexture = global.post_process.frame_buffer_.GetColorTexture();
-        if (captureTexture) {
-            ImVec2 uv0(0.0f, 1.0f);
-            ImVec2 uv1(1.0f, 0.0f);
-
-            ImGui::Image((ImTextureID)(intptr_t)captureTexture, window_size, uv0, uv1);
-        }
+    if (global.is_playing) {
+        ImGui::Begin("Main", nullptr);
     }
+    else {
+        ImGui::Begin("GameWindow", nullptr);
+    }
+
+    ImVec2 window_size = ImGui::GetContentRegionAvail();
+
+    if (global.is_playing) {
+        button_pos = { (window_size.x - button_size.x) * 0.5f, 0.0f };
+    }
+    else {
+        button_pos = { (window_size.x - button_size.x) * 0.5f, 25.0f };
+    }
+
+    ImGui::SetCursorPos(button_pos);
+
+    ImTextureID icon = global.is_playing ? m_StopIcon.getID() : m_PlayIcon.getID();
+    if (ImGui::ImageButton("Play", icon, button_size, { 0, 1 }, { 1, 0 })) {
+        global.is_playing = !global.is_playing;
+    }
+
+    GLuint captureTexture = global.post_process.frame_buffer_.GetColorTexture();
+    if (captureTexture) {
+        ImVec2 uv0(0.0f, 1.0f);
+        ImVec2 uv1(1.0f, 0.0f);
+        ImGui::Image((ImTextureID)(intptr_t)captureTexture, window_size, uv0, uv1);
+    }
+
     ImGui::End();
 }
-
 
 void ImGuiManager::HierarchyWindow() {
     ImGui::Begin("Hierarchy", nullptr);
@@ -1005,8 +1024,7 @@ void ImGuiManager::ContentBrowserWindow() {
 
 void ImGuiManager::TopBarWindow() {
 
-    ImGui::Begin("Menu", nullptr,
-        ImGuiWindowFlags_MenuBar);
+    ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_MenuBar);
 
     auto& loc_ecs = global.ecs;
     static int curr_type_draw = 0; 
