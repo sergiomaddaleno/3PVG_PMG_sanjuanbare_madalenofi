@@ -26,6 +26,8 @@ class Terrain {
   void draw();
   void setTexture(std::string file_path);
 
+  void setHeightMap(std::string file_path);
+
   const float* GetVertexTerrain();
 
   //Save data
@@ -56,6 +58,7 @@ private:
   std::vector<float> data_;
 
   Texture height_map_;
+  std::string heightmap_path_;
 
 };
 

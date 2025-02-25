@@ -17,7 +17,10 @@ Terrain::Terrain()
     num_rows_(0), num_cols_(0), num_vertex_(0),
     height_mult_(0.0f), size_(0.0f),
     is_centered_(true), use_perlin_noise_(true),
-    use_texture_(true), texture_path_("../stages/assets/textures/images/grass.jpg") {
+    use_texture_(true), 
+    texture_path_("../stages/assets/textures/images/grass.jpg"),
+    heightmap_path_("../stages/assets/textures/heightmaps/heightmap.png")
+{
 }
 
 Terrain::~Terrain() {}
@@ -47,7 +50,7 @@ void Terrain::init(const int num_cols, const int num_rows,
         int index = 0;
 
         if (!use_perlin_noise) {
-            height_map_.loadTexture("../stages/assets/textures/heightmaps/heightmap.png");
+            setHeightMap(heightmap_path_);
         }
 
         glm::vec3 center = { 0.0f, 0.0f, 0.0f };
@@ -230,6 +233,13 @@ void Terrain::setTexture(std::string file_path)
         texture_.push_back(tempTexture);
     }
     texture_count_ = (int)texture_.size();*/
+}
+
+void Terrain::setHeightMap(std::string file_path) {
+
+    heightmap_path_ = file_path;
+
+    height_map_.loadTexture(file_path);
 }
 
 void Terrain::draw(){
