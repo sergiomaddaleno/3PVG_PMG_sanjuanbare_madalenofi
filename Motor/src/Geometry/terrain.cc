@@ -17,7 +17,7 @@ Terrain::Terrain()
     num_rows_(0), num_cols_(0), num_vertex_(0),
     height_mult_(0.0f), size_(0.0f),
     is_centered_(true), use_perlin_noise_(true),
-    use_texture_(true), texture_path_("../assets/textures/images/grass.jpg") {
+    use_texture_(true), texture_path_("../stages/assets/textures/images/grass.jpg") {
 }
 
 Terrain::~Terrain() {}

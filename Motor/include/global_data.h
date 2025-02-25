@@ -31,6 +31,7 @@ public:
     glm::vec3 sky_colour = glm::vec3(0.5f, 0.5f, 0.5f);
 
     bool use_skybox = true;
+    bool is_playing = false;
 
     // -------------------------------------------------------------
     

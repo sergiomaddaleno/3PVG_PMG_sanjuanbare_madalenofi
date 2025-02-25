@@ -13,7 +13,7 @@ Quad::Quad()
     : VAO(0), VBO(0), EBO(0),
     order_(), data_(),
     size_(0.0f), use_texture_(true),
-    texture_path_("../assets/textures/images/blue.png") {
+    texture_path_("../stages/assets/textures/images/blue.png") {
 }
 
 Quad::~Quad()

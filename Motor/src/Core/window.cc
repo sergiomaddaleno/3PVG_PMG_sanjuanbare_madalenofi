@@ -91,11 +91,9 @@ bool Window::toggleFullScreen(Input& input, Input::Keys key, bool imgui_enter)
 	return false;
 }
 
-bool Window::closePressed()
+bool Window::closePressed(Input& input, Input::Keys key)
 {
-	int state = glfwGetKey(window_, GLFW_KEY_ESCAPE);
-
-	if (state == GLFW_PRESS || glfwWindowShouldClose(window_))
+	if (input.isKeyPressed(key) || glfwWindowShouldClose(window_))
 	{
 		return true;
 	}

@@ -58,7 +58,7 @@ void ShadowMap::init()
 
 void ShadowMap::initCubeMap()
 {
-    char* vs_geometry = (char*)ReadFile("../assets/shaders/geometry.gs");
+    char* vs_geometry = (char*)ReadFile("../stages/assets/shaders/geometry.gs");
     geometry_.compileGeometry(vs_geometry);
 
     glGenTextures(1, &depthCubemap);

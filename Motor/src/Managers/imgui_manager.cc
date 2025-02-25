@@ -63,6 +63,7 @@ ImGuiManager::ImGuiManager()
     m_TagIcon(),
     m_LightIcon(),
     m_RenderIcon(),
+    m_PlayIcon(),
     padding(16.0f),
     thumbnailSize(128.0f),
     post_process_window(false),
@@ -156,7 +157,7 @@ void ImGuiManager::Init(GLFWwindow* window) {
 
     SetImguiTheme();
 
-    io.Fonts->AddFontFromFileTTF("../assets/fonts/Roboto_Mono/RobotoMono-VariableFont_wght.ttf", 15.0f);
+    io.Fonts->AddFontFromFileTTF("../stages/assets/fonts/Roboto_Mono/RobotoMono-VariableFont_wght.ttf", 15.0f);
 
     // Initialize content browser
     fileDialog.SetTitle("File Browser");
@@ -167,20 +168,21 @@ void ImGuiManager::Init(GLFWwindow* window) {
         ".vs", ".fs",
         });
 
-    m_DirectoryIcon.loadTexture("../assets/textures/imgui/DirectoryIcon.png");
-    m_FileIcon.loadTexture("../assets/textures/imgui/FileIcon.png");
-    m_EntityIcon.loadTexture("../assets/textures/imgui/cube.png");
-    m_BackIcon.loadTexture("../assets/textures/imgui/back.png");
-    m_ToolsIcon.loadTexture("../assets/textures/imgui/tool.png");
-    m_CameraIcon.loadTexture("../assets/textures/imgui/camera.png");
-    m_TransformIcon.loadTexture("../assets/textures/imgui/transform.png");
-    m_SettingsIcon.loadTexture("../assets/textures/imgui/setting.png");
-    m_TagIcon.loadTexture("../assets/textures/imgui/tag.png");
-    m_LightIcon.loadTexture("../assets/textures/imgui/light.png");
-    m_RenderIcon.loadTexture("../assets/textures/imgui/render.png");
-    m_EditIcon.loadTexture("../assets/textures/imgui/edit.png");
-    m_PuzzleIcon.loadTexture("../assets/textures/imgui/puzzle.png");
-    m_DeleteIcon.loadTexture("../assets/textures/imgui/delete.png");
+    m_DirectoryIcon.loadTexture("../stages/assets/textures/imgui/DirectoryIcon.png");
+    m_FileIcon.loadTexture("../stages/assets/textures/imgui/FileIcon.png");
+    m_EntityIcon.loadTexture("../stages/assets/textures/imgui/cube.png");
+    m_BackIcon.loadTexture("../stages/assets/textures/imgui/back.png");
+    m_ToolsIcon.loadTexture("../stages/assets/textures/imgui/tool.png");
+    m_CameraIcon.loadTexture("../stages/assets/textures/imgui/camera.png");
+    m_TransformIcon.loadTexture("../stages/assets/textures/imgui/transform.png");
+    m_SettingsIcon.loadTexture("../stages/assets/textures/imgui/setting.png");
+    m_TagIcon.loadTexture("../stages/assets/textures/imgui/tag.png");
+    m_LightIcon.loadTexture("../stages/assets/textures/imgui/light.png");
+    m_RenderIcon.loadTexture("../stages/assets/textures/imgui/render.png");
+    m_EditIcon.loadTexture("../stages/assets/textures/imgui/edit.png");
+    m_PuzzleIcon.loadTexture("../stages/assets/textures/imgui/puzzle.png");
+    m_DeleteIcon.loadTexture("../stages/assets/textures/imgui/delete.png");
+    m_PlayIcon.loadTexture("../stages/assets/textures/imgui/play.png");
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -277,20 +279,29 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
 }
 
 void ImGuiManager::GameWindow() {
-    ImGui::Begin("GameWindow", nullptr);
-    ImVec2 content_avail = ImGui::GetContentRegionAvail();
+    if (ImGui::Begin("GameWindow", nullptr)) {
+        ImVec2 window_size = ImGui::GetContentRegionAvail();
+        ImVec2 button_size = { 20.0f, 20.0f };
 
-    GLuint captureTexture = global.post_process.frame_buffer_.GetColorTexture();
+        ImVec2 button_pos = {(window_size.x - button_size.x) * 0.5f, 0.0f };
 
-    if (captureTexture) {
-        ImVec2 uv0(0.0f, 1.0f);
-        ImVec2 uv1(1.0f, 0.0f);
+        ImGui::SetCursorPos(button_pos);
 
-        ImGui::Image((ImTextureID)(intptr_t)captureTexture, content_avail, uv0, uv1);
+        if (ImGui::ImageButton("Play", (ImTextureID)m_PlayIcon.getID(), { 20.0f, 20.0f }, { 0, 1 }, { 1, 0 })) {
+            global.is_playing = !global.is_playing;
+        }
+
+        GLuint captureTexture = global.post_process.frame_buffer_.GetColorTexture();
+        if (captureTexture) {
+            ImVec2 uv0(0.0f, 1.0f);
+            ImVec2 uv1(1.0f, 0.0f);
+
+            ImGui::Image((ImTextureID)(intptr_t)captureTexture, window_size, uv0, uv1);
+        }
     }
-
     ImGui::End();
 }
+
 
 void ImGuiManager::HierarchyWindow() {
     ImGui::Begin("Hierarchy", nullptr);
@@ -1014,7 +1025,7 @@ void ImGuiManager::TopBarWindow() {
                 (global.input.isKeyPressed(Input::CTRL) && global.input.isKeyPressed(Input::S))*/) {
 
                 if (global.save_manager.getCurrentScene().empty()) {
-                    global.save_manager.saveToFile("../saves/scene_0.json", global.ecs, global.cam, global.skybox);
+                    global.save_manager.saveToFile("../stages/saves/scene_0.json", global.ecs, global.cam, global.skybox);
                 }
                 else {
                     global.save_manager.saveToFile(global.save_manager.getCurrentScene(), global.ecs, global.cam, global.skybox);
@@ -1162,13 +1173,18 @@ void ImGuiManager::TopBarWindow() {
         ImGui::Spacing();
         if (ImGui::BeginMenu("Camera")) {
             
+            static glm::vec3 position = global.cam.getPosition();
+            if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f)) {
+                global.cam.setPosition(position);
+            }
+
             static float sensitivity = global.cam.getSensitivity();
             if (ImGui::SliderFloat("Sensitivity", &sensitivity, 0.1f, 1.0f)) {
                 global.cam.setSensitibity(sensitivity);
             }
 
             static float speed = global.cam.getSpeed();
-            if (ImGui::SliderFloat("Speed", &speed, 0.01f, 30.0f)) {
+            if (ImGui::SliderFloat("Speed", &speed, 0.001f, 1.0f)) {
                 global.cam.setSpeed(speed);
             }
 
@@ -1475,8 +1491,8 @@ void ImGuiManager::SkyboxWindow()
                 }
                 global.skybox.loadCubeMap(
                     full_paths,
-                    "../assets/shaders/skybox_cubemap.vs",
-                    "../assets/shaders/skybox_cubemap.fs"
+                    "../stages/assets/shaders/skybox_cubemap.vs",
+                    "../stages/assets/shaders/skybox_cubemap.fs"
                 );
                 global.skybox.initcubeMap();
                 AddConsoleMessage("Cubemap compiled");

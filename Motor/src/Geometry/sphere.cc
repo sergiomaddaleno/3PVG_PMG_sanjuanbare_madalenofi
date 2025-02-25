@@ -17,7 +17,7 @@ Sphere::Sphere()
     : VAO(0), VBO(0), EBO(0),
     num_heights_(0), num_revs_(0), size_(0.0f), 
     num_vertex_(0), use_texture_(true),
-    texture_path_("../assets/textures/images/blue.png"){
+    texture_path_("../stages/assets/textures/images/blue.png"){
 }
 
 Sphere::~Sphere()

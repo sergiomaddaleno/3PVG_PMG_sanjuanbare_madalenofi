@@ -368,7 +368,7 @@ void SaveManager::loadFromFile(std::string filename, ECSManager& ecs, RenderSyst
 
 void SaveManager::newFile()
 {
-    std::string filename = "../saves/scene_" + std::to_string(number_of_scenes) + ".json";
+    std::string filename = "../stages/saves/scene_" + std::to_string(number_of_scenes) + ".json";
     std::ofstream file(filename);
 
     if (file.is_open()) {
@@ -390,19 +390,19 @@ void SaveManager::newFile()
             }},
            {"Skybox", {
                 {"Use_cubemap", false},
-                {"DDS_file_path", "../assets/textures/skybox/sky.dds"},
-                {"DDS_vertex_file", "../assets/shaders/skybox_dds.vs"},
-                {"DDS_fragment_file", "../assets/shaders/skybox_dds.fs"},
+                {"DDS_file_path", "../stages/assets/textures/skybox/sky.dds"},
+                {"DDS_vertex_file", "../stages/assets/shaders/skybox_dds.vs"},
+                {"DDS_fragment_file", "../stages/assets/shaders/skybox_dds.fs"},
                 {"DDS_angle", -90.0f},
-                {"Cubemap_vertex_file", "../assets/shaders/skybox_cubemap.vs"},
-                {"Cubemap_fragment_file", "../assets/shaders/skybox_cubemap.fs"},
+                {"Cubemap_vertex_file", "../stages/assets/shaders/skybox_cubemap.vs"},
+                {"Cubemap_fragment_file", "../stages/assets/shaders/skybox_cubemap.fs"},
                 {"Cubemap_file_paths", {
-                    "../assets/textures/skybox/cubemap/nebulae/right.png",
-                    "../assets/textures/skybox/cubemap/nebulae/left.png",
-                    "../assets/textures/skybox/cubemap/nebulae/top.png",
-                    "../assets/textures/skybox/cubemap/nebulae/bottom.png",
-                    "../assets/textures/skybox/cubemap/nebulae/front.png",
-                    "../assets/textures/skybox/cubemap/nebulae/back.png"
+                    "../stages/assets/textures/skybox/cubemap/nebulae/right.png",
+                    "../stages/assets/textures/skybox/cubemap/nebulae/left.png",
+                    "../stages/assets/textures/skybox/cubemap/nebulae/top.png",
+                    "../stages/assets/textures/skybox/cubemap/nebulae/bottom.png",
+                    "../stages/assets/textures/skybox/cubemap/nebulae/front.png",
+                    "../stages/assets/textures/skybox/cubemap/nebulae/back.png"
                 }}
             }}
         };

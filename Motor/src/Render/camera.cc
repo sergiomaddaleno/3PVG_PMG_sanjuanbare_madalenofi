@@ -22,7 +22,7 @@ Camera::Camera()
     last_mouse(0.0f, 0.0f),
     delta_mouse(0.0f, 0.0f),
     accum_mouse_offset_(0.0f, 0.0f),
-    speed_(10.0f),
+    speed_(5.0f),
     sensitivity_(1.0f),
     fov_(global.use_fog),
     aspect_ratio_((float)global.window_width / (float)global.window_height),
@@ -34,6 +34,10 @@ Camera::Camera()
     use_perspective_matrix_(true),
     view_(initViewTarget())
 {}
+
+Camera::~Camera()
+{
+}
 
 glm::mat4 Camera::initViewTarget()
 {

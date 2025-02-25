@@ -1,6 +1,5 @@
 
-#include "Render/shadow_map.h"
-
+#include "Render/deferred.h"
 #include "Systems/ecs_manager.h"
 #include "Core/shader.h"
 
@@ -21,9 +20,6 @@
 
 #include <memory> 
 #include <iostream>
-#include "Render/deferred.h"
-
-
 
 Deferred::Deferred() : gBuffer(0), gPosition(0),
 gNormal(0), gColorSpec(0), deferred_width_(800), deferred_height_(600)
