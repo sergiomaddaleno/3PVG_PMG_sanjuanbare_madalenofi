@@ -248,6 +248,9 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 terrain_size = terrain["size"];
                 terrain_is_centered = terrain["is_centered"];
                 terrain_use_perlin_noise = terrain["use_perlin_noise"];
+                terrain_tex_path = terrain["Texture_path"];
+                heightmap_path = terrain["Heightmap_path"];
+                int entity_id = entity["Entity_id"];
 
                 rs.createTerrain(ecs, tc,
                     terrain_num_cols,
@@ -256,10 +259,13 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                     terrain_size,
                     terrain_is_centered,
                     terrain_use_perlin_noise);
-
-                terrain_tex_path = terrain["Texture_path"];
-                auto& render_comp = global.ecs.get_component<RenderComponent>(entity["Entity_id"].get<int>());
-                render_comp->terrain_->setTexture(terrain_tex_path);
+                
+                auto& render_comp = global.ecs.get_component<RenderComponent>(entity_id);
+                if (render_comp && render_comp->terrain_) {
+                    render_comp->terrain_->setHeightMap(heightmap_path);
+                    render_comp->terrain_->setTexture(terrain_tex_path);
+                }
+                
                 break;
             }
             }
@@ -390,11 +396,11 @@ void SaveManager::newFile()
            {"Skybox", {
                 {"Use_cubemap", false},
                 {"DDS_file_path", "../stages/assets/textures/skybox/sky.dds"},
-                {"DDS_vertex_file", "../stages/assets/shaders/skybox_dds.vs"},
-                {"DDS_fragment_file", "../stages/assets/shaders/skybox_dds.fs"},
+                {"DDS_vertex_file", "../stages/shaders/skybox/skybox_dds.vs"},
+                {"DDS_fragment_file", "../stages/shaders/skybox/skybox_dds.fs"},
                 {"DDS_angle", -90.0f},
-                {"Cubemap_vertex_file", "../stages/assets/shaders/skybox_cubemap.vs"},
-                {"Cubemap_fragment_file", "../stages/assets/shaders/skybox_cubemap.fs"},
+                {"Cubemap_vertex_file", "../stages/shaders/skybox/skybox_cubemap.vs"},
+                {"Cubemap_fragment_file", "../stages/shaders/skybox/skybox_cubemap.fs"},
                 {"Cubemap_file_paths", {
                     "../stages/assets/textures/skybox/cubemap/nebulae/right.png",
                     "../stages/assets/textures/skybox/cubemap/nebulae/left.png",

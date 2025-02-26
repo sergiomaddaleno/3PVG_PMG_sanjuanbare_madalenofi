@@ -7,18 +7,18 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -11.448775291442871,
-   23.40288734436035,
-   33.03385543823242
+   -11.26683521270752,
+   23.73326301574707,
+   33.63227844238281
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.054999999701976776,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.28612691164016724,
-   -0.5014895796775818,
-   -0.8164799809455872
+   0.24509574472904205,
+   -0.5052616000175476,
+   -0.8274289965629578
   ]
  },
  "Entities": [
@@ -63,13 +63,14 @@
    "Render_component": {
     "Render_type": 1,
     "Terrain": {
+     "Heightmap_path": "../stages\\assets\\textures\\heightmaps\\volcano.png",
      "Texture_path": "../stages/assets\\textures\\imgui\\back.png",
-     "height_mult": 0.0,
+     "height_mult": 0.5,
      "is_centered": true,
      "num_cols": 50,
      "num_rows": 50,
      "size": 1.0,
-     "use_perlin_noise": true
+     "use_perlin_noise": false
     }
    },
    "Transform_component": {
@@ -208,12 +209,12 @@
    "../stages/assets\\textures\\skybox\\cubemap\\nebulae\\front.png",
    "../stages/assets\\textures\\skybox\\cubemap\\nebulae\\back.png"
   ],
-  "Cubemap_fragment_file": "../stages/assets/shaders/skybox_cubemap.fs",
-  "Cubemap_vertex_file": "../stages/assets/shaders/skybox_cubemap.vs",
+  "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
+  "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
   "DDS_angle": -90.0,
-  "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
-  "DDS_fragment_file": "../stages/assets/shaders/skybox_dds.fs",
-  "DDS_vertex_file": "../stages/assets/shaders/skybox_dds.vs",
+  "DDS_file_path": "../stages/textures/skybox/sky.dds",
+  "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
+  "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
   "Use_cubemap": true
  }
 }

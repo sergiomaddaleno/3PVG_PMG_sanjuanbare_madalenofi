@@ -19,7 +19,7 @@ Terrain::Terrain()
     is_centered_(true), use_perlin_noise_(true),
     use_texture_(true), 
     texture_path_("../stages/assets/textures/images/grass.jpg"),
-    heightmap_path_("../stages/assets/textures/heightmaps/heightmap.png")
+    heightmap_path_()
 {
 }
 
@@ -270,6 +270,7 @@ nlohmann::json Terrain::serialize() const
     json_data["is_centered"] = is_centered_;
     json_data["use_perlin_noise"] = use_perlin_noise_;
     json_data["Texture_path"] = texture_path_;
+    json_data["Heightmap_path"] = heightmap_path_;
 
     return json_data;
 }

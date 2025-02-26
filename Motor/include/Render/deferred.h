@@ -21,11 +21,9 @@ public:
 	Deferred();
 	~Deferred();
 
-	void initDefered();
+	void init();
 
 	void render(ECSManager& ecs, Shader shader, LightComponent lc);
-
-
 
 private:
 	unsigned int gBuffer;

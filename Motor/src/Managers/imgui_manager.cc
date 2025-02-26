@@ -175,7 +175,7 @@ void ImGuiManager::Init(GLFWwindow* window) {
     //---
     global.post_process.initData();
 
-    global.render_system.initShader("../stages/assets/shaders/entities.vs", "../stages/assets/shaders/entities.fs");
+    global.render_system.initShader("../stages/shaders/entities.vs", "../stages/shaders/entities.fs");
     global.render_system.setupEntities(global.ecs);
 
     global.save_manager.loadFromFile("../stages/saves/main_scene.json");
@@ -479,6 +479,8 @@ void ImGuiManager::InspectorWindow() {
 
     if (global.ecs.has_component<RenderComponent>(selected_entity)) {
 
+        auto& render_comp = global.ecs.get_component<RenderComponent>(selected_entity);
+
         bool open = ImGui::CollapsingHeader("##RenderComponent", ImGuiTreeNodeFlags_DefaultOpen);
         ImGui::SameLine();
         ImGui::Image(m_RenderIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
@@ -562,30 +564,27 @@ void ImGuiManager::InspectorWindow() {
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
             if (ImGui::Button("Compile Texture")) {
-                if (global.ecs.has_component<RenderComponent>(selected_entity)) {
-                    auto& render_comp = global.ecs.get_component<RenderComponent>(selected_entity);
+                
+                switch (render_comp->type_) {
+                case RenderType::RT_Mesh:
+                    break;
 
-                    switch (render_comp->type_) {
-                    case RenderType::RT_Mesh:
-                        break;
+                case RenderType::RT_Terrain:
+                    render_comp->terrain_->setTexture(texture_file_path);
+                    break;
 
-                    case RenderType::RT_Terrain:
-                        render_comp->terrain_->setTexture(texture_file_path);
-                        break;
+                case RenderType::RT_Sphere:
+                    render_comp->sphere_->setTexture(texture_file_path);
+                    break;
 
-                    case RenderType::RT_Sphere:
-                        render_comp->sphere_->setTexture(texture_file_path);
-                        break;
+                case RenderType::RT_Quad:
+                    render_comp->quad_->setTexture(texture_file_path);
+                    break;
 
-                    case RenderType::RT_Quad:
-                        render_comp->quad_->setTexture(texture_file_path);
-                        break;
-
-                    case RenderType::RT_Cube8v:
-                    case RenderType::RT_Cube24v:
-                        render_comp->cube_->setTexture(texture_file_path);
-                        break;
-                    }
+                case RenderType::RT_Cube8v:
+                case RenderType::RT_Cube24v:
+                    render_comp->cube_->setTexture(texture_file_path);
+                    break;
                 }
 
                 texture_file_path.clear();
@@ -593,10 +592,10 @@ void ImGuiManager::InspectorWindow() {
             }
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-            // -----------------------------------------------------------------   
             
-            switch (global.ecs.get_component<RenderComponent>(selected_entity)->type_) {
+            // -----------------------------------------------------------------
+
+            switch (render_comp->type_) {
             case ::RT_Terrain:
             {
                 ImGui::Separator();
@@ -622,7 +621,29 @@ void ImGuiManager::InspectorWindow() {
 
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
+                static std::string hm_file_path;
+                static std::string hm_file_name;
+                if (ImGui::Button(!hm_file_path.empty() ? hm_file_name.c_str() : "Heightmap drop here", { 200.0f, 40.0f })) {}
+
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                        std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                        if ((filePath.extension() == ".png") || (filePath.extension() == ".jpg")) {
+                            hm_file_path = filePath.string();
+                            hm_file_name = filePath.filename().string();
+                        }
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
                 if (ImGui::Button("Apply Changes")) {
+
+                    if (!hm_file_path.empty()) {
+                        render_comp->terrain_->setHeightMap(hm_file_path);
+                    }
+
                     terrain.init(temp_num_cols, temp_num_rows, temp_hm,
                         temp_size, temp_is_centered, temp_use_pn);
 
@@ -729,7 +750,7 @@ void ImGuiManager::InspectorWindow() {
            
             // -----------------------------------------------------------------   
 
-            switch (global.ecs.get_component<RenderComponent>(selected_entity)->type_) {
+            switch (render_comp->type_) {
             case ::RT_Terrain:
                 {
                 ImGui::Separator();
@@ -1530,8 +1551,8 @@ void ImGuiManager::SkyboxWindow()
                 }
                 global.skybox.loadCubeMap(
                     full_paths,
-                    "../stages/assets/shaders/skybox_cubemap.vs",
-                    "../stages/assets/shaders/skybox_cubemap.fs"
+                    "../stages/shaders/skybox/skybox_cubemap.vs",
+                    "../stages/shaders/skybox/skybox_cubemap.fs"
                 );
                 global.skybox.initcubeMap();
                 AddConsoleMessage("Cubemap compiled");
@@ -1568,8 +1589,8 @@ void ImGuiManager::SkyboxWindow()
         if (ImGui::Button("Compile DDS")) {
             global.skybox.loadDDS(
                 (skybox_file_path).c_str(),
-                "../stages/assets/shaders/skybox_dds.vs",
-                "../stages/assets/shaders/skybox_dds.fs"
+                "../stages/shaders/skybox/skybox_dds.vs",
+                "../stages/shaders/skybox/skybox_dds.fs"
             );
             global.skybox.initDDS();
 

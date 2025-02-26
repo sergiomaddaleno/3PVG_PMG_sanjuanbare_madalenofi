@@ -31,7 +31,7 @@ Deferred::~Deferred()
 {
 }
 
-void Deferred::initDefered()
+void Deferred::init()
 {
 	glGenFramebuffers(1, &gBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
@@ -59,15 +59,18 @@ void Deferred::initDefered()
 
 	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 	glDrawBuffers(3, attachments);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Deferred::render(ECSManager& ecs, Shader shader, LightComponent lc)
 {
-	
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 	glClearColor(0.0, 0.0, 0.0, 1.0); 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	shader.useProgram();
+
 	auto ri = ecs.getComponentList<RenderComponent>().begin();
 	auto ti = ecs.getComponentList<TransformComponent>().begin();
 	auto riend = ecs.getComponentList<RenderComponent>().end();
@@ -116,7 +119,4 @@ void Deferred::render(ECSManager& ecs, Shader shader, LightComponent lc)
 	glBindTexture(GL_TEXTURE_2D, gNormal);
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, gColorSpec);
-
-	
-
 }

@@ -20,7 +20,8 @@ class Terrain {
  
   void init(const int num_cols = 2, const int num_rows = 2, 
             const float height_mult = 1.0f, const float size = 1.0f,
-            const bool is_centered = true, const bool use_perlin_noise = true);  //false for heightmap
+            const bool is_centered = true, 
+            const bool use_perlin_noise = true);  //false for heightmap
 
   void bind();
   void draw();
@@ -44,6 +45,7 @@ class Terrain {
   Texture texture_;
   bool use_texture_;
   std::string texture_path_;
+  std::string heightmap_path_;
 
   GerstnerWave wave_;
 
@@ -58,7 +60,6 @@ private:
   std::vector<float> data_;
 
   Texture height_map_;
-  std::string heightmap_path_;
 
 };
 

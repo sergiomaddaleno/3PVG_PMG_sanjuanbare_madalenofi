@@ -52,6 +52,7 @@ private:
 	bool terrain_is_centered;
 	bool terrain_use_perlin_noise;
 	std::string terrain_tex_path;
+	std::string heightmap_path;
 
 	int sphere_num_heights;
 	int sphere_num_revs;

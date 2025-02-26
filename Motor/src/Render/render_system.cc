@@ -4,6 +4,7 @@
 #include "Core/mesh.h"
 #include "Render/camera.h"
 #include "Render/shadow_map.h"
+#include "Render/deferred.h"
 #include "Core/shader.h"
 #include "utils.h"
 #include "global_data.h"
@@ -40,6 +41,8 @@ RenderSystem::RenderSystem()
 {}
 
 RenderSystem::~RenderSystem() {}
+
+Deferred deferred;
 
 void RenderSystem::initEntities(ECSManager& ecs) {
 
@@ -96,6 +99,8 @@ void RenderSystem::initEntities(ECSManager& ecs) {
             }
         }
     }
+
+    deferred.init();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glUseProgram(0);
