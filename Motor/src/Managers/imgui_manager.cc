@@ -175,7 +175,12 @@ void ImGuiManager::Init(GLFWwindow* window) {
     //---
     global.post_process.initData();
 
-    global.render_system.initShader("../stages/shaders/entities.vs", "../stages/shaders/entities.fs");
+    global.render_system.initShader("../stages/shaders/entities.vs", "../stages/shaders/entities.fs",global.render_system.shader);
+
+    global.render_system.initShader("../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs",global.render_system.Gbuffer);
+
+   // global.render_system.initShader("../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs", global.render_system.shaderDeferred);
+
     global.render_system.setupEntities(global.ecs);
 
     global.save_manager.loadFromFile("../stages/saves/main_scene.json");
@@ -528,7 +533,7 @@ void ImGuiManager::InspectorWindow() {
 
             if (ImGui::Button("Compile Shader")) {
                 
-                global.render_system.initShader(vertex_file_path, fragment_file_path);
+                global.render_system.initShader(vertex_file_path, fragment_file_path,global.render_system.shader);
 
                 vertex_file_path.clear();
                 vertex_file_name.clear();

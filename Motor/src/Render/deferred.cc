@@ -22,7 +22,7 @@
 #include <iostream>
 
 Deferred::Deferred() : gBuffer(0), gPosition(0),
-gNormal(0), gColorSpec(0), deferred_width_(800), deferred_height_(600)
+gNormal(0), gAlbedoSpec(0), deferred_width_(800), deferred_height_(600)
 {
 
 }
@@ -50,12 +50,12 @@ void Deferred::init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
 
-	glGenTextures(1, &gColorSpec);
-	glBindTexture(GL_TEXTURE_2D, gColorSpec);
+	glGenTextures(1, &gAlbedoSpec);
+	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, deferred_width_, deferred_height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gColorSpec, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
 
 	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 	glDrawBuffers(3, attachments);
@@ -63,13 +63,14 @@ void Deferred::init()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Deferred::render(ECSManager& ecs, Shader shader, LightComponent lc)
+void Deferred::render(ECSManager& ecs, Shader shadergeometry,Shader shaderdeferred, LightComponent lc,Camera cam)
 {
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 	glClearColor(0.0, 0.0, 0.0, 1.0); 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	shader.useProgram();
+	shadergeometry.useProgram();
 
 	auto ri = ecs.getComponentList<RenderComponent>().begin();
 	auto ti = ecs.getComponentList<TransformComponent>().begin();
@@ -85,7 +86,22 @@ void Deferred::render(ECSManager& ecs, Shader shader, LightComponent lc)
 			model = glm::translate(model, transform_comp->position);
 			model = model * glm::mat4_cast(transform_comp->rotation);
 			model = glm::scale(model, transform_comp->scale);
-			shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+
+			glm::mat4 view = cam.getViewMatrix();
+			glm::mat4 projection;
+			if (cam.getUsePerspectiveMatrix()) {
+				projection = cam.getPerspectiveMatrix();
+			}
+			else {
+				projection = cam.getOrthograficMatrix();
+			}
+
+			shadergeometry.setUniformValue(shadergeometry.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+			shadergeometry.setUniformValue(shadergeometry.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+			shadergeometry.setUniformValue(shadergeometry.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
+
+			int tex_id = 1;
+			shadergeometry.setUniformValue(shadergeometry.getUniformLocation("texture_diffuse"), ValueType::T_INT_1, &tex_id);
 
 			switch (render_comp->type_) {
 			case RenderType::RT_Mesh:
@@ -118,5 +134,19 @@ void Deferred::render(ECSManager& ecs, Shader shader, LightComponent lc)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, gNormal);
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, gColorSpec);
+	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+
+	shaderdeferred.useProgram();
+
+	lc.light.setUniforms(shaderdeferred);
+
+	shaderdeferred.setUniformValue(shaderdeferred.getUniformLocation("viewPos"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
+
+	
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 1); 
+	
+	glBlitFramebuffer(0, 0, deferred_width_, deferred_height_, 0, 0, deferred_width_, deferred_height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 1);
+
 }
