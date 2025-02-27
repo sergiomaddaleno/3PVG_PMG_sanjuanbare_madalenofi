@@ -33,7 +33,7 @@ public:
 
 	void initEntities(ECSManager &ecs);
 
-	void initShader(std::string vertrex_path, std::string fragment_path);
+	void initShader(std::string vertrex_path, std::string fragment_path, Shader &shader);
 
 	void setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
 
@@ -78,6 +78,8 @@ public:
 	//-----------------------
 
 	Shader shader;
+	Shader Gbuffer;
+	Shader shaderDeferred;
 	size_t entity_;
 
 	int entity_mesh;

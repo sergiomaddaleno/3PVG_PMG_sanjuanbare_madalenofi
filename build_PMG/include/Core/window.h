@@ -43,7 +43,7 @@ public:
 
 	bool toggleFullScreen(Input &input, Input::Keys key = Input::Keys::F11, bool imgui_enter=false);
 
-	bool closePressed();
+	bool closePressed(Input& input, Input::Keys key = Input::Keys::ESC);
 
 	double getTime();
 

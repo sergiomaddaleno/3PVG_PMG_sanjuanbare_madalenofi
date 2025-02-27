@@ -15,6 +15,7 @@ class Camera {
 public:
 
 	Camera();
+	~Camera();
 
 	glm::mat4 initViewTarget();
 
