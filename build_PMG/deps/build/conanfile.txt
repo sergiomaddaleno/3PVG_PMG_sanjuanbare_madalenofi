@@ -1,7 +1,0 @@
-[requires]
-glfw/3.3.8
-glew/2.2.0
-lua/5.4.7
-
-[generators]
-premake
