@@ -125,6 +125,7 @@ function createExample(project_name, example_name)
 	kind "ConsoleApp"
 	language "C++"
 	targetdir "build/%{prj.name}/%{cfg.buildcfg}"
+	libdirs{"lib/%{cfg.buildcfg}"}
 	links "Motor"
 
 	conan_config_exec("Debug")
