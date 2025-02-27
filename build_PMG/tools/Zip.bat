@@ -39,10 +39,8 @@ echo function conan_config_exec(^)
 echo.
 echo 	configs = {'Debug','Release','RelWithDebInfo'}
 echo 	for i = 1,3 do
-echo 	
 echo 		local cfg = conan[configs[i]]
 echo 		filter("configurations:"..configs[i]^)
-echo 	
 echo 		linkoptions { cfg["exelinkflags"] }
 echo 		includedirs{ cfg["includedirs"] }
 echo 		libdirs{ cfg["libdirs"] }
@@ -50,7 +48,6 @@ echo 		links{ cfg["libs"] }
 echo 		links{ cfg["system_libs"] }
 echo 		links{ cfg["frameworks"] }
 echo 		defines{ cfg["defines"] }
-echo 	
 echo 		filter{}
 echo 	end
 echo end
@@ -58,14 +55,11 @@ echo.
 echo function conan_config_lib(^)
 echo 	configs = {'Debug','Release','RelWithDebInfo'}
 echo 	for i = 1,3 do
-echo 	
 echo 		local cfg = conan[configs[i]]
 echo 		filter("configurations:"..configs[i]^)
-echo 	
 echo 		linkoptions { cfg["sharedlinkflags"] }
 echo 		includedirs{ cfg["includedirs"] }
 echo 		defines{ cfg["defines"] }
-echo 	
 echo 		filter{}
 echo 	end
 echo end
@@ -100,7 +94,6 @@ echo filter {}
 echo.
 echo function createExample(project_name, example_name^)
 echo 	project(project_name^)
-echo 	
 echo 	kind "ConsoleApp"
 echo 	language "C++"
 echo 	targetdir "build/%%{prj.name}/%%{cfg.buildcfg}"
