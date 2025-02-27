@@ -10,3 +10,5 @@ IF EXIST ..\bin rmdir /s /q ..\bin
 
 IF EXIST ..\build\EDK_Workspace_vs2019.sln del /F ..\build\EDK_Workspace_vs2019.sln
 IF EXIST ..\build\EDK_Workspace_vs2022.sln del /F ..\build\EDK_Workspace_vs2022.sln
+
+IF EXIST ..\lib\** del /F ..\lib\**
