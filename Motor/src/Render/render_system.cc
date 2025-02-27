@@ -45,7 +45,7 @@ RenderSystem::~RenderSystem() {}
 Deferred deferred;
 
 void RenderSystem::initEntities(ECSManager& ecs) {
-
+    
     auto ri = ecs.getComponentList<RenderComponent>().begin();
     auto li = ecs.getComponentList<LightComponent>().begin();
 
@@ -82,7 +82,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 render_comp->cube_->setTexture(render_comp->cube_->texture_path_);
                 break;
             }
-
+            /*
             for (; li != liend; ++li) {
                 if (li->has_value()) {
                     auto& light_comp = *li;
@@ -96,17 +96,17 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                         light_comp->shadow_map_.initCubeMap(); break;
                     }
                 }
-            }
+            }*/
         }
     }
-
+    
     deferred.init();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glUseProgram(0);
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //glUseProgram(0);
 }
 
-void RenderSystem::initShader(std::string vertrex_path, std::string fragment_path)
+void RenderSystem::initShader(std::string vertrex_path, std::string fragment_path,Shader &shader)
 {
     char* vs_entities = (char*)ReadFile(vertrex_path.c_str());
     char* fs_entities = (char*)ReadFile(fragment_path.c_str());
@@ -116,6 +116,7 @@ void RenderSystem::initShader(std::string vertrex_path, std::string fragment_pat
     free(vs_entities);
     free(fs_entities);
 }
+
 
 void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam)
 {
@@ -140,14 +141,11 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     int tex_id = 1;
     shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
 
-    shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &global.use_fog);
-    shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &global.fog_density);
-    shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &global.fog_gradient);
-    shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &global.sky_colour);
+   
 }
 
 void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
-    
+    /*
     glEnable(GL_DEPTH_TEST);
     glClear( GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
@@ -245,6 +243,20 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
     
     glDisable(GL_BLEND);
     glUseProgram(0);
+    
+    */
+    auto li = ecs.getComponentList<LightComponent>().begin();
+    auto liend = ecs.getComponentList<LightComponent>().end();
+
+    for (; li != liend; ++li) {
+        if (li->has_value()) {
+            auto& light_comp = *li;
+    
+            deferred.render(ecs, Gbuffer, shaderDeferred, *light_comp, cam);
+
+        }
+
+    }
 }
 
 void RenderSystem::setupEntities(ECSManager& ecs)

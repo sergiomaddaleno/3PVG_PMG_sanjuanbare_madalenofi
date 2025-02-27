@@ -23,11 +23,12 @@ public:
 
 	void init();
 
-	void render(ECSManager& ecs, Shader shader, LightComponent lc);
+	void render(ECSManager& ecs, Shader shadergeometry, Shader shaderdeferred, LightComponent lc, Camera cam);
+
 
 private:
 	unsigned int gBuffer;
-	unsigned int gPosition, gNormal, gColorSpec;
+	unsigned int gPosition, gNormal, gAlbedoSpec;
 
 	unsigned int deferred_width_;
 	unsigned int deferred_height_;
