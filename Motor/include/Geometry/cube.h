@@ -39,6 +39,7 @@ class Cube {
 
     Texture texture_;
     bool use_texture_;
+    glm::vec3 color_;
     std::string texture_path_;
 
     std::vector<int> order_;

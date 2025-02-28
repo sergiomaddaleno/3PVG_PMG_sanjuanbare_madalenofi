@@ -111,13 +111,7 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     model = glm::scale(model, tc.scale);
 
     glm::mat4 view = cam.getViewMatrix();
-    glm::mat4 projection;
-    if (cam.getUsePerspectiveMatrix()) {
-        projection = cam.getPerspectiveMatrix();
-    }
-    else {
-        projection = cam.getOrthograficMatrix();
-    }
+    glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();
 
     shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
@@ -125,13 +119,11 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
 
     int tex_id = 1;
     shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
-
-   
 }
 
 void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
     
-    /*
+    
     glEnable(GL_DEPTH_TEST);
     glClear( GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
@@ -174,6 +166,9 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     {
                         int use_texture = render_comp->mesh_->use_texture_;
                         shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
+                        glm::vec3 color_tex = render_comp->mesh_->color_;
+                        shader.setUniformValue(shader.getUniformLocation("u_color_texture"), ValueType::T_FLOAT_3, &color_tex);
+
                         for (auto& mesh : render_comp->mesh_->meshes) {
                             render_comp->mesh_->draw();
                         }
@@ -184,6 +179,9 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     {
                         int use_texture = render_comp->terrain_->use_texture_;
                         shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
+                        glm::vec3 color_tex = render_comp->terrain_->color_;
+                        shader.setUniformValue(shader.getUniformLocation("u_color_texture"), ValueType::T_FLOAT_3, &color_tex);
+
                         render_comp->terrain_->draw();
 
                         render_comp->terrain_->wave_.setUniforms(shader);
@@ -194,6 +192,9 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     {
                         int use_texture = render_comp->sphere_->use_texture_;
                         shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
+                        glm::vec3 color_tex = render_comp->sphere_->color_;
+                        shader.setUniformValue(shader.getUniformLocation("u_color_texture"), ValueType::T_FLOAT_3, &color_tex);
+
                         render_comp->sphere_->draw();
 
                         render_comp->sphere_->wave_.setUniforms(shader);
@@ -205,6 +206,9 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     {
                         int use_texture = render_comp->cube_->use_texture_;
                         shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
+                        glm::vec3 color_tex = render_comp->cube_->color_;
+                        shader.setUniformValue(shader.getUniformLocation("u_color_texture"), ValueType::T_FLOAT_3, &color_tex);
+
                         render_comp->cube_->draw();
 
                         render_comp->cube_->wave_.setUniforms(shader);
@@ -215,6 +219,9 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
                     {
                         int use_texture = render_comp->quad_->use_texture_;
                         shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
+                        glm::vec3 color_tex = render_comp->quad_->color_;
+                        shader.setUniformValue(shader.getUniformLocation("u_color_texture"), ValueType::T_FLOAT_3, &color_tex);
+
                         render_comp->quad_->draw();
 
                         render_comp->quad_->wave_.setUniforms(shader);
@@ -228,10 +235,10 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
     }
     
     glDisable(GL_BLEND);
-    glUseProgram(0); */
+    glUseProgram(0); 
     
     
-     deferred.render(ecs, cam);
+     //deferred.render(ecs, cam);
 }
 
 void RenderSystem::setupEntities(ECSManager& ecs)

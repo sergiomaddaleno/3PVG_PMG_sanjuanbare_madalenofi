@@ -42,10 +42,12 @@ public:
     std::vector<Vertex> vertices;
     std::vector<Mesh> meshes;
     std::vector<Texture> textures;
-    bool use_texture_;
 
     std::vector<unsigned int> indices;
     int materialID;
+
+    bool use_texture_;
+    glm::vec3 color_;
 
     std::string mesh_path;
     std::string texture_folder;

@@ -47,6 +47,7 @@ class Sphere {
   std::vector<float> data_;
   std::string texture_path_;
   bool use_texture_;
+  glm::vec3 color_;
 
 };
 

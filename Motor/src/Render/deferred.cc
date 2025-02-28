@@ -125,13 +125,7 @@ void Deferred::render(ECSManager& ecs,Camera cam)
 			model = glm::scale(model, transform_comp->scale);
 
 			glm::mat4 view = cam.getViewMatrix();
-			glm::mat4 projection;
-			if (cam.getUsePerspectiveMatrix()) {
-				projection = cam.getPerspectiveMatrix();
-			}
-			else {
-				projection = cam.getOrthograficMatrix();
-			}
+			glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();
 
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
@@ -174,11 +168,11 @@ void Deferred::render(ECSManager& ecs,Camera cam)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	deferred_shading.useProgram();
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gPosition);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
 	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
 
 	auto li = ecs.getComponentList<LightComponent>().begin();
@@ -198,6 +192,8 @@ void Deferred::render(ECSManager& ecs,Camera cam)
 		}
 	}
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
+
+	renderQuad();
 
 	// ----------------------------------------------------------------------------------
 	

@@ -7,6 +7,9 @@
 
 #include "Geometry/wave.h"
 #include "Core/texture.h"
+#include "Render/camera.h"
+#include "Core/shader.h"
+
 #include <../deps/glm/glm.hpp>
 #include <../nlohmann/json.hpp>
 
@@ -26,12 +29,13 @@ class Terrain {
   void bind();
   void draw();
   void setTexture(std::string file_path);
-
   void setHeightMap(std::string file_path);
 
   const float* GetVertexTerrain();
 
-  //Save data
+  void initGrid(const int num_cols = 70, const int num_rows = 70);
+  void drawGrid(Camera cam = Camera());
+
   nlohmann::json serialize() const;
 
   // ----
@@ -44,10 +48,14 @@ class Terrain {
 
   Texture texture_;
   bool use_texture_;
+  glm::vec3 color_;
   std::string texture_path_;
   std::string heightmap_path_;
 
   GerstnerWave wave_;
+
+  glm::vec3 grid_color_;
+  float grid_scale_;
 
 private:
 
@@ -60,6 +68,8 @@ private:
   std::vector<float> data_;
 
   Texture height_map_;
+
+  Shader gridShader;
 
 };
 

@@ -34,6 +34,8 @@ uniform bool u_fog;
 uniform vec3 u_sky_colour;
 in float visibility;
 
+uniform vec3 u_color_texture;
+
 in vec3 normal;
 in vec3 pos;
 in vec2 uv;
@@ -169,7 +171,7 @@ void main() {
        vec4 texture_color = texture(u_texture, uv);
        color = texture_color.rgb;
    }else{
-       color = vec3(0.0f, 0.0f, 1.0f);
+       color = u_color_texture;
    }
 
    vec3 final_color = color * final_light;

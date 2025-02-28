@@ -12,7 +12,6 @@ uniform sampler2D texture_diffuse;
 void main()
 {    
     gPosition = FragPos;
-   
     gNormal = normalize(Normal);
     
     vec4 albedo = texture(texture_diffuse, uv);

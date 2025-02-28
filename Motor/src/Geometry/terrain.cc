@@ -1,7 +1,9 @@
 
 #include "Geometry/terrain.h"
+#include "Core/shader.h"
 #include "../deps/stb_image.h"
 #include "../Perlin/SimplexNoise.h"
+#include "utils.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -12,6 +14,37 @@
 #include <iostream>
 #include <math.h>
 
+#define GLSL(x) "#version 330\n"#x
+static const char* gridVertex = GLSL(
+    layout(location = 0) in vec3 aPos;
+
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
+    uniform vec3 u_camera_pos;
+    uniform float u_grid_scale;
+    
+    void main() {
+        vec3 pos = aPos;
+        vec3 camera_offset = u_camera_pos / u_grid_scale;
+
+        //pos.xz += camera_offset.xz - fract(u_camera_pos.xz);
+        pos.xz += floor(camera_offset.xz);
+
+        gl_Position = projection * view * model * vec4(pos, 1.0);
+    }
+);
+
+static const char* gridFragment = GLSL(
+    out vec4 FragColor;
+    uniform vec3 u_grid_color;
+    
+    void main() {
+        
+        FragColor = vec4(u_grid_color, 1.0f);
+    }
+);
+
 Terrain::Terrain()
     : VAO(0), VBO(0), EBO(0),
     num_rows_(0), num_cols_(0), num_vertex_(0),
@@ -19,7 +52,9 @@ Terrain::Terrain()
     is_centered_(true), use_perlin_noise_(true),
     use_texture_(true), 
     texture_path_("../stages/assets/textures/images/grass.jpg"),
-    heightmap_path_()
+    heightmap_path_("../stages/assets/textures/heightmaps/heightmap.png"),
+    grid_color_({ 0.5f, 0.5f, 0.5f}), grid_scale_(20.0f),
+    color_({ 0.5f, 0.5f, 0.5f })
 {
 }
 
@@ -244,8 +279,10 @@ void Terrain::setHeightMap(std::string file_path) {
 
 void Terrain::draw(){
 
-    texture_.active();
-    texture_.bind2D();
+    if(use_texture_){
+        texture_.active();
+        texture_.bind2D();
+    }
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_cols_ * num_rows_) * 6, GL_UNSIGNED_INT, 0);
@@ -253,11 +290,47 @@ void Terrain::draw(){
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-
 const float* Terrain::GetVertexTerrain()
 {
     return vertex_terrain_.data();
 }
+
+void Terrain::initGrid(const int num_cols, const int num_rows)
+{
+    init(num_cols, num_rows, 0.0f, 1.0f, true, true);
+
+    bind();
+    gridShader.compile(gridVertex, gridFragment);
+}
+
+void Terrain::drawGrid(Camera cam)
+{
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    gridShader.useProgram();
+
+    glm::mat4 view = cam.getViewMatrix();
+    glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(grid_scale_, 1.0f, grid_scale_));
+
+    gridShader.setUniformValue(gridShader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+    gridShader.setUniformValue(gridShader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+    gridShader.setUniformValue(gridShader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
+
+    glm::vec3 cameraPos = cam.getPosition();
+    gridShader.setUniformValue(gridShader.getUniformLocation("u_camera_pos"), ValueType::T_FLOAT_3, glm::value_ptr(cameraPos));
+    gridShader.setUniformValue(gridShader.getUniformLocation("u_grid_color"), ValueType::T_FLOAT_3, &grid_color_);
+    gridShader.setUniformValue(gridShader.getUniformLocation("u_grid_scale"), ValueType::T_FLOAT_1, &grid_scale_);
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, (num_cols_ * num_rows_) * 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
 
 nlohmann::json Terrain::serialize() const
 {

@@ -13,7 +13,8 @@ Cube::Cube()
     order_(), data_(),
     size_(0.0f),
     cube_8v_(false), cube_24v_(false),
-    use_texture_(true), texture_path_("../stages/assets/textures/images/blue.png")
+    use_texture_(true), texture_path_("../stages/assets/textures/images/blue.png"),
+    color_({ 0.5f, 0.5f, 0.5f })
 {
 }
 
@@ -166,8 +167,10 @@ void Cube::bind()
 
 void Cube::draw()
 {
-    texture_.active();
-    texture_.bind2D();
+    if (use_texture_) {
+        texture_.active();
+        texture_.bind2D();
+    }
 
     /*int i = 0;
     for (auto& tex : texture_) {

@@ -13,7 +13,9 @@ Quad::Quad()
     : VAO(0), VBO(0), EBO(0),
     order_(), data_(),
     size_(0.0f), use_texture_(true),
-    texture_path_("../stages/assets/textures/images/blue.png") {
+    texture_path_("../stages/assets/textures/images/blue.png"),
+    color_({ 0.5f, 0.5f, 0.5f })
+{
 }
 
 Quad::~Quad()
@@ -107,8 +109,10 @@ void Quad::setTexture(std::string file_path)
 
 void Quad::draw()
 {
-    texture_.active();
-    texture_.bind2D();
+    if (use_texture_) {
+        texture_.active();
+        texture_.bind2D();
+    }
 
     /*int i = 0;
     for (auto& tex : texture_) {

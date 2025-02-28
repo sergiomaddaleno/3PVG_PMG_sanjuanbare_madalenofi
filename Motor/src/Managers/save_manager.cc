@@ -231,7 +231,6 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 sphere_num_heights = sphere["num_heights"];
                 sphere_num_revs = sphere["num_revs"];
                 sphere_size = sphere["size"];
-                sphere_size = sphere["size"];
                 rs.createSphere(ecs, tc, sphere_num_heights, sphere_num_revs, sphere_size);
 
                 sphere_tex_path = sphere["Texture_path"];
