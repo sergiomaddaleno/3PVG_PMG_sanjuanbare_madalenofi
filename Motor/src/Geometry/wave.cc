@@ -14,7 +14,7 @@ GerstnerWave::~GerstnerWave()
 void GerstnerWave::setUniforms(Shader& shader)
 {
 	if (use_wave_) {
-		float time_ = glfwGetTime();
+		double time_ = glfwGetTime();
 
 		shader.setUniformValue(shader.getUniformLocation("u_use_wave"), ValueType::T_FLOAT_1, &use_wave_);
 		shader.setUniformValue(shader.getUniformLocation("u_time"), ValueType::T_FLOAT_1, &time_);

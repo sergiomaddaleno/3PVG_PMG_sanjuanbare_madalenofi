@@ -4,7 +4,6 @@
 #include "Core/mesh.h"
 #include "Render/camera.h"
 #include "Render/shadow_map.h"
-#include "Render/deferred.h"
 #include "Core/shader.h"
 #include "utils.h"
 #include "global_data.h"
@@ -41,8 +40,6 @@ RenderSystem::RenderSystem()
 {}
 
 RenderSystem::~RenderSystem() {}
-
-Deferred deferred;
 
 void RenderSystem::initEntities(ECSManager& ecs) {
     
@@ -82,7 +79,7 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                 render_comp->cube_->setTexture(render_comp->cube_->texture_path_);
                 break;
             }
-            /*
+            
             for (; li != liend; ++li) {
                 if (li->has_value()) {
                     auto& light_comp = *li;
@@ -96,27 +93,15 @@ void RenderSystem::initEntities(ECSManager& ecs) {
                         light_comp->shadow_map_.initCubeMap(); break;
                     }
                 }
-            }*/
+            }
         }
     }
     
     deferred.init();
 
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //glUseProgram(0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glUseProgram(0);
 }
-
-void RenderSystem::initShader(std::string vertrex_path, std::string fragment_path,Shader &shader)
-{
-    char* vs_entities = (char*)ReadFile(vertrex_path.c_str());
-    char* fs_entities = (char*)ReadFile(fragment_path.c_str());
-
-    shader.compile(vs_entities, fs_entities);
-
-    free(vs_entities);
-    free(fs_entities);
-}
-
 
 void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam)
 {
@@ -145,6 +130,7 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
 }
 
 void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
+    
     /*
     glEnable(GL_DEPTH_TEST);
     glClear( GL_DEPTH_BUFFER_BIT);
@@ -242,21 +228,10 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
     }
     
     glDisable(GL_BLEND);
-    glUseProgram(0);
+    glUseProgram(0); */
     
-    */
-    auto li = ecs.getComponentList<LightComponent>().begin();
-    auto liend = ecs.getComponentList<LightComponent>().end();
-
-    for (; li != liend; ++li) {
-        if (li->has_value()) {
-            auto& light_comp = *li;
     
-            deferred.render(ecs, Gbuffer, shaderDeferred, *light_comp, cam);
-
-        }
-
-    }
+     deferred.render(ecs, cam);
 }
 
 void RenderSystem::setupEntities(ECSManager& ecs)

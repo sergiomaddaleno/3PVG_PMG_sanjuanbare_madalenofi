@@ -1,7 +1,7 @@
 #version 330 core
 out vec4 FragColor;
 
-in vec2 TexCoords;
+in vec2 uv;
 
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
@@ -27,19 +27,19 @@ struct LightInfo {
 
 
 uniform LightInfo u_light;
-uniform vec3 viewPos;
+uniform vec3 u_camera_position;
 
 void main()
 {             
    
-    vec3 FragPos = texture(gPosition, TexCoords).rgb;
-    vec3 Normal = texture(gNormal, TexCoords).rgb;
-    vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;
+    vec3 FragPos = texture(gPosition, uv).rgb;
+    vec3 Normal = texture(gNormal, uv).rgb;
+    vec3 Diffuse = texture(gAlbedoSpec, uv).rgb;
   
     
   
     vec3 lighting  = Diffuse * 0.1; 
-    vec3 viewDir  = normalize(viewPos - FragPos);
+    vec3 viewDir  = normalize(u_camera_position - FragPos);
     
        
    float distance = length(u_light.pos_ - FragPos);
@@ -61,5 +61,3 @@ void main()
        
     FragColor = vec4(lighting, 1.0);
 }
-
-

@@ -31,6 +31,36 @@ Deferred::~Deferred()
 {
 }
 
+unsigned int quadVAO = 0;
+unsigned int quadVBO;
+void renderQuad()
+{
+	if (quadVAO == 0)
+	{
+		float quadVertices[] = {
+			// positions        // texture Coords
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+		};
+		// setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(1);
+}
+
+
 void Deferred::init()
 {
 	glGenFramebuffers(1, &gBuffer);
@@ -60,17 +90,24 @@ void Deferred::init()
 	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 	glDrawBuffers(3, attachments);
 
+	glGenRenderbuffers(1, &rboDepth);
+	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, deferred_width_, deferred_height_);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Deferred::render(ECSManager& ecs, Shader shadergeometry,Shader shaderdeferred, LightComponent lc,Camera cam)
+void Deferred::render(ECSManager& ecs,Camera cam)
 {
-	
+	// Geometry pass -------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 	glClearColor(0.0, 0.0, 0.0, 1.0); 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	shadergeometry.useProgram();
+	gbuffer.useProgram();
 
 	auto ri = ecs.getComponentList<RenderComponent>().begin();
 	auto ti = ecs.getComponentList<TransformComponent>().begin();
@@ -96,12 +133,17 @@ void Deferred::render(ECSManager& ecs, Shader shadergeometry,Shader shaderdeferr
 				projection = cam.getOrthograficMatrix();
 			}
 
-			shadergeometry.setUniformValue(shadergeometry.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
-			shadergeometry.setUniformValue(shadergeometry.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
-			shadergeometry.setUniformValue(shadergeometry.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
+			gbuffer.setUniformValue(gbuffer.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+
+			gbuffer.setUniformValue(gbuffer.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+			gbuffer.setUniformValue(gbuffer.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
 			int tex_id = 1;
-			shadergeometry.setUniformValue(shadergeometry.getUniformLocation("texture_diffuse"), ValueType::T_INT_1, &tex_id);
+			gbuffer.setUniformValue(gbuffer.getUniformLocation("texture_diffuse"), ValueType::T_INT_1, &tex_id);
+			
+			GLuint screen_tex_loc = glGetUniformLocation(gbuffer.getProgram(), "u_screen_tex");
+			glUniform1i(screen_tex_loc, 0);
 
 			switch (render_comp->type_) {
 			case RenderType::RT_Mesh:
@@ -125,27 +167,43 @@ void Deferred::render(ECSManager& ecs, Shader shadergeometry,Shader shaderdeferr
 			}
 		}
 	}
-	
-	glBindFramebuffer(GL_FRAMEBUFFER, 1);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Lightning pass -------------------------------------------------
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glActiveTexture(GL_TEXTURE1);
+	deferred_shading.useProgram();
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
-	glActiveTexture(GL_TEXTURE2);
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, gNormal);
-	glActiveTexture(GL_TEXTURE3);
+	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
 
-	shaderdeferred.useProgram();
+	auto li = ecs.getComponentList<LightComponent>().begin();
+	auto liend = ecs.getComponentList<LightComponent>().end();
+	for (; li != liend; ++li) {
+		if (li->has_value()) {
+			auto& light_comp = *li;
 
-	lc.light.setUniforms(shaderdeferred);
+			light_comp->light.setUniforms(deferred_shading);
 
-	shaderdeferred.setUniformValue(shaderdeferred.getUniformLocation("viewPos"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
+			int tex_id0 = 0;
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gPosition"), ValueType::T_INT_1, &tex_id0);
+			int tex_id1= 1;
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex_id1);
+			int tex_id2 = 2;
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gAlbedoSpec"), ValueType::T_INT_1, &tex_id2);
+		}
+	}
+	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
 
+	// ----------------------------------------------------------------------------------
 	
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 1); 
-	
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 1);
+
 	glBlitFramebuffer(0, 0, deferred_width_, deferred_height_, 0, 0, deferred_width_, deferred_height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 1);
 

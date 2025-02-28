@@ -14,6 +14,7 @@
 
 #include "../Systems/ecs_manager.h"
 #include "Render/camera.h"
+#include "Render/deferred.h"
 
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
@@ -32,8 +33,6 @@ public:
 	~RenderSystem();
 
 	void initEntities(ECSManager &ecs);
-
-	void initShader(std::string vertrex_path, std::string fragment_path, Shader &shader);
 
 	void setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
 
@@ -78,8 +77,7 @@ public:
 	//-----------------------
 
 	Shader shader;
-	Shader Gbuffer;
-	Shader shaderDeferred;
+	Deferred deferred;
 	size_t entity_;
 
 	int entity_mesh;

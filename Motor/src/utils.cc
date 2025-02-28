@@ -1,10 +1,11 @@
 
+#include "utils.h"
+#include "Core/shader.h"
+
 #include <memory> 
 #include <iostream>
 #include <cassert>
 #include "vector"
-
-#include "utils.h"
 
 char* ReadFile(const char* file_path) {
 
@@ -36,6 +37,17 @@ char* ReadFile(const char* file_path) {
     }
 
     return nullptr;
+}
+
+void initShader(Shader& shader, std::string vertrex_path, std::string fragment_path)
+{
+    char* vs_entities = (char*)ReadFile(vertrex_path.c_str());
+    char* fs_entities = (char*)ReadFile(fragment_path.c_str());
+
+    shader.compile(vs_entities, fs_entities);
+
+    free(vs_entities);
+    free(fs_entities);
 }
 
 void CheckGPUErrors(const char* file, int line) {

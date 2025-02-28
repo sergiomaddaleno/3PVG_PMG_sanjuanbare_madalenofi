@@ -57,7 +57,6 @@ ImGuiManager::ImGuiManager()
     skybox_window(false),
     console_window(false),
     fog_window(false),
-    shadow_map_window(false),
     new_pp_shader(),
     grey_sh(),
     negative_sh(),
@@ -175,12 +174,6 @@ void ImGuiManager::Init(GLFWwindow* window) {
     //---
     global.post_process.initData();
 
-    global.render_system.initShader("../stages/shaders/entities.vs", "../stages/shaders/entities.fs",global.render_system.shader);
-
-    global.render_system.initShader("../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs",global.render_system.Gbuffer);
-
-   // global.render_system.initShader("../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs", global.render_system.shaderDeferred);
-
     global.render_system.setupEntities(global.ecs);
 
     global.save_manager.loadFromFile("../stages/saves/main_scene.json");
@@ -196,16 +189,6 @@ void ImGuiManager::Render(GLFWwindow* window) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
-    //---
-    global.post_process.resize(global.window_width, global.window_height);
-
-    global.post_process.beginRender();
-
-    if (global.use_skybox) global.skybox.render(global.cam);
-
-    global.render_system.renderEntities(global.ecs, global.cam);
-    //---
-
     ImguiWindow(window);
 
     if (!global.is_playing) {
@@ -218,7 +201,6 @@ void ImGuiManager::Render(GLFWwindow* window) {
         if (post_process_window) PostProcessWindow();
         if (skybox_window) SkyboxWindow();
         if (fog_window) FogWindow();
-        if (shadow_map_window) ShadowMapWindow();
         if (load_scene) LoadSceneWindow();
         if (add_mesh_window) AddMeshWindow();
     }
@@ -533,7 +515,7 @@ void ImGuiManager::InspectorWindow() {
 
             if (ImGui::Button("Compile Shader")) {
                 
-                global.render_system.initShader(vertex_file_path, fragment_file_path,global.render_system.shader);
+                initShader(global.render_system.shader, vertex_file_path, fragment_file_path);
 
                 vertex_file_path.clear();
                 vertex_file_name.clear();
@@ -889,6 +871,41 @@ void ImGuiManager::InspectorWindow() {
             ImGui::SliderFloat("Shininess", &light_comp->light.shininess_, 1.0f, 128.0f);
             ImGui::SliderFloat("Strength", &light_comp->light.strength_, 0.0f, 10.0f);
 
+
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+            ImGui::Text("Shadow Map");
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+            static float near_plane = light_comp->shadow_map_.near_plane;
+            ImGui::SliderFloat("Near Plane", &near_plane, 0.1f, 100.0f);
+
+            static float far_plane = light_comp->shadow_map_.far_plane;
+            ImGui::SliderFloat("Far Plane", &far_plane, 10.0f, 1000.0f);
+
+            static int shadow_width = light_comp->shadow_map_.shadow_width_;
+            static int shadow_height = light_comp->shadow_map_.shadow_height_;
+            ImGui::SliderInt("Shadow Width", &shadow_width, 512, 8192);
+            ImGui::SliderInt("Shadow Height", &shadow_height, 512, 8192);
+
+            static float directional_size = light_comp->shadow_map_.directional_size_;
+            if (light_comp->light.type_ == LightType::LT_Directional) {
+                ImGui::SliderFloat("Directional Size", &directional_size, 10.0f, 1000.0f);
+            }
+
+            ImGui::Dummy({ 0.0f, 5.0f });
+
+            if (ImGui::Button("Apply Shadow Map")) {
+                light_comp->shadow_map_.near_plane = near_plane;
+                light_comp->shadow_map_.far_plane = far_plane;
+                light_comp->shadow_map_.shadow_width_ = shadow_width;
+                light_comp->shadow_map_.shadow_height_ = shadow_height;
+                light_comp->shadow_map_.directional_size_ = directional_size;
+
+                light_comp->shadow_map_.init();
+            }
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
         }
     }
     
@@ -1140,11 +1157,6 @@ void ImGuiManager::TopBarWindow() {
 
             if (ImGui::BeginMenu("Post Proccess")) {
                 ImGui::Checkbox("Post Process Window", &post_process_window);
-                ImGui::EndMenu();
-            }
-
-            if (ImGui::BeginMenu("Shadow map")) {
-                ImGui::Checkbox("Shadow map Window", &shadow_map_window);
                 ImGui::EndMenu();
             }
 
@@ -1440,62 +1452,6 @@ void ImGuiManager::FogWindow()
 
     ImGui::End();
 }
-
-void ImGuiManager::ShadowMapWindow()
-{
-    ImGui::Begin("ShadowMap");
-
-    auto li = global.ecs.getComponentList<LightComponent>().begin();
-    auto liend = global.ecs.getComponentList<LightComponent>().end();
-
-    auto ni = global.ecs.getComponentList<NameComponent>().begin();
-    auto niend = global.ecs.getComponentList<NameComponent>().end();
-
-    for (; li != liend && ni != niend; ++li, ++ni) {
-        if (li->has_value() && ni->has_value()) {
-            auto& light_comp = *li;
-            auto& name_comp = *ni;
-
-            ImGui::Dummy(ImVec2(0.0f, 2.0f));
-            ImGui::Text(name_comp->name.c_str());
-            ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-            static float near_plane = light_comp->shadow_map_.near_plane;
-            ImGui::SliderFloat(("Near Plane##" + name_comp->name).c_str(), &near_plane, 0.1f, 100.0f);
-
-            static float far_plane = light_comp->shadow_map_.far_plane;
-            ImGui::SliderFloat(("Far Plane##" + name_comp->name).c_str(), &far_plane, 10.0f, 1000.0f);
-
-            static int shadow_width = light_comp->shadow_map_.shadow_width_;
-            static int shadow_height = light_comp->shadow_map_.shadow_height_;
-            ImGui::SliderInt(("Shadow Width##" + name_comp->name).c_str(), &shadow_width, 512, 8192);
-            ImGui::SliderInt(("Shadow Height##" + name_comp->name).c_str(), &shadow_height, 512, 8192);
-
-            static float directional_size = light_comp->shadow_map_.directional_size_;
-            if (light_comp->light.type_ == LightType::LT_Directional) {
-                ImGui::SliderFloat(("Directional Size##" + name_comp->name).c_str(), &directional_size, 10.0f, 1000.0f);
-            }
-
-            ImGui::Dummy({ 0.0f, 5.0f });
-
-            if (ImGui::Button(("Apply Changes##" + name_comp->name).c_str())) {
-                light_comp->shadow_map_.near_plane = near_plane;
-                light_comp->shadow_map_.far_plane = far_plane;
-                light_comp->shadow_map_.shadow_width_ = shadow_width;
-                light_comp->shadow_map_.shadow_height_ = shadow_height;
-                light_comp->shadow_map_.directional_size_ = directional_size;
-
-                light_comp->shadow_map_.init();
-            }
-            ImGui::Dummy(ImVec2(0.0f, 2.0f));
-            ImGui::Separator();
-            ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-        }
-    }
-    ImGui::End();
-}
-
 
 void ImGuiManager::SkyboxWindow()
 {

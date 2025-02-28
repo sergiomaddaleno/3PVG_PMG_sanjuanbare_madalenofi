@@ -32,7 +32,6 @@ public:
 
     void PostProcessWindow();
     void FogWindow();
-    void ShadowMapWindow();
     void SkyboxWindow();
     void ConsoleWindow();
     void LoadSceneWindow();
@@ -64,7 +63,6 @@ private:
     bool skybox_window;
     bool console_window;
     bool fog_window;
-    bool shadow_map_window;
 
     Shader new_pp_shader;
     Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
