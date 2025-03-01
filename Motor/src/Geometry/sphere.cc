@@ -95,21 +95,18 @@ void Sphere::init(const float sphere_size, const int num_heights, const int num_
 
 void Sphere::bind()
 {
-    glGenBuffers(1, &  VBO);
-    glBindBuffer(GL_ARRAY_BUFFER,   VBO);
-    glBufferData(GL_ARRAY_BUFFER,   data_.size() * sizeof(float),   data_.data(), GL_STATIC_DRAW);
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
-    glGenBuffers(1, &  EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,   EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,   order_.size() * sizeof(int),   order_.data(), GL_STATIC_DRAW);
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, data_.size() * sizeof(float), data_.data(), GL_STATIC_DRAW);
 
-    glGenVertexArrays(1, &  VAO);
-    glBindVertexArray(  VAO);
-    glBindBuffer(GL_ARRAY_BUFFER,   VBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,   EBO);
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, order_.size() * sizeof(int), order_.data(), GL_STATIC_DRAW);
 
-    //--
-
+    // --- 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -119,10 +116,12 @@ void Sphere::bind()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    glBindVertexArray(0);
+    // --- 
 
-    //--
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
+
 
 void Sphere::draw()
 {
@@ -140,6 +139,7 @@ void Sphere::draw()
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_heights_ * num_revs_) * 6, GL_UNSIGNED_INT, 0);
+
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }

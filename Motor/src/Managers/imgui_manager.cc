@@ -528,6 +528,36 @@ void ImGuiManager::InspectorWindow() {
 
             ImGui::Separator();
             ImGui::Dummy(ImVec2(0.0f, 2.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.3f, 0.2f, 1.0f));
+            ImGui::Text("Texture settings");
+            ImGui::PopStyleColor();
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+            switch (render_comp->type_) {
+                case RenderType::RT_Mesh:
+                    ImGui::Checkbox("Use Texture", &render_comp->mesh_->use_texture_);
+                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->mesh_->color_));
+                    break;
+                case RenderType::RT_Terrain:
+                    ImGui::Checkbox("Use Texture", &render_comp->terrain_->use_texture_);
+                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->terrain_->color_));
+                    break;
+                case RenderType::RT_Sphere:
+                    ImGui::Checkbox("Use Texture", &render_comp->sphere_->use_texture_);
+                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->sphere_->color_));
+                    break;
+                case RenderType::RT_Quad:
+                    ImGui::Checkbox("Use Texture", &render_comp->quad_->use_texture_);
+                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->quad_->color_));
+                    break;
+                case RenderType::RT_Cube8v:
+                case RenderType::RT_Cube24v:
+                    ImGui::Checkbox("Use Texture", &render_comp->cube_->use_texture_);
+                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->cube_->color_));
+                    break;
+            }
+            
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.3f, 0.0f, 1.0f));
             ImGui::Text("Change Texture");
@@ -578,32 +608,6 @@ void ImGuiManager::InspectorWindow() {
                 texture_file_name.clear();
             }
 
-            ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-            switch (render_comp->type_) {
-                case RenderType::RT_Mesh:
-                    ImGui::Checkbox("Use Texture", &render_comp->mesh_->use_texture_);
-                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->mesh_->color_));
-                    break;
-                case RenderType::RT_Terrain:
-                    ImGui::Checkbox("Use Texture", &render_comp->terrain_->use_texture_);
-                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->terrain_->color_));
-                    break;
-                case RenderType::RT_Sphere:
-                    ImGui::Checkbox("Use Texture", &render_comp->sphere_->use_texture_);
-                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->sphere_->color_));
-                    break;
-                case RenderType::RT_Quad:
-                    ImGui::Checkbox("Use Texture", &render_comp->quad_->use_texture_);
-                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->quad_->color_));
-                    break;
-                case RenderType::RT_Cube8v:
-                case RenderType::RT_Cube24v:
-                    ImGui::Checkbox("Use Texture", &render_comp->cube_->use_texture_);
-                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->cube_->color_));
-                    break;
-            }
-            
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
             
             // -----------------------------------------------------------------

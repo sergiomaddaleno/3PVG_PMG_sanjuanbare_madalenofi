@@ -67,20 +67,19 @@ void Quad::init(const float quad_size) {
 
 void Quad::bind()
 {
-    glGenVertexArrays(1, &  VAO);
-    glGenBuffers(1, &  VBO);
-    glGenBuffers(1, &  EBO);
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
-    glBindVertexArray(  VAO);
+    glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER,   VBO);
-    glBufferData(GL_ARRAY_BUFFER,   data_.size() * sizeof(float),   data_.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, data_.size() * sizeof(float), data_.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,   EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,   order_.size() * sizeof(int),   order_.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, order_.size() * sizeof(int), order_.data(), GL_STATIC_DRAW);
 
-    //--
-
+    //---
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -89,9 +88,12 @@ void Quad::bind()
 
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+    //---
 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
+
 
 void Quad::setTexture(std::string file_path)
 {
@@ -123,6 +125,7 @@ void Quad::draw()
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }

@@ -58,6 +58,13 @@ void Texture::bind2D() const
     }
 }
 
+void Texture::bind3D() const
+{
+    if (textureID != 0) {
+        glBindTexture(GL_TEXTURE_3D, textureID);
+    }
+}
+
 void Texture::bindCubeMap() const
 {
     if (textureID != 0) {

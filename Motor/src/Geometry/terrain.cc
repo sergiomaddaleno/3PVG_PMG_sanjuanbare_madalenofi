@@ -228,6 +228,9 @@ void Terrain::init(const int num_cols, const int num_rows,
 
 void Terrain::bind()
 {
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, data_.size() * sizeof(float), data_.data(), GL_STATIC_DRAW);
@@ -235,13 +238,6 @@ void Terrain::bind()
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, order_.size() * sizeof(int), order_.data(), GL_STATIC_DRAW);
-
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-    //---
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -252,6 +248,7 @@ void Terrain::bind()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 
@@ -286,6 +283,7 @@ void Terrain::draw(){
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_cols_ * num_rows_) * 6, GL_UNSIGNED_INT, 0);
+
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -305,8 +303,6 @@ void Terrain::initGrid(const int num_cols, const int num_rows)
 
 void Terrain::drawGrid(Camera cam)
 {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     gridShader.useProgram();
 
     glm::mat4 view = cam.getViewMatrix();
@@ -324,11 +320,22 @@ void Terrain::drawGrid(Camera cam)
     gridShader.setUniformValue(gridShader.getUniformLocation("u_grid_color"), ValueType::T_FLOAT_3, &grid_color_);
     gridShader.setUniformValue(gridShader.getUniformLocation("u_grid_scale"), ValueType::T_FLOAT_1, &grid_scale_);
 
+    glDepthMask(GL_FALSE);
+    glEnable(GL_DEPTH_TEST);
+
+    GLint prevPolygonMode[2];
+    glGetIntegerv(GL_POLYGON_MODE, prevPolygonMode);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_cols_ * num_rows_) * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT, prevPolygonMode[0]);
+    glPolygonMode(GL_BACK, prevPolygonMode[1]);
+
+    glDepthMask(GL_TRUE);
+    glUseProgram(0);
 }
 
 
