@@ -128,7 +128,6 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
 
 void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
     
-    
     glEnable(GL_DEPTH_TEST);
     glClear( GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
@@ -240,10 +239,11 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
     }
     
     glDisable(GL_BLEND);
-    glUseProgram(0); 
+    glUseProgram(0);
     
-    
+     //deferred.resize(global.window_width, global.window_height);
      //deferred.render(ecs, cam);
+
 }
 
 void RenderSystem::setupEntities(ECSManager& ecs)

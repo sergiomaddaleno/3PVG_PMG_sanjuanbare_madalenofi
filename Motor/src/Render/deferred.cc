@@ -21,30 +21,28 @@
 #include <memory> 
 #include <iostream>
 
-Deferred::Deferred() : gBuffer(0), gPosition(0),
-gNormal(0), gAlbedoSpec(0), deferred_width_(800), deferred_height_(600)
-{
+float quadVertices[] = {
+	// positions        // texture Coords
+	-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+	-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+	 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+	 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+};
 
-}
+Deferred::Deferred() : gBuffer(0), rboDepth(0),
+	gPosition(0),gNormal(0), gAlbedoSpec(0), 
+	quadVAO(0), quadVBO(0),
+	width_(800), height_(600)
+{}
 
 Deferred::~Deferred()
 {
 }
 
-unsigned int quadVAO = 0;
-unsigned int quadVBO;
-void renderQuad()
+void Deferred::renderQuad()
 {
 	if (quadVAO == 0)
 	{
-		float quadVertices[] = {
-			// positions        // texture Coords
-			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-		};
-		// setup plane VAO
 		glGenVertexArrays(1, &quadVAO);
 		glGenBuffers(1, &quadVBO);
 		glBindVertexArray(quadVAO);
@@ -60,6 +58,13 @@ void renderQuad()
 	glBindVertexArray(1);
 }
 
+void Deferred::resize(unsigned int width, unsigned int height)
+{
+	if (width_ != width || height_ != height) {
+		width_ = width;
+		height_ = height;
+	}
+}
 
 void Deferred::init()
 {
@@ -68,21 +73,21 @@ void Deferred::init()
 
 	glGenTextures(1, &gPosition);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, deferred_width_, deferred_height_, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width_, height_, 0, GL_RGBA, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
 
 	glGenTextures(1, &gNormal);
 	glBindTexture(GL_TEXTURE_2D, gNormal);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, deferred_width_, deferred_height_, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width_, height_, 0, GL_RGBA, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
 
 	glGenTextures(1, &gAlbedoSpec);
 	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, deferred_width_, deferred_height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
@@ -92,7 +97,7 @@ void Deferred::init()
 
 	glGenRenderbuffers(1, &rboDepth);
 	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, deferred_width_, deferred_height_);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -183,24 +188,25 @@ void Deferred::render(ECSManager& ecs,Camera cam)
 
 			light_comp->light.setUniforms(deferred_shading);
 
-			int tex_id0 = 0;
-			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gPosition"), ValueType::T_INT_1, &tex_id0);
-			int tex_id1= 1;
-			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex_id1);
-			int tex_id2 = 2;
-			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gAlbedoSpec"), ValueType::T_INT_1, &tex_id2);
+			int tex_id = 1;
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gPosition"), ValueType::T_INT_1, &tex_id);
+			tex_id= 2;
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex_id);
+			tex_id = 3;
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gAlbedoSpec"), ValueType::T_INT_1, &tex_id);
 		}
 	}
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
 
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 1);
 	renderQuad();
 
 	// ----------------------------------------------------------------------------------
-	
+
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 1);
 
-	glBlitFramebuffer(0, 0, deferred_width_, deferred_height_, 0, 0, deferred_width_, deferred_height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 1);
 
 }

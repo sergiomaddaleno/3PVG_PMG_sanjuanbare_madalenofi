@@ -24,6 +24,9 @@ public:
 	void init();
 
 	void render(ECSManager& ecs, Camera cam);
+	void renderQuad();
+
+	void resize(unsigned int width, unsigned int height);
 
 	Shader gbuffer, deferred_shading;
 
@@ -31,8 +34,10 @@ private:
 	unsigned int gBuffer, rboDepth;
 	unsigned int gPosition, gNormal, gAlbedoSpec;
 
-	unsigned int deferred_width_;
-	unsigned int deferred_height_;
+	unsigned int quadVAO, quadVBO;
+
+	unsigned int width_;
+	unsigned int height_;
 };
 
 #endif // __DEFERRED__

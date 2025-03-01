@@ -199,9 +199,9 @@ void ImGuiManager::Render(GLFWwindow* window) {
         if (fog_window) FogWindow();
         if (load_scene) LoadSceneWindow();
         if (add_mesh_window) AddMeshWindow();
+
+        global.grid.drawGrid(global.cam);
     }
-    
-    global.grid.drawGrid(global.cam);
 
     global.post_process.endRender();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
