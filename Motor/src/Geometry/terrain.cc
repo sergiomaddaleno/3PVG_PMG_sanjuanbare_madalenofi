@@ -288,9 +288,9 @@ void Terrain::draw(){
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-const float* Terrain::GetVertexTerrain()
+std::vector<float> Terrain::GetVertexTerrain()
 {
-    return vertex_terrain_.data();
+    return vertex_terrain_;
 }
 
 void Terrain::initGrid(const int num_cols, const int num_rows)

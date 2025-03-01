@@ -3,6 +3,7 @@
 #define __WAVE__
 
 #include <../deps/glm/glm.hpp>
+#include <vector>
 
 class Shader;
 
@@ -12,7 +13,7 @@ public:
     GerstnerWave();
     ~GerstnerWave();
 
-    void setUniforms(Shader& shader);
+    void setUniforms(Shader& shader, float time);
 
     float time_;
     float amplitude_;

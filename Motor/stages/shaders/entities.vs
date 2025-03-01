@@ -21,7 +21,6 @@ uniform float u_density = 0.06;
 uniform float u_gradient = 2.0;
 
 // wave effect
-out vec3 original_pos;
 uniform float u_time;
 uniform float u_wave_amplitude = 0.2;
 uniform float u_wave_length = 2.0;

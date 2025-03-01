@@ -188,7 +188,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
 
                         render_comp->terrain_->draw();
 
-                        render_comp->terrain_->wave_.setUniforms(shader);
+                        render_comp->terrain_->wave_.setUniforms(shader, (float)glfwGetTime());
                     }
                     break;
 
@@ -201,7 +201,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
 
                         render_comp->sphere_->draw();
 
-                        render_comp->sphere_->wave_.setUniforms(shader);
+                        //render_comp->sphere_->wave_.setUniforms(shader);
                     }
                     break;
 
@@ -215,7 +215,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
 
                         render_comp->cube_->draw();
 
-                        render_comp->cube_->wave_.setUniforms(shader);
+                        //render_comp->cube_->wave_.setUniforms(shader);
                     }
                     break;
 
@@ -228,7 +228,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
 
                         render_comp->quad_->draw();
 
-                        render_comp->quad_->wave_.setUniforms(shader);
+                        //render_comp->quad_->wave_.setUniforms(shader);
                     }
                     break;
                     }

@@ -31,7 +31,7 @@ class Terrain {
   void setTexture(std::string file_path);
   void setHeightMap(std::string file_path);
 
-  const float* GetVertexTerrain();
+  std::vector<float> GetVertexTerrain();
 
   void initGrid(const int num_cols = 70, const int num_rows = 70);
   void drawGrid(Camera cam = Camera());
