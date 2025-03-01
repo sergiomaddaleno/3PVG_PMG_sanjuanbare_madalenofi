@@ -21,12 +21,12 @@ struct LightInfo {
 uniform sampler2D u_texture;
 uniform bool u_use_texture;
 uniform sampler2D u_shadow_map;
-uniform samplerCube depthMap;
+uniform samplerCube u_depth_map;
 
 uniform LightInfo u_light;
 uniform vec3 u_camera_position;
 uniform vec3 u_ambient;
-uniform float far_plane;
+uniform float u_far_plane;
 
 in vec4 FragPosLight;
 
@@ -139,8 +139,8 @@ float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
     vec3 fragToLight = fragPos - lightPos;
     float currentDepth = length(fragToLight); 
     
-    float closestDepth = texture(depthMap, fragToLight).r;
-    closestDepth *= far_plane; 
+    float closestDepth = texture(u_depth_map, fragToLight).r;
+    closestDepth *= u_far_plane; 
 
     float bias = 0.05; 
     float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;

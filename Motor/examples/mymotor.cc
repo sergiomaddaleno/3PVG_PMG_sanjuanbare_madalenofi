@@ -8,11 +8,8 @@
 #include "Core/input.h"
 #include "Managers/lua_manager.h"
 
-#include "Geometry/terrain.h"
 #include "global_data.h"
 #include "utils.h"
-
-
 
 void init() {
 
@@ -64,8 +61,12 @@ int main(int, char**) {
         global.cam.update(input, dt, global.window_width, global.window_height);
 
         if (global.use_skybox) global.skybox.render(global.cam);
-        global.render_system.render(global.ecs, global.cam);
-
+        
+        if (global.deferred_shading){
+            global.render_system.deferredRender(global.ecs, global.cam);
+        }else{
+            global.render_system.forwardRender(global.ecs, global.cam);
+        }
 
         global.ui_manager.Render(window->getWindow());
 

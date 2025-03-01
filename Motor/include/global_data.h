@@ -34,6 +34,8 @@ public:
     bool use_skybox = true;
     bool is_playing = false;
 
+    bool deferred_shading = false;
+
     // -------------------------------------------------------------
     
     //Classes

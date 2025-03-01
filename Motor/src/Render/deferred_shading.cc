@@ -1,5 +1,5 @@
 
-#include "Render/deferred.h"
+#include "Render/deferred_shading.h"
 #include "Systems/ecs_manager.h"
 #include "Core/shader.h"
 
@@ -63,6 +63,8 @@ void Deferred::resize(unsigned int width, unsigned int height)
 	if (width_ != width || height_ != height) {
 		width_ = width;
 		height_ = height;
+
+		init();
 	}
 }
 
@@ -105,7 +107,7 @@ void Deferred::init()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Deferred::render(ECSManager& ecs,Camera cam)
+void Deferred::render(ECSManager& ecs, Camera cam)
 {
 	// Geometry pass -------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
@@ -180,25 +182,25 @@ void Deferred::render(ECSManager& ecs,Camera cam)
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
 
+	int tex_id = 1;
+	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gPosition"), ValueType::T_INT_1, &tex_id);
+	tex_id = 2;
+	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex_id);
+	tex_id = 3;
+	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gAlbedoSpec"), ValueType::T_INT_1, &tex_id);
+
 	auto li = ecs.getComponentList<LightComponent>().begin();
 	auto liend = ecs.getComponentList<LightComponent>().end();
 	for (; li != liend; ++li) {
 		if (li->has_value()) {
 			auto& light_comp = *li;
-
 			light_comp->light.setUniforms(deferred_shading);
-
-			int tex_id = 1;
-			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gPosition"), ValueType::T_INT_1, &tex_id);
-			tex_id= 2;
-			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex_id);
-			tex_id = 3;
-			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gAlbedoSpec"), ValueType::T_INT_1, &tex_id);
 		}
 	}
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 1);
+
 	renderQuad();
 
 	// ----------------------------------------------------------------------------------

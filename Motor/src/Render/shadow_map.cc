@@ -170,13 +170,13 @@ void ShadowMap::renderSceneMultipleShadow(ECSManager& ecs, Shader shader, Shader
 
     shader.setUniformValue(shader.getUniformLocation("lightPos"), ValueType::T_FLOAT_3, glm::value_ptr(lc.light.pos_));
 
-    shader.setUniformValue(shader.getUniformLocation("far_plane"), ValueType::T_FLOAT_1, &far_plane);
+    shader.setUniformValue(shader.getUniformLocation("u_far_plane"), ValueType::T_FLOAT_1, &far_plane);
 
     // Vincular el cubemap de profundidad
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
     int texture_unit = 0;
-    shader.setUniformValue(shader.getUniformLocation("depthMap"), ValueType::T_INT_1, &texture_unit);
+    shader.setUniformValue(shader.getUniformLocation("u_depth_map"), ValueType::T_INT_1, &texture_unit);
 
     // Configurar framebuffer y viewport
     glViewport(0, 0, shadow_width_, shadow_height_);

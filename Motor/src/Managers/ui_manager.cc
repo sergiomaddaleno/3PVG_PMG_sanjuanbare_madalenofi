@@ -318,11 +318,7 @@ void UIManager::GameWindow() {
     }
 
     GLuint captureTexture = global.post_process.frame_buffer_.GetColorTexture();
-    if (captureTexture) {
-        ImVec2 uv0(0.0f, 1.0f);
-        ImVec2 uv1(1.0f, 0.0f);
-        ImGui::Image((ImTextureID)(intptr_t)captureTexture, window_size, uv0, uv1);
-    }
+    if (captureTexture) ImGui::Image((ImTextureID)(intptr_t)captureTexture, { window_size.x, window_size.y - (button_size.y + 7.0f)}, { 0.0f, 1.0f }, { 1.0f, 0.0f });
 
     ImGui::End();
 }
@@ -1159,6 +1155,16 @@ void UIManager::TopBarWindow() {
         ImGui::Image(m_EditIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
         ImGui::SameLine();
         if (ImGui::BeginMenu("Edit")) {
+
+            if (ImGui::BeginMenu("Render Type")) {
+                if (ImGui::MenuItem("Forward Render", nullptr)) {
+                    global.deferred_shading = false;
+                }
+                if (ImGui::MenuItem("Deferred Render", nullptr)) {
+                    global.deferred_shading = true;
+                }
+                ImGui::EndMenu();
+            }
 
             if (ImGui::BeginMenu("Drawing Type")) {
 

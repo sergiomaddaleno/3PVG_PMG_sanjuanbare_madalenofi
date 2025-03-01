@@ -126,7 +126,7 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &global.sky_colour);
 }
 
-void RenderSystem::render(ECSManager& ecs, Camera cam) {
+void RenderSystem::forwardRender(ECSManager& ecs, Camera cam) {
     
     glEnable(GL_DEPTH_TEST);
     glClear( GL_DEPTH_BUFFER_BIT);
@@ -240,10 +240,12 @@ void RenderSystem::render(ECSManager& ecs, Camera cam) {
     
     glDisable(GL_BLEND);
     glUseProgram(0);
-    
-     //deferred.resize(global.window_width, global.window_height);
-     //deferred.render(ecs, cam);
+}
 
+void RenderSystem::deferredRender(ECSManager& ecs, Camera cam)
+{
+    deferred.resize(global.window_width, global.window_height);
+    deferred.render(ecs, cam);
 }
 
 void RenderSystem::setup(ECSManager& ecs)

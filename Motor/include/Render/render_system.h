@@ -14,7 +14,7 @@
 
 #include "../Systems/ecs_manager.h"
 #include "Render/camera.h"
-#include "Render/deferred.h"
+#include "Render/deferred_shading.h"
 
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
@@ -36,7 +36,9 @@ public:
 
 	void setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
 
-	void render(ECSManager& ecs, Camera cam);
+	void forwardRender(ECSManager& ecs, Camera cam);
+
+	void deferredRender(ECSManager& ecs, Camera cam);
 
 	//call one time to create entites
 	void setup(ECSManager& ecs);
