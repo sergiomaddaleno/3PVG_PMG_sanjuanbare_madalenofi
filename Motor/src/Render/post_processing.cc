@@ -55,6 +55,7 @@ void PostProcessing::endRender()
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     
     glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
     frame_buffer_.unbind();
 }
 
@@ -87,11 +88,14 @@ void PostProcessing::render(Shader& shader)
 
 void PostProcessing::resize(unsigned int width, unsigned int height)
 {
-    width_ = width;
-    height_ = height;
+    if (width_ != width || height_ != height) {
 
-    frame_buffer_.resize(width_, height_);
+        width_ = width;
+        height_ = height;
 
-    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
+        frame_buffer_.resize(width_, height_);
+
+        glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
+    }
 }

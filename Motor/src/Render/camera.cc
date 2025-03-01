@@ -24,7 +24,7 @@ Camera::Camera()
     accum_mouse_offset_(0.0f, 0.0f),
     speed_(5.0f),
     sensitivity_(1.0f),
-    fov_(global.use_fog),
+    fov_(global.fov),
     aspect_ratio_((float)global.window_width / (float)global.window_height),
     near_clip_plane_(global.near_clip_plane),
     far_clip_plane_(global.far_clip_plane),

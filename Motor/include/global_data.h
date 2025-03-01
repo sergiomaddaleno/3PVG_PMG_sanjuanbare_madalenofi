@@ -9,6 +9,7 @@
 #include "Systems/ecs_manager.h"
 #include "Managers/save_manager.h"
 #include "Managers/imgui_manager.h"
+#include "Geometry/terrain.h"
 
 class Globals {
 public:
@@ -43,6 +44,7 @@ public:
     Skybox skybox;
     SaveManager save_manager;
     ImGuiManager imgui_manager;
+    Terrain grid;
 };
 
 extern Globals global;

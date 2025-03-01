@@ -12,14 +12,18 @@
 #include "global_data.h"
 #include "utils.h"
 
-Terrain grid;
+
 
 void init() {
+
+    global.post_process.initData();
+    global.render_system.setupEntities(global.ecs);
+
     initShader(global.render_system.shader, "../stages/shaders/entities.vs", "../stages/shaders/entities.fs");
     initShader(global.render_system.deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
     initShader(global.render_system.deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
 
-    grid.initGrid();
+    global.grid.initGrid();
 }
 
 int main(int, char**) {
@@ -47,8 +51,12 @@ int main(int, char**) {
         window->updateWindow();
         window->toggleFullScreen(input);
 
-        global.window_width = window->getWidth();
-        global.window_height = window->getHeight();
+        if (global.window_width != window->getWidth() ||
+            global.window_height != window->getHeight()) {
+
+            global.window_width = window->getWidth();
+            global.window_height = window->getHeight();
+        }
 
         global.post_process.resize(global.window_width, global.window_height);
         global.post_process.beginRender();
@@ -58,7 +66,6 @@ int main(int, char**) {
         if (global.use_skybox) global.skybox.render(global.cam);
         global.render_system.renderEntities(global.ecs, global.cam);
 
-        grid.drawGrid(global.cam);
 
         global.imgui_manager.Render(window->getWindow());
 

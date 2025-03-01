@@ -171,10 +171,6 @@ void ImGuiManager::Init(GLFWwindow* window) {
     m_PlayIcon.loadTexture("../stages/assets/textures/imgui/play.png");
     m_StopIcon.loadTexture("../stages/assets/textures/imgui/stop.png");
 
-    //---
-    global.post_process.initData();
-
-    global.render_system.setupEntities(global.ecs);
 
     global.save_manager.loadFromFile("../stages/saves/main_scene.json");
     //---
@@ -205,6 +201,8 @@ void ImGuiManager::Render(GLFWwindow* window) {
         if (add_mesh_window) AddMeshWindow();
     }
     
+    global.grid.drawGrid(global.cam);
+
     global.post_process.endRender();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -279,13 +277,12 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
         ImGui::DockBuilderDockWindow("Inspector", dock_right);
         ImGui::DockBuilderDockWindow("ContentBrowser", dock_bottom);
         ImGui::DockBuilderDockWindow("GameWindow", dock_main);
-        ImGui::DockBuilderDockWindow("PostProcess", dock_bottom_right);
-        ImGui::DockBuilderDockWindow("Fog", dock_bottom_right);
-        ImGui::DockBuilderDockWindow("ShadowMap", dock_bottom_right);
-        ImGui::DockBuilderDockWindow("SkyBox", dock_bottom_right);
+        ImGui::DockBuilderDockWindow("PostProcess", dock_right);
+        ImGui::DockBuilderDockWindow("Fog", dock_right);
+        ImGui::DockBuilderDockWindow("SkyBox", dock_right);
         ImGui::DockBuilderDockWindow("Console", dock_bottom_right);
-        ImGui::DockBuilderDockWindow("Load Scene", dock_bottom_right);
-        ImGui::DockBuilderDockWindow("Add Mesh", dock_bottom_right);
+        ImGui::DockBuilderDockWindow("Load Scene", dock_right);
+        ImGui::DockBuilderDockWindow("Add Mesh", dock_right);
 
         ImGui::DockBuilderFinish(dockspace_id);
     }
@@ -1372,7 +1369,6 @@ void ImGuiManager::PostProcessWindow()
     static std::string fragment_file_path;
     static std::string fragment_file_name;
     static char* fragment_content = nullptr;
-    ImGui::SameLine();
     if (ImGui::Button(!fragment_file_path.empty() ? fragment_file_name.c_str() : ".fs Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
@@ -1585,7 +1581,7 @@ void ImGuiManager::SkyboxWindow()
             );
             global.skybox.initDDS();
 
-            AddConsoleMessage(skybox_file_name + "compiled");
+            AddConsoleMessage(skybox_file_name + " compiled");
 
             skybox_file_path.clear();
             skybox_file_name.clear();
@@ -1707,7 +1703,6 @@ void ImGuiManager::AddMeshWindow()
         ImGui::EndDragDropTarget();
     }
 
-    ImGui::SameLine();
     if (ImGui::Button(!texture_folder_path.empty() ? texture_folder_name.c_str() : "Texture Folder Drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
