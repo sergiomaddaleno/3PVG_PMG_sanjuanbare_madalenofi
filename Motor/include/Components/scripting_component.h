@@ -6,10 +6,10 @@
 
 struct ScriptingComponent {
 
-	std::shared_ptr<LuaScript> lua_script = nullptr;
+	std::shared_ptr<LuaScript> lua_script;
 
-	ScriptingComponent() : lua_script(std::make_shared<LuaScript>()) {}
-	~ScriptingComponent(){}
+	ScriptingComponent();
+	~ScriptingComponent();
 };
 
 #endif // __SCRIPTING_COMPONENT__
