@@ -8,7 +8,7 @@
 #include "Render/render_system.h"
 #include "Systems/ecs_manager.h"
 #include "Managers/save_manager.h"
-#include "Managers/imgui_manager.h"
+#include "Managers/ui_manager.h"
 #include "Geometry/terrain.h"
 
 class Globals {
@@ -43,7 +43,7 @@ public:
     RenderSystem render_system;
     Skybox skybox;
     SaveManager save_manager;
-    ImGuiManager imgui_manager;
+    UIManager ui_manager;
     Terrain grid;
 };
 

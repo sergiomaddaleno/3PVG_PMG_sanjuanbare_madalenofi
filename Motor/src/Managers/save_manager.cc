@@ -332,7 +332,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             }
         }
     }
-    rs.initEntities(ecs);
+    rs.init(ecs);
 }
 
 void SaveManager::saveToFile(std::string filename)

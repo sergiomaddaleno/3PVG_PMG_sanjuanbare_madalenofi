@@ -1,5 +1,5 @@
 
-#include "Managers/imgui_manager.h"
+#include "Managers/ui_manager.h"
 #include "utils.h"
 #include "Render/post_processing.h"
 #include "Components/render_component.h"
@@ -47,7 +47,7 @@
 
 ImGui::FileBrowser fileDialog;
 
-ImGuiManager::ImGuiManager()
+UIManager::UIManager()
     : selected_entity(0),
     m_BaseDirectory("../"),
     m_CurrentDirectory(m_BaseDirectory),
@@ -70,16 +70,16 @@ ImGuiManager::ImGuiManager()
     add_mesh_window(false)
 {}
 
-ImGuiManager::~ImGuiManager() {
+UIManager::~UIManager() {
     Cleanup();
 }
-void ImGuiManager::Cleanup() {
+void UIManager::Cleanup() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
 
-void ImGuiManager::SetImguiTheme() {
+void UIManager::SetImguiTheme() {
     ImGuiStyle& style = ImGui::GetStyle();
     ImVec4* colors = style.Colors;
 
@@ -133,7 +133,7 @@ void ImGuiManager::SetImguiTheme() {
     style.FramePadding = ImVec2(5.0f, 3.0f);
 }
 
-void ImGuiManager::Init(GLFWwindow* window) {
+void UIManager::Init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -180,7 +180,7 @@ void ImGuiManager::Init(GLFWwindow* window) {
 
 }
 
-void ImGuiManager::Render(GLFWwindow* window) {
+void UIManager::Render(GLFWwindow* window) {
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
@@ -221,7 +221,7 @@ void ImGuiManager::Render(GLFWwindow* window) {
 }
 
 //--
-void ImGuiManager::ImguiWindow(GLFWwindow* window) {
+void UIManager::ImguiWindow(GLFWwindow* window) {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     if (global.is_playing) {
@@ -290,7 +290,7 @@ void ImGuiManager::ImguiWindow(GLFWwindow* window) {
     ImGui::End();
 }
 
-void ImGuiManager::GameWindow() {
+void UIManager::GameWindow() {
     ImVec2 button_size = { 20.0f, 20.0f };
     ImVec2 button_pos;
 
@@ -327,7 +327,7 @@ void ImGuiManager::GameWindow() {
     ImGui::End();
 }
 
-void ImGuiManager::HierarchyWindow() {
+void UIManager::HierarchyWindow() {
     ImGui::Begin("Hierarchy", nullptr);
 
     auto& loc_ecs = global.ecs;
@@ -367,7 +367,7 @@ void ImGuiManager::HierarchyWindow() {
     ImGui::End();
 }
 
-void ImGuiManager::InspectorWindow() {
+void UIManager::InspectorWindow() {
     ImGui::Begin("Inspector");
 
     if (global.ecs.has_component<NameComponent>(selected_entity)) {
@@ -1050,7 +1050,7 @@ void ImGuiManager::InspectorWindow() {
     ImGui::End();
 }
 
-void ImGuiManager::ContentBrowserWindow() {
+void UIManager::ContentBrowserWindow() {
     ImGui::Begin("ContentBrowser");
 
     if (std::filesystem::canonical(m_CurrentDirectory) != std::filesystem::canonical(m_BaseDirectory))
@@ -1113,7 +1113,7 @@ void ImGuiManager::ContentBrowserWindow() {
     ImGui::End();
 }
 
-void ImGuiManager::TopBarWindow() {
+void UIManager::TopBarWindow() {
 
     ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_MenuBar);
 
@@ -1208,31 +1208,31 @@ void ImGuiManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Sphere")) {
                     global.render_system.createSphere(loc_ecs);
-                    global.render_system.initEntities(loc_ecs);
+                    global.render_system.init(loc_ecs);
                     AddConsoleMessage("Sphere added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 8v")) {
                     global.render_system.createCube8v(loc_ecs);
-                    global.render_system.initEntities(loc_ecs);
+                    global.render_system.init(loc_ecs);
                     AddConsoleMessage("Cube 8v added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 24v")) {
                     global.render_system.createCube24v(loc_ecs);
-                    global.render_system.initEntities(loc_ecs);
+                    global.render_system.init(loc_ecs);
                     AddConsoleMessage("Cube 24v added to scene");
                 }
 
                 if (ImGui::MenuItem("Quad")) {
                     global.render_system.createQuad(loc_ecs);
-                    global.render_system.initEntities(loc_ecs);
+                    global.render_system.init(loc_ecs);
                     AddConsoleMessage("Quad added to scene");
                 }
 
                 if (ImGui::MenuItem("Terrain")) {
                     global.render_system.createTerrain(loc_ecs);
-                    global.render_system.initEntities(loc_ecs);
+                    global.render_system.init(loc_ecs);
                     AddConsoleMessage("Terrain Light added to scene");
                 }
 
@@ -1243,19 +1243,19 @@ void ImGuiManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Point Light")) {
                     global.render_system.createPointLight(loc_ecs);
-                    global.render_system.initEntities(loc_ecs);
+                    global.render_system.init(loc_ecs);
                     AddConsoleMessage("Point Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Spot Light")) {
                     global.render_system.createSpotLight(loc_ecs);
-                    global.render_system.initEntities(loc_ecs);
+                    global.render_system.init(loc_ecs);
                     AddConsoleMessage("Spot Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Directional Light")) {
                     global.render_system.createDirectionalLight(loc_ecs);
-                    global.render_system.initEntities(loc_ecs);
+                    global.render_system.init(loc_ecs);
                     AddConsoleMessage("Directional Light added to scene");
                 }
 
@@ -1341,7 +1341,7 @@ void ImGuiManager::TopBarWindow() {
 }
 //--
 
-void ImGuiManager::PostProcessWindow()
+void UIManager::PostProcessWindow()
 {
     ImGui::Begin("PostProcess");
 
@@ -1450,7 +1450,7 @@ void ImGuiManager::PostProcessWindow()
 }
 
 
-void ImGuiManager::FogWindow()
+void UIManager::FogWindow()
 {
     ImGui::Begin("Fog");
 
@@ -1479,7 +1479,7 @@ void ImGuiManager::FogWindow()
     ImGui::End();
 }
 
-void ImGuiManager::SkyboxWindow()
+void UIManager::SkyboxWindow()
 {
     ImGui::Begin("SkyBox");
 
@@ -1594,7 +1594,7 @@ void ImGuiManager::SkyboxWindow()
     ImGui::End();
 }
 
-void ImGuiManager::ConsoleWindow()
+void UIManager::ConsoleWindow()
 {
     ImGui::Begin("Console");
 
@@ -1627,7 +1627,7 @@ void ImGuiManager::ConsoleWindow()
 }
 
 
-void ImGuiManager::AddConsoleMessage(const std::string& message)
+void UIManager::AddConsoleMessage(const std::string& message)
 {
     consoleMessages.push_back(message);
 
@@ -1637,7 +1637,7 @@ void ImGuiManager::AddConsoleMessage(const std::string& message)
     }
 }
 
-void ImGuiManager::LoadSceneWindow()
+void UIManager::LoadSceneWindow()
 {
     ImGui::Begin("Load Scene");
 
@@ -1678,7 +1678,7 @@ void ImGuiManager::LoadSceneWindow()
     ImGui::End();
 }
 
-void ImGuiManager::AddMeshWindow()
+void UIManager::AddMeshWindow()
 {
     ImGui::Begin("Add Mesh");
 
@@ -1724,7 +1724,7 @@ void ImGuiManager::AddMeshWindow()
         
         if (!obj_file_path.empty() && !texture_folder_path.empty()) {
             global.render_system.createMesh(global.ecs, obj_file_path, texture_folder_path);
-            global.render_system.initEntities(global.ecs);
+            global.render_system.init(global.ecs);
 
             AddConsoleMessage(obj_file_name + " added to scene");
 
@@ -1739,7 +1739,7 @@ void ImGuiManager::AddMeshWindow()
 }
 //--
 
-void ImGuiManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity) {
+void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity) {
 
     static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     static bool useSnap = false;

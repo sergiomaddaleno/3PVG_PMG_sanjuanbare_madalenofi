@@ -41,7 +41,7 @@ RenderSystem::RenderSystem()
 
 RenderSystem::~RenderSystem() {}
 
-void RenderSystem::initEntities(ECSManager& ecs) {
+void RenderSystem::init(ECSManager& ecs) {
     
     auto ri = ecs.getComponentList<RenderComponent>().begin();
     auto li = ecs.getComponentList<LightComponent>().begin();
@@ -126,7 +126,7 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &global.sky_colour);
 }
 
-void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
+void RenderSystem::render(ECSManager& ecs, Camera cam) {
     
     glEnable(GL_DEPTH_TEST);
     glClear( GL_DEPTH_BUFFER_BIT);
@@ -246,7 +246,7 @@ void RenderSystem::renderEntities(ECSManager& ecs, Camera cam) {
 
 }
 
-void RenderSystem::setupEntities(ECSManager& ecs)
+void RenderSystem::setup(ECSManager& ecs)
 {
     entity_ = ecs.create_entity();
 

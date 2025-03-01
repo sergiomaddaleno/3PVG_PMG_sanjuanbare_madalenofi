@@ -17,7 +17,7 @@
 void init() {
 
     global.post_process.initData();
-    global.render_system.setupEntities(global.ecs);
+    global.render_system.setup(global.ecs);
 
     initShader(global.render_system.shader, "../stages/shaders/entities.vs", "../stages/shaders/entities.fs");
     initShader(global.render_system.deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
@@ -38,7 +38,7 @@ int main(int, char**) {
 
     init();
 
-    global.imgui_manager.Init(window->getWindow());
+    global.ui_manager.Init(window->getWindow());
 
     float dt = 0.0f;
     double currentTime = 0.0f;
@@ -64,10 +64,10 @@ int main(int, char**) {
         global.cam.update(input, dt, global.window_width, global.window_height);
 
         if (global.use_skybox) global.skybox.render(global.cam);
-        global.render_system.renderEntities(global.ecs, global.cam);
+        global.render_system.render(global.ecs, global.cam);
 
 
-        global.imgui_manager.Render(window->getWindow());
+        global.ui_manager.Render(window->getWindow());
 
         if (window->closePressed(input)) done = true;
     }

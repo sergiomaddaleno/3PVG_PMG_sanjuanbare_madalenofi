@@ -32,16 +32,14 @@ public:
 	RenderSystem();
 	~RenderSystem();
 
-	void initEntities(ECSManager &ecs);
+	void init(ECSManager &ecs);
 
 	void setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
 
-	void renderEntities(ECSManager& ecs, Camera cam);
+	void render(ECSManager& ecs, Camera cam);
 
-	//----------------------------------
-	
 	//call one time to create entites
-	void setupEntities(ECSManager& ecs);
+	void setup(ECSManager& ecs);
 
 	//----------------------------------
 

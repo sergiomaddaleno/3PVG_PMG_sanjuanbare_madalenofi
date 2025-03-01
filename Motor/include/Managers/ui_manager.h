@@ -10,10 +10,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-class ImGuiManager {
+class UIManager {
 public:
-    ImGuiManager();
-    ~ImGuiManager();
+    UIManager();
+    ~UIManager();
 
     void Init(GLFWwindow* window);
     void Render(GLFWwindow* window);
