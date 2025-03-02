@@ -375,6 +375,8 @@ std::string SaveManager::newFile()
     std::string directory = std::filesystem::absolute("../stages/saves/").string();
     std::filesystem::path dirPath(directory);
 
+    if (!std::filesystem::exists(dirPath)) std::filesystem::create_directories(dirPath);
+
     std::string filename = directory + "scene_" + std::to_string(number_of_scenes) + ".json";
     std::ofstream file(filename);
 
