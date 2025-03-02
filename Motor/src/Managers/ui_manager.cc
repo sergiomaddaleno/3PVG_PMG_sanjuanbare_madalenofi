@@ -171,8 +171,6 @@ void UIManager::Init(GLFWwindow* window) {
     m_PlayIcon.loadTexture("../stages/assets/textures/imgui/play.png");
     m_StopIcon.loadTexture("../stages/assets/textures/imgui/stop.png");
 
-
-    global.save_manager.loadFromFile("../stages/saves/main_scene.json");
     //---
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);

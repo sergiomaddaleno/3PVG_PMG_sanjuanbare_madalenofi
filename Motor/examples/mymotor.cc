@@ -16,6 +16,8 @@ void init() {
     global.post_process.initData();
     global.render_system.setup(global.ecs);
 
+    global.save_manager.loadFromFile("../stages/saves/main_scene.json");
+
     initShader(global.render_system.shader, "../stages/shaders/entities.vs", "../stages/shaders/entities.fs");
     initShader(global.render_system.deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
     initShader(global.render_system.deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
@@ -33,9 +35,9 @@ int main(int, char**) {
 
     Input input{ window->getWindow() };
 
-    init();
-
     global.ui_manager.Init(window->getWindow());
+
+    init();
 
     float dt = 0.0f;
     double currentTime = 0.0f;
