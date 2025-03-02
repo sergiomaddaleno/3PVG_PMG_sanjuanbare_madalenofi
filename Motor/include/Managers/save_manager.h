@@ -25,7 +25,7 @@ public:
 	
 	void saveToFile(std::string filename);
 	void loadFromFile(std::string filename);
-	void newFile();
+	std::string newFile();
 
 	std::string getCurrentScene() { return current_scene_file; }
 	void setCurrentScene(std::string scene_file) { current_scene_file = scene_file; }

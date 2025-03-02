@@ -352,25 +352,24 @@ void SaveManager::saveToFile(std::string filename)
 }
 
 void SaveManager::loadFromFile(std::string filename) {
-
     std::ifstream file(filename);
-    if (file.is_open()) {
 
-        current_scene_file = filename;
+    if (!file.is_open()) {
+        filename = newFile();
+        file.open(filename);
+    }
 
-        nlohmann::json j;
-        file >> j;
-        file.close();
-        deSerialize(j, global.ecs, global.render_system, global.cam, global.skybox);
-        
-        printf("Loaded from %s\n", filename.c_str());
-    }
-    else {
-        printf("Unable to open file\n");
-    }
+    current_scene_file = filename;
+
+    nlohmann::json j;
+    file >> j;
+    file.close();
+
+    deSerialize(j, global.ecs, global.render_system, global.cam, global.skybox);
+    printf("Loaded from %s\n", filename.c_str());
 }
 
-void SaveManager::newFile()
+std::string SaveManager::newFile()
 {
     std::string filename = "../stages/saves/scene_" + std::to_string(number_of_scenes) + ".json";
     std::ofstream file(filename);
@@ -421,6 +420,8 @@ void SaveManager::newFile()
     }
 
     number_of_scenes++;
+
+    return filename;
 }
 
 glm::vec3 SaveManager::parseVec3(const nlohmann::json& j)
