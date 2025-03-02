@@ -26,8 +26,6 @@ public:
 
 	void active(unsigned int num = 0);
 	void bind();
-	void renderSceneOneShadow(ECSManager& ecs, Shader shader, LightComponent lc);
-	void renderSceneMultipleShadow(ECSManager& ecs, Shader shader, Shader GeomtryShader, LightComponent lc);
 	void render(ECSManager& ecs, Shader shader, LightComponent lc);
 
 	float near_plane, far_plane;
@@ -37,6 +35,9 @@ public:
 	float directional_size_;
 
 private:
+	void renderScene(ECSManager& ecs, Shader shader, LightComponent lc);
+	void renderCubeMap(ECSManager& ecs, Shader shader, Shader GeomtryShader, LightComponent lc);
+
 	unsigned int depthMapFBO;
 	unsigned int depthMap;
 	unsigned int depthCubemap;

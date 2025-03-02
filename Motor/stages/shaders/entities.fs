@@ -152,7 +152,7 @@ void main() {
 
     vec3 final_light = u_ambient;
     float shadow = ShadowCalculation(FragPosLight);
-    //float shadow_pl = ShadowCalculationPoint(FragPosLight, u_light.pos_);
+    float shadow_pl = ShadowCalculationPoint(FragPosLight.xyz, u_light.pos_);
 
     if (u_light.type_ == 0) {
         final_light += DirectionalLight(u_light) * shadow ; 
@@ -163,7 +163,7 @@ void main() {
     }
     
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light) * shadow;  
+        final_light += PointLight(u_light) * shadow_pl;  
     }
 
    vec3 color;

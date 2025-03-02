@@ -58,8 +58,9 @@ void ShadowMap::init()
 
 void ShadowMap::initCubeMap()
 {
-    char* vs_geometry = (char*)ReadFile("../stages/assets/shaders/geometry.gs");
+    char* vs_geometry = (char*)ReadFile("../stages/shaders/geometry.gs");
     geometry_.compileGeometry(vs_geometry);
+    free(vs_geometry);
 
     glGenTextures(1, &depthCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
@@ -98,7 +99,7 @@ void ShadowMap::bind()
     }
 }
 
-void ShadowMap::renderSceneOneShadow(ECSManager& ecs, Shader shader, LightComponent lc) {
+void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
 
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_FRONT);
@@ -163,7 +164,7 @@ void ShadowMap::renderSceneOneShadow(ECSManager& ecs, Shader shader, LightCompon
     glViewport(0, 0, global.window_width, global.window_height);
 }
 
-void ShadowMap::renderSceneMultipleShadow(ECSManager& ecs, Shader shader, Shader GeomtryShader,LightComponent lc) {
+void ShadowMap::renderCubeMap(ECSManager& ecs, Shader shader, Shader GeomtryShader, LightComponent lc) {
 
     glEnable(GL_DEPTH_TEST);
     shader.useProgram();
@@ -226,7 +227,6 @@ void ShadowMap::renderSceneMultipleShadow(ECSManager& ecs, Shader shader, Shader
     glViewport(0, 0, global.window_width, global.window_height);
 }
 
-
 void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
 
@@ -239,8 +239,6 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
         lightView = glm::lookAt(lc.light.pos_, lc.light.pos_ + lc.light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
         lightSpaceMatrix = lightProjection * lightView;
 
-        renderSceneOneShadow(ecs,shader,lc);
-
         break;
     }
     case LightType::LT_Directional:
@@ -251,14 +249,12 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
         lightSpaceMatrix = lightProjection * lightView;
 
-        renderSceneOneShadow(ecs, shader, lc);
-
         break;
     }
     case LightType::LT_Point:
     {
-    
-        
+        geometry_.useProgram();
+
         float aspect = (float) shadow_width_ / (float) shadow_height_;
         lightProjection = glm::perspective(glm::radians(90.0f), aspect, near_plane, far_plane);
 
@@ -276,14 +272,12 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, face, depthCubemap, 0);
 
             std::string uniformName = "shadowMatrices[" + std::to_string(i) + "]";
-            geometry_.setUniformValue(geometry_.getUniformLocation(uniformName.c_str()), ValueType::T_MAT_4x4, glm::value_ptr(lightSpaceMatrix[i]));
-
-            renderSceneMultipleShadow(ecs, shader, geometry_,lc);
+            geometry_.setUniformValue(geometry_.getUniformLocation(uniformName.c_str()), ValueType::T_MAT_4x4, glm::value_ptr(shadowTransforms[i]));
         }
 
         break;
     }
     }
 
-   
+    renderScene(ecs, shader, lc);
 }
