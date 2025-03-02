@@ -17,6 +17,7 @@
 #include <../nlohmann/json.hpp>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include "utils.h"
 
 SaveManager::SaveManager()
@@ -371,7 +372,10 @@ void SaveManager::loadFromFile(std::string filename) {
 
 std::string SaveManager::newFile()
 {
-    std::string filename = "../stages/saves/scene_" + std::to_string(number_of_scenes) + ".json";
+    std::string directory = std::filesystem::absolute("../stages/saves/").string();
+    std::filesystem::path dirPath(directory);
+
+    std::string filename = directory + "scene_" + std::to_string(number_of_scenes) + ".json";
     std::ofstream file(filename);
 
     if (file.is_open()) {
