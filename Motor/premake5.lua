@@ -108,7 +108,6 @@ files {
 	"deps/imgui/backends/imgui_impl_opengl3.h",
 	"deps/imgui/backends/imgui_impl_opengl3.cpp",
 	"deps/imgui/backends/imgui_impl_opengl3_loader.h",
-	"deps/imgui/*.cpp",
 	"deps/imGuizmo/*.h",
 	"deps/imGuizmo/*.cpp",
 

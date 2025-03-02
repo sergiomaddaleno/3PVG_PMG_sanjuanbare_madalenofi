@@ -1,8 +1,6 @@
 
-#include "window.h"
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Core/window.h"
+#include "Core/Input.h"
 
 #include <../deps/glm/glm.hpp>
 #include <optional>
@@ -12,11 +10,11 @@ glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
 int main(int, char**) {
 
-	//---
 	auto window = Window::make(800, 600, "Window");
 	window->setWindowActive();
 	//window->initGLEW();
-	//---
+
+	Input input { window->getWindow() };
 
 	double lastTime = window->getTime();
 	bool done = false;
@@ -30,7 +28,7 @@ int main(int, char**) {
 
 
 
-		if (window->closePressed()) done = true;
+		if (window->closePressed(input)) done = true;
 	}
 
 	return 0;
