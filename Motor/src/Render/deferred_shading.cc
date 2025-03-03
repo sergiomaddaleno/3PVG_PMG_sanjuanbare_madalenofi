@@ -168,7 +168,7 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			}
 		}
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 1);
 
 	// Lightning pass -------------------------------------------------
 
@@ -189,19 +189,32 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	tex_id = 3;
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gAlbedoSpec"), ValueType::T_INT_1, &tex_id);
 
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_BLEND);
+
+	glBlendFunc(GL_ONE, GL_ZERO);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LEQUAL);
+
 	auto li = ecs.getComponentList<LightComponent>().begin();
 	auto liend = ecs.getComponentList<LightComponent>().end();
 	for (; li != liend; ++li) {
 		if (li->has_value()) {
 			auto& light_comp = *li;
 			light_comp->light.setUniforms(deferred_shading);
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
+
+			renderQuad();
 		}
+		glBlendFunc(GL_ONE, GL_ONE);
 	}
-	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
+	
+	glDisable(GL_BLEND);
+	glUseProgram(0);
+	
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 1);
-
-	renderQuad();
+	
 
 	// ----------------------------------------------------------------------------------
 
