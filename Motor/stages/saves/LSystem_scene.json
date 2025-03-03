@@ -1,0 +1,153 @@
+{
+ "Camera": {
+  "Aspect_ratio": 1.7769999504089355,
+  "Far_clip_plane": 1000.0,
+  "Fov": 45.0,
+  "Near_clip_plane": 0.10000000149011612,
+  "Ortho_height": 600.0,
+  "Ortho_width": 800.0,
+  "Position": [
+   16.562149047851563,
+   17.669139862060547,
+   -15.846010208129883
+  ],
+  "Scroll_speed": 1.0,
+  "Sensitivity": 1.0,
+  "Speed": 0.023000000044703484,
+  "Use_perspective_matrix": true,
+  "View_direction": [
+   -0.7381055355072021,
+   -0.5065168142318726,
+   0.44569164514541626
+  ]
+ },
+ "Entities": [
+  {
+   "Entity_id": 0,
+   "Name_component": {
+    "Entity_name": "Cube8v [0]"
+   },
+   "Render_component": {
+    "Cube": {
+     "Texture_path": "../stages/assets/textures/images/blue.png",
+     "cube_24v": false,
+     "cube_8v": true,
+     "size": 1.0
+    },
+    "Render_type": 3
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 1
+  },
+  {
+   "Entity_id": 2,
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
+      ]
+     ],
+     "Light_color": [
+      [
+       21.847156524658203,
+       20.572269439697266,
+       20.572269439697266
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Spot_softness": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   },
+   "Name_component": {
+    "Entity_name": "Directional Light [0]"
+   }
+  }
+ ],
+ "Skybox": {
+  "Cubemap_file_paths": [
+   "..\\stages\\assets\\textures\\skybox\\cubemap\\nebulae\\right.png",
+   "..\\stages\\assets\\textures\\skybox\\cubemap\\nebulae\\left.png",
+   "..\\stages\\assets\\textures\\skybox\\cubemap\\nebulae\\bottom.png",
+   "..\\stages\\assets\\textures\\skybox\\cubemap\\nebulae\\top.png",
+   "..\\stages\\assets\\textures\\skybox\\cubemap\\nebulae\\front.png",
+   "..\\stages\\assets\\textures\\skybox\\cubemap\\nebulae\\back.png"
+  ],
+  "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
+  "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
+  "DDS_angle": -90.0,
+  "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
+  "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
+  "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
+  "Use_cubemap": true
+ }
+}
