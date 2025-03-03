@@ -1,3 +1,4 @@
+#include <vector>
 
 #include "IA/l_system.h"
 #include "utils.h"
@@ -7,7 +8,6 @@
 #include "Systems/ecs_manager.h"
 
 #include "Components\transform_component.h"
-
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -22,49 +22,44 @@ LSystem::~LSystem()
 {
 }
 
-void LSystem::init(std::string& axiom, std::string& rule, int iterations)
-{
-    axiom_ = axiom;
-    rule_ = rule;
-
+void LSystem::init(std::string axiom, std::string rules, int iterations) {
+    std::vector<Branch> branchStack;
     Branch branch;
-    branch.position = glm::vec3(0.0f, 0.0f, 0.0f); 
+    branch.position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    for (int i = 0; i < iterations; i++) {
+    for (int i = 0; i < iterations; ++i) {
         std::string new_axiom = "";
 
-        for (char axiom_char : axiom_) {
+        for (char axiom_char : axiom) {
             switch (axiom_char) {
-            case 'F': {
+            case 'C': {
                 TransformComponent tc;
                 tc.position = branch.position;
                 tc.scale = glm::vec3(1.0f);
+                global.render_system.createCube8v(global.ecs, tc); 
 
-                global.render_system.createCube8v(global.ecs, tc);
-                new_axiom += rule_;
+                new_axiom += rules;
+
                 break;
             }
-            case '+': branch.position.x += cube_size; break;
-            case '-': branch.position.x -= cube_size; break;
-            case '^': branch.position.y += cube_size; break;
-            case 'v': branch.position.y -= cube_size; break;
+            case 'E': {
+                TransformComponent tc;
+                tc.position = branch.position;
+                tc.scale = glm::vec3(1.0f); 
 
-            //case '[': positions.push_back(branch.position); break;
-            //case ']':
-            //    if (!positions.empty()) {
-            //        branch.position = positions.back();
-            //        positions.pop_back();
-            //    }
-            //    break;
-
-            default: new_axiom += axiom_char; break;
+                new_axiom += rules;
+                break;
+            }
+            case '+': { branch.position.y += cube_size; new_axiom += rules;break; } 
+            case '-': { branch.position.y -= cube_size; new_axiom += rules;break; }
+            case 'R': { branch.position.x += cube_size; new_axiom += rules;break; } 
+            case 'L': { branch.position.x -= cube_size; new_axiom += rules;break; }
             }
         }
-
-        axiom_ = new_axiom;
-
-        global.render_system.init(global.ecs);
+        axiom = new_axiom;
     }
+
+    global.render_system.init(global.ecs); 
 }
 
 

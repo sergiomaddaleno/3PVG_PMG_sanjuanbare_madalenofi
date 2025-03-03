@@ -1,6 +1,7 @@
 #ifndef __L_SYSTEM__
 #define __L_SYSTEM__
 
+#include <unordered_map>
 #include <../deps/glm/glm.hpp>
 
 #include "Core/shader.h"
@@ -19,12 +20,17 @@ public:
 		glm::vec3 position;
 	};
 
-	void init(std::string& axiom, std::string& rule, int iterations = 50);
+	//syntax
+	// C -> Create cube
+	// E -> Create Empty
+	// + -> Go up in y
+	// - -> Go down in y
+	// R -> Go right in x
+	// L -> Go left in x
+
+	void init(std::string axiom, std::string rules, int iterations = 5);
 
 private:
-
-	std::string axiom_;
-	std::string rule_;
 
 	std::vector<glm::vec3> positions;
 	float cube_size = 2.0f;

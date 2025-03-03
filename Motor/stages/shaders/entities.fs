@@ -163,7 +163,7 @@ void main() {
     }
     
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light) * shadow_pl;  
+        final_light += PointLight(u_light);  
     }
 
    vec3 color;

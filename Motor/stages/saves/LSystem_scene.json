@@ -7,59 +7,26 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   16.562149047851563,
-   17.669139862060547,
-   -15.846010208129883
+   18.50157928466797,
+   19.491138458251953,
+   -18.832468032836914
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.023000000044703484,
   "Use_perspective_matrix": true,
   "View_direction": [
-   -0.7381055355072021,
-   -0.5065168142318726,
-   0.44569164514541626
+   -0.48485666513442993,
+   -0.4554993510246277,
+   0.7466152310371399
   ]
  },
  "Entities": [
   {
-   "Entity_id": 0,
-   "Name_component": {
-    "Entity_name": "Cube8v [0]"
-   },
-   "Render_component": {
-    "Cube": {
-     "Texture_path": "../stages/assets/textures/images/blue.png",
-     "cube_24v": false,
-     "cube_8v": true,
-     "size": 1.0
-    },
-    "Render_type": 3
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
+   "Entity_id": 0
   },
   {
-   "Entity_id": 1
-  },
-  {
-   "Entity_id": 2,
+   "Entity_id": 1,
    "Light_component": {
     "light": {
      "Ambient_color": [
@@ -131,6 +98,9 @@
    "Name_component": {
     "Entity_name": "Directional Light [0]"
    }
+  },
+  {
+   "Entity_id": 2
   }
  ],
  "Skybox": {

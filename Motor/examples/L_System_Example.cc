@@ -31,10 +31,10 @@ void init() {
 
     global.grid.initGrid();
 
-    std::string axiom = "F";
-    std::string rule = "F^";
+    std::string axiom = "C";
+    std::string rule = "C+R";
 
-    lsystem.init(axiom, rule, 3);
+    lsystem.init(axiom, rule, 4);
 }
 
 int main(int, char**) {
