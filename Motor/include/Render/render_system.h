@@ -36,9 +36,9 @@ public:
 
 	void setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
 
-	void forwardRender(ECSManager& ecs, Camera cam);
+	void forwardRender(ECSManager& ecs, Camera cam = Camera());
 
-	void deferredRender(ECSManager& ecs, Camera cam);
+	void deferredRender(ECSManager& ecs, Camera cam = Camera());
 
 	//call one time to create entites
 	void setup(ECSManager& ecs);

@@ -1,7 +1,4 @@
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
 #include <optional>
 #include <string>
 #include <../deps/glm/glm.hpp>
@@ -16,8 +13,6 @@
 #include "Components/transform_component.h"
 #include "utils.h"
 
-#define M_PI 3.14159265358979323846
-
 auto teapot_mesh = std::make_unique<Mesh>();
 auto toad_mesh = std::make_unique<Mesh>();
 auto mario_mesh = std::make_unique<Mesh>();
@@ -25,16 +20,10 @@ auto mario_mesh = std::make_unique<Mesh>();
 RenderSystem render_system;
 ECSManager ecs;
 
-char* vs_normals = (char*)ReadFile("../assets/shaders/normals.vs");
-char* fs_normals = (char*)ReadFile("../assets/shaders/normals.fs");
-
-char* vs_texture = (char*)ReadFile("../assets/shaders/texture.vs");
-char* fs_texture = (char*)ReadFile("../assets/shaders/texture.fs");
-
 int num_entities = 5000;
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
-Shader shader_tex, shader_normals;
+Shader shader_tex;
 
 int main(int, char**) {
    
@@ -45,25 +34,24 @@ int main(int, char**) {
     Input input{ window->getWindow() };
 
     // ---
-    if (!toad_mesh->loadOBJ("../assets/obj/toad.obj", "../assets/textures/toad")) {
+    if (!toad_mesh->loadOBJ("../stages/assets/obj/toad.obj", "../stages/assets/textures/toad")) {
         return -1;
     }
 
-    if (!mario_mesh->loadOBJ("../assets/obj/Mario.obj", "../assets/textures/mario")) {
+    if (!mario_mesh->loadOBJ("../stages/assets/obj/Mario.obj", "../stages/assets/textures/mario")) {
         return -1;
     }
 
-    if (!teapot_mesh->loadOBJ("../assets/obj/SM_Teapot.obj", "../assets/textures/toad")) {
+    if (!teapot_mesh->loadOBJ("../stages/assets/obj/SM_Teapot.obj", "../stages/assets/textures/toad")) {
        return -1;
     }
 
     auto j = ecs.create_entity();
-
     ecs.add_component_type<RenderComponent>();
     ecs.add_component_type<TransformComponent>();
 
-    ecs.add_component<RenderComponent>(j);
     ecs.add_component<TransformComponent>(j);
+    ecs.add_component<RenderComponent>(j);
     ecs.get_component<RenderComponent>(j)->type_ = RT_Mesh;
     ecs.get_component<RenderComponent>(j)->mesh_ = std::move(mario_mesh);
     ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
@@ -87,19 +75,10 @@ int main(int, char**) {
         ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.5f, 0.5f, 0.5f };
     }
 
-    //---
-    shader_tex.compile(vs_texture, fs_texture);
-    shader_normals.compile(vs_normals, fs_normals);
+    initShader(shader_tex, "../stages/shaders/basic/texture.vs", "../stages/shaders/basic/texture.fs");
 
-    ecs.get_component<RenderComponent>(0)->shader = shader_tex;
-    ecs.get_component<RenderComponent>(1)->shader = shader_tex;
-
-    for (int i = 2; i < num_entities; i++) {
-        ecs.get_component<RenderComponent>(i)->shader = shader_normals;
-    }
-    //---
-
-    render_system.initEntities(ecs);
+    render_system.init(ecs);
+    render_system.shader = shader_tex;
 
     double lastTime = window->getTime();
     bool done = false;
@@ -118,9 +97,9 @@ int main(int, char**) {
         ecs.get_component<TransformComponent>(0)->moveEntity(input, dt);
         ecs.get_component<TransformComponent>(1)->moveEntity(input, dt);
 
-        //render_system.renderMesh(ecs);
+        render_system.forwardRender(ecs);
 
-        if (window->closePressed()) done = true;
+        if (window->closePressed(input)) done = true;
     }
 
     return 0;
