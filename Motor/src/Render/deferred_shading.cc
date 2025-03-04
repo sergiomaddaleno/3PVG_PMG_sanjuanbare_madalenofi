@@ -30,8 +30,8 @@ float quadVertices[] = {
 };
 
 Deferred::Deferred() : gBuffer(0), rboDepth(0),
-	gPosition(0),gNormal(0), gAlbedoSpec(0), 
-	quadVAO(0), quadVBO(0),
+	gPosition(0),gNormal(0), gAlbedoSpec(0), shadowMap(0),
+	quadVAO(0), quadVBO(0), u_light_space(0),
 	width_(800), height_(600)
 {}
 
@@ -109,6 +109,16 @@ void Deferred::init()
 
 void Deferred::render(ECSManager& ecs, Camera cam)
 {
+	gbuffer.useProgram();
+	//shadow pass----------------------------------------------------
+	auto lis = ecs.getComponentList<LightComponent>().begin();
+	auto liends = ecs.getComponentList<LightComponent>().end();
+	for (; lis != liends; ++lis) {
+		if (lis->has_value()) {
+			auto& light_comp = *lis;
+			light_comp->shadow_map_.render(ecs,gbuffer,*light_comp);
+		}
+	}
 	// Geometry pass -------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 	glClearColor(0.0, 0.0, 0.0, 1.0); 
@@ -140,9 +150,14 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
+			
+			
+			
 			int tex_id = 1;
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("texture_diffuse"), ValueType::T_INT_1, &tex_id);
+
 			
+		   
 			GLuint screen_tex_loc = glGetUniformLocation(gbuffer.getProgram(), "u_screen_tex");
 			glUniform1i(screen_tex_loc, 0);
 
@@ -181,6 +196,8 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	glBindTexture(GL_TEXTURE_2D, gNormal);
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, shadowMap);
 
 	int tex_id = 1;
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gPosition"), ValueType::T_INT_1, &tex_id);
@@ -188,7 +205,10 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex_id);
 	tex_id = 3;
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gAlbedoSpec"), ValueType::T_INT_1, &tex_id);
+	tex_id = 4;
+	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &tex_id);
 
+	
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
@@ -205,6 +225,12 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			light_comp->light.setUniforms(deferred_shading);
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
 
+			float spotLightFOV = light_comp->light.spot_angle_ * 2.0f;
+			glm::mat4 lightProjection = glm::perspective(spotLightFOV, (float)global.window_width / (float)global.window_height, 1.0f, 100.0f);
+
+			glm::mat4 lightView = glm::lookAt(light_comp->light.pos_, light_comp->light.pos_ + light_comp->light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
+			u_light_space = lightProjection * lightView;
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_light_space"), ValueType::T_FLOAT_3, glm::value_ptr(u_light_space));
 			renderQuad();
 		}
 		glBlendFunc(GL_ONE, GL_ONE);

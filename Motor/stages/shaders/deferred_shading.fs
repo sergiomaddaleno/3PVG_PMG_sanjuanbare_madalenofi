@@ -32,7 +32,7 @@ uniform vec3 u_ambient;
 uniform float u_far_plane;
 
 uniform vec3 u_camera_position;
-
+in vec4 FragPosLight;
 vec3 FragPos;
 vec3 normal;
 vec3 Diffuse;
@@ -147,7 +147,7 @@ void main()
     FragPos = texture(gPosition, uv).rgb;
     normal = texture(gNormal, uv).rgb;
     Diffuse = texture(gAlbedoSpec, uv).rgb;
-  
+    float shadow = ShadowCalculation(FragPosLight);
     vec3 final_light = u_ambient;
 
     if (u_light.type_ == 0) {
@@ -155,7 +155,7 @@ void main()
     }
     
     if (u_light.type_ == 1) {
-        final_light += SpotLight(u_light); 
+        final_light += SpotLight(u_light)*shadow; 
     }
     
     if (u_light.type_ == 2) {
