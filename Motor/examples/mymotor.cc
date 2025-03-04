@@ -6,7 +6,6 @@
 
 #include "Core/window.h"
 #include "Core/input.h"
-#include "Managers/lua_manager.h"
 
 #include "global_data.h"
 #include "utils.h"
@@ -31,7 +30,6 @@ int main(int, char**) {
     window->setWindowActive();
     window->initGLEW();
     window->setResizeCallback();
-    //window->setWindowIcon(window->getWindow(), "../assets/textures/images/AE.png");
 
     Input input{ window->getWindow() };
 
@@ -52,7 +50,6 @@ int main(int, char**) {
 
         if (global.window_width != window->getWidth() ||
             global.window_height != window->getHeight()) {
-
             global.window_width = window->getWidth();
             global.window_height = window->getHeight();
         }

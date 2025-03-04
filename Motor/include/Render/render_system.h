@@ -89,6 +89,9 @@ public:
 	int entity_spotlight;
 	int entity_pointlight;
 	int entity_dirlight;
+
+	//Dont use
+	void compileShaderForBuild();
 };
 
 #endif // __RENDER_SYSTEM__
