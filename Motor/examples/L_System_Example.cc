@@ -15,8 +15,6 @@
 #include "utils.h"
 
 LSystem lsystem;
-Cube cube;
-
 
 void init() {
 
@@ -31,10 +29,10 @@ void init() {
 
     global.grid.initGrid();
 
-    std::string axiom = "C";
-    std::string rule = "C+R";
+    std::map<char, std::string> rules = {{'F', "FF+[+F-F-F]-[-F+F+F]"}};
 
-    lsystem.init(axiom, rule, 4);
+    lsystem.init("F", rules, 2);
+
 }
 
 int main(int, char**) {

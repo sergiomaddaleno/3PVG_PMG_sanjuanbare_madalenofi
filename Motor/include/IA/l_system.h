@@ -3,6 +3,9 @@
 
 #include <unordered_map>
 #include <../deps/glm/glm.hpp>
+#include <../deps/glm/gtc/matrix_transform.hpp>
+#include <../deps/glm/gtc/type_ptr.hpp>
+#include <../deps/glm/gtc/quaternion.hpp>
 
 #include "Core/shader.h"
 #include "Geometry/cube.h"
@@ -16,24 +19,23 @@ public:
 	LSystem();
 	~LSystem();
 
-	struct Branch {
-		glm::vec3 position;
-	};
-
 	//syntax
-	// C -> Create cube
-	// E -> Create Empty
-	// + -> Go up in y
-	// - -> Go down in y
-	// R -> Go right in x
-	// L -> Go left in x
+	//F -> Move forward by line length drawing a line
+	//f -> Move forward by line length without drawing a line
+	//+ -> Turn left by turning angle
+	//- -> Turn right by turning angle
+	//[ -> Push current drawing state onto stack
+	//] -> Pop current drawing state from the stack
 
-	void init(std::string axiom, std::string rules, int iterations = 5);
+	void init(std::string axiom, std::map<char, std::string> rule_map, int iterations = 1);
+
+	float angle = glm::radians(30.0f);
+	float cube_size = 0.5f;
+	float spacing = 3.0f;
 
 private:
-
-	std::vector<glm::vec3> positions;
-	float cube_size = 2.0f;
+	glm::vec3 position;
+	glm::quat rotation;
 };
 
 #endif // __L_SYSTEM__
