@@ -10,7 +10,7 @@
 #include "Systems/ecs_manager.h"
 #include "Render/render_system.h"
 #include "Render/skybox.h"
-#include "IA/l_system.h"
+#include "Algorithms/l_system.h"
 
 #include "Managers/save_manager.h"
 #include "Core/window.h"
@@ -1871,6 +1871,8 @@ void UIManager::LSystemWindow() {
     static float angle = glm::radians(30.0f);
     static glm::vec3 cube_size = { 0.4f, 2.0f, 0.4f };
     static float spacing = 2.0f;
+    static glm::vec3 starting_pos = { 0.0f, 0.0f, 0.0f };
+    static glm::quat starting_rot = { 1.0f, 0.0f, 0.0f, 0.0f };
 
     ImGui::Dummy({ 0.0f, 5.0f });
     ImGui::SliderAngle("Angle", &angle);
@@ -1879,6 +1881,11 @@ void UIManager::LSystemWindow() {
     ImGui::Dummy({ 0.0f, 5.0f });
     ImGui::InputFloat("Spacing", &spacing);
     ImGui::Dummy({ 0.0f, 2.0f });
+    ImGui::DragFloat3("Starting position", &starting_pos.x);
+    ImGui::Dummy({ 0.0f, 5.0f });
+    ImGui::DragFloat4("Starting rotation", glm::value_ptr(starting_rot), 0.01f, -1.0f, 1.0f);
+
+    ImGui::Dummy({ 0.0f, 5.0f });
 
     ImGui::Separator();
     ImGui::Dummy({ 0.0f, 2.0f });
@@ -1888,6 +1895,9 @@ void UIManager::LSystemWindow() {
         lsystem.angle_ = angle;
         lsystem.cube_size_ = cube_size;
         lsystem.spacing_ = spacing;
+        lsystem.starting_pos_ = starting_pos;
+        lsystem.starting_rot_ = glm::normalize(starting_rot);
+
         lsystem.init(axiom, rule_map, iterations);
     }
 

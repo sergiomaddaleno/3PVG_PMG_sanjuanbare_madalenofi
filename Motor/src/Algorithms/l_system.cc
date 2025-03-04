@@ -1,7 +1,7 @@
 #include <vector>
 #include <stack>
 
-#include "IA/l_system.h"
+#include "Algorithms/l_system.h"
 #include "utils.h"
 #include "../include/global_data.h"
 
@@ -16,8 +16,10 @@
 #include <../deps/glm/gtc/quaternion.hpp>
 
 LSystem::LSystem(ECSManager& ecs, RenderSystem& rs) :
-    position_(0.0f, 0.0f, 0.0f),
-    rotation_(1.0f, 0.0f, 0.0f, 0.0f),
+    starting_pos_(0.0f, 0.0f, 0.0f),
+    starting_rot_(1.0f, 0.0f, 0.0f, 0.0f),
+    position_(starting_pos_),
+    rotation_(starting_rot_),
     angle_(glm::radians(30.0f)),
     cube_size_(0.4f, 2.0f, 0.4f),
     spacing_(2.0f),
@@ -30,6 +32,9 @@ LSystem::~LSystem()
 }
 
 void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int iterations) {
+    
+    position_ = starting_pos_;
+    rotation_ = starting_rot_;
     std::string final_string = axiom;
 
     for (int i = 0; i < iterations; ++i) {

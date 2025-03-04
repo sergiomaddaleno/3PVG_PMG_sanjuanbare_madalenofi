@@ -33,6 +33,8 @@ public:
 	float angle_;
 	glm::vec3 cube_size_;
 	float spacing_;
+	glm::vec3 starting_pos_;
+	glm::quat starting_rot_;
 
 private:
 	glm::vec3 position_;
