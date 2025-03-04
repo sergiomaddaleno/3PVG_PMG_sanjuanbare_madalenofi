@@ -15,9 +15,15 @@
 #include <../deps/glm/gtc/type_ptr.hpp>
 #include <../deps/glm/gtc/quaternion.hpp>
 
-LSystem::LSystem() : position(0.0f, 0.0f, 0.0f), rotation(1.0f, 0.0f, 0.0f, 0.0f)
-{
-}
+LSystem::LSystem(ECSManager& ecs, RenderSystem& rs) :
+    position_(0.0f, 0.0f, 0.0f),
+    rotation_(1.0f, 0.0f, 0.0f, 0.0f),
+    angle_(glm::radians(30.0f)),
+    cube_size_(0.4f, 2.0f, 0.4f),
+    spacing_(2.0f),
+    ecs_(ecs),                    
+    rs_(rs) 
+{}
 
 LSystem::~LSystem()
 {
@@ -46,40 +52,40 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
         switch (c) {
         case 'F': {
             TransformComponent tc;
-            tc.position = position;
-            tc.rotation = rotation;
-            tc.scale = glm::vec3(cube_size);
-            global.render_system.createCube8v(global.ecs, tc);
+            tc.position = position_;
+            tc.rotation = rotation_;
+            tc.scale = cube_size_;
+            rs_.createCube8v(ecs_, tc, 1.0f, false);
 
-            glm::vec3 forward = rotation * glm::vec3(0.0f, 1.0f, 0.0f);
-            position += forward * (cube_size * spacing);
+            glm::vec3 forward = rotation_ * glm::vec3(0.0f, 1.0f, 0.0f);
+            position_ += forward * (cube_size_.y * spacing_);
             break;
         }
         case 'f': {
-            glm::vec3 forward = rotation * glm::vec3(1.0f, 0.0f, 0.0f);
-            position += forward * (cube_size * spacing);
+            glm::vec3 forward = rotation_ * glm::vec3(1.0f, 0.0f, 0.0f);
+            position_ += forward * (cube_size_.x * spacing_);
             break;
         }
         case '+': {
-            rotation = glm::rotate(rotation, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+            rotation_ = glm::rotate(rotation_, angle_, glm::vec3(1.0f, 0.0f, 0.0f));
             break;
         }
         case '-': {
-            rotation = glm::rotate(rotation, -angle, glm::vec3(1.0f, 0.0f, 0.0f));
+            rotation_ = glm::rotate(rotation_, -angle_, glm::vec3(1.0f, 0.0f, 0.0f));
             break;
         }
         case '[': {
-            position_stack.push(position);
-            rotation_stack.push(rotation);
+            position_stack.push(position_);
+            rotation_stack.push(rotation_);
             break;
         }
         case ']': {
             if (!position_stack.empty()) {
-                position = position_stack.top();
+                position_ = position_stack.top();
                 position_stack.pop();
             }
             if (!rotation_stack.empty()) {
-                rotation = rotation_stack.top();
+                rotation_ = rotation_stack.top();
                 rotation_stack.pop();
             }
             break;
@@ -87,7 +93,7 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
         }
     }
 
-    global.render_system.init(global.ecs);
+    rs_.init(ecs_);
 }
 
 

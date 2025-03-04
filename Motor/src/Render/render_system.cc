@@ -344,10 +344,10 @@ size_t RenderSystem::createSphere(ECSManager& ecs, TransformComponent tc, int nu
     return entity_;
 }
 
-size_t RenderSystem::createCube8v(ECSManager& ecs, TransformComponent tc, const float size)
+size_t RenderSystem::createCube8v(ECSManager& ecs, TransformComponent tc, const float size, bool is_centered)
 {
     auto cube = std::make_unique<Cube>();
-    cube->init8v(size);
+    cube->init8v(size, is_centered);
 
     ecs.add_component<NameComponent>(entity_);
     ecs.add_component<RenderComponent>(entity_);

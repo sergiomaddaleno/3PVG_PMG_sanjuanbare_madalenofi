@@ -17,14 +17,13 @@ class Cube {
      Cube();
     ~Cube();
  
-    void init8v(const float cube_size = 1.0f);
+    void init8v(const float cube_size = 1.0f, bool is_centered = true);
     void init24v(const float cube_size = 1.0f);
 
     void bind();
     void draw();
     void setTexture(std::string file_path);
 
-    //Save data
     nlohmann::json serialize() const;
 
     //---

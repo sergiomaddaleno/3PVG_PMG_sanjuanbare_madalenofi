@@ -14,7 +14,6 @@
 #include "global_data.h"
 #include "utils.h"
 
-LSystem lsystem;
 
 void init() {
 
@@ -29,9 +28,6 @@ void init() {
 
     global.grid.initGrid();
 
-    std::map<char, std::string> rules = {{'F', "FF+[+F-F-F]-[-F+F+F]"}};
-
-    lsystem.init("F", rules, 2);
 
 }
 

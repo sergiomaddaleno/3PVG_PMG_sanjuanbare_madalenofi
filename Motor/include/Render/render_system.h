@@ -57,7 +57,7 @@ public:
 		int num_heights_ = 60, int num_revs_ = 60, float size = 1.0f);
 
 	size_t createCube8v(ECSManager& ecs, TransformComponent tc = TransformComponent(),
-		const float size = 1.0f);
+		const float size = 1.0f, bool is_centered = true);
 
 	size_t createCube24v(ECSManager& ecs, TransformComponent tc = TransformComponent(),
 		const float size = 1.0f);

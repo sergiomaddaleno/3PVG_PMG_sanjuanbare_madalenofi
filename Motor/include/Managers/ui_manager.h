@@ -37,6 +37,8 @@ public:
     void LoadSceneWindow();
     void AddMeshWindow();
 
+    void LSystemWindow();
+
     void AddConsoleMessage(const std::string& message);
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity);
 
@@ -52,7 +54,7 @@ private:
     Texture m_DirectoryIcon, m_FileIcon, m_EntityIcon, m_BackIcon,
     m_ToolsIcon, m_LightIcon, m_CameraIcon, m_TransformIcon, m_SettingsIcon,
     m_TagIcon, m_RenderIcon, m_EditIcon, m_PuzzleIcon, m_DeleteIcon,
-    m_PlayIcon, m_StopIcon;
+    m_PlayIcon, m_StopIcon, m_AlgorithmIcon;
 
     float padding;
     float thumbnailSize;
@@ -63,6 +65,7 @@ private:
     bool skybox_window;
     bool console_window;
     bool fog_window;
+    bool l_system_window;
 
     Shader new_pp_shader;
     Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;

@@ -10,6 +10,7 @@
 #include "Systems/ecs_manager.h"
 #include "Render/render_system.h"
 #include "Render/skybox.h"
+#include "IA/l_system.h"
 
 #include "Managers/save_manager.h"
 #include "Core/window.h"
@@ -23,6 +24,7 @@
 #include <optional>
 #include <string>
 #include <fstream>
+#include <unordered_map>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -57,6 +59,7 @@ UIManager::UIManager()
     skybox_window(false),
     console_window(false),
     fog_window(false),
+    l_system_window(false),
     new_pp_shader(),
     grey_sh(),
     negative_sh(),
@@ -170,6 +173,7 @@ void UIManager::Init(GLFWwindow* window) {
     m_DeleteIcon.loadTexture("../stages/assets/textures/imgui/delete.png");
     m_PlayIcon.loadTexture("../stages/assets/textures/imgui/play.png");
     m_StopIcon.loadTexture("../stages/assets/textures/imgui/stop.png");
+    m_AlgorithmIcon.loadTexture("../stages/assets/textures/imgui/algorithm.png");
 
     //---
 
@@ -197,6 +201,7 @@ void UIManager::Render(GLFWwindow* window) {
         if (fog_window) FogWindow();
         if (load_scene) LoadSceneWindow();
         if (add_mesh_window) AddMeshWindow();
+        if (l_system_window) LSystemWindow();
 
         global.grid.drawGrid(global.cam);
     }
@@ -280,7 +285,8 @@ void UIManager::ImguiWindow(GLFWwindow* window) {
         ImGui::DockBuilderDockWindow("SkyBox", dock_right);
         ImGui::DockBuilderDockWindow("Console", dock_bottom_right);
         ImGui::DockBuilderDockWindow("Load Scene", dock_right);
-        ImGui::DockBuilderDockWindow("Add Mesh", dock_right);
+        ImGui::DockBuilderDockWindow("Add Mesh", dock_right); 
+        ImGui::DockBuilderDockWindow("L-System", dock_right);
 
         ImGui::DockBuilderFinish(dockspace_id);
     }
@@ -1338,6 +1344,20 @@ void UIManager::TopBarWindow() {
             ImGui::EndMenu();
         }
 
+        ImGui::Image(m_AlgorithmIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Spacing();
+        if (ImGui::BeginMenu("Algorithms")) {
+
+            if (ImGui::BeginMenu("LSystem")) {
+                ImGui::Checkbox("LSystem Window", &l_system_window);
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMenu();
+        }
+
+
         ImGui::EndMenuBar();
     }
 
@@ -1741,6 +1761,7 @@ void UIManager::AddMeshWindow()
 
     ImGui::End();
 }
+
 //--
 
 void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity) {
@@ -1822,5 +1843,60 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
             ImGui::Dummy({ 0.0f, 5.0f });
         }
     }
+    ImGui::End();
+}
+
+void UIManager::LSystemWindow() {
+    ImGui::Begin("L-System");
+
+    static std::string axiom = "F";
+    static std::string rule = "F=FF+[+F-F-F]-[-F+F+F]";
+    static int iterations = 3; 
+
+    ImGui::Dummy({ 0.0f, 5.0f });
+    ImGui::InputText("Axiom", &axiom);
+    ImGui::Dummy({ 0.0f, 2.0f });
+    ImGui::InputText("Rule", &rule);
+    ImGui::Dummy({ 0.0f, 2.0f });
+    ImGui::InputInt("Iterations", &iterations);
+
+    static std::map<char, std::string> rule_map;
+    size_t equals_pos = rule.find('=');
+    if (equals_pos != std::string::npos) {
+        char key = rule[0];
+        std::string value = rule.substr(equals_pos + 1);
+        rule_map[key] = value;
+    }
+
+    static float angle = glm::radians(30.0f);
+    static glm::vec3 cube_size = { 0.4f, 2.0f, 0.4f };
+    static float spacing = 2.0f;
+
+    ImGui::Dummy({ 0.0f, 5.0f });
+    ImGui::SliderAngle("Angle", &angle);
+    ImGui::Dummy({ 0.0f, 2.0f });
+    ImGui::DragFloat3("Cube8v size", &cube_size.x);
+    ImGui::Dummy({ 0.0f, 5.0f });
+    ImGui::InputFloat("Spacing", &spacing);
+    ImGui::Dummy({ 0.0f, 2.0f });
+
+    ImGui::Separator();
+    ImGui::Dummy({ 0.0f, 2.0f });
+
+    if (ImGui::Button("Start L-System algorithm")) {
+        LSystem lsystem(global.ecs, global.render_system);
+        lsystem.angle_ = angle;
+        lsystem.cube_size_ = cube_size;
+        lsystem.spacing_ = spacing;
+        lsystem.init(axiom, rule_map, iterations);
+    }
+
+    ImGui::Dummy({ 0.0f, 5.0f });
+
+    if (ImGui::Button("Delete all entities")) {
+        global.ecs.remove_entities();
+    }
+
+    ImGui::Dummy({ 0.0f, 5.0f });
     ImGui::End();
 }

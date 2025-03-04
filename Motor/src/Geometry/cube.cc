@@ -22,7 +22,7 @@ Cube::~Cube()
 {
 }
 
-void Cube::init8v(const float cube_size) {
+void Cube::init8v(const float cube_size, bool is_centered) {
 
     size_ = cube_size;
     cube_8v_ = true;
@@ -31,10 +31,27 @@ void Cube::init8v(const float cube_size) {
     data_.clear();
     order_.clear();
    
-    glm::vec3 positions[] = {
-        {-size_, -size_, size_}, {-size_, +size_, size_}, {+size_, +size_, size_}, {+size_, -size_, size_},
-        {+size_, -size_, -size_}, {+size_, +size_, -size_}, {-size_, +size_, -size_}, {-size_, -size_, -size_},
-    };
+    glm::vec3 positions[8];
+    if (is_centered) {
+        positions[0] = { -size_, -size_, size_ };
+        positions[1] = { -size_, +size_, size_ };
+        positions[2] = { +size_, +size_, size_ };
+        positions[3] = { +size_, -size_, size_ };
+        positions[4] = { +size_, -size_, -size_ };
+        positions[5] = { +size_, +size_, -size_ };
+        positions[6] = { -size_, +size_, -size_ };
+        positions[7] = { -size_, -size_, -size_ };
+    }
+    else {
+        positions[0] = {-size_, 0.0f, size_};
+        positions[1] = {-size_, 2 * size_, size_};
+        positions[2] = {+size_, 2 * size_, size_};
+        positions[3] = {+size_, 0.0f, size_};
+        positions[4] = {+size_, 0.0f, -size_};
+        positions[5] = {+size_, 2 * size_, -size_};
+        positions[6] = {-size_, 2 * size_, -size_};
+        positions[7] = {-size_, 0.0f, -size_};
+    }
 
     glm::vec3 normals[] = {
         {-1.0f, -1.0f, 1.0f}, {-1.0f, +1.0f, +1.0f}, {+1.0f, +1.0f, +1.0f}, {+1.0f, -1.0f, +1.0f},
