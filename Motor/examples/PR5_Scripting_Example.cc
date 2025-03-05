@@ -1,21 +1,18 @@
 
-#include "Core/window.h"
-#include "lua.hpp"
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-#include <../deps/glm/glm.hpp>
 #include <optional>
 #include <string>
 
+#include "Core/window.h"
+#include "lua.hpp"
 #include "Systems/ecs_manager.h"
 #include "Components/scripting_component.h"
 #include "utils.h"
 
+#include <../deps/glm/glm.hpp>
+
 ECSManager ecs;
 
-auto lua_file = ReadFile("../scripts/test.lua");
+auto lua_file = ReadFile("../stages/scripts/test.lua");
 
 int main(int, char**) {
 
@@ -46,7 +43,7 @@ int main(int, char**) {
 		window->updateWindow();
 
 
-		if (window->closePressed()) done = true;
+		//if (window->closePressed(input)) done = true;
 	}
 
 	return 0;

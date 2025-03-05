@@ -19,9 +19,9 @@
 #include <string>
 
 std::vector<std::string> meshFiles = {
-        "../assets/obj/SM_Suzanne.obj",
-        "../assets/obj/SM_Teapot.obj",
-        "../assets/obj/Mario.obj",
+        "../stages/assets/obj/SM_Suzanne.obj",
+        "../stages/assets/obj/SM_Teapot.obj",
+        "../stages/assets/obj/Mario.obj",
 };
 
 auto mesh_ = std::make_unique<Mesh>();
@@ -30,9 +30,6 @@ std::future<std::unique_ptr<Mesh>> monetemesh;
 JobSystem jb;
 RenderComponent rc;
 TransformComponent tc;
-
-char* vs_normals = (char*)ReadFile("../assets/shaders/normals.vs");
-char* fs_normals = (char*)ReadFile("../assets/shaders/normals.fs");
 
 int currentMeshIndex = 0;
 bool loadingNewMesh = false;
@@ -55,7 +52,7 @@ int main(int, char**) {
     tc.scale = glm::vec3{ 0.8f, 0.8f, 0.8f };
     tc.position = glm::vec3{ 0.0f, -2.0f, 0.0f };
 
-    rc.shader.compile(vs_normals, fs_normals);
+    initShader(rc.mesh_->shader, "../stages/shaders/basic/normals.vs", "../stages/shaders/basic/normals.fs");
     //---
 
     double lastTime = window->getTime();
@@ -105,7 +102,7 @@ int main(int, char**) {
     
         rc.mesh_->render(rc, tc);
 
-        if (window->closePressed()) done = true;
+        if (window->closePressed(input)) done = true;
     }
 
     return 0;

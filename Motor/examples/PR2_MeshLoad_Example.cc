@@ -7,6 +7,7 @@
 #include "Core/shader.h"
 #include "Components/render_component.h"
 #include "Components/transform_component.h"
+#include "Core/input.h"
 #include "utils.h"
 
 #include <../deps/glm/glm.hpp>
@@ -14,9 +15,6 @@
 auto mesh_ = std::make_unique<Mesh>();
 RenderComponent rc;
 TransformComponent tc;
-
-char* vs_normals = (char*)ReadFile("../assets/shaders/normals.vs");
-char* fs_normals = (char*)ReadFile("../assets/shaders/normals.fs");
 
 int main(int, char**) {
 	
@@ -26,15 +24,18 @@ int main(int, char**) {
 	window->initGLEW();
 	//---
 
-	if (!mesh_->loadOBJ("../assets/obj/SM_Teapot.obj")) {
+	Input input{ window->getWindow() };
+
+	if (!mesh_->loadOBJ("../stages/assets/obj/SM_Teapot.obj")) {
 		return -1;
 	}
 
-	rc.shader.compile(vs_normals, fs_normals);
 	rc.mesh_ = std::move(mesh_);
-	
 	tc.position = glm::vec3{ 0.0f, 0.0f, -5.0f };
 	tc.scale = glm::vec3{ 5.0f, 5.0f, 5.0f };
+
+	initShader(rc.mesh_->shader, "../stages/shaders/basic/normals.vs", "../stages/shaders/basic/normals.fs");
+	rc.mesh_->bind();
 
 	double lastTime = window->getTime();
 	bool done = false;
@@ -48,7 +49,7 @@ int main(int, char**) {
 
 		rc.mesh_->render(rc, tc);
 
-		if (window->closePressed()) done = true;
+		if (window->closePressed(input)) done = true;
 	}
 
 	return 0;

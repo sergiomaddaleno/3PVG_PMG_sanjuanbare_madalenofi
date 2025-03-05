@@ -4,11 +4,13 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include <../deps/glm/glm.hpp>
-#include "../deps/nlohmann/json.hpp"
 
 #include "texture.h"
 #include "Render/camera.h"
+#include "Core/shader.h"
+
+#include <../deps/glm/glm.hpp>
+#include "../deps/nlohmann/json.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -29,6 +31,10 @@ public:
 
     Texture getTexture(int shape_index);
 
+    // ---
+    //Only used for example render
+    void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
+    Shader shader;
     // ---
 
     struct Vertex {
@@ -52,7 +58,6 @@ public:
 
     GLuint VAO, VBO, EBO;
 
-    //Save data
     nlohmann::json serialize() const;
 };
 
