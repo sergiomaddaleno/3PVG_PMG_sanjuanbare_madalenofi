@@ -1,10 +1,18 @@
+/**
+ * @file triangle.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
 #ifndef __TRIANGLE__
 #define __TRIANGLE__
 
 #include <optional>
 #include <string>
 
-#include "Render/camera.h"
+#include "Core/camera.h"
 #include "Core/shader.h"
 #include <../deps/glm/glm.hpp>
 
@@ -17,11 +25,15 @@ struct TransformComponent;
 class Triangle {
 
 public:
-	 
+
 	struct PointsTriangle {
 		glm::vec2 pos_;
 		glm::vec3 rgb;
 	};
+	 
+	Triangle(PointsTriangle t[3]);
+	~Triangle();
+	Triangle(const Triangle& other);
 
 	enum Color {
 		Red,
@@ -31,19 +43,12 @@ public:
 		Other,
 	};
 
-	PointsTriangle my_triangle[3];   
-
 	static std::optional<Triangle> make(float size_, Color color);
 
 	void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
 
-	// ---
-
 	Shader shader;
-
-	Triangle(PointsTriangle t[3]);
-	~Triangle();
-	Triangle(const Triangle& other);
+	PointsTriangle my_triangle[3];   
 };
 
 #endif // __TRIANGLE__

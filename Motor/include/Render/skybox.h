@@ -1,3 +1,10 @@
+/**
+ * @file skybox.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
 #ifndef __SKYBOX__
 #define __SKYBOX__
@@ -6,13 +13,17 @@
 #include <GLFW/glfw3.h>
 #include <../deps/glm/glm.hpp>
 
-#include "camera.h"
+#include "Core/camera.h"
 #include "Core/shader.h"
 #include "Core/texture.h"
 #include "../Systems/ecs_manager.h"
 
 #include "../deps/nlohmann/json.hpp"
 
+ /**
+  * @class Skybox
+  * @brief Implements skybox rendering for 3D scenes. Including the typical Cubemap format and DDS format.
+  */
 class Skybox {
 
 public:

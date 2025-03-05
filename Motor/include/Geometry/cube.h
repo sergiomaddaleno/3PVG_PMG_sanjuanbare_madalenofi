@@ -1,7 +1,13 @@
+/**
+ * @file cube.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
-
-#ifndef __CUBE_H__
-#define __CUBE_H__ 1
+#ifndef __CUBE__
+#define __CUBE__ 1
 
 #include <memory>
 #include <vector>
@@ -12,6 +18,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+ /**
+  * @class Cube
+  * @brief Represents a 3D cube.
+  */
 class Cube {
 public:
     Cube();
@@ -30,9 +40,6 @@ public:
     nlohmann::json serialize() const;
 
     //---
-
-    GLuint VAO, VBO, EBO;
-
     float size_;
     bool is_centered_;
     bool cube_8v_;
@@ -51,7 +58,8 @@ private:
 
     glm::vec3 vertex_cube8v_[8];
     glm::vec3 vertex_cube24v_[24];
+
+    GLuint VAO, VBO, EBO;
 };
 
-
-#endif //__CUBE_H__
+#endif //__CUBE__

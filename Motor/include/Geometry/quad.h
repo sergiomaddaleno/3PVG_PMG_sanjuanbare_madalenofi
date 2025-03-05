@@ -1,7 +1,13 @@
+/**
+ * @file quad.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
-
-#ifndef __QUAD_H__
-#define __QUAD_H__ 1
+#ifndef __QUAD__
+#define __QUAD__ 1
 
 #include <memory>
 #include <vector>
@@ -13,6 +19,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+ /**
+  * @class Quad
+  * @brief Represents a 2D quad.
+  */
 class Quad {
  public:
      Quad();
@@ -53,5 +63,4 @@ private:
 
 };
 
-
-#endif //__QUAD_H__
+#endif // !__QUAD__

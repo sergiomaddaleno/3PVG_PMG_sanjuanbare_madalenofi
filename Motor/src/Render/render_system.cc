@@ -2,7 +2,7 @@
 
 #include "Render/render_system.h"
 #include "Core/mesh.h"
-#include "Render/camera.h"
+#include "Core/camera.h"
 #include "Render/shadow_map.h"
 #include "Core/shader.h"
 #include "utils.h"
@@ -85,11 +85,11 @@ void RenderSystem::init(ECSManager& ecs) {
                     auto& light_comp = *li;
 
                     switch (light_comp->light.type_) {
-                    case LightType::LT_Spot:
-                    case LightType::LT_Directional:
+                    case Light::LightType::LT_Spot:
+                    case Light::LightType::LT_Directional:
                         light_comp->shadow_map_.init(); break;
 
-                    case LightType::LT_Point:
+                    case Light::LightType::LT_Point:
                         light_comp->shadow_map_.initCubeMap(); break;
                     }
                 }
@@ -436,7 +436,7 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, Light li, bool default_lig
 
     // ----
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
-    light_comp->light.type_ = LightType::LT_Spot;
+    light_comp->light.type_ = Light::LightType::LT_Spot;
 
     if (default_light) {
 
@@ -484,7 +484,7 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, Light li, bool default_li
     //--
 
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
-    light_comp->light.type_ = LightType::LT_Point;
+    light_comp->light.type_ = Light::LightType::LT_Point;
 
     if (default_light) {
         light_comp->light.pos_ = li.pos_;
@@ -522,7 +522,7 @@ size_t RenderSystem::createDirectionalLight(ECSManager& ecs, Light li, bool defa
     ecs.get_component<NameComponent>(entity_)->name = "Directional Light [" + std::to_string(entity_dirlight) + "]";
 
     auto& light_comp = ecs.get_component<LightComponent>(entity_);
-    light_comp->light.type_ = LightType::LT_Directional;
+    light_comp->light.type_ = Light::LightType::LT_Directional;
   
     if (default_light) {
         light_comp->light.dir_ = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));

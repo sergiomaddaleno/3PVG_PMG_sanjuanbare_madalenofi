@@ -1,3 +1,10 @@
+/**
+ * @file render_system.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
 #ifndef __RENDER_SYSTEM__
 #define __RENDER_SYSTEM__
@@ -13,7 +20,7 @@
 #include <GLFW/glfw3.h>
 
 #include "../Systems/ecs_manager.h"
-#include "Render/camera.h"
+#include "Core/camera.h"
 #include "Render/deferred_shading.h"
 
 #include "Components\transform_component.h"
@@ -25,6 +32,10 @@ class Shader;
 class Terrain;
 class Shader;
 
+/**
+ * @class RenderSystem
+ * @brief Manages rendering of 3D scenes, including entity creation and rendering techniques.
+ */
 class RenderSystem {
 
 public:

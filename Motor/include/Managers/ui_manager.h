@@ -1,5 +1,13 @@
-#ifndef _UI_MANAGER_H_
-#define _UI_MANAGER_H_
+/**
+ * @file ui_manager.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
+#ifndef __UI_MANAGER__
+#define __UI_MANAGER__
 
 #include "Core/texture.h"
 #include "Core/shader.h"
@@ -10,6 +18,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+ /**
+  * @class UIManager
+  * @brief Manages the user interface elements.
+  */
 class UIManager {
 public:
     UIManager();
@@ -73,4 +85,4 @@ private:
     bool post_process_compiled;
 };
 
-#endif // _UI_MANAGER_H_
+#endif // __UI_MANAGER__

@@ -3,6 +3,8 @@
 
 std::unordered_map<GLFWwindow*, Input*> Input::input_map;
 std::unordered_map<int, Input::Keys> Input::keyGLFW_map;
+std::unordered_map<int, Input::MouseButton> Input::MouseGLFW_map;
+std::unordered_map<int, Input::GamePad> Input::GamePadGLFW_map;
 
 Input::Input(GLFWwindow* window) :
     mouse_x(0.0f),
@@ -13,7 +15,10 @@ Input::Input(GLFWwindow* window) :
 {
     keys.assign(Keys_End, false);
     mouse_buttons.assign(MouseButton_End, 0);
+
     InitKeyMap();
+    InitMouseMap();
+    InitGamePadMap();
 
     input_map.emplace(window_, this);
     glfwSetKeyCallback(window_, global_key_callback);
@@ -32,25 +37,91 @@ Input::~Input()
 }
 
 void Input::InitKeyMap() {
+    
     keyGLFW_map[GLFW_KEY_UP] = Keys::UP;
     keyGLFW_map[GLFW_KEY_DOWN] = Keys::DOWN;
     keyGLFW_map[GLFW_KEY_LEFT] = Keys::LEFT;
     keyGLFW_map[GLFW_KEY_RIGHT] = Keys::RIGHT;
-    keyGLFW_map[GLFW_KEY_W] = Keys::W;
-    keyGLFW_map[GLFW_KEY_A] = Keys::A;
-    keyGLFW_map[GLFW_KEY_S] = Keys::S;
-    keyGLFW_map[GLFW_KEY_D] = Keys::D;
-    keyGLFW_map[GLFW_KEY_Q] = Keys::Q;
-    keyGLFW_map[GLFW_KEY_E] = Keys::E;
 
-    keyGLFW_map[GLFW_KEY_LEFT_CONTROL] = Keys::CTRL;
-    keyGLFW_map[GLFW_KEY_RIGHT_CONTROL] = Keys::CTRL;
-    keyGLFW_map[GLFW_KEY_LEFT_SHIFT] = Keys::SHIFT;
-    keyGLFW_map[GLFW_KEY_RIGHT_SHIFT] = Keys::SHIFT;
-    keyGLFW_map[GLFW_KEY_DELETE] = Keys::SUPR;
+    for (int i = GLFW_KEY_A; i <= GLFW_KEY_Z; i++) {
+        keyGLFW_map[i] = static_cast<Keys>(Keys::A + (i - GLFW_KEY_A));
+    }
+
+    keyGLFW_map[GLFW_KEY_LEFT_CONTROL] = Keys::LCTRL;
+    keyGLFW_map[GLFW_KEY_RIGHT_CONTROL] = Keys::RCTRL;
+    keyGLFW_map[GLFW_KEY_LEFT_SHIFT] = Keys::LSHIFT;
+    keyGLFW_map[GLFW_KEY_RIGHT_SHIFT] = Keys::RSHIFT;
+    keyGLFW_map[GLFW_KEY_LEFT_ALT] = Keys::LALT;
+    keyGLFW_map[GLFW_KEY_RIGHT_ALT] = Keys::RALT;
+
+    keyGLFW_map[GLFW_KEY_ENTER] = Keys::ENTER;
     keyGLFW_map[GLFW_KEY_ESCAPE] = Keys::ESC;
+    keyGLFW_map[GLFW_KEY_SPACE] = Keys::SPACEBAR;
+    keyGLFW_map[GLFW_KEY_BACKSPACE] = Keys::BACKSPACE;
+    keyGLFW_map[GLFW_KEY_TAB] = Keys::TAB;
+    keyGLFW_map[GLFW_KEY_CAPS_LOCK] = Keys::CAPSLOCK;
+    keyGLFW_map[GLFW_KEY_DELETE] = Keys::SUPR;
+    keyGLFW_map[GLFW_KEY_INSERT] = Keys::INSERT;
+    keyGLFW_map[GLFW_KEY_HOME] = Keys::HOME;
+    keyGLFW_map[GLFW_KEY_END] = Keys::END;
+    keyGLFW_map[GLFW_KEY_PAGE_UP] = Keys::PAGEUP;
+    keyGLFW_map[GLFW_KEY_PAGE_DOWN] = Keys::PAGEDOWN;
+    keyGLFW_map[GLFW_KEY_PRINT_SCREEN] = Keys::PRINTSCREEN;
+    keyGLFW_map[GLFW_KEY_SCROLL_LOCK] = Keys::SCROLLLOCK;
+    keyGLFW_map[GLFW_KEY_PAUSE] = Keys::PAUSE;
 
-    keyGLFW_map[GLFW_KEY_F11] = Keys::F11;
+    for (int i = GLFW_KEY_F1; i <= GLFW_KEY_F12; i++) {
+        keyGLFW_map[i] = static_cast<Keys>(Keys::F1 + (i - GLFW_KEY_F1));
+    }
+
+    for (int i = GLFW_KEY_0; i <= GLFW_KEY_9; i++) {
+        keyGLFW_map[i] = static_cast<Keys>(Keys::NUM0 + (i - GLFW_KEY_0));
+    }
+
+    keyGLFW_map[GLFW_KEY_NUM_LOCK] = Keys::NUMLOCK;
+    keyGLFW_map[GLFW_KEY_KP_ADD] = Keys::NUMPLUS;
+    keyGLFW_map[GLFW_KEY_KP_SUBTRACT] = Keys::NUMMINUS;
+    keyGLFW_map[GLFW_KEY_KP_MULTIPLY] = Keys::NUMMULTIPLY;
+    keyGLFW_map[GLFW_KEY_KP_DIVIDE] = Keys::NUMDIVIDE;
+    keyGLFW_map[GLFW_KEY_KP_DECIMAL] = Keys::NUMDECIMAL;
+    keyGLFW_map[GLFW_KEY_KP_ENTER] = Keys::NUMENTER;
+
+    for (int i = GLFW_KEY_KP_0; i <= GLFW_KEY_KP_9; i++) {
+        keyGLFW_map[i] = static_cast<Keys>(Keys::NUM0 + (i - GLFW_KEY_KP_0));
+    }
+}
+
+void Input::InitMouseMap()
+{
+    MouseGLFW_map[GLFW_MOUSE_BUTTON_LEFT] = MouseButton::MOUSE_LEFT;
+    MouseGLFW_map[GLFW_MOUSE_BUTTON_RIGHT] = MouseButton::MOUSE_RIGHT;
+    MouseGLFW_map[GLFW_MOUSE_BUTTON_MIDDLE] = MouseButton::MOUSE_MIDDLE;
+}
+
+void Input::InitGamePadMap()
+{
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_A] = GamePad::BUTTON_X; 
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_X] = GamePad::BUTTON_SQUARE;
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_Y] = GamePad::BUTTON_TRIANGLE;
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_B] = GamePad::BUTTON_CIRCLE;
+
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_DPAD_UP] = GamePad::DPAD_UP;
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_DPAD_DOWN] = GamePad::DPAD_DOWN;
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] = GamePad::DPAD_LEFT;
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] = GamePad::DPAD_RIGHT;
+
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] = GamePad::L1;
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] = GamePad::R1;
+
+    GamePadGLFW_map[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] = GamePad::L2;
+    GamePadGLFW_map[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] = GamePad::R2;
+
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_LEFT_THUMB] = GamePad::L3;
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] = GamePad::R3;
+
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_START] = GamePad::START;
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_BACK] = GamePad::SELECT;
+    GamePadGLFW_map[GLFW_GAMEPAD_BUTTON_GUIDE] = GamePad::GP_HOME;
 }
 
 void Input::global_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {

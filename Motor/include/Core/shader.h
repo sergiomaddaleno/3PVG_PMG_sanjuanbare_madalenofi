@@ -1,3 +1,11 @@
+/**
+ * @file shader.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
 #ifndef __SHADER__
 #define __SHADER__
 
@@ -48,4 +56,4 @@ private:
 	GLuint program_;
 };
 
-#endif //__SHADER__
+#endif // !__SHADER__

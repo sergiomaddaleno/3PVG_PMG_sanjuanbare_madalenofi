@@ -1,3 +1,10 @@
+/**
+ * @file window.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
 #ifndef __WINDOW__
 #define __WINDOW__
@@ -72,4 +79,4 @@ private:
 };
 
 
-#endif // __WINDOW__
+#endif // !__WINDOW__

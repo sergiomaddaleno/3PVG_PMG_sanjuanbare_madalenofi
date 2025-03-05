@@ -1,3 +1,11 @@
+/**
+ * @file camera.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
 #ifndef __CAMERA__
 #define __CAMERA__
 
@@ -10,6 +18,10 @@
 
 #include <../nlohmann/json.hpp>
 
+ /**
+  * @class Camera
+  * @brief Represents a 3D camera for scene viewing and navigation.
+  */
 class Camera {
 
 public:
@@ -24,8 +36,10 @@ public:
 	glm::mat4 getPerspectiveMatrix() const;
 	glm::mat4 getOrthograficMatrix() const;
 
-	// ---
+	glm::mat4 getViewMatrix() const;
+	void setViewMatrix(const glm::mat4 view);
 
+	// Getters
 	const float getSpeed() const {return speed_;}
 	const float getSensitivity() const {return sensitivity_;}
 	const glm::vec3 getPosition() const{return position_;}
@@ -37,6 +51,7 @@ public:
 	const float getFarCliPlane() { return far_clip_plane_; }
 	const bool getUsePerspectiveMatrix() { return use_perspective_matrix_; }
 
+	// Setters
 	void setSpeed(const float speed){ speed_ = speed; }
 	void setSensitibity(const float sensitivity){ sensitivity_ = sensitivity; }
 	void setPosition(glm::vec3 position) {position_ = position;}
@@ -51,9 +66,6 @@ public:
 	void setScrollSpeed(float scroll_speed) { scroll_speed_ = scroll_speed; }
 	void setViewDir(glm::vec3 view_direction) {view_direction_ = view_direction;}
 	void setUp(glm::vec3 up) { up_ = up; }
-
-	glm::mat4 getViewMatrix() const;
-	void setViewMatrix(const glm::mat4 view);
 
 	//Save data
 	nlohmann::json serialize();
@@ -87,4 +99,4 @@ private:
 };
 
 
-#endif // __CAMERA__
+#endif // !__CAMERA__

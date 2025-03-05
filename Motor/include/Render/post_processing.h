@@ -1,3 +1,11 @@
+/**
+ * @file post_processing.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
 #ifndef __POST_PROCESS__
 #define __POST_PROCESS__
 
@@ -11,6 +19,10 @@
 #include <vector>
 #include <../deps/glm/glm.hpp>
 
+ /**
+  * @class PostProcessing
+  * @brief Implements post-processing effects for rendered scenes.
+  */
 class PostProcessing {
 public:
 
@@ -20,13 +32,9 @@ public:
 	void initData();
 
 	void beginRender();
-	
 	void endRender();
 
 	void render(Shader& shader);
-
-	// --
-
 	void resize(unsigned int width, unsigned int height);
 
 	float grey_;

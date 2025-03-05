@@ -231,7 +231,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
 
     switch(lc.light.type_) {
-    case LightType::LT_Spot: {
+    case Light::LightType::LT_Spot: {
 
         float spotLightFOV = lc.light.spot_angle_ * 2.0f;
         lightProjection = glm::perspective(spotLightFOV, (float)global.window_width / (float)global.window_height, near_plane, far_plane);
@@ -241,7 +241,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
         break;
     }
-    case LightType::LT_Directional:
+    case Light::LightType::LT_Directional:
     {
         lightProjection = glm::ortho(-directional_size_, directional_size_, -directional_size_, directional_size_, near_plane, far_plane);
 
@@ -251,7 +251,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
         break;
     }
-    case LightType::LT_Point:
+    case Light::LightType::LT_Point:
     {
         geometry_.useProgram();
 

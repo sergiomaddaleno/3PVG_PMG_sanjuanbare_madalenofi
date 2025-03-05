@@ -1,3 +1,10 @@
+/**
+ * @file light.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
 #ifndef __LIGHT__
 #define __LIGHT__
@@ -13,15 +20,19 @@
 
 class Shader;
 
-enum LightType {
-    LT_Directional,
-    LT_Spot,
-    LT_Point,
-};
-
+/**
+ * @class Light
+ * @brief Represents a light source in a 3D scene.
+ */
 class Light {
 
 public:
+
+    enum LightType {
+        LT_Directional,
+        LT_Spot,
+        LT_Point,
+    };
 
     Light();
     ~Light();
@@ -49,4 +60,4 @@ public:
     nlohmann::json serialize() const;
 };
 
-#endif // __LIGHT__
+#endif // !__LIGHT__

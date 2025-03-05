@@ -1,5 +1,13 @@
-#ifndef __TERRAIN_H__
-#define __TERRAIN_H__ 1
+/**
+ * @file terrain.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
+#ifndef __TERRAIN__
+#define __TERRAIN__ 1
 
 #include <iostream>
 #include <memory>
@@ -7,7 +15,7 @@
 
 #include "Geometry/wave.h"
 #include "Core/texture.h"
-#include "Render/camera.h"
+#include "Core/camera.h"
 #include "Core/shader.h"
 
 #include <../deps/glm/glm.hpp>
@@ -16,6 +24,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+ /**
+  * @class Terrain
+  * @brief Represents a 3D terrain.
+  */
 class Terrain {
  public:
      Terrain();
@@ -33,6 +45,9 @@ class Terrain {
 
   std::vector<float> GetVertexTerrain();
 
+  /**
+  * @brief Initializes the world grid.
+  */
   void initGrid(const int num_cols = 70, const int num_rows = 70);
   void drawGrid(Camera cam = Camera());
 
@@ -73,4 +88,4 @@ private:
 
 };
 
-#endif //__TERRAIN_H__
+#endif // !__TERRAIN__

@@ -1,3 +1,11 @@
+/**
+ * @file mesh.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
 #ifndef __MESH__
 #define __MESH__
 
@@ -6,7 +14,7 @@
 #include <vector>
 
 #include "texture.h"
-#include "Render/camera.h"
+#include "Core/camera.h"
 #include "Core/shader.h"
 
 #include <../deps/glm/glm.hpp>
@@ -18,6 +26,10 @@
 struct RenderComponent;
 struct TransformComponent;
 
+/**
+ * @class Mesh
+ * @brief Represents a 3D mesh with vertices, textures, and rendering capabilities.
+ */
 class Mesh {
 
 public:
@@ -31,12 +43,22 @@ public:
 
     Texture getTexture(int shape_index);
 
+    nlohmann::json serialize() const;
+
     // ---
     //Only used for example render
     void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
     Shader shader;
     // ---
 
+    bool use_texture_;
+    glm::vec3 color_;
+
+    std::vector<Mesh> meshes;
+    std::string mesh_path;
+    std::string texture_folder;
+
+private:
     struct Vertex {
         glm::vec3 pos;
         glm::vec3 normal;
@@ -44,21 +66,12 @@ public:
     };
 
     std::vector<Vertex> vertices;
-    std::vector<Mesh> meshes;
     std::vector<Texture> textures;
 
     std::vector<unsigned int> indices;
     int materialID;
 
-    bool use_texture_;
-    glm::vec3 color_;
-
-    std::string mesh_path;
-    std::string texture_folder;
-
     GLuint VAO, VBO, EBO;
-
-    nlohmann::json serialize() const;
 };
 
-#endif // __MESH__
+#endif // !__MESH__

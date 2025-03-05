@@ -2,7 +2,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 const float PI = 3.141592653589793f;
 
-#include "Render/camera.h"
+#include "Core/camera.h"
 #include "utils.h"
 #include "Core/input.h"
 #include "Core/window.h"

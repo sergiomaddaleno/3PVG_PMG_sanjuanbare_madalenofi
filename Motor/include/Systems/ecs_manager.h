@@ -1,3 +1,10 @@
+/**
+ * @file ecs_manager.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
 #ifndef __ECS_MANAGER__
 #define __ECS_MANAGER__
@@ -8,6 +15,10 @@
 #include <iostream>
 #include <any>
 
+ /**
+  * @struct ComponentListBase
+  * @brief Base class for component lists in the ECS.
+  */
 struct ComponentListBase {
 	virtual ~ComponentListBase() {}
 
@@ -18,6 +29,10 @@ struct ComponentListBase {
 	virtual size_t get_entities() = 0;
 };
 
+/**
+ * @struct ComponentListDerived
+ * @brief Derived class for type-specific component lists.
+ */
 template<typename T>
 struct ComponentListDerived : ComponentListBase {
 	std::vector<std::optional<T>> component_list_;
@@ -46,6 +61,10 @@ struct ComponentListDerived : ComponentListBase {
 	}
 };
 
+/**
+ * @class ECSManager
+ * @brief Manages entities and components in the ECS.
+ */
 class ECSManager {
 public:
 	ECSManager() : last_entity(-1) {}
@@ -230,7 +249,7 @@ private:
 
 };
 
-#endif // __ECS_MANAGER__
+#endif // !__ECS_MANAGER__
 
 
 

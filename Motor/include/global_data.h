@@ -1,8 +1,16 @@
-#ifndef _GLOBALS_H_
-#define _GLOBALS_H_
+/**
+ * @file globals.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
+#ifndef __GLOBALS__
+#define __GLOBALS__
 
 #include "Core/window.h"
-#include "Render/camera.h"
+#include "Core/camera.h"
 #include "Render/post_processing.h"
 #include "Render/skybox.h"
 #include "Render/render_system.h"
@@ -11,6 +19,10 @@
 #include "Managers/ui_manager.h"
 #include "Geometry/terrain.h"
 
+ /**
+  * @class Globals
+  * @brief Manages global variables and objects for the application.
+  */
 class Globals {
 public:
 
@@ -51,4 +63,4 @@ public:
 
 extern Globals global;
 
-#endif // _GLOBALS_H_
+#endif // !__GLOBALS__

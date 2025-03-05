@@ -2,7 +2,7 @@
 #include "Managers/save_manager.h"
 #include "Systems/ecs_manager.h"
 #include "Render/render_system.h"
-#include "Render/camera.h"
+#include "Core/camera.h"
 #include "Core/mesh.h"
 #include "Render/light.h"
 #include "Render/skybox.h"
@@ -295,7 +295,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             li.spot_angle_ = lc["Spot_angle"][0].get<float>();
             li.spot_softness_ = lc["Spot_softness"][0].get<float>();
 
-            li.type_ = lc["Type"].get<LightType>();
+            li.type_ = lc["Type"].get<Light::LightType>();
 
             // --
 
@@ -303,13 +303,13 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             lightType = lc.value("Type", -1);
 
             switch (lightType) {
-            case LightType::LT_Spot: 
+            case Light::LightType::LT_Spot:
                 rs.createSpotLight(ecs, li, false);
                 break;
-            case LightType::LT_Point: 
+            case Light::LightType::LT_Point:
                 rs.createPointLight(ecs, li, false);
                 break;
-            case LightType::LT_Directional: 
+            case Light::LightType::LT_Directional:
                 rs.createDirectionalLight(ecs, li, false);
                 break;
             }

@@ -798,7 +798,7 @@ void UIManager::InspectorWindow() {
         if (open) {
             auto& light_comp = global.ecs.get_component<LightComponent>(selected_entity);
 
-            if (light_comp->light.type_ == LT_Directional) {
+            if (light_comp->light.type_ == Light::LightType::LT_Directional) {
                 ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.9f, 0.9f, 1.0f));
@@ -913,7 +913,7 @@ void UIManager::InspectorWindow() {
             ImGui::SliderInt("Shadow Height", &shadow_height, 512, 8192);
 
             static float directional_size = light_comp->shadow_map_.directional_size_;
-            if (light_comp->light.type_ == LightType::LT_Directional) {
+            if (light_comp->light.type_ == Light::LightType::LT_Directional) {
                 ImGui::SliderFloat("Directional Size", &directional_size, 10.0f, 1000.0f);
             }
 
@@ -981,7 +981,7 @@ void UIManager::InspectorWindow() {
                         case 1: global.ecs.add_component<LightComponent>(selected_entity); 
                         {
                             auto& light_comp = global.ecs.get_component<LightComponent>(selected_entity);
-                            light_comp->light.type_ = LightType::LT_Point;
+                            light_comp->light.type_ = Light::LightType::LT_Point;
                             light_comp->light.pos_ = global.ecs.get_component<TransformComponent>(selected_entity)->position;
                             light_comp->light.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
                             light_comp->light.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);

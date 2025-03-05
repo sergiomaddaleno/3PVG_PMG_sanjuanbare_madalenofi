@@ -1,3 +1,10 @@
+/**
+ * @file deferred_shading.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
 #ifndef __DEFERRED__
 #define __DEFERRED__
@@ -14,6 +21,10 @@ class Shader;
 class Camera;
 struct LightComponent;
 
+/**
+ * @class Deferred
+ * @brief Implements deferred rendering technique for 3D scenes.
+ */
 class Deferred {
 
 public:
@@ -42,4 +53,4 @@ private:
 	unsigned int height_;
 };
 
-#endif // __DEFERRED__
+#endif // !__DEFERRED__

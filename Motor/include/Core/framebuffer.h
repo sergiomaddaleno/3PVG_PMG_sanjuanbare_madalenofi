@@ -1,9 +1,21 @@
+/**
+ * @file frameBuffer.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
 #ifndef __FRAMEBUFFER_H__
 #define __FRAMEBUFFER_H__
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+ /**
+  * @class FrameBuffer
+  * @brief A class for managing OpenGL frame buffers.
+  */
 class FrameBuffer {
 public:
     FrameBuffer();
@@ -34,4 +46,4 @@ private:
     bool use_depth_;
 };
 
-#endif //__FRAMEBUFFER_H__
+#endif // !__FRAMEBUFFER_H__

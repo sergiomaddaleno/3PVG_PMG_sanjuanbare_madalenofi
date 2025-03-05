@@ -1,3 +1,11 @@
+/**
+ * @file scripting.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
 #ifndef __SCRIPTING__
 #define __SCRIPTING__
 
@@ -10,43 +18,31 @@
 #include <fstream>
 #include <filesystem>
 
+ /**
+  * @class LuaScript
+  * @brief Manages Lua scripting functionality.
+  */
 class LuaScript {
 
 public:
-	LuaScript()
-		: state_{ luaL_newstate(),&lua_close }
-		, s{ state_.get() } {
-		luaL_openlibs(s);
-	}
+	LuaScript();
+	~LuaScript();
 
-	void check(int error) {
-		if (error != LUA_OK) {
-			std::string err = lua_tostring(s, lua_gettop(s));
-			lua_pop(s, lua_gettop(s));
-			throw std::runtime_error("Lua error: " + err);
-		}
-	}
-
+	void check(int error);
 	void run(const std::string& str);
-
 	void add_global(int(*function)(lua_State*), const std::string& name);
 	
 	// --
 
 	void get_table(const std::string& table_name);
-
 	int get_integer(const std::string& var_name);
-
 	float get_float(const std::string& var_name);
-
 	bool get_bool(const std::string& var_name);
 
 	// --
 
 	int stack_size() { return lua_gettop(s); }
-
 	void pop(int count = 1) { lua_pop(s, count); }
-
 	lua_State* get_state() { return s; }
 
 private:

@@ -1,6 +1,24 @@
 
 #include "Systems/scripting.h"
 
+LuaScript::LuaScript() 
+	: state_{ luaL_newstate(),&lua_close }
+	, s{ state_.get() } 
+
+{ luaL_openlibs(s);}
+
+LuaScript::~LuaScript()
+{
+}
+
+void LuaScript::check(int error)
+{
+	if (error != LUA_OK) {
+		std::string err = lua_tostring(s, lua_gettop(s));
+		lua_pop(s, lua_gettop(s));
+		throw std::runtime_error("Lua error: " + err);
+	}
+}
 
 void LuaScript::run(const std::string& str) {
 	check(luaL_loadstring(s, str.c_str()));

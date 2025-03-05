@@ -1,3 +1,10 @@
+/**
+ * @file wave.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
 #ifndef __WAVE__
 #define __WAVE__
@@ -7,6 +14,10 @@
 
 class Shader;
 
+/**
+ * @class GerstnerWave
+ * @brief Implements the Gerstner wave algorithm for realistic water surface simulation.
+ */
 class GerstnerWave{
 
 public:
@@ -23,4 +34,4 @@ public:
     bool use_wave_;
 };
 
-#endif // __WAVE__
+#endif // !__WAVE__

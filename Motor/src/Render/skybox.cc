@@ -1,7 +1,7 @@
 
 #include "Render/skybox.h"
 #include "Core/mesh.h"
-#include "Render/Camera.h"
+#include "Core/Camera.h"
 
 #include "Components/render_component.h"
 #include "utils.h"

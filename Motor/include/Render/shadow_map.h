@@ -1,3 +1,10 @@
+/**
+ * @file shadow_map.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
 #ifndef __SHADOW_MAP__
 #define __SHADOW_MAP__
@@ -14,6 +21,10 @@ class Shader;
 class Camera;
 struct LightComponent;
 
+/**
+ * @class ShadowMap
+ * @brief Implements shadow mapping techniques for 3D rendering.
+ */
 class ShadowMap {
 
 public:
@@ -49,4 +60,4 @@ private:
 	glm::mat4 lightSpaceMatrix;
 };
 
-#endif // __SHADOW_MAP__
+#endif // !__SHADOW_MAP__

@@ -1,3 +1,11 @@
+/**
+ * @file texture.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
 #ifndef __TEXTURE__
 #define __TEXTURE__
 
@@ -38,4 +46,4 @@ private:
     unsigned char* data_;
 };
 
-#endif // __TEXTURE__
+#endif // !__TEXTURE__

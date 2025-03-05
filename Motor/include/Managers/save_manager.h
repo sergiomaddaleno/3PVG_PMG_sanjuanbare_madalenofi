@@ -1,6 +1,14 @@
 
-#ifndef _SAVE_MANAGER_H_
-#define _SAVE_MANAGER_H_
+/**
+ * @file save_manager.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
+#ifndef __SAVE_MANAGER__
+#define __SAVE_MANAGER__
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/quaternion.hpp>
@@ -16,6 +24,10 @@ class Shader;
 class Camera;
 class Skybox;
 
+/**
+ * @class SaveManager
+ * @brief Manages saving and loading of scene data.
+ */
 class SaveManager {
 
 public:
@@ -75,4 +87,4 @@ private:
 };
 
 
-#endif //_SAVE_MANAGER_H_
+#endif // !__SAVE_MANAGER__

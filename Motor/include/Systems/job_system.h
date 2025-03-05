@@ -1,3 +1,11 @@
+/**
+ * @file job_system.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
+
 #ifndef __JOB_SYSTEM__
 #define __JOB_SYSTEM__
 
@@ -19,6 +27,10 @@
 #include <iostream>
 #include <mutex>
 
+ /**
+  * @class JobSystem
+  * @brief Manages a queue of asynchronous tasks and executes them in a separate thread.
+  */
 class JobSystem {
 public:
     JobSystem() : done_(false) {

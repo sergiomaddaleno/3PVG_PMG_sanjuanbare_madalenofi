@@ -1,7 +1,13 @@
+/**
+ * @file sphere.h
+ * @authors madalenofi@esat-alumni.com
+ * @authors sanjuanbare@esat-alumni.com
+ * @date 2025-03-05
+ * @version 1.0
+ */
 
-
-#ifndef __SPHERE_H__
-#define __SPHERE_H__ 1
+#ifndef __SPHERE__
+#define __SPHERE__ 1
 
 #include <memory>
 #include <vector>
@@ -13,6 +19,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+ /**
+  * @class Sphere
+  * @brief Represents a 3D sphere.
+  */
 class Sphere {
  public:
      Sphere();
@@ -51,4 +61,4 @@ class Sphere {
 };
 
 
-#endif //__SPHERE_H__
+#endif // !__SPHERE__
