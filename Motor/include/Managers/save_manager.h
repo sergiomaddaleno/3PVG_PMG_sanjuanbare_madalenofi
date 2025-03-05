@@ -60,6 +60,7 @@ private:
 	std::string sphere_tex_path;
 
 	float cube_size;
+	bool cube_is_centered;
 	bool cube_8v;
 	bool cube_24v;
 	std::string cube_tex_path;

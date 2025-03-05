@@ -34,6 +34,7 @@ SaveManager::SaveManager()
       sphere_num_revs(0),
       sphere_size(0.0f),
       cube_size(0.0f),
+      cube_is_centered(false),
       cube_8v(false),
       cube_24v(false),
       quad_size(0.0f),
@@ -207,7 +208,9 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 cube_8v = cube["cube_8v"];
                 cube_24v = cube["cube_24v"];
                 cube_size = cube["size"];
-                if (cube_8v) rs.createCube8v(ecs, tc, cube_size);
+                cube_is_centered = cube["Is_centered"];
+
+                if (cube_8v) rs.createCube8v(ecs, tc, cube_size, cube_is_centered);
                 if (cube_24v) rs.createCube24v(ecs, tc, cube_size);
 
                 cube_tex_path = cube["Texture_path"];

@@ -703,12 +703,15 @@ void UIManager::InspectorWindow() {
 
                 auto& cube = *global.ecs.get_component<RenderComponent>(selected_entity)->cube_;
                 static float temp_size = cube.size_;
+                static bool temp_is_centered = cube.is_centered_;
+
                 ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
+                ImGui::Checkbox("Is Centered", &temp_is_centered);
 
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
                 if (ImGui::Button("Apply Changes")) {
-                    cube.init8v(temp_size);
+                    cube.init8v(temp_size, temp_is_centered);
                     cube.bind();
                 }
 
