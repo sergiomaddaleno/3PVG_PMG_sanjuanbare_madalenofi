@@ -10,7 +10,7 @@ in vec3 FragPos;
 in vec3 Normal;
 
 uniform sampler2D texture_diffuse;
-uniform sampler2D u_shadow_map;
+
 
 void main()
 {    
@@ -19,6 +19,5 @@ void main()
     
     vec4 albedo = texture(texture_diffuse, uv);
     gAlbedoSpec.rgb = albedo.rgb;
-    vec4 shadowSample = texture(u_shadow_map, uv);
-    gAlbedoSpec.a = shadowSample.r;  
+ 
 }
