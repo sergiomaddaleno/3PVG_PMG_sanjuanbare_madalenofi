@@ -151,11 +151,11 @@ void main()
     vec3 final_light = u_ambient;
 
     if (u_light.type_ == 0) {
-        final_light += DirectionalLight(u_light); 
+        final_light += DirectionalLight(u_light)* shadow; 
     }
     
     if (u_light.type_ == 1) {
-        final_light += SpotLight(u_light)*shadow; 
+        final_light += SpotLight(u_light); 
     }
     
     if (u_light.type_ == 2) {
