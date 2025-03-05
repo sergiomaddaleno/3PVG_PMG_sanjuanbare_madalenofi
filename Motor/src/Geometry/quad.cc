@@ -13,10 +13,10 @@ Quad::Quad()
     : VAO(0), VBO(0), EBO(0),
     order_(), data_(),
     size_(0.0f), use_texture_(true),
-    texture_path_("../stages/assets/textures/images/blue.png"),
+    texture_path_("../stages/assets/textures/materials/brick_wall/brickwall.jpg"),
+    normal_map_path_("../stages/assets/textures/materials/brick_wall/brickwall_normal.jpg"),
     color_({ 0.5f, 0.5f, 0.5f })
-{
-}
+{}
 
 Quad::~Quad()
 {
@@ -97,10 +97,10 @@ void Quad::bind()
 }
 
 
-void Quad::setTexture(std::string file_path)
+void Quad::setTexture(std::string texture_path)
 {
-    texture_path_ = file_path;
-    texture_.loadTexture(file_path);
+    texture_path_ = texture_path;
+    texture_.loadTexture(texture_path);
 
     /*texture_.clear();
     for (auto& loc_text : files_path) {
@@ -109,6 +109,12 @@ void Quad::setTexture(std::string file_path)
         texture_.push_back(tempTexture);
     }
     texture_count_ = (int)texture_.size();*/
+}
+
+void Quad::setNormalMap(std::string normal_map_path)
+{
+    normal_map_path_ = normal_map_path;
+    normal_map_.loadTexture(normal_map_path_);
 }
 
 glm::vec3* Quad::GetVertex()
