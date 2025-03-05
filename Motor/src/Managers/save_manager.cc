@@ -150,6 +150,8 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
     cam.setOrthoWidth(camera["Ortho_width"]);
     cam.setOrthoHeight(camera["Ortho_height"]);
     cam.setUsePerspectiveMatrix(camera["Use_perspective_matrix"]);
+    cam.setViewDir(parseVec3(camera["View_direction"]));
+    cam.initViewTarget();
     
     //-----------------------------------------------------------
     
@@ -387,6 +389,7 @@ std::string SaveManager::newFile()
             {"Entities", nlohmann::json::array()},
             {"Camera", {
                 {"Position", {0.0f, 0.0f, -10.0f}},
+                {"View_direction", {0.0f, 0.0f, -1.0f}},
                 {"Fov", 45.0f},
                 {"Scroll_speed", 1.0f},
                 {"Sensitivity", 1.0f},
