@@ -7,6 +7,19 @@
 
 #include <optional>
 
+Window::Window(Window&& other) noexcept
+ {
+	window_ = other.window_;
+	other.window_ = nullptr;
+}
+
+Window::~Window()
+{
+	if (nullptr != window_) {
+		glfwDestroyWindow(window_);
+	}
+}
+
 std::optional<WindowSystem> WindowSystem::make()
 {
 	WindowSystem ws_;

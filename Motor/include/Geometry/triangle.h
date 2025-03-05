@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Render/camera.h"
+#include "Core/shader.h"
 #include <../deps/glm/glm.hpp>
 
 #include <GL/glew.h>
@@ -37,6 +38,8 @@ public:
 	void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
 
 	// ---
+
+	Shader shader;
 
 	Triangle(PointsTriangle t[3]);
 	~Triangle();

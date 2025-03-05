@@ -5,6 +5,17 @@
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
 
+static float rect_screen_vertices[] = {
+    // positions   // texCoords
+    -1.0f, -1.0f,  0.0f, 0.0f,
+     1.0f, -1.0f,  1.0f, 0.0f,
+     1.0f,  1.0f,  1.0f, 1.0f,
+
+    -1.0f, -1.0f,  0.0f, 0.0f,
+     1.0f,  1.0f,  1.0f, 1.0f,
+    -1.0f,  1.0f,  0.0f, 1.0f
+};
+
 PostProcessing::PostProcessing()
     : grey_(0.0f), negative_(1.0f), waves_(0.0f), blur_(0.0f),
     kernel_types_(0), frame_buffer_(),

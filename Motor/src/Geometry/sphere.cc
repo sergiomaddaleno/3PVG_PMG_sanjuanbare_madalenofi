@@ -159,9 +159,9 @@ void Sphere::setTexture(std::string file_path)
     texture_count_ = (int)texture_.size();*/
 }
 
-float* Sphere::GetVertexSphere()
+std::vector<float> Sphere::GetVertexSphere()
 {
-    return nullptr;
+    return vertex_sphere_;
 }
 
 nlohmann::json Sphere::serialize() const

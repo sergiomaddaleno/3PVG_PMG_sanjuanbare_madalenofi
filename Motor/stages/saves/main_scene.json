@@ -7,18 +7,18 @@
   "Ortho_height": 53.17760467529297,
   "Ortho_width": 70.90347290039063,
   "Position": [
-   -49.423152923583984,
-   24.378509521484375,
-   -2.375321626663208
+   -12.44226360321045,
+   13.977999687194824,
+   -4.684467315673828
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.014000000432133675,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.8609814047813416,
-   -0.49518120288848877,
-   0.1162182167172432
+   0.8928265571594238,
+   -0.37343788146972656,
+   0.25180312991142273
   ]
  },
  "Entities": [
@@ -99,6 +99,7 @@
    },
    "Render_component": {
     "Cube": {
+     "Is_centered": true,
      "Texture_path": "../stages/assets\\textures\\apple\\red.jpg",
      "cube_24v": false,
      "cube_8v": true,
@@ -208,6 +209,40 @@
      0.0,
      0.0,
      0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 4,
+   "Name_component": {
+    "Entity_name": "Cube24v [0]"
+   },
+   "Render_component": {
+    "Cube": {
+     "Is_centered": false,
+     "Texture_path": "../stages/assets/textures/images/blue.png",
+     "cube_24v": true,
+     "cube_8v": false,
+     "size": 1.0
+    },
+    "Render_type": 4
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     5.532428741455078,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
      1.0
     ],
     "Scale": [
@@ -215,6 +250,80 @@
      1.0,
      1.0
     ]
+   }
+  },
+  {
+   "Entity_id": 5,
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
+      ]
+     ],
+     "Light_color": [
+      [
+       8.026415824890137,
+       8.025612831115723,
+       8.025612831115723
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Spot_softness": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   },
+   "Name_component": {
+    "Entity_name": "Directional Light [0]"
    }
   }
  ],

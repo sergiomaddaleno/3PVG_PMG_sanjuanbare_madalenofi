@@ -11,7 +11,7 @@
 Cube::Cube()
     : VAO(0), VBO(0), EBO(0),
     order_(), data_(),
-    size_(0.0f),
+    size_(0.0f), is_centered_(false),
     cube_8v_(false), cube_24v_(false),
     use_texture_(true), texture_path_("../stages/assets/textures/images/blue.png"),
     color_({ 0.5f, 0.5f, 0.5f })
@@ -25,32 +25,32 @@ Cube::~Cube()
 void Cube::init8v(const float cube_size, bool is_centered) {
 
     size_ = cube_size;
+    is_centered_ = is_centered;
     cube_8v_ = true;
     cube_24v_ = false;
 
     data_.clear();
     order_.clear();
    
-    glm::vec3 positions[8];
     if (is_centered) {
-        positions[0] = { -size_, -size_, size_ };
-        positions[1] = { -size_, +size_, size_ };
-        positions[2] = { +size_, +size_, size_ };
-        positions[3] = { +size_, -size_, size_ };
-        positions[4] = { +size_, -size_, -size_ };
-        positions[5] = { +size_, +size_, -size_ };
-        positions[6] = { -size_, +size_, -size_ };
-        positions[7] = { -size_, -size_, -size_ };
+        vertex_cube8v_[0] = { -size_, -size_, size_ };
+        vertex_cube8v_[1] = { -size_, +size_, size_ };
+        vertex_cube8v_[2] = { +size_, +size_, size_ };
+        vertex_cube8v_[3] = { +size_, -size_, size_ };
+        vertex_cube8v_[4] = { +size_, -size_, -size_ };
+        vertex_cube8v_[5] = { +size_, +size_, -size_ };
+        vertex_cube8v_[6] = { -size_, +size_, -size_ };
+        vertex_cube8v_[7] = { -size_, -size_, -size_ };
     }
     else {
-        positions[0] = {-size_, 0.0f, size_};
-        positions[1] = {-size_, 2 * size_, size_};
-        positions[2] = {+size_, 2 * size_, size_};
-        positions[3] = {+size_, 0.0f, size_};
-        positions[4] = {+size_, 0.0f, -size_};
-        positions[5] = {+size_, 2 * size_, -size_};
-        positions[6] = {-size_, 2 * size_, -size_};
-        positions[7] = {-size_, 0.0f, -size_};
+        vertex_cube8v_[0] = {-size_, 0.0f, size_};
+        vertex_cube8v_[1] = {-size_, 2 * size_, size_};
+        vertex_cube8v_[2] = {+size_, 2 * size_, size_};
+        vertex_cube8v_[3] = {+size_, 0.0f, size_};
+        vertex_cube8v_[4] = {+size_, 0.0f, -size_};
+        vertex_cube8v_[5] = {+size_, 2 * size_, -size_};
+        vertex_cube8v_[6] = {-size_, 2 * size_, -size_};
+        vertex_cube8v_[7] = {-size_, 0.0f, -size_};
     }
 
     glm::vec3 normals[] = {
@@ -63,12 +63,11 @@ void Cube::init8v(const float cube_size, bool is_centered) {
         {0.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f},
     };
 
-    
     data_.reserve(8 * 8); 
     for (int i = 0; i < 8; ++i) {
-        data_.push_back(positions[i].x);
-        data_.push_back(positions[i].y);
-        data_.push_back(positions[i].z);
+        data_.push_back(vertex_cube8v_[i].x);
+        data_.push_back(vertex_cube8v_[i].y);
+        data_.push_back(vertex_cube8v_[i].z);
 
         data_.push_back(normals[i].x);
         data_.push_back(normals[i].y);
@@ -108,7 +107,9 @@ void Cube::init24v(const float cube_size) {
         {-size_, +size_, -size_}, {+size_, +size_, -size_}, {+size_, +size_, +size_}, {-size_, +size_, +size_},
         {-size_, -size_, +size_}, {+size_, -size_, +size_}, {+size_, -size_, -size_}, {-size_, -size_, -size_},
     };
-   
+
+    std::copy(positions, positions + 24, vertex_cube24v_);
+
     glm::vec3 normals[] = {
         {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f},
         {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f},
@@ -183,7 +184,6 @@ void Cube::bind()
     glBindVertexArray(0);
 }
 
-
 void Cube::draw()
 {
     if (use_texture_) {
@@ -220,6 +220,16 @@ void Cube::setTexture(std::string file_path)
     texture_count_ = (int)texture_.size();*/
 }
 
+glm::vec3* Cube::GetVertexCube8v()
+{
+    return vertex_cube8v_;
+}
+
+glm::vec3* Cube::GetVertexCube24v()
+{
+    return vertex_cube24v_;
+}
+
 nlohmann::json Cube::serialize() const
 {
     nlohmann::json json_data;
@@ -228,6 +238,7 @@ nlohmann::json Cube::serialize() const
     json_data["cube_8v"] = cube_8v_;
     json_data["cube_24v"] = cube_24v_;
     json_data["Texture_path"] = texture_path_;
+    json_data["Is_centered"] = is_centered_;
 
     return json_data;
 }

@@ -16,12 +16,6 @@
 struct RenderComponent;
 struct TransformComponent;
 
-struct Vertex {
-    glm::vec3 pos;
-    glm::vec3 normal;
-    glm::vec2 tex_coord;
-};
-
 class Mesh {
 
 public:
@@ -30,14 +24,18 @@ public:
     
     bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
 
-    void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
-
     void bind();
     void draw();
 
     Texture getTexture(int shape_index);
 
     // ---
+
+    struct Vertex {
+        glm::vec3 pos;
+        glm::vec3 normal;
+        glm::vec2 tex_coord;
+    };
 
     std::vector<Vertex> vertices;
     std::vector<Mesh> meshes;

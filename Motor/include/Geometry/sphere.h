@@ -23,9 +23,8 @@ class Sphere {
   void bind();
   void draw();
   void setTexture(std::string file_path);
-  float* GetVertexSphere();
+  std::vector<float> GetVertexSphere();
 
-  //Save data
   nlohmann::json serialize() const;
 
   // --

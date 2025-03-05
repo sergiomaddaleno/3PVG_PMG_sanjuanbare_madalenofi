@@ -35,6 +35,8 @@ void Quad::init(const float quad_size) {
         {-size_, -size_, 0.0f}
     };
 
+    std::copy(positions, positions + 3, vertex);
+
     glm::vec3 normals[] = {
         {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}
     };
@@ -107,6 +109,11 @@ void Quad::setTexture(std::string file_path)
         texture_.push_back(tempTexture);
     }
     texture_count_ = (int)texture_.size();*/
+}
+
+glm::vec3* Quad::GetVertex()
+{
+    return vertex;
 }
 
 void Quad::draw()

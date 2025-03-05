@@ -51,7 +51,7 @@ Terrain::Terrain()
     height_mult_(0.0f), size_(0.0f),
     is_centered_(true), use_perlin_noise_(true),
     use_texture_(true), 
-    texture_path_("../stages/assets/textures/images/grass.jpg"),
+    texture_path_("../stages/assets/textures/images/grass.png"),
     heightmap_path_("../stages/assets/textures/heightmaps/heightmap.png"),
     grid_color_({ 0.5f, 0.5f, 0.5f}), grid_scale_(20.0f),
     color_({ 0.5f, 0.5f, 0.5f })

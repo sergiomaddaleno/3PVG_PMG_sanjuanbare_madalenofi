@@ -57,16 +57,8 @@ public:
 
 	//---
 
-	Window(Window&& other) noexcept {
-		window_ = other.window_;
-		other.window_ = nullptr;
-	}
-
-	~Window() {
-		if (nullptr != window_) {
-			glfwDestroyWindow(window_);
-		}
-	}
+	Window(Window&& other) noexcept;
+	~Window();
 
 private:
 

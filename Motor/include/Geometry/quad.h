@@ -24,7 +24,8 @@ class Quad {
    void draw();
    void setTexture(std::string file_path);
 
-   //Save data
+   glm::vec3* GetVertex();
+
    nlohmann::json serialize() const;
 
    //---
@@ -39,8 +40,13 @@ class Quad {
 
   GerstnerWave wave_;
 
+private:
+
   std::vector<int> order_;
   std::vector<float> data_;
+
+  glm::vec3 vertex[3];
+
 };
 
 
