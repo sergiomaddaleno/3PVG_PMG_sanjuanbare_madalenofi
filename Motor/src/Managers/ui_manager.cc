@@ -61,15 +61,10 @@ UIManager::UIManager()
     fog_window(false),
     l_system_window(false),
     new_pp_shader(),
-    grey_sh(),
-    negative_sh(),
-    waves_sh(),
-    blur_sh(),
-    kernel_sh(),
     m_PuzzleIcon(),
     m_DeleteIcon(),
     post_process_compiled(false),
-    load_scene(false),
+    load_scene_window(false),
     add_mesh_window(false)
 {}
 
@@ -199,7 +194,7 @@ void UIManager::Render(GLFWwindow* window) {
         if (post_process_window) PostProcessWindow();
         if (skybox_window) SkyboxWindow();
         if (fog_window) FogWindow();
-        if (load_scene) LoadSceneWindow();
+        if (load_scene_window) LoadSceneWindow();
         if (add_mesh_window) AddMeshWindow();
         if (l_system_window) LSystemWindow();
 
@@ -1147,7 +1142,7 @@ void UIManager::TopBarWindow() {
             }
 
             if (ImGui::BeginMenu("Load Scene")) {
-                ImGui::Checkbox("Load Scene Window", &load_scene);
+                ImGui::Checkbox("Load Scene Window", &load_scene_window);
                 ImGui::EndMenu();
             }
 

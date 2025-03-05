@@ -66,13 +66,11 @@ private:
     bool console_window;
     bool fog_window;
     bool l_system_window;
+    bool load_scene_window;
+    bool add_mesh_window;
 
     Shader new_pp_shader;
-    Shader grey_sh, negative_sh, waves_sh, blur_sh, kernel_sh;
     bool post_process_compiled;
-
-    bool load_scene;
-    bool add_mesh_window;
 };
 
 #endif // _UI_MANAGER_H_

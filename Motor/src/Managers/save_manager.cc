@@ -113,7 +113,6 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam, Skybox& skyb
     //-----------------
 
     j["Camera"] = cam.serialize(); 
-
     j["Skybox"] = skybox.serialize();
 
     return j;

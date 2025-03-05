@@ -4,68 +4,63 @@
   "Far_clip_plane": 1000.0,
   "Fov": 45.0,
   "Near_clip_plane": 0.10000000149011612,
-  "Ortho_height": 53.17760467529297,
-  "Ortho_width": 70.90347290039063,
+  "Ortho_height": 600.0,
+  "Ortho_width": 800.0,
   "Position": [
-   -37.24332046508789,
-   19.110891342163086,
-   0.49796241521835327
+   -44.01416778564453,
+   24.411218643188477,
+   -0.031510040163993835
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
-  "Speed": 0.006000000052154064,
+  "Speed": 0.004999999888241291,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.909281849861145,
-   -0.4148905873298645,
-   -0.03274574130773544
+   0.8320935964584351,
+   -0.5546084642410278,
+   -0.005446100141853094
   ]
  },
  "Entities": [
   {
-   "Entity_id": 0
+   "Entity_id": 0,
+   "Name_component": {
+    "Entity_name": "Terrain [0]"
+   },
+   "Render_component": {
+    "Render_type": 1,
+    "Terrain": {
+     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
+     "Texture_path": "../stages/assets/textures/images/grass.png",
+     "height_mult": 0.18700000643730164,
+     "is_centered": true,
+     "num_cols": 50,
+     "num_rows": 50,
+     "size": 1.0,
+     "use_perlin_noise": false
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
   },
   {
-   "Entity_id": 1
-  },
-  {
-   "Entity_id": 2
-  },
-  {
-   "Entity_id": 3
-  },
-  {
-   "Entity_id": 4
-  },
-  {
-   "Entity_id": 5
-  },
-  {
-   "Entity_id": 6
-  },
-  {
-   "Entity_id": 7
-  },
-  {
-   "Entity_id": 8
-  },
-  {
-   "Entity_id": 9
-  },
-  {
-   "Entity_id": 10
-  },
-  {
-   "Entity_id": 11
-  },
-  {
-   "Entity_id": 12
-  },
-  {
-   "Entity_id": 13
-  },
-  {
-   "Entity_id": 14,
+   "Entity_id": 1,
    "Light_component": {
     "light": {
      "Ambient_color": [
@@ -87,16 +82,16 @@
      ],
      "Direction": [
       [
-       0.942477822303772,
-       -0.9407208561897278,
-       -0.28221628069877625
+       0.0,
+       -0.9578263163566589,
+       -0.2873479127883911
       ]
      ],
      "Light_color": [
       [
-       6.3785200119018555,
-       6.37788200378418,
-       6.37788200378418
+       8.026415824890137,
+       8.025612831115723,
+       8.025612831115723
       ]
      ],
      "Linear_attenuation": [
@@ -135,48 +130,11 @@
     }
    },
    "Name_component": {
-    "Entity_name": "Directional Light [1]"
+    "Entity_name": "Directional Light [0]"
    }
   },
   {
-   "Entity_id": 15,
-   "Name_component": {
-    "Entity_name": "Terrain [1]"
-   },
-   "Render_component": {
-    "Render_type": 1,
-    "Terrain": {
-     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
-     "Texture_path": "../stages/assets/textures/images/grass.png",
-     "height_mult": 0.19599999487400055,
-     "is_centered": true,
-     "num_cols": 50,
-     "num_rows": 50,
-     "size": 1.0,
-     "use_perlin_noise": false
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 16,
+   "Entity_id": 2,
    "Name_component": {
     "Entity_name": "Mario"
    },
@@ -189,61 +147,27 @@
    },
    "Transform_component": {
     "Position": [
-     0.18233650922775269,
-     0.6258299350738525,
-     5.2423095703125
+     -11.174692153930664,
+     -1.1617634296417236,
+     10.758328437805176
     ],
     "Rotation": [
-     4.3525005821720697e-10,
-     -0.7073181867599487,
-     -4.3525005821720697e-10,
-     0.7068952918052673
+     0.0,
+     -0.684744119644165,
+     0.0,
+     0.7287835478782654
     ],
     "Scale": [
+     1.0000001192092896,
      1.0,
-     1.0,
-     1.0
+     1.0000001192092896
     ]
    }
   },
   {
-   "Entity_id": 17,
+   "Entity_id": 3,
    "Name_component": {
-    "Entity_name": "Cube24v [1]"
-   },
-   "Render_component": {
-    "Cube": {
-     "Is_centered": false,
-     "Texture_path": "../stages/assets/textures/images/blue.png",
-     "cube_24v": true,
-     "cube_8v": false,
-     "size": 1.0
-    },
-    "Render_type": 4
-   },
-   "Transform_component": {
-    "Position": [
-     -6.5345683097839355,
-     5.1672043800354,
-     -8.874092102050781
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 18,
-   "Name_component": {
-    "Entity_name": "Ball"
+    "Entity_name": "Sphere [0]"
    },
    "Render_component": {
     "Render_type": 2,
@@ -256,9 +180,43 @@
    },
    "Transform_component": {
     "Position": [
-     -11.773242950439453,
-     6.613439083099365,
-     -1.532474160194397
+     -4.491018295288086,
+     2.767496109008789,
+     -2.4647016525268555
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 4,
+   "Name_component": {
+    "Entity_name": "Cube24v [0]"
+   },
+   "Render_component": {
+    "Cube": {
+     "Is_centered": false,
+     "Texture_path": "../stages/assets/textures/images/blue.png",
+     "cube_24v": true,
+     "cube_8v": false,
+     "size": 1.9420000314712524
+    },
+    "Render_type": 4
+   },
+   "Transform_component": {
+    "Position": [
+     0.14533472061157227,
+     5.03639554977417,
+     -10.344361305236816
     ],
     "Rotation": [
      0.0,
@@ -276,17 +234,17 @@
  ],
  "Skybox": {
   "Cubemap_file_paths": [
-   "../stages/assets\\textures\\skybox\\cubemap\\nebulae\\right.png",
-   "../stages/assets\\textures\\skybox\\cubemap\\nebulae\\left.png",
-   "../stages/assets\\textures\\skybox\\cubemap\\nebulae\\bottom.png",
-   "../stages/assets\\textures\\skybox\\cubemap\\nebulae\\top.png",
-   "../stages/assets\\textures\\skybox\\cubemap\\nebulae\\front.png",
-   "../stages/assets\\textures\\skybox\\cubemap\\nebulae\\back.png"
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\right.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\left.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\bottom.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\top.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\front.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\back.png"
   ],
   "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
   "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
   "DDS_angle": -90.0,
-  "DDS_file_path": "../stages/textures/skybox/sky.dds",
+  "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
   "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
   "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
   "Use_cubemap": true
