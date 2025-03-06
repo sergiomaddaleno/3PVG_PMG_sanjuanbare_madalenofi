@@ -1857,6 +1857,20 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
                 mCurrentGizmoOperation = ImGuizmo::SCALE;
             ImGui::Dummy({ 0.0f, 5.0f });
         }
+
+        if (!input_->isMouseButtonDown(Input::MOUSE_RIGHT)) {
+            if (input_->isKeyPressed(Input::Q) && selected_entity) {
+                mCurrentGizmoOperation = ImGuizmo::SCALE;
+            }
+
+            if (input_->isKeyPressed(Input::W) && selected_entity) {
+                mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+            }
+
+            if (input_->isKeyPressed(Input::E) && selected_entity) {
+                mCurrentGizmoOperation = ImGuizmo::ROTATE;
+            }
+        }
     }
     ImGui::End();
 }
