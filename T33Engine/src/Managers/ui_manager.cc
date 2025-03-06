@@ -7,8 +7,6 @@
 #include "Components/transform_component.h"
 #include "Components\name_component.h"
 
-#include "Systems/ecs_manager.h"
-#include "Render/render_system.h"
 #include "Render/skybox.h"
 #include "Algorithms/l_system.h"
 
@@ -49,7 +47,7 @@
 
 ImGui::FileBrowser fileDialog;
 
-UIManager::UIManager()
+UIManager::UIManager(ECSManager& ecs, RenderSystem& rs)
     : selected_entity(0),
     m_BaseDirectory("../"),
     m_CurrentDirectory(m_BaseDirectory),
@@ -65,8 +63,11 @@ UIManager::UIManager()
     m_DeleteIcon(),
     post_process_compiled(false),
     load_scene_window(false),
-    add_mesh_window(false)
-{}
+    add_mesh_window(false),
+    ecs_(ecs),
+    rs_(rs)
+{
+}
 
 UIManager::~UIManager() {
     Cleanup();
@@ -325,20 +326,18 @@ void UIManager::GameWindow() {
 void UIManager::HierarchyWindow() {
     ImGui::Begin("Hierarchy", nullptr);
 
-    auto& loc_ecs = global.ecs;
-
     //--
-    auto ri = loc_ecs.getComponentList<RenderComponent>().begin();
-    auto ti = loc_ecs.getComponentList<TransformComponent>().begin();
+    auto ri = ecs_.getComponentList<RenderComponent>().begin();
+    auto ti = ecs_.getComponentList<TransformComponent>().begin();
 
-    auto riend = loc_ecs.getComponentList<RenderComponent>().end();
-    auto tiend = loc_ecs.getComponentList<TransformComponent>().end();
+    auto riend = ecs_.getComponentList<RenderComponent>().end();
+    auto tiend = ecs_.getComponentList<TransformComponent>().end();
 
-    auto li = loc_ecs.getComponentList<LightComponent>().begin();
-    auto liend = loc_ecs.getComponentList<LightComponent>().end();
+    auto li = ecs_.getComponentList<LightComponent>().begin();
+    auto liend = ecs_.getComponentList<LightComponent>().end();
 
-    auto ni = loc_ecs.getComponentList<NameComponent>().begin();
-    auto niend = loc_ecs.getComponentList<NameComponent>().end();
+    auto ni = ecs_.getComponentList<NameComponent>().begin();
+    auto niend = ecs_.getComponentList<NameComponent>().end();
 
     int entity_id = 0;
     
@@ -365,7 +364,7 @@ void UIManager::HierarchyWindow() {
 void UIManager::InspectorWindow() {
     ImGui::Begin("Inspector");
 
-    if (global.ecs.has_component<NameComponent>(selected_entity)) {
+    if (ecs_.has_component<NameComponent>(selected_entity)) {
 
         bool open = ImGui::CollapsingHeader("##NameComponent", ImGuiTreeNodeFlags_DefaultOpen);
         ImGui::SameLine();
@@ -374,7 +373,7 @@ void UIManager::InspectorWindow() {
         ImGui::Text("Name Component");
 
         if (open) {
-            auto& name_comp = global.ecs.get_component<NameComponent>(selected_entity);
+            auto& name_comp = ecs_.get_component<NameComponent>(selected_entity);
             ImGui::Dummy({ 0.0f, 3.0f });
 
             if (name_comp->name.empty()) name_comp->name = "Entity"; 
@@ -388,7 +387,7 @@ void UIManager::InspectorWindow() {
 
     }
 
-    if (global.ecs.has_component<TransformComponent>(selected_entity)) {
+    if (ecs_.has_component<TransformComponent>(selected_entity)) {
 
         bool open = ImGui::CollapsingHeader("##TransformComponent", ImGuiTreeNodeFlags_DefaultOpen);
         ImGui::SameLine();
@@ -397,7 +396,7 @@ void UIManager::InspectorWindow() {
         ImGui::Text("Transform Component");
 
         if (open) {
-            auto& transf_comp = global.ecs.get_component<TransformComponent>(selected_entity);
+            auto& transf_comp = ecs_.get_component<TransformComponent>(selected_entity);
 
             if (global.cam.getUsePerspectiveMatrix()) {
                 ImGuizmo::SetOrthographic(false);
@@ -456,9 +455,9 @@ void UIManager::InspectorWindow() {
         }
     }
 
-    if (global.ecs.has_component<RenderComponent>(selected_entity)) {
+    if (ecs_.has_component<RenderComponent>(selected_entity)) {
 
-        auto& render_comp = global.ecs.get_component<RenderComponent>(selected_entity);
+        auto& render_comp = ecs_.get_component<RenderComponent>(selected_entity);
 
         bool open = ImGui::CollapsingHeader("##RenderComponent", ImGuiTreeNodeFlags_DefaultOpen);
         ImGui::SameLine();
@@ -507,7 +506,7 @@ void UIManager::InspectorWindow() {
 
             if (ImGui::Button("Compile Shader")) {
                 
-                initShader(global.render_system.shader, vertex_file_path, fragment_file_path);
+                initShader(rs_.shader, vertex_file_path, fragment_file_path);
 
                 vertex_file_path.clear();
                 vertex_file_name.clear();
@@ -612,7 +611,7 @@ void UIManager::InspectorWindow() {
                 ImGui::Text("Terrain Dimensions");
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-                auto& terrain = *global.ecs.get_component<RenderComponent>(selected_entity)->terrain_;
+                auto& terrain = *ecs_.get_component<RenderComponent>(selected_entity)->terrain_;
 
                 static int temp_num_cols = terrain.num_cols_;
                 static int temp_num_rows = terrain.num_rows_;
@@ -669,7 +668,7 @@ void UIManager::InspectorWindow() {
                 ImGui::Text("Sphere Dimensions");
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-                auto& sphere = *global.ecs.get_component<RenderComponent>(selected_entity)->sphere_;
+                auto& sphere = *ecs_.get_component<RenderComponent>(selected_entity)->sphere_;
 
                 static int temp_num_heights = sphere.num_heights_;
                 static int temp_num_revs = sphere.num_revs_;
@@ -696,7 +695,7 @@ void UIManager::InspectorWindow() {
                 ImGui::Text("Cube8v Dimensions");
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-                auto& cube = *global.ecs.get_component<RenderComponent>(selected_entity)->cube_;
+                auto& cube = *ecs_.get_component<RenderComponent>(selected_entity)->cube_;
                 static float temp_size = cube.size_;
                 static bool temp_is_centered = cube.is_centered_;
 
@@ -720,7 +719,7 @@ void UIManager::InspectorWindow() {
                 ImGui::Text("Cube24v Dimensions");
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-                auto& cube = *global.ecs.get_component<RenderComponent>(selected_entity)->cube_;
+                auto& cube = *ecs_.get_component<RenderComponent>(selected_entity)->cube_;
                 static float temp_size = cube.size_;
                 ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
 
@@ -741,7 +740,7 @@ void UIManager::InspectorWindow() {
                 ImGui::Text("Quad Dimensions");
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-                auto& quad = *global.ecs.get_component<RenderComponent>(selected_entity)->quad_;
+                auto& quad = *ecs_.get_component<RenderComponent>(selected_entity)->quad_;
 
                 static float temp_size = quad.size_;
                 ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
@@ -772,7 +771,7 @@ void UIManager::InspectorWindow() {
                 ImGui::PopStyleColor();
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-                auto& terrain = *global.ecs.get_component<RenderComponent>(selected_entity)->terrain_;
+                auto& terrain = *ecs_.get_component<RenderComponent>(selected_entity)->terrain_;
                 ImGui::Checkbox("Use Wave Effect", &terrain.wave_.use_wave_);
 
                 ImGui::SliderFloat("Amplitude", &terrain.wave_.amplitude_, 0.0f, 1.0f);
@@ -787,7 +786,7 @@ void UIManager::InspectorWindow() {
         }
     }
 
-    if (global.ecs.has_component<LightComponent>(selected_entity)) {
+    if (ecs_.has_component<LightComponent>(selected_entity)) {
 
         bool open = ImGui::CollapsingHeader("##LightComponent", ImGuiTreeNodeFlags_DefaultOpen);
         ImGui::SameLine();
@@ -796,7 +795,7 @@ void UIManager::InspectorWindow() {
         ImGui::Text("Light Component");
 
         if (open) {
-            auto& light_comp = global.ecs.get_component<LightComponent>(selected_entity);
+            auto& light_comp = ecs_.get_component<LightComponent>(selected_entity);
 
             if (light_comp->light.type_ == Light::LightType::LT_Directional) {
                 ImGui::Dummy(ImVec2(0.0f, 5.0f));
@@ -948,16 +947,16 @@ void UIManager::InspectorWindow() {
         ImGui::Text("Entity has:");
         ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-        if (global.ecs.has_component<TransformComponent>(selected_entity)) {
+        if (ecs_.has_component<TransformComponent>(selected_entity)) {
             ImGui::Text("- Transform component");
         }
-        if (global.ecs.has_component<LightComponent>(selected_entity)) {
+        if (ecs_.has_component<LightComponent>(selected_entity)) {
             ImGui::Text("- Light component");
         }
-        if (global.ecs.has_component<RenderComponent>(selected_entity)) {
+        if (ecs_.has_component<RenderComponent>(selected_entity)) {
             ImGui::Text("- Render component");
         }
-        if (global.ecs.has_component<NameComponent>(selected_entity)) {
+        if (ecs_.has_component<NameComponent>(selected_entity)) {
             ImGui::Text("- Name component");
         }
         ImGui::Dummy(ImVec2(0.0f, 3.0f));
@@ -969,20 +968,20 @@ void UIManager::InspectorWindow() {
             for (int i = 0; i < IM_ARRAYSIZE(addComponents); i++) {
                 bool hasComponent = false;
                 switch (i) {
-                case 0: hasComponent = global.ecs.has_component<TransformComponent>(selected_entity); break;
-                case 1: hasComponent = global.ecs.has_component<LightComponent>(selected_entity); break;
-                case 2: hasComponent = global.ecs.has_component<RenderComponent>(selected_entity); break;
+                case 0: hasComponent = ecs_.has_component<TransformComponent>(selected_entity); break;
+                case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
+                case 2: hasComponent = ecs_.has_component<RenderComponent>(selected_entity); break;
                 }
 
                 if (!hasComponent) {
                     if (ImGui::Selectable(addComponents[i], addCurrentItem == i)) {
                         switch (i) {
-                        case 0: global.ecs.add_component<TransformComponent>(selected_entity); break;
-                        case 1: global.ecs.add_component<LightComponent>(selected_entity); 
+                        case 0: ecs_.add_component<TransformComponent>(selected_entity); break;
+                        case 1: ecs_.add_component<LightComponent>(selected_entity); 
                         {
-                            auto& light_comp = global.ecs.get_component<LightComponent>(selected_entity);
+                            auto& light_comp = ecs_.get_component<LightComponent>(selected_entity);
                             light_comp->light.type_ = Light::LightType::LT_Point;
-                            light_comp->light.pos_ = global.ecs.get_component<TransformComponent>(selected_entity)->position;
+                            light_comp->light.pos_ = ecs_.get_component<TransformComponent>(selected_entity)->position;
                             light_comp->light.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
                             light_comp->light.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
                             light_comp->light.linear_att = 0.7f;
@@ -992,7 +991,7 @@ void UIManager::InspectorWindow() {
                             light_comp->light.strength_ = 1.0f;
                         }
                         break;
-                        case 2: global.ecs.add_component<RenderComponent>(selected_entity); break;
+                        case 2: ecs_.add_component<RenderComponent>(selected_entity); break;
                         }
                         addCurrentItem = -1; 
                     }
@@ -1010,17 +1009,17 @@ void UIManager::InspectorWindow() {
             for (int i = 0; i < IM_ARRAYSIZE(deleteComponents); i++) {
                 bool hasComponent = false;
                 switch (i) {
-                case 0: hasComponent = global.ecs.has_component<TransformComponent>(selected_entity); break;
-                case 1: hasComponent = global.ecs.has_component<LightComponent>(selected_entity); break;
-                case 2: hasComponent = global.ecs.has_component<RenderComponent>(selected_entity); break;
+                case 0: hasComponent = ecs_.has_component<TransformComponent>(selected_entity); break;
+                case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
+                case 2: hasComponent = ecs_.has_component<RenderComponent>(selected_entity); break;
                 }
 
                 if (hasComponent) {
                     if (ImGui::Selectable(deleteComponents[i], deleteCurrentItem == i)) {
                         switch (i) {
-                        case 0: global.ecs.delete_component<TransformComponent>(selected_entity); break;
-                        case 1: global.ecs.delete_component<LightComponent>(selected_entity); break;
-                        //case 2: global.ecs.delete_component<RenderComponent>(selected_entity); break;
+                        case 0: ecs_.delete_component<TransformComponent>(selected_entity); break;
+                        case 1: ecs_.delete_component<LightComponent>(selected_entity); break;
+                        //case 2: ecs_.delete_component<RenderComponent>(selected_entity); break;
                         }
                         deleteCurrentItem = -1; 
                     }
@@ -1039,8 +1038,8 @@ void UIManager::InspectorWindow() {
 
     if (ImGui::Button("Delete Entity") /*|| global.input.isKeyPressed(Input::SUPR)*/) {
         
-        if (global.ecs.has_component<NameComponent>(selected_entity)) {
-            global.ecs.destroy_entity(selected_entity);
+        if (ecs_.has_component<NameComponent>(selected_entity)) {
+            ecs_.destroy_entity(selected_entity);
         }
 
     }
@@ -1115,7 +1114,6 @@ void UIManager::TopBarWindow() {
 
     ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_MenuBar);
 
-    auto& loc_ecs = global.ecs;
     static int curr_type_draw = 0; 
 
     if (ImGui::BeginMenuBar()) {
@@ -1215,32 +1213,32 @@ void UIManager::TopBarWindow() {
             if (ImGui::BeginMenu("Add Geometry")) {
 
                 if (ImGui::MenuItem("Sphere")) {
-                    global.render_system.createSphere();
-                    global.render_system.init();
+                    rs_.createSphere();
+                    rs_.init();
                     AddConsoleMessage("Sphere added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 8v")) {
-                    global.render_system.createCube8v();
-                    global.render_system.init();
+                    rs_.createCube8v();
+                    rs_.init();
                     AddConsoleMessage("Cube 8v added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 24v")) {
-                    global.render_system.createCube24v();
-                    global.render_system.init();
+                    rs_.createCube24v();
+                    rs_.init();
                     AddConsoleMessage("Cube 24v added to scene");
                 }
 
                 if (ImGui::MenuItem("Quad")) {
-                    global.render_system.createQuad();
-                    global.render_system.init();
+                    rs_.createQuad();
+                    rs_.init();
                     AddConsoleMessage("Quad added to scene");
                 }
 
                 if (ImGui::MenuItem("Terrain")) {
-                    global.render_system.createTerrain();
-                    global.render_system.init();
+                    rs_.createTerrain();
+                    rs_.init();
                     AddConsoleMessage("Terrain Light added to scene");
                 }
 
@@ -1250,20 +1248,20 @@ void UIManager::TopBarWindow() {
             if (ImGui::BeginMenu("Add Light")) {
 
                 if (ImGui::MenuItem("Point Light")) {
-                    global.render_system.createPointLight();
-                    global.render_system.init();
+                    rs_.createPointLight();
+                    rs_.init();
                     AddConsoleMessage("Point Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Spot Light")) {
-                    global.render_system.createSpotLight();
-                    global.render_system.init();
+                    rs_.createSpotLight();
+                    rs_.init();
                     AddConsoleMessage("Spot Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Directional Light")) {
-                    global.render_system.createDirectionalLight();
-                    global.render_system.init();
+                    rs_.createDirectionalLight();
+                    rs_.init();
                     AddConsoleMessage("Directional Light added to scene");
                 }
 
@@ -1745,8 +1743,8 @@ void UIManager::AddMeshWindow()
     if (ImGui::Button("Add Mesh")) {
         
         if (!obj_file_path.empty() && !texture_folder_path.empty()) {
-            global.render_system.createMesh(obj_file_path, texture_folder_path);
-            global.render_system.init();
+            rs_.createMesh(obj_file_path, texture_folder_path);
+            rs_.init();
 
             AddConsoleMessage(obj_file_name + " added to scene");
 
@@ -1768,8 +1766,6 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
     static bool useSnap = false;
     static float snap[3] = { 1.0f, 1.0f, 1.0f };
 
-    auto& loc_ecs = global.ecs;
-
     ImGuizmo::BeginFrame();
     if (ImGui::Begin("GameWindow", nullptr, ImGuiWindowFlags_NoTitleBar)) {
         ImGuizmo::SetAlternativeWindow(ImGui::GetCurrentWindow());
@@ -1779,10 +1775,10 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
 
         ImGuizmo::SetRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
-        auto ti = loc_ecs.getComponentList<TransformComponent>().begin();
-        auto li = loc_ecs.getComponentList<LightComponent>().begin();
-        auto tiend = loc_ecs.getComponentList<TransformComponent>().end();
-        auto liend = loc_ecs.getComponentList<LightComponent>().end();
+        auto ti = ecs_.getComponentList<TransformComponent>().begin();
+        auto li = ecs_.getComponentList<LightComponent>().begin();
+        auto tiend = ecs_.getComponentList<TransformComponent>().end();
+        auto liend = ecs_.getComponentList<LightComponent>().end();
 
         int entity_id = 0;
 
@@ -1790,10 +1786,10 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
             
             if (entity_id == selected_entity && ti->has_value()) {
 
-                auto& transform = loc_ecs.get_component<TransformComponent>(selected_entity);
+                auto& transform = ecs_.get_component<TransformComponent>(selected_entity);
 
-                if (loc_ecs.has_component<LightComponent>(selected_entity)) {
-                    auto& light_comp = loc_ecs.get_component<LightComponent>(selected_entity);
+                if (ecs_.has_component<LightComponent>(selected_entity)) {
+                    auto& light_comp = ecs_.get_component<LightComponent>(selected_entity);
                     light_comp->light.pos_ = transform->position;
                     light_comp->light.dir_ = glm::mat3(transform->rotation) * glm::vec3(0.0f, 0.0f, 1.0f);
                 }
@@ -1889,7 +1885,7 @@ void UIManager::LSystemWindow() {
     ImGui::Dummy({ 0.0f, 2.0f });
 
     if (ImGui::Button("Start L-System algorithm")) {
-        LSystem lsystem(global.ecs, global.render_system);
+        LSystem lsystem(ecs_, rs_);
         lsystem.angle_ = angle;
         lsystem.cube_size_ = cube_size;
         lsystem.spacing_ = spacing;
@@ -1902,7 +1898,7 @@ void UIManager::LSystemWindow() {
     ImGui::Dummy({ 0.0f, 5.0f });
 
     if (ImGui::Button("Delete all entities")) {
-        global.ecs.remove_entities();
+        ecs_.remove_entities();
     }
 
     ImGui::Dummy({ 0.0f, 5.0f });

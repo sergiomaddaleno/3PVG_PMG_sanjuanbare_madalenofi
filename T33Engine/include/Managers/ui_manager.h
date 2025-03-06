@@ -9,6 +9,8 @@
 #ifndef __UI_MANAGER__
 #define __UI_MANAGER__
 
+#include "Render/render_system.h"
+#include "../Systems/ecs_manager.h"
 #include "Core/texture.h"
 #include "Core/shader.h"
 #include "utils.h"
@@ -24,7 +26,7 @@
   */
 class UIManager {
 public:
-    UIManager();
+    UIManager(ECSManager& ecs, RenderSystem& rs);
     ~UIManager();
 
     void Init(GLFWwindow* window);
@@ -55,6 +57,8 @@ public:
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity);
 
 private:
+    ECSManager& ecs_;
+    RenderSystem& rs_;
 
     int selected_entity;
 
