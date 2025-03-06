@@ -26,7 +26,7 @@ void init() {
 
 int main(int, char**) {
 
-    auto window = Window::make(global.window_width, global.window_height, "Atomic Engine", global.full_screen);
+    auto window = Window::make(global.window_width, global.window_height, "T33Engine", global.full_screen);
     window->setWindowActive();
     window->initGLEW();
     window->setResizeCallback();

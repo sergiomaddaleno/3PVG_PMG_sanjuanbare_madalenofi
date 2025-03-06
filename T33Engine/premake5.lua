@@ -56,13 +56,13 @@ function conan_config_lib()
 	end
 end
 
-workspace "Motor"
+workspace "T33Engine"
 
 configurations { "Debug", "Release", "RelWithDebInfo" }
 architecture "x64"
 location "build"
 cppdialect "c++20"
-startproject "MyMotor"
+startproject "T33Launcher"
 includedirs { "include", "deps/imgui", "deps/imgui/backends", "deps/imGuizmo", "deps/Perlin"} 
 
 filter "configurations:Debug"
@@ -85,7 +85,7 @@ symbols "On"
 filter {}
 
 -----
-project "Motor"
+project "T33Engine"
 
 kind "StaticLib"
 targetdir "build/%{cfg.buildcfg}"
@@ -125,7 +125,7 @@ function createExample(project_name, example_name)
 	language "C++"
 	targetdir "build/%{prj.name}/%{cfg.buildcfg}"
 	libdirs{"lib/%{cfg.buildcfg}"}
-	links "Motor"
+	links "T33Engine"
 
 	conan_config_exec("Debug")
 	conan_config_exec("Release")
@@ -135,7 +135,7 @@ function createExample(project_name, example_name)
 	files { "examples/" ..example_name.. ".cc" }
 end
 
-createExample("MyMotor", "mymotor")
+createExample("T33Launcher", "t33_launcher")
 createExample("PR0_Window", "PR0_Window_Example")
 createExample("PR1_Triangle", "PR1_Triangle_Example")
 createExample("PR2_MeshLoad", "PR2_MeshLoad_Example")
