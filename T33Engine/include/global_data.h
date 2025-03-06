@@ -26,6 +26,8 @@
 class Globals {
 public:
 
+    Globals();
+
     //Variables
     int window_width = 800;
     int window_height = 600;
@@ -53,8 +55,8 @@ public:
     //Classes
     Camera cam;
     ECSManager ecs;
-    PostProcessing post_process;
     RenderSystem render_system;
+    PostProcessing post_process;
     Skybox skybox;
     SaveManager save_manager;
     UIManager ui_manager;

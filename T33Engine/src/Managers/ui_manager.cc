@@ -1215,32 +1215,32 @@ void UIManager::TopBarWindow() {
             if (ImGui::BeginMenu("Add Geometry")) {
 
                 if (ImGui::MenuItem("Sphere")) {
-                    global.render_system.createSphere(loc_ecs);
-                    global.render_system.init(loc_ecs);
+                    global.render_system.createSphere();
+                    global.render_system.init();
                     AddConsoleMessage("Sphere added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 8v")) {
-                    global.render_system.createCube8v(loc_ecs);
-                    global.render_system.init(loc_ecs);
+                    global.render_system.createCube8v();
+                    global.render_system.init();
                     AddConsoleMessage("Cube 8v added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 24v")) {
-                    global.render_system.createCube24v(loc_ecs);
-                    global.render_system.init(loc_ecs);
+                    global.render_system.createCube24v();
+                    global.render_system.init();
                     AddConsoleMessage("Cube 24v added to scene");
                 }
 
                 if (ImGui::MenuItem("Quad")) {
-                    global.render_system.createQuad(loc_ecs);
-                    global.render_system.init(loc_ecs);
+                    global.render_system.createQuad();
+                    global.render_system.init();
                     AddConsoleMessage("Quad added to scene");
                 }
 
                 if (ImGui::MenuItem("Terrain")) {
-                    global.render_system.createTerrain(loc_ecs);
-                    global.render_system.init(loc_ecs);
+                    global.render_system.createTerrain();
+                    global.render_system.init();
                     AddConsoleMessage("Terrain Light added to scene");
                 }
 
@@ -1250,20 +1250,20 @@ void UIManager::TopBarWindow() {
             if (ImGui::BeginMenu("Add Light")) {
 
                 if (ImGui::MenuItem("Point Light")) {
-                    global.render_system.createPointLight(loc_ecs);
-                    global.render_system.init(loc_ecs);
+                    global.render_system.createPointLight();
+                    global.render_system.init();
                     AddConsoleMessage("Point Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Spot Light")) {
-                    global.render_system.createSpotLight(loc_ecs);
-                    global.render_system.init(loc_ecs);
+                    global.render_system.createSpotLight();
+                    global.render_system.init();
                     AddConsoleMessage("Spot Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Directional Light")) {
-                    global.render_system.createDirectionalLight(loc_ecs);
-                    global.render_system.init(loc_ecs);
+                    global.render_system.createDirectionalLight();
+                    global.render_system.init();
                     AddConsoleMessage("Directional Light added to scene");
                 }
 
@@ -1745,8 +1745,8 @@ void UIManager::AddMeshWindow()
     if (ImGui::Button("Add Mesh")) {
         
         if (!obj_file_path.empty() && !texture_folder_path.empty()) {
-            global.render_system.createMesh(global.ecs, obj_file_path, texture_folder_path);
-            global.render_system.init(global.ecs);
+            global.render_system.createMesh(obj_file_path, texture_folder_path);
+            global.render_system.init();
 
             AddConsoleMessage(obj_file_name + " added to scene");
 

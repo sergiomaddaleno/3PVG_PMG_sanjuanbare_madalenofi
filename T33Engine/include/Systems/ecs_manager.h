@@ -68,6 +68,13 @@ struct ComponentListDerived : ComponentListBase {
 class ECSManager {
 public:
 	ECSManager() : last_entity(-1) {}
+	~ECSManager() = default;
+
+	ECSManager(const ECSManager&) = delete;
+	ECSManager& operator=(const ECSManager&) = delete;
+
+	ECSManager(ECSManager&&) = default;
+	ECSManager& operator=(ECSManager&&) = default;
 
 	size_t create_entity() {
 		// TODO Incrementar todas las listas

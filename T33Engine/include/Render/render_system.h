@@ -40,55 +40,51 @@ class RenderSystem {
 
 public:
 
-	RenderSystem();
+	RenderSystem(ECSManager& ecs);
 	~RenderSystem();
 
-	void init(ECSManager &ecs);
+	void init();
 
-	void setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
+	void forwardRender(Camera cam = Camera());
 
-	void forwardRender(ECSManager& ecs, Camera cam = Camera());
-
-	void deferredRender(ECSManager& ecs, Camera cam = Camera());
+	void deferredRender(Camera cam = Camera());
 
 	//call one time to create entites
-	void setup(ECSManager& ecs);
+	void setup();
 
 	//----------------------------------
 
-	size_t createMesh(ECSManager &ecs, std::string file, std::string textureFolder, 
+	size_t createMesh(std::string file, std::string textureFolder, 
 		TransformComponent tc = TransformComponent());
 
-	size_t createTerrain(ECSManager& ecs, TransformComponent tc = TransformComponent(),
+	size_t createTerrain(TransformComponent tc = TransformComponent(),
 		const int num_cols = 2, const int num_rows = 2,
 		const float height_mult = 1.0f, const float size = 1.0f,
 		const bool is_centered = true, const bool use_perlin_noise = true);
 
-	size_t createSphere(ECSManager& ecs, TransformComponent tc = TransformComponent(),
+	size_t createSphere(TransformComponent tc = TransformComponent(),
 		int num_heights_ = 60, int num_revs_ = 60, float size = 1.0f);
 
-	size_t createCube8v(ECSManager& ecs, TransformComponent tc = TransformComponent(),
+	size_t createCube8v(TransformComponent tc = TransformComponent(),
 		const float size = 1.0f, bool is_centered = true);
 
-	size_t createCube24v(ECSManager& ecs, TransformComponent tc = TransformComponent(),
+	size_t createCube24v(TransformComponent tc = TransformComponent(),
 		const float size = 1.0f);
 
-	size_t createQuad(ECSManager& ecs, TransformComponent tc = TransformComponent(),
+	size_t createQuad(TransformComponent tc = TransformComponent(),
 		const float size = 1.0f);
 	
-	size_t createSpotLight(ECSManager& ecs, 
-		Light li = Light(), bool default_light = true);
+	size_t createSpotLight(Light li = Light(), bool default_light = true);
 
-	size_t createPointLight(ECSManager& ecs, 
-		Light li = Light(), bool default_light = true);
+	size_t createPointLight(Light li = Light(), bool default_light = true);
 
-	size_t createDirectionalLight(ECSManager& ecs, 
-		Light li = Light(), bool default_light = true);
+	size_t createDirectionalLight(Light li = Light(), bool default_light = true);
 	
 	//-----------------------
 
 	Shader shader;
 	Deferred deferred;
+	ECSManager& ecs_;
 	size_t entity_;
 
 	int entity_mesh;
@@ -101,7 +97,10 @@ public:
 	int entity_pointlight;
 	int entity_dirlight;
 
-	//Dont use
+private:
+
+	void setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
+
 	void compileShaderForBuild();
 };
 

@@ -7,18 +7,18 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -44.01416778564453,
-   24.411218643188477,
-   -0.031510040163993835
+   -50.94547653198242,
+   23.90631103515625,
+   1.48390531539917
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.004999999888241291,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.9013775587081909,
-   -0.43202754855155945,
-   -0.02950805239379406
+   0.9195123910903931,
+   -0.3868965804576874,
+   -0.06934025138616562
   ]
  },
  "Entities": [
@@ -223,6 +223,37 @@
      0.0,
      0.0,
      1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Entity_id": 5,
+   "Name_component": {
+    "Entity_name": "Quad [0]"
+   },
+   "Render_component": {
+    "Quad": {
+     "Texture_path": "../stages/assets/textures/materials/brick_wall/brickwall.jpg",
+     "size": 4.709000110626221
+    },
+    "Render_type": 5
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     10.168638229370117,
+     0.0
+    ],
+    "Rotation": [
+     6.179286060614686e-08,
+     0.7266819477081299,
+     6.179286060614686e-08,
+     -0.686974048614502
     ],
     "Scale": [
      1.0,

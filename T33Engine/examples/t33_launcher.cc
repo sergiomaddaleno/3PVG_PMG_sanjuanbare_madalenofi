@@ -13,7 +13,7 @@
 void init() {
 
     global.post_process.initData();
-    global.render_system.setup(global.ecs);
+    global.render_system.setup();
 
     global.save_manager.loadFromFile("../stages/saves/main_scene.json");
 
@@ -62,9 +62,9 @@ int main(int, char**) {
         if (global.use_skybox) global.skybox.render(global.cam);
         
         if (global.deferred_shading){
-            global.render_system.deferredRender(global.ecs, global.cam);
+            global.render_system.deferredRender(global.cam);
         }else{
-            global.render_system.forwardRender(global.ecs, global.cam);
+            global.render_system.forwardRender(global.cam);
         }
 
         global.ui_manager.Render(window->getWindow());

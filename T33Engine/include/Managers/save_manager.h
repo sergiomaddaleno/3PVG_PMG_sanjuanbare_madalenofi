@@ -48,7 +48,7 @@ public:
 private:
 
 	nlohmann::json serialize(ECSManager& ecs, Camera& cam, Skybox& skybox);
-	void deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera& cam, Skybox& skybox);
+	void deSerialize(const nlohmann::json& j, RenderSystem& rs, Camera& cam, Skybox& skybox);
 
 	std::string current_scene_file;
 	int number_of_scenes;

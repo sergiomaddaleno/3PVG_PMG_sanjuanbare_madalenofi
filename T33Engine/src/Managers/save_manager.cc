@@ -118,9 +118,9 @@ nlohmann::json SaveManager::serialize(ECSManager& ecs, Camera& cam, Skybox& skyb
     return j;
 }
 
-void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSystem& rs, Camera &cam, Skybox& skybox) {
+void SaveManager::deSerialize(const nlohmann::json& j, RenderSystem& rs, Camera &cam, Skybox& skybox) {
 
-    ecs.remove_entities();
+    rs.ecs_.remove_entities();
     rs.entity_ = 0;
 
     rs.entity_mesh = 0;
@@ -199,7 +199,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             case RenderType::RT_Mesh: {
                 std::string mesh_path = entity["Render_component"]["Mesh"].value("Mesh_path", "");
                 std::string texture_folder = entity["Render_component"]["Mesh"].value("Texture_folder", "");
-                rs.createMesh(ecs, mesh_path, texture_folder, tc);
+                rs.createMesh(mesh_path, texture_folder, tc);
                 break;
             }
 
@@ -211,8 +211,8 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 cube_size = cube["size"];
                 cube_is_centered = cube["Is_centered"];
 
-                if (cube_8v) rs.createCube8v(ecs, tc, cube_size, cube_is_centered);
-                if (cube_24v) rs.createCube24v(ecs, tc, cube_size);
+                if (cube_8v) rs.createCube8v(tc, cube_size, cube_is_centered);
+                if (cube_24v) rs.createCube24v(tc, cube_size);
 
                 cube_tex_path = cube["Texture_path"];
                 auto& render_comp = global.ecs.get_component<RenderComponent>(entity["Entity_id"].get<int>());
@@ -223,7 +223,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             case RenderType::RT_Quad: {
                 const auto& quad = entity["Render_component"]["Quad"];
                 quad_size = quad["size"];
-                rs.createQuad(ecs, tc, quad_size);
+                rs.createQuad(tc, quad_size);
 
                 quad_tex_path = quad["Texture_path"];
                 auto& render_comp = global.ecs.get_component<RenderComponent>(entity["Entity_id"].get<int>());
@@ -236,7 +236,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 sphere_num_heights = sphere["num_heights"];
                 sphere_num_revs = sphere["num_revs"];
                 sphere_size = sphere["size"];
-                rs.createSphere(ecs, tc, sphere_num_heights, sphere_num_revs, sphere_size);
+                rs.createSphere(tc, sphere_num_heights, sphere_num_revs, sphere_size);
 
                 sphere_tex_path = sphere["Texture_path"];
                 auto& render_comp = global.ecs.get_component<RenderComponent>(entity["Entity_id"].get<int>());
@@ -256,7 +256,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
                 heightmap_path = terrain["Heightmap_path"];
                 int entity_id = entity["Entity_id"];
 
-                rs.createTerrain(ecs, tc,
+                rs.createTerrain(tc,
                     terrain_num_cols,
                     terrain_num_rows,
                     terrain_height_mult,
@@ -304,13 +304,13 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 
             switch (lightType) {
             case Light::LightType::LT_Spot:
-                rs.createSpotLight(ecs, li, false);
+                rs.createSpotLight(li, false);
                 break;
             case Light::LightType::LT_Point:
-                rs.createPointLight(ecs, li, false);
+                rs.createPointLight(li, false);
                 break;
             case Light::LightType::LT_Directional:
-                rs.createDirectionalLight(ecs, li, false);
+                rs.createDirectionalLight(li, false);
                 break;
             }
         }
@@ -319,12 +319,11 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
 
         if (entity.contains("Name_component")) {
 
-            auto ni = ecs.getComponentList<NameComponent>().begin();
-            auto niend = ecs.getComponentList<NameComponent>().end();
+            auto ni = rs.ecs_.getComponentList<NameComponent>().begin();
+            auto niend = rs.ecs_.getComponentList<NameComponent>().end();
             for (const auto& entity : j["Entities"]) {
                 if (entity.contains("Name_component")) {
                     const auto& nc = entity["Name_component"];
-
 
                     if (ni != niend) {
                         if (ni->has_value()) {
@@ -337,7 +336,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, ECSManager& ecs, RenderSy
             }
         }
     }
-    rs.init(ecs);
+    rs.init();
 }
 
 void SaveManager::saveToFile(std::string filename)
@@ -370,7 +369,7 @@ void SaveManager::loadFromFile(std::string filename) {
     file >> j;
     file.close();
 
-    deSerialize(j, global.ecs, global.render_system, global.cam, global.skybox);
+    deSerialize(j, global.render_system, global.cam, global.skybox);
     printf("Loaded from %s\n", filename.c_str());
 }
 

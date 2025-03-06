@@ -25,7 +25,8 @@
 #include <memory> 
 #include <iostream>
 
-RenderSystem::RenderSystem()
+
+RenderSystem::RenderSystem(ECSManager& ecs_)
     : shader(),
     entity_(0),
     entity_mesh(0),
@@ -36,18 +37,20 @@ RenderSystem::RenderSystem()
     entity_quad(0),
     entity_spotlight(0),
     entity_pointlight(0),
-    entity_dirlight(0)
-{}
+    entity_dirlight(0),
+    ecs_(ecs_)
+{
+}
 
 RenderSystem::~RenderSystem() {}
 
-void RenderSystem::init(ECSManager& ecs) {
+void RenderSystem::init() {
     
-    auto ri = ecs.getComponentList<RenderComponent>().begin();
-    auto li = ecs.getComponentList<LightComponent>().begin();
+    auto ri = ecs_.getComponentList<RenderComponent>().begin();
+    auto li = ecs_.getComponentList<LightComponent>().begin();
 
-    auto riend = ecs.getComponentList<RenderComponent>().end();
-    auto liend = ecs.getComponentList<LightComponent>().end();
+    auto riend = ecs_.getComponentList<RenderComponent>().end();
+    auto liend = ecs_.getComponentList<LightComponent>().end();
 
     for (; ri != riend; ++ri) {
         if (ri->has_value()) {
@@ -126,7 +129,7 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &global.sky_colour);
 }
 
-void RenderSystem::forwardRender(ECSManager& ecs, Camera cam) {
+void RenderSystem::forwardRender(Camera cam) {
     
     glEnable(GL_DEPTH_TEST);
     glClear( GL_DEPTH_BUFFER_BIT);
@@ -136,8 +139,8 @@ void RenderSystem::forwardRender(ECSManager& ecs, Camera cam) {
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
 
-    auto li = ecs.getComponentList<LightComponent>().begin();
-    auto liend = ecs.getComponentList<LightComponent>().end();
+    auto li = ecs_.getComponentList<LightComponent>().begin();
+    auto liend = ecs_.getComponentList<LightComponent>().end();
 
     shader.useProgram();
 
@@ -145,7 +148,7 @@ void RenderSystem::forwardRender(ECSManager& ecs, Camera cam) {
         if (li->has_value()) {
             auto& light_comp = *li;
 
-            light_comp->shadow_map_.render(ecs, shader, *light_comp);
+            light_comp->shadow_map_.render(ecs_, shader, *light_comp);
 
             shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
             
@@ -153,10 +156,10 @@ void RenderSystem::forwardRender(ECSManager& ecs, Camera cam) {
             
             // ---------------------------------------------------------------
 
-            auto ri = ecs.getComponentList<RenderComponent>().begin();
-            auto ti = ecs.getComponentList<TransformComponent>().begin();
-            auto riend = ecs.getComponentList<RenderComponent>().end();
-            auto tiend = ecs.getComponentList<TransformComponent>().end();
+            auto ri = ecs_.getComponentList<RenderComponent>().begin();
+            auto ti = ecs_.getComponentList<TransformComponent>().begin();
+            auto riend = ecs_.getComponentList<RenderComponent>().end();
+            auto tiend = ecs_.getComponentList<TransformComponent>().end();
 
             for (; ri != riend && ti != tiend; ++ri, ++ti) {
                 if (ri->has_value() && ti->has_value()) {
@@ -242,23 +245,23 @@ void RenderSystem::forwardRender(ECSManager& ecs, Camera cam) {
     glUseProgram(0);
 }
 
-void RenderSystem::deferredRender(ECSManager& ecs, Camera cam)
+void RenderSystem::deferredRender(Camera cam)
 {
     deferred.resize(global.window_width, global.window_height);
-    deferred.render(ecs, cam);
+    deferred.render(ecs_, cam);
 }
 
-void RenderSystem::setup(ECSManager& ecs)
+void RenderSystem::setup()
 {
-    entity_ = ecs.create_entity();
+    entity_ = ecs_.create_entity();
 
-    ecs.add_component_type<NameComponent>();
-    ecs.add_component_type<RenderComponent>();
-    ecs.add_component_type<TransformComponent>();
-    ecs.add_component_type<LightComponent>();
+    ecs_.add_component_type<NameComponent>();
+    ecs_.add_component_type<RenderComponent>();
+    ecs_.add_component_type<TransformComponent>();
+    ecs_.add_component_type<LightComponent>();
 }
 
-size_t RenderSystem::createMesh(ECSManager& ecs, std::string file, std::string textureFolder, 
+size_t RenderSystem::createMesh(std::string file, std::string textureFolder, 
     TransformComponent tc)
 {
     auto mesh = std::make_unique<Mesh>();
@@ -266,21 +269,21 @@ size_t RenderSystem::createMesh(ECSManager& ecs, std::string file, std::string t
         return -1;
     }
     
-    ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
-    ecs.add_component<TransformComponent>(entity_);
+    ecs_.add_component<NameComponent>(entity_);
+    ecs_.add_component<RenderComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
 
     //---
 
-    ecs.get_component<NameComponent>(entity_)->name = "Mesh [" + std::to_string(entity_mesh) + "]";
+    ecs_.get_component<NameComponent>(entity_)->name = "Mesh [" + std::to_string(entity_mesh) + "]";
 
-    auto& transform = ecs.get_component<TransformComponent>(entity_);
+    auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Mesh;
-    ecs.get_component<RenderComponent>(entity_)->mesh_ = std::move(mesh);
+    ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Mesh;
+    ecs_.get_component<RenderComponent>(entity_)->mesh_ = std::move(mesh);
 
     entity_++;
     entity_mesh++;
@@ -288,7 +291,7 @@ size_t RenderSystem::createMesh(ECSManager& ecs, std::string file, std::string t
     return entity_;
 }
 
-size_t RenderSystem::createTerrain(ECSManager& ecs, TransformComponent tc,
+size_t RenderSystem::createTerrain(TransformComponent tc,
     const int num_cols, const int num_rows,
     const float height_mult, const float size, 
     const bool is_centered, const bool use_perlin_noise){
@@ -296,20 +299,20 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, TransformComponent tc,
     auto terrain = std::make_unique<Terrain>();
     terrain->init(num_cols, num_rows, height_mult, size, is_centered, use_perlin_noise);
 
-    ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
-    ecs.add_component<TransformComponent>(entity_);
+    ecs_.add_component<NameComponent>(entity_);
+    ecs_.add_component<RenderComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
 
     //---
-    ecs.get_component<NameComponent>(entity_)->name = "Terrain [" + std::to_string(entity_terrain) + "]";
+    ecs_.get_component<NameComponent>(entity_)->name = "Terrain [" + std::to_string(entity_terrain) + "]";
 
-    auto& transform = ecs.get_component<TransformComponent>(entity_);
+    auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Terrain;
-    ecs.get_component<RenderComponent>(entity_)->terrain_ = std::move(terrain);
+    ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Terrain;
+    ecs_.get_component<RenderComponent>(entity_)->terrain_ = std::move(terrain);
 
     entity_++;
     entity_terrain++;
@@ -317,26 +320,26 @@ size_t RenderSystem::createTerrain(ECSManager& ecs, TransformComponent tc,
     return entity_;
 }
 
-size_t RenderSystem::createSphere(ECSManager& ecs, TransformComponent tc, int num_heights_, int num_revs_, float size)
+size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int num_revs_, float size)
 {
     auto sphere = std::make_unique<Sphere>();
     sphere->init(size, num_heights_, num_revs_);
 
-    ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
-    ecs.add_component<TransformComponent>(entity_);
+    ecs_.add_component<NameComponent>(entity_);
+    ecs_.add_component<RenderComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
 
     //---
 
-    ecs.get_component<NameComponent>(entity_)->name = "Sphere [" + std::to_string(entity_sphere) + "]";
+    ecs_.get_component<NameComponent>(entity_)->name = "Sphere [" + std::to_string(entity_sphere) + "]";
 
-    auto& transform = ecs.get_component<TransformComponent>(entity_);
+    auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Sphere;
-    ecs.get_component<RenderComponent>(entity_)->sphere_ = std::move(sphere);
+    ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Sphere;
+    ecs_.get_component<RenderComponent>(entity_)->sphere_ = std::move(sphere);
 
     entity_++;
     entity_sphere++;
@@ -344,25 +347,25 @@ size_t RenderSystem::createSphere(ECSManager& ecs, TransformComponent tc, int nu
     return entity_;
 }
 
-size_t RenderSystem::createCube8v(ECSManager& ecs, TransformComponent tc, const float size, bool is_centered)
+size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool is_centered)
 {
     auto cube = std::make_unique<Cube>();
     cube->init8v(size, is_centered);
 
-    ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
-    ecs.add_component<TransformComponent>(entity_);
+    ecs_.add_component<NameComponent>(entity_);
+    ecs_.add_component<RenderComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
 
     //---
-    ecs.get_component<NameComponent>(entity_)->name = "Cube8v [" + std::to_string(entity_cube8v) + "]";
+    ecs_.get_component<NameComponent>(entity_)->name = "Cube8v [" + std::to_string(entity_cube8v) + "]";
 
-    auto& transform = ecs.get_component<TransformComponent>(entity_);
+    auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube8v;
-    ecs.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
+    ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube8v;
+    ecs_.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
 
     entity_++;
     entity_cube8v++;
@@ -370,25 +373,25 @@ size_t RenderSystem::createCube8v(ECSManager& ecs, TransformComponent tc, const 
     return entity_;
 }
 
-size_t RenderSystem::createCube24v(ECSManager& ecs, TransformComponent tc, const float size)
+size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
 {
     auto cube = std::make_unique<Cube>();
     cube->init24v(size);
 
-    ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
-    ecs.add_component<TransformComponent>(entity_);
+    ecs_.add_component<NameComponent>(entity_);
+    ecs_.add_component<RenderComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
 
     //---
-    ecs.get_component<NameComponent>(entity_)->name = "Cube24v [" + std::to_string(entity_cube24v) + "]";
+    ecs_.get_component<NameComponent>(entity_)->name = "Cube24v [" + std::to_string(entity_cube24v) + "]";
 
-    auto& transform = ecs.get_component<TransformComponent>(entity_);
+    auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube24v;
-    ecs.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
+    ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube24v;
+    ecs_.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
 
     entity_++;
     entity_cube24v++;
@@ -396,25 +399,25 @@ size_t RenderSystem::createCube24v(ECSManager& ecs, TransformComponent tc, const
     return entity_;
 }
 
-size_t RenderSystem::createQuad(ECSManager& ecs, TransformComponent tc, const float size)
+size_t RenderSystem::createQuad(TransformComponent tc, const float size)
 {
     auto quad = std::make_unique<Quad>();
     quad->init(size);
 
-    ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<RenderComponent>(entity_);
-    ecs.add_component<TransformComponent>(entity_);
+    ecs_.add_component<NameComponent>(entity_);
+    ecs_.add_component<RenderComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
 
     //---
-    ecs.get_component<NameComponent>(entity_)->name = "Quad [" + std::to_string(entity_quad) + "]";
+    ecs_.get_component<NameComponent>(entity_)->name = "Quad [" + std::to_string(entity_quad) + "]";
 
-    auto& transform = ecs.get_component<TransformComponent>(entity_);
+    auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
-    ecs.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Quad;
-    ecs.get_component<RenderComponent>(entity_)->quad_ = std::move(quad);
+    ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Quad;
+    ecs_.get_component<RenderComponent>(entity_)->quad_ = std::move(quad);
 
     entity_++;
     entity_quad++;
@@ -423,19 +426,19 @@ size_t RenderSystem::createQuad(ECSManager& ecs, TransformComponent tc, const fl
 
 }
 
-size_t RenderSystem::createSpotLight(ECSManager& ecs, Light li, bool default_light)
+size_t RenderSystem::createSpotLight(Light li, bool default_light)
 {
-    ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<TransformComponent>(entity_);
-    ecs.add_component<LightComponent>(entity_);
+    ecs_.add_component<NameComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<LightComponent>(entity_);
 
     //---
-    ecs.get_component<NameComponent>(entity_)->name = "Spot Light [" + std::to_string(entity_spotlight) + "]";
+    ecs_.get_component<NameComponent>(entity_)->name = "Spot Light [" + std::to_string(entity_spotlight) + "]";
 
-    ecs.add_component<TransformComponent>(entity_)->position = li.pos_;
+    ecs_.add_component<TransformComponent>(entity_)->position = li.pos_;
 
     // ----
-    auto& light_comp = ecs.get_component<LightComponent>(entity_);
+    auto& light_comp = ecs_.get_component<LightComponent>(entity_);
     light_comp->light.type_ = Light::LightType::LT_Spot;
 
     if (default_light) {
@@ -471,19 +474,19 @@ size_t RenderSystem::createSpotLight(ECSManager& ecs, Light li, bool default_lig
     return entity_;
 }
 
-size_t RenderSystem::createPointLight(ECSManager& ecs, Light li, bool default_light)
+size_t RenderSystem::createPointLight(Light li, bool default_light)
 {
-    ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<TransformComponent>(entity_);
-    ecs.add_component<LightComponent>(entity_);
+    ecs_.add_component<NameComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<LightComponent>(entity_);
 
     //---
-    ecs.get_component<NameComponent>(entity_)->name = "Point Light [" + std::to_string(entity_spotlight) + "]";
+    ecs_.get_component<NameComponent>(entity_)->name = "Point Light [" + std::to_string(entity_spotlight) + "]";
 
-    ecs.get_component<TransformComponent>(entity_)->position = li.pos_;
+    ecs_.get_component<TransformComponent>(entity_)->position = li.pos_;
     //--
 
-    auto& light_comp = ecs.get_component<LightComponent>(entity_);
+    auto& light_comp = ecs_.get_component<LightComponent>(entity_);
     light_comp->light.type_ = Light::LightType::LT_Point;
 
     if (default_light) {
@@ -513,15 +516,15 @@ size_t RenderSystem::createPointLight(ECSManager& ecs, Light li, bool default_li
     return entity_;
 }
 
-size_t RenderSystem::createDirectionalLight(ECSManager& ecs, Light li, bool default_light)
+size_t RenderSystem::createDirectionalLight(Light li, bool default_light)
 {
-    ecs.add_component<NameComponent>(entity_);
-    ecs.add_component<LightComponent>(entity_);
+    ecs_.add_component<NameComponent>(entity_);
+    ecs_.add_component<LightComponent>(entity_);
 
     // ----
-    ecs.get_component<NameComponent>(entity_)->name = "Directional Light [" + std::to_string(entity_dirlight) + "]";
+    ecs_.get_component<NameComponent>(entity_)->name = "Directional Light [" + std::to_string(entity_dirlight) + "]";
 
-    auto& light_comp = ecs.get_component<LightComponent>(entity_);
+    auto& light_comp = ecs_.get_component<LightComponent>(entity_);
     light_comp->light.type_ = Light::LightType::LT_Directional;
   
     if (default_light) {

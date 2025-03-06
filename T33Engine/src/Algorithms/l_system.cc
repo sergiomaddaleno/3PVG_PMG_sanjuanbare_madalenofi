@@ -60,7 +60,7 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
             tc.position = position_;
             tc.rotation = rotation_;
             tc.scale = cube_size_;
-            rs_.createCube8v(ecs_, tc, 1.0f, false);
+            rs_.createCube8v(tc, 1.0f, false);
 
             glm::vec3 forward = rotation_ * glm::vec3(0.0f, 1.0f, 0.0f);
             position_ += forward * (cube_size_.y * spacing_);
@@ -98,7 +98,7 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
         }
     }
 
-    rs_.init(ecs_);
+    rs_.init();
 }
 
 
