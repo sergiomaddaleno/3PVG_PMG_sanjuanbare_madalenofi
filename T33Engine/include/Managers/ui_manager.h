@@ -13,9 +13,11 @@
 #include "../Systems/ecs_manager.h"
 #include "Core/texture.h"
 #include "Core/shader.h"
+#include "Core/input.h"
 #include "utils.h"
 #include <../deps/glm/glm.hpp>
 #include <filesystem>
+#include <optional>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -29,15 +31,15 @@ public:
     UIManager(ECSManager& ecs, RenderSystem& rs);
     ~UIManager();
 
-    void Init(GLFWwindow* window);
-    void Render(GLFWwindow* window);
+    void Init(Window* window, Input* input);
+    void Render();
     void Cleanup();
 
     void SetImguiTheme();
 
     // ---
 
-    void ImguiWindow(GLFWwindow* window);
+    void ImguiWindow();
     void GameWindow();
     void HierarchyWindow();
     void InspectorWindow();
@@ -59,6 +61,9 @@ public:
 private:
     ECSManager& ecs_;
     RenderSystem& rs_;
+
+    Window* window_;
+    Input* input_;
 
     int selected_entity;
 

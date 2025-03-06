@@ -74,34 +74,27 @@ void Window::setResizeCallback() {
 	glfwSetWindowUserPointer(window_, this);
 }
 
-bool Window::toggleFullScreen(Input& input, Input::Keys key, bool imgui_enter)
-{
-	if (input.isKeyPressed(key) || imgui_enter)
-	{
-		if (!full_screen)
-		{
-			int xpos, ypos;
-			glfwGetWindowPos(window_, &xpos, &ypos);
-			int width, height;
-			glfwGetWindowSize(window_, &width, &height);
-
-			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-
-			// fullscreen
-			glfwSetWindowMonitor(window_, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-			full_screen = true;
-		}
-		else
-		{
-			// windowed mode
-			glfwSetWindowMonitor(window_, NULL, 5, 40, 800, 600, 0);
-			full_screen = false;
-		}
-		return true;
+bool Window::toggleFullScreen(Input& input, Input::Keys key, bool imgui_enter) {
+	if (!imgui_enter && !input.isKeyPressed(key)) {
+		return false;
 	}
 
-	return false;
+	GLFWmonitor* monitor = nullptr;
+	int xpos = 5, ypos = 40, width = 800, height = 600, refresh_rate = 0;
+
+	if (!full_screen) {
+		monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		width = mode->width;
+		height = mode->height;
+		refresh_rate = mode->refreshRate;
+		xpos = ypos = 0;
+	}
+
+	glfwSetWindowMonitor(window_, monitor, xpos, ypos, width, height, refresh_rate);
+	full_screen = !full_screen;
+
+	return true;
 }
 
 bool Window::closePressed(Input& input, Input::Keys key)

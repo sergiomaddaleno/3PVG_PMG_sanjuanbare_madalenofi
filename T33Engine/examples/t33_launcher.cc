@@ -33,7 +33,7 @@ int main(int, char**) {
 
     Input input{ window->getWindow() };
 
-    global.ui_manager.Init(window->getWindow());
+    global.ui_manager.Init(&window.value(), &input);
 
     init();
 
@@ -67,7 +67,7 @@ int main(int, char**) {
             global.render_system.forwardRender(global.cam);
         }
 
-        global.ui_manager.Render(window->getWindow());
+        global.ui_manager.Render();
 
         if (window->closePressed(input)) done = true;
     }

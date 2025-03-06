@@ -49,6 +49,8 @@ void Input::InitKeyMap() {
 
     keyGLFW_map[GLFW_KEY_LEFT_CONTROL] = Keys::LCTRL;
     keyGLFW_map[GLFW_KEY_RIGHT_CONTROL] = Keys::RCTRL;
+    keyGLFW_map[GLFW_KEY_LEFT_CONTROL] = Keys::CTRL;
+    keyGLFW_map[GLFW_KEY_RIGHT_CONTROL] = Keys::CTRL;
     keyGLFW_map[GLFW_KEY_LEFT_SHIFT] = Keys::LSHIFT;
     keyGLFW_map[GLFW_KEY_RIGHT_SHIFT] = Keys::RSHIFT;
     keyGLFW_map[GLFW_KEY_LEFT_ALT] = Keys::LALT;

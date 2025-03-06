@@ -65,7 +65,8 @@ UIManager::UIManager(ECSManager& ecs, RenderSystem& rs)
     load_scene_window(false),
     add_mesh_window(false),
     ecs_(ecs),
-    rs_(rs)
+    rs_(rs),
+    input_(nullptr)
 {
 }
 
@@ -132,7 +133,7 @@ void UIManager::SetImguiTheme() {
     style.FramePadding = ImVec2(5.0f, 3.0f);
 }
 
-void UIManager::Init(GLFWwindow* window) {
+void UIManager::Init(Window* window, Input* input) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -173,17 +174,20 @@ void UIManager::Init(GLFWwindow* window) {
 
     //---
 
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    input_ = input;
+    window_ = window;
+
+    ImGui_ImplGlfw_InitForOpenGL(window->getWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
 }
 
-void UIManager::Render(GLFWwindow* window) {
+void UIManager::Render() {
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
-    ImguiWindow(window);
+    ImguiWindow();
 
     if (!global.is_playing) {
         HierarchyWindow();
@@ -207,6 +211,7 @@ void UIManager::Render(GLFWwindow* window) {
 
     GameWindow();
 
+    // ---
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -220,7 +225,7 @@ void UIManager::Render(GLFWwindow* window) {
 }
 
 //--
-void UIManager::ImguiWindow(GLFWwindow* window) {
+void UIManager::ImguiWindow() {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     if (global.is_playing) {
@@ -1036,7 +1041,7 @@ void UIManager::InspectorWindow() {
     ImGui::Image(m_DeleteIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
     ImGui::SameLine();
 
-    if (ImGui::Button("Delete Entity") /*|| global.input.isKeyPressed(Input::SUPR)*/) {
+    if (ImGui::Button("Delete Entity") || input_->isKeyPressed(Input::SUPR)) {
         
         if (ecs_.has_component<NameComponent>(selected_entity)) {
             ecs_.destroy_entity(selected_entity);
@@ -1123,11 +1128,10 @@ void UIManager::TopBarWindow() {
         if (ImGui::BeginMenu("Settings")) {
             
             if (ImGui::MenuItem("Toggle Full Screen [F11]")) {
-                //global.window->toggleFullScreen(global.input, Input::None, true);
+                window_->toggleFullScreen(*input_, Input::None, true);
             }
 
-            if (ImGui::MenuItem("Save Scene [CTRL + S]") /*||
-                (global.input.isKeyPressed(Input::CTRL) && global.input.isKeyPressed(Input::S))*/) {
+            if (ImGui::MenuItem("Save Scene [CTRL + S]")) {
 
                 if (global.save_manager.getCurrentScene().empty()) {
                     global.save_manager.saveToFile("../stages/saves/scene_0.json");
@@ -1144,7 +1148,7 @@ void UIManager::TopBarWindow() {
                 ImGui::EndMenu();
             }
 
-            if (ImGui::MenuItem("New Scene")) {
+            if (ImGui::MenuItem("New Scene  [CTRL + N]")) {
                 global.save_manager.newFile();
                 AddConsoleMessage("New scene created");
             }
@@ -1357,6 +1361,23 @@ void UIManager::TopBarWindow() {
         ImGui::EndMenuBar();
     }
 
+    // ---
+
+    if (input_->isKeyDown(Input::CTRL) && input_->isKeyPressed(Input::S)) {
+        if (global.save_manager.getCurrentScene().empty()) {
+            global.save_manager.saveToFile("../stages/saves/scene_0.json");
+        }
+        else {
+            global.save_manager.saveToFile(global.save_manager.getCurrentScene());
+        }
+
+        AddConsoleMessage("Saving current scene");
+    }
+
+    if (input_->isKeyDown(Input::CTRL) && input_->isKeyPressed(Input::N)) {
+        global.save_manager.newFile();
+        AddConsoleMessage("New scene created");
+    }
     ImGui::End();
 }
 //--
