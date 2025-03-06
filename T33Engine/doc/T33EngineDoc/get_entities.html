@@ -87,9 +87,25 @@ $(document).ready(function(){initNavTree('index.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Hola</div>  </div>
+<div class="title">Getting Entities</div>  </div>
 </div><!--header-->
 <div class="contents">
+  <p>
+    You can retrieve entities created in the engine by calling the following method from the <code>ecs</code> class:
+  </p>
+
+  <p><code> ecs.get_component<TransformComponent>(ecs.getEntity(0))->rotation = { 0.0f, time, 0.0f, 0.0f };</code></p>
+
+  <p>
+    This allows already created entities to be modified by code. The <code>getEntity</code> function retrieves an entity by its ID. 
+    The ID is shown in the hierarchy, starting from <code>0</code> at the top and increasing downward.
+  </p>
+
+  <p>
+   With this method you can edit all the different component that entity has.
+  </p>
+</div>
+
 
 </div><!-- contents -->
 </div><!-- doc-content -->

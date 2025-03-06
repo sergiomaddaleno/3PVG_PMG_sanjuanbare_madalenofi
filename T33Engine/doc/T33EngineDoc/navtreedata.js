@@ -23,9 +23,8 @@ for the JavaScript code in this file
 var NAVTREE =
 [
   [ "T33Engine", "index.html", [
-    [ "Starting with the Engine", "starting_engine.html",[
+    [ "Starting with the Engine", null,[
       [ "Things to know", "things_to_know.html", null ],
-      [ "Add Mesh", "add_mesh.html", null ],
       [ "Add Entities", "add_entities.html", null ],
       [ "Get Entities", "get_entities.html", null ],
       [ "Creating scenes", "creating_scenes.html", null ],

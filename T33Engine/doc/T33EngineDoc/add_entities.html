@@ -87,11 +87,80 @@ $(document).ready(function(){initNavTree('index.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Hola</div>  </div>
+<div class="title">Adding entities to scene</div>  </div>
 </div><!--header-->
 <div class="contents">
+  <p>
+      There are several ways to create entities in <strong>T33Engine</strong>:
+  </p>
+  <ul>
+      <li><strong>From the Engine Interface:</strong> You can create entities directly from the engine’s UI, in the tools option.</li>
+      <li><strong>By Code (RenderSystem Functions):</strong> T33Engine provides functions within the <em>RenderSystem</em> that allow you to cretae different entity types.</li>
+      <li><strong>By Code (Manual Implementation):</strong> If you prefer full control, you can manually write the necessary code to define the entities, with your desired components.</li>
+  </ul>
 
-</div><!-- contents -->
+  <hr style="border: 1px solid #ddd;">
+
+  <h3 style="color: rgb(124, 223, 10);">Using RenderSystem class functions:</h3>
+    
+  <p> You just have to call the <code>setup()</code> mehtod one time before creating entities.</p>
+  <div class="code-box">
+    <p><code>size_t createMesh(ECSManager &ecs, const std::string& file, const std::string& textureFolder, TransformComponent tc = TransformComponent());</code></p>
+
+    <p><code>size_t createTerrain(ECSManager& ecs, TransformComponent tc = TransformComponent(), int num_cols = 2, int num_rows = 2, float height_mult = 1.0f, float size = 1.0f, bool is_centered = true, bool use_perlin_noise = true);</code></p>
+
+    <p><code>size_t createSphere(ECSManager& ecs, TransformComponent tc = TransformComponent(), int num_heights_ = 60, int num_revs_ = 60, float size = 1.0f);</code></p>
+
+    <p><code>size_t createCube8v(ECSManager& ecs, TransformComponent tc = TransformComponent(), float size = 1.0f, bool is_centered = true);</code></p>
+
+    <p><code>size_t createCube24v(ECSManager& ecs, TransformComponent tc = TransformComponent(), float size = 1.0f);</code></p>
+
+    <p><code>size_t createQuad(ECSManager& ecs, TransformComponent tc = TransformComponent(), float size = 1.0f);</code></p>
+
+    <p><code>size_t createSpotLight(ECSManager& ecs, Light li = Light(), bool default_light = true);</code></p>
+
+    <p><code>size_t createPointLight(ECSManager& ecs, Light li = Light(), bool default_light = true);</code></p>
+
+    <p><code>size_t createDirectionalLight(ECSManager& ecs, Light li = Light(), bool default_light = true);</code></p>
+</div>
+    
+    <h3 style="color: rgb(124, 223, 10);">Default way:</h3>
+
+    <pre><code>
+      auto mario_mesh = std::make_unique<Mesh>();
+      
+      RenderSystem render_system;
+      ECSManager ecs;
+      Shader shader_tex;
+
+      if (!mario_mesh->loadOBJ("../stages/assets/obj/Mario.obj", "../stages/assets/textures/mario")) {
+          return -1;
+      }
+      
+      auto j = ecs.create_entity();
+      ecs.add_component_type<RenderComponent>();
+      ecs.add_component_type<TransformComponent>();
+      
+      ecs.add_component<TransformComponent>(j);
+      ecs.add_component<RenderComponent>(j);
+      ecs.get_component<RenderComponent>(j)->type_ = RT_Mesh;
+      ecs.get_component<RenderComponent>(j)->mesh_ = std::move(mario_mesh);
+      ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
+      ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
+      
+      initShader(shader_tex, "../stages/shaders/basic/texture.vs", "../stages/shaders/basic/texture.fs");
+      render_system.init(ecs);
+      render_system.shader = shader_tex;
+
+      while (!done) {
+    
+        render_system.forwardRender(ecs);
+    
+        if (window->closePressed(input)) done = true;
+    }
+      </code></pre>
+
+</div>
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
