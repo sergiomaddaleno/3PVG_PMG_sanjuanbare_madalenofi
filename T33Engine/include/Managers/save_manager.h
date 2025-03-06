@@ -55,6 +55,7 @@ private:
 
 	ECSManager& ecs_;
 	RenderSystem& rs_;
+
 	//---
 
 	Light li;
