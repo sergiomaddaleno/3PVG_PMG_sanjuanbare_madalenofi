@@ -32,7 +32,7 @@ class SaveManager {
 
 public:
 
-	SaveManager();
+	SaveManager(ECSManager& ecs, RenderSystem& rs);
 	~SaveManager();
 	
 	void saveToFile(std::string filename);
@@ -47,12 +47,14 @@ public:
 
 private:
 
-	nlohmann::json serialize(ECSManager& ecs, Camera& cam, Skybox& skybox);
-	void deSerialize(const nlohmann::json& j, RenderSystem& rs, Camera& cam, Skybox& skybox);
+	nlohmann::json serialize(Camera& cam, Skybox& skybox);
+	void deSerialize(const nlohmann::json& j, Camera& cam, Skybox& skybox);
 
 	std::string current_scene_file;
 	int number_of_scenes;
 
+	ECSManager& ecs_;
+	RenderSystem& rs_;
 	//---
 
 	Light li;
