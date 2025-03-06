@@ -1,19 +1,19 @@
 # 3PVG_PMG_sanjuanbare_madalenofi
 
-·Dependencias:
+. Dependencies:
 
 	-Python 
 	-Conan 
 	-Cmake
 
-·Proceso para ejecutar el proyecto:
+· Process to execute project:
 
-	-Ejecutar gendeps.bat 
-	-Ejecutar genproject_vs2022
-	-En la carpeta build abrir la solucion motor
-
+	- Execute gendeps.bat in tools folder
+	- Execute genproject_vs2022 / genproject_vs2019 in tools folder
+	- In the build folder, open solution T33Engine.sln
 
 ·Authors: 
 
-	-Fede Sanjuan & Sergio Madaleno
+	- Fede Sanjuan 
+	- Sergio Madaleno Figueroa
  
