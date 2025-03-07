@@ -531,24 +531,19 @@ void UIManager::InspectorWindow() {
             switch (render_comp->type_) {
                 case RenderType::RT_Mesh:
                     ImGui::Checkbox("Use Texture", &render_comp->mesh_->use_texture_);
-                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->mesh_->color_));
                     break;
                 case RenderType::RT_Terrain:
                     ImGui::Checkbox("Use Texture", &render_comp->terrain_->use_texture_);
-                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->terrain_->color_));
                     break;
                 case RenderType::RT_Sphere:
                     ImGui::Checkbox("Use Texture", &render_comp->sphere_->use_texture_);
-                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->sphere_->color_));
                     break;
                 case RenderType::RT_Quad:
                     ImGui::Checkbox("Use Texture", &render_comp->quad_->use_texture_);
-                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->quad_->color_));
                     break;
                 case RenderType::RT_Cube8v:
                 case RenderType::RT_Cube24v:
                     ImGui::Checkbox("Use Texture", &render_comp->cube_->use_texture_);
-                    ImGui::ColorEdit3("Color", glm::value_ptr(render_comp->cube_->color_));
                     break;
             }
             

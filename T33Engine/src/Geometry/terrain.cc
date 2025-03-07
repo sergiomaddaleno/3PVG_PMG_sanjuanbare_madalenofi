@@ -53,8 +53,7 @@ Terrain::Terrain()
     use_texture_(true), 
     texture_path_("../stages/assets/textures/images/grass.png"),
     heightmap_path_("../stages/assets/textures/heightmaps/heightmap.png"),
-    grid_color_({ 0.5f, 0.5f, 0.5f}), grid_scale_(20.0f),
-    color_({ 0.5f, 0.5f, 0.5f })
+    grid_color_({ 0.5f, 0.5f, 0.5f}), grid_scale_(20.0f)
 {
 }
 
@@ -277,7 +276,7 @@ void Terrain::setHeightMap(std::string file_path) {
 void Terrain::draw(){
 
     if(use_texture_){
-        texture_.active();
+        texture_.active(TextureID::TI_Albedo);
         texture_.bind2D();
     }
 

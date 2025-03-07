@@ -49,7 +49,6 @@ public:
 
     Texture texture_;
     bool use_texture_;
-    glm::vec3 color_;
     std::string texture_path_;
 
 private:

@@ -7,24 +7,190 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -44.61130142211914,
-   16.646814346313477,
-   -2.7199831008911133
+   -2.7223777770996094,
+   7.13427209854126,
+   3.0143582820892334
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
-  "Speed": 0.004999999888241291,
+  "Speed": 0.0010000000474974513,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.9593484401702881,
-   -0.281594842672348,
-   0.018839186057448387
+   0.5244832038879395,
+   -0.05526858568191528,
+   -0.8496250510215759
   ]
  },
  "Entities": [
   {
    "Identifier_component": {
     "Entity_id": 0,
+    "Entity_name": "Terrain [0]"
+   },
+   "Render_component": {
+    "Render_type": 1,
+    "Terrain": {
+     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
+     "Texture_path": "../stages/assets/textures/images/grass.png",
+     "height_mult": 1.0,
+     "is_centered": true,
+     "num_cols": 50,
+     "num_rows": 50,
+     "size": 1.0,
+     "use_perlin_noise": true
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.7973053455352783,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 1,
+    "Entity_name": "Mario"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\Mario.obj",
+     "Texture_folder": "../stages\\assets\\textures\\mario"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     -9.547403335571289,
+     1.4547303915023804,
+     13.072508811950684
+    ],
+    "Rotation": [
+     0.0,
+     -0.7068952918052673,
+     0.0,
+     0.7073181867599487
+    ],
+    "Scale": [
+     0.9999998807907104,
+     1.0,
+     0.9999998807907104
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 2,
+    "Entity_name": "Quad [1]"
+   },
+   "Render_component": {
+    "Quad": {
+     "Texture_path": "../stages/assets/textures/materials/brick_wall/brickwall.jpg",
+     "size": 1.0
+    },
+    "Render_type": 5
+   },
+   "Transform_component": {
+    "Position": [
+     -1.1899484395980835,
+     7.173027515411377,
+     0.05704972892999649
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 3,
+    "Entity_name": "Cube8v [0]"
+   },
+   "Render_component": {
+    "Cube": {
+     "Is_centered": true,
+     "Texture_path": "../stages\\assets\\textures\\apple\\red.jpg",
+     "cube_24v": false,
+     "cube_8v": true,
+     "size": 1.0
+    },
+    "Render_type": 3
+   },
+   "Transform_component": {
+    "Position": [
+     -9.686514854431152,
+     2.9109954833984375,
+     -7.854733467102051
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 4,
+    "Entity_name": "Sphere [0]"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages/assets/textures/images/blue.png",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     -8.371593475341797,
+     2.627809762954712,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 6,
     "Entity_name": "Directional Light [0]"
    },
    "Light_component": {
@@ -94,172 +260,6 @@
      ],
      "Type": 0
     }
-   }
-  },
-  {
-   "Identifier_component": {
-    "Entity_id": 1,
-    "Entity_name": "Terrain [0]"
-   },
-   "Render_component": {
-    "Render_type": 1,
-    "Terrain": {
-     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
-     "Texture_path": "../stages/assets/textures/images/grass.png",
-     "height_mult": 1.0,
-     "is_centered": true,
-     "num_cols": 50,
-     "num_rows": 50,
-     "size": 1.0,
-     "use_perlin_noise": true
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Identifier_component": {
-    "Entity_id": 2,
-    "Entity_name": "Mesh [0]"
-   },
-   "Render_component": {
-    "Mesh": {
-     "Mesh_path": "../stages\\assets\\obj\\Mario.obj",
-     "Texture_folder": "../stages\\assets\\textures\\mario"
-    },
-    "Render_type": 0
-   },
-   "Transform_component": {
-    "Position": [
-     -9.547403335571289,
-     0.5466796159744263,
-     13.072508811950684
-    ],
-    "Rotation": [
-     0.0,
-     -0.7068952918052673,
-     0.0,
-     0.7073181867599487
-    ],
-    "Scale": [
-     0.9999998807907104,
-     1.0,
-     0.9999998807907104
-    ]
-   }
-  },
-  {
-   "Identifier_component": {
-    "Entity_id": 3,
-    "Entity_name": "Quad [1]"
-   },
-   "Render_component": {
-    "Quad": {
-     "Texture_path": "../stages/assets/textures/materials/brick_wall/brickwall.jpg",
-     "size": 1.0
-    },
-    "Render_type": 5
-   },
-   "Transform_component": {
-    "Position": [
-     0.09497112780809402,
-     5.192156791687012,
-     0.1409008800983429
-    ],
-    "Rotation": [
-     6.178442646387339e-08,
-     0.7297669053077698,
-     6.178442646387339e-08,
-     -0.6836960315704346
-    ],
-    "Scale": [
-     4.006931304931641,
-     4.513526916503906,
-     1.0
-    ]
-   }
-  },
-  {
-   "Identifier_component": {
-    "Entity_id": 4,
-    "Entity_name": "Cube8v [0]"
-   },
-   "Render_component": {
-    "Cube": {
-     "Is_centered": true,
-     "Texture_path": "../stages\\assets\\textures\\apple\\red.jpg",
-     "cube_24v": false,
-     "cube_8v": true,
-     "size": 1.0
-    },
-    "Render_type": 3
-   },
-   "Transform_component": {
-    "Position": [
-     -9.686514854431152,
-     2.9109954833984375,
-     -7.854733467102051
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Identifier_component": {
-    "Entity_id": 5,
-    "Entity_name": "Sphere [0]"
-   },
-   "Render_component": {
-    "Render_type": 2,
-    "Sphere": {
-     "Texture_path": "../stages/assets/textures/images/blue.png",
-     "num_heights": 60,
-     "num_revs": 60,
-     "size": 1.0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     -8.371593475341797,
-     2.627809762954712,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
    }
   }
  ],

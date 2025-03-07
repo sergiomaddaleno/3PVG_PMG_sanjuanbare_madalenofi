@@ -47,7 +47,6 @@ class Quad {
   Texture texture_;
   Texture normal_map_;
   bool use_texture_;
-  glm::vec3 color_;
 
   std::string texture_path_;
   std::string normal_map_path_;

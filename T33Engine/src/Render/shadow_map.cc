@@ -13,6 +13,7 @@
 #include "Components\render_component.h"
 #include "Components\light_component.h"
 #include "global_data.h"
+#include "utils.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -92,10 +93,17 @@ void ShadowMap::active(unsigned int num)
     }
 }
 
-void ShadowMap::bind()
+void ShadowMap::bind2D()
 {
     if (depthMap != 0) {
         glBindTexture(GL_TEXTURE_2D, depthMap);
+    }
+}
+
+void ShadowMap::bindCubeMap()
+{
+    if (depthMap != 0) {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap);
     }
 }
 
@@ -109,10 +117,10 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(lightView));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));
 
-    int texture_unit = 0;
-    shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &texture_unit);
-    active();
-    bind();
+    int tex_id = TextureID::TI_ShadowMap;
+    shader.setUniformValue(shader.getUniformLocation("u_depth_map"), ValueType::T_INT_1, &tex_id);
+    active(tex_id);
+    bind2D();
 
     glViewport(0, 0, shadow_width_, shadow_height_);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -170,16 +178,13 @@ void ShadowMap::renderCubeMap(ECSManager& ecs, Shader shader, Shader GeomtryShad
     shader.useProgram();
 
     shader.setUniformValue(shader.getUniformLocation("lightPos"), ValueType::T_FLOAT_3, glm::value_ptr(lc.light.pos_));
-
     shader.setUniformValue(shader.getUniformLocation("u_far_plane"), ValueType::T_FLOAT_1, &far_plane);
 
-    // Vincular el cubemap de profundidad
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-    int texture_unit = 0;
-    shader.setUniformValue(shader.getUniformLocation("u_depth_map"), ValueType::T_INT_1, &texture_unit);
+    int tex_id = TextureID::TI_ShadowMap;
+    shader.setUniformValue(shader.getUniformLocation("u_depth_map"), ValueType::T_INT_1, &tex_id);
+    active(tex_id);
+    bind2D();
 
-    // Configurar framebuffer y viewport
     glViewport(0, 0, shadow_width_, shadow_height_);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glClear(GL_DEPTH_BUFFER_BIT);

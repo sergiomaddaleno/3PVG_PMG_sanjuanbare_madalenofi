@@ -1,5 +1,6 @@
 
 #include "Geometry/cube.h"
+#include "utils.h"
 #include "../deps/stb_image.h"
 #include "../Perlin/SimplexNoise.h"
 
@@ -13,8 +14,7 @@ Cube::Cube()
     order_(), data_(),
     size_(0.0f), is_centered_(false),
     cube_8v_(false), cube_24v_(false),
-    use_texture_(true), texture_path_("../stages/assets/textures/images/blue.png"),
-    color_({ 0.5f, 0.5f, 0.5f })
+    use_texture_(true), texture_path_("../stages/assets/textures/images/blue.png")
 {
 }
 
@@ -187,7 +187,7 @@ void Cube::bind()
 void Cube::draw()
 {
     if (use_texture_) {
-        texture_.active();
+        texture_.active(TextureID::TI_Albedo);
         texture_.bind2D();
     }
 

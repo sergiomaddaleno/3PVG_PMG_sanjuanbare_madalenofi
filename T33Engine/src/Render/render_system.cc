@@ -117,8 +117,11 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-    int tex_id = 1;
+    int tex_id = TextureID::TI_Albedo;
     shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
+
+    tex_id = TextureID::TI_Normal;
+    shader.setUniformValue(shader.getUniformLocation("u_normal_map"), ValueType::T_INT_1, &tex_id);
 
     shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &global.use_fog);
     shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &global.fog_density);
@@ -168,11 +171,6 @@ void RenderSystem::forwardRender(Camera cam) {
                     switch (render_comp->type_) {
                     case RenderType::RT_Mesh:
                     {
-                        int use_texture = render_comp->mesh_->use_texture_;
-                        shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
-                        glm::vec3 color_tex = render_comp->mesh_->color_;
-                        shader.setUniformValue(shader.getUniformLocation("u_color_texture"), ValueType::T_FLOAT_3, &color_tex);
-
                         for (auto& mesh : render_comp->mesh_->meshes) {
                             render_comp->mesh_->draw();
                         }
@@ -181,11 +179,6 @@ void RenderSystem::forwardRender(Camera cam) {
 
                     case RenderType::RT_Terrain:
                     {
-                        int use_texture = render_comp->terrain_->use_texture_;
-                        shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
-                        glm::vec3 color_tex = render_comp->terrain_->color_;
-                        shader.setUniformValue(shader.getUniformLocation("u_color_texture"), ValueType::T_FLOAT_3, &color_tex);
-
                         render_comp->terrain_->draw();
 
                         render_comp->terrain_->wave_.setUniforms(shader, (float)glfwGetTime());
@@ -194,11 +187,6 @@ void RenderSystem::forwardRender(Camera cam) {
 
                     case RenderType::RT_Sphere:
                     {
-                        int use_texture = render_comp->sphere_->use_texture_;
-                        shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
-                        glm::vec3 color_tex = render_comp->sphere_->color_;
-                        shader.setUniformValue(shader.getUniformLocation("u_color_texture"), ValueType::T_FLOAT_3, &color_tex);
-
                         render_comp->sphere_->draw();
 
                         //render_comp->sphere_->wave_.setUniforms(shader);
@@ -208,11 +196,6 @@ void RenderSystem::forwardRender(Camera cam) {
                     case RenderType::RT_Cube8v:
                     case RenderType::RT_Cube24v:
                     {
-                        int use_texture = render_comp->cube_->use_texture_;
-                        shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
-                        glm::vec3 color_tex = render_comp->cube_->color_;
-                        shader.setUniformValue(shader.getUniformLocation("u_color_texture"), ValueType::T_FLOAT_3, &color_tex);
-
                         render_comp->cube_->draw();
 
                         //render_comp->cube_->wave_.setUniforms(shader);
@@ -221,11 +204,6 @@ void RenderSystem::forwardRender(Camera cam) {
 
                     case RenderType::RT_Quad:
                     {
-                        int use_texture = render_comp->quad_->use_texture_;
-                        shader.setUniformValue(shader.getUniformLocation("u_use_texture"), ValueType::T_INT_1, &use_texture);
-                        glm::vec3 color_tex = render_comp->quad_->color_;
-                        shader.setUniformValue(shader.getUniformLocation("u_color_texture"), ValueType::T_FLOAT_3, &color_tex);
-
                         render_comp->quad_->draw();
 
                         //render_comp->quad_->wave_.setUniforms(shader);
@@ -561,7 +539,7 @@ size_t RenderSystem::createDirectionalLight(Light li, bool default_light)
 
 #define GLSL(x) "#version 330\n"#x
 static const char* VertexVertexForBuild = GLSL(
-    layout(location = 0) in vec3 aPos;
+layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aTexCoord;
 
@@ -573,6 +551,7 @@ out vec2 uv;
 out vec3 normal;
 out vec3 FragPos;
 
+//Shadows
 uniform mat4 u_light_space;
 out vec4 FragPosLight;
 
@@ -641,30 +620,31 @@ static const char* FragmentVertexForBuild = GLSL(
     float spot_softness_;
 };
 
-uniform sampler2D u_texture;
-uniform bool u_use_texture;
-uniform sampler2D u_shadow_map;
-uniform samplerCube u_depth_map;
-
-uniform LightInfo u_light;
-uniform vec3 u_camera_position;
-uniform vec3 u_ambient;
-uniform float u_far_plane;
-
-in vec4 FragPosLight;
-
-uniform bool u_fog;
-uniform vec3 u_sky_colour;
-in float visibility;
-
-uniform vec3 u_color_texture;
-
 in vec3 normal;
 in vec3 pos;
 in vec2 uv;
 in vec3 FragPos;
-
 out vec4 FragColor;
+
+//Samplers
+uniform sampler2D u_texture;
+uniform sampler2D u_normal_map;
+uniform sampler2D u_shadow_map;
+uniform samplerCube u_depth_map;
+
+vec3 mapped_normal = normal;
+
+//Light
+uniform LightInfo u_light;
+uniform vec3 u_camera_position;
+uniform vec3 u_ambient;
+uniform float u_far_plane;
+in vec4 FragPosLight;
+
+//Fog
+uniform bool u_fog;
+uniform vec3 u_sky_colour;
+in float visibility;
 
 // --- Lights
 vec3 PointLight(LightInfo lc) {
@@ -672,11 +652,11 @@ vec3 PointLight(LightInfo lc) {
     float distance = length(lc.pos_ - FragPos);
     float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
 
-    float diffuseStrength = max(dot(lightDir, normal), 0.0);
+    float diffuseStrength = max(dot(lightDir, mapped_normal), 0.0);
     vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation;
 
     vec3 viewDir = normalize(u_camera_position - FragPos);
-    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 reflectDir = reflect(-lightDir, mapped_normal);
     float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
 
     vec3 specular = specStrength * lc.light_color_ * attenuation;
@@ -695,11 +675,11 @@ vec3 SpotLight(LightInfo lc) {
 
     float intensity = smoothstep(outerCutOff, cutOff, theta);
 
-    float diffuseStrength = max(dot(lightDir, normal), 0.0);
+    float diffuseStrength = max(dot(lightDir, mapped_normal), 0.0);
     vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation * intensity;
 
     vec3 viewDir = normalize(u_camera_position - FragPos);
-    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 reflectDir = reflect(-lightDir, mapped_normal);
     float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
     vec3 specular = lc.spec_color_ * specStrength * attenuation * intensity;
 
@@ -716,7 +696,7 @@ vec3 DirectionalLight(LightInfo lc) {
     vec3 diffuse = diff * lc.light_color_ * lc.diff_color_ * lc.strength_;
 
     vec3 view_dir = normalize(u_camera_position - FragPos);
-    vec3 reflect_dir = reflect(-light_dir, normal);
+    vec3 reflect_dir = reflect(-light_dir, mapped_normal);
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), lc.shininess_);
     vec3 specular = spec * lc.spec_color_;
 
@@ -777,6 +757,9 @@ void main() {
     float shadow = ShadowCalculation(FragPosLight);
     float shadow_pl = ShadowCalculationPoint(FragPosLight.xyz, u_light.pos_);
 
+    mapped_normal = texture(u_normal_map, uv).rgb;
+    mapped_normal = normalize(normal * 2.0 - 1.0);
+
     if (u_light.type_ == 0) {
         final_light += DirectionalLight(u_light) * shadow;
     }
@@ -786,24 +769,15 @@ void main() {
     }
 
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light);
+        final_light += PointLight(u_light) * shadow;
     }
 
-    vec3 color;
-    if (u_use_texture) {
-        vec4 texture_color = texture(u_texture, uv);
-        color = texture_color.rgb;
-    }
-    else {
-        color = u_color_texture;
-    }
+    vec3 texture_color = texture(u_texture, uv).rgb;
 
-    vec3 final_color = color * final_light;
-
+    vec3 final_color = texture_color * final_light;
     FragColor = vec4(final_color, 1.0);
 
     if (u_fog) FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
-
 }
 );
 

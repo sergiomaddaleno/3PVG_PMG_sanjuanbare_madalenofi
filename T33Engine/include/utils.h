@@ -19,9 +19,10 @@ class Shader;
 enum TextureID {
 	TI_ShadowMap,
 	TI_Albedo,
+	TI_Diffuse,
 	TI_Normal,
 	TI_Specular,
-	//...
+	TI_Position,
 };
 
 enum FrameBufferID {

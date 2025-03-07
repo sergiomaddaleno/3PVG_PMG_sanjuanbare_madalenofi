@@ -18,32 +18,31 @@ struct LightInfo {
     float spot_softness_;
 };
 
-uniform sampler2D u_texture;
-uniform sampler2D u_normal_map;
-
-uniform bool u_use_texture;
-uniform sampler2D u_shadow_map;
-uniform samplerCube u_depth_map;
-
-uniform LightInfo u_light;
-uniform vec3 u_camera_position;
-uniform vec3 u_ambient;
-uniform float u_far_plane;
-
-in vec4 FragPosLight;
-
-uniform bool u_fog;
-uniform vec3 u_sky_colour;
-in float visibility;
-
-uniform vec3 u_color_texture;
-
 in vec3 normal;
 in vec3 pos;
 in vec2 uv;
 in vec3 FragPos;
-
 out vec4 FragColor;
+
+//Samplers
+uniform sampler2D u_texture;
+uniform sampler2D u_normal_map;
+uniform sampler2D u_shadow_map;
+uniform samplerCube u_depth_map;
+
+vec3 mapped_normal = normal;
+
+//Light
+uniform LightInfo u_light;
+uniform vec3 u_camera_position;
+uniform vec3 u_ambient;
+uniform float u_far_plane;
+in vec4 FragPosLight;
+
+//Fog
+uniform bool u_fog;
+uniform vec3 u_sky_colour;
+in float visibility;
 
 // --- Lights
 vec3 PointLight(LightInfo lc) {
@@ -51,11 +50,11 @@ vec3 PointLight(LightInfo lc) {
     float distance = length(lc.pos_ - FragPos);
     float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
 
-    float diffuseStrength = max(dot(lightDir, normal), 0.0);
+    float diffuseStrength = max(dot(lightDir, mapped_normal), 0.0);
     vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation;
 
     vec3 viewDir = normalize(u_camera_position - FragPos);
-    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 reflectDir = reflect(-lightDir, mapped_normal);
     float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
 
     vec3 specular = specStrength * lc.light_color_ * attenuation;
@@ -74,11 +73,11 @@ vec3 SpotLight(LightInfo lc) {
 
     float intensity = smoothstep(outerCutOff, cutOff, theta);
 
-    float diffuseStrength = max(dot(lightDir, normal), 0.0);
+    float diffuseStrength = max(dot(lightDir, mapped_normal), 0.0);
     vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation * intensity;
 
     vec3 viewDir = normalize(u_camera_position - FragPos);
-    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 reflectDir = reflect(-lightDir, mapped_normal);
     float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
     vec3 specular = lc.spec_color_ * specStrength * attenuation * intensity;
 
@@ -95,7 +94,7 @@ vec3 DirectionalLight(LightInfo lc) {
     vec3 diffuse = diff * lc.light_color_ * lc.diff_color_ * lc.strength_;
 
     vec3 view_dir = normalize(u_camera_position - FragPos);
-    vec3 reflect_dir = reflect(-light_dir, normal);
+    vec3 reflect_dir = reflect(-light_dir, mapped_normal);
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), lc.shininess_);
     vec3 specular = spec * lc.spec_color_;
 
@@ -156,6 +155,9 @@ void main() {
     float shadow = ShadowCalculation(FragPosLight);
     float shadow_pl = ShadowCalculationPoint(FragPosLight.xyz, u_light.pos_);
 
+    mapped_normal = texture(u_normal_map, uv).rgb;
+    mapped_normal = normalize(normal * 2.0 - 1.0);
+
     if (u_light.type_ == 0) {
         final_light += DirectionalLight(u_light) * shadow ; 
     }
@@ -165,22 +167,13 @@ void main() {
     }
     
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light);  
+        final_light += PointLight(u_light) * shadow;  
     }
 
-   vec3 color;
-   if (u_use_texture) {
-       vec4 texture_color = texture(u_texture, uv);
+    vec3 texture_color = texture(u_texture, uv).rgb;
 
-       color = texture_color.rgb;
-   }else{
-       color = u_color_texture;
-   }
+    vec3 final_color = texture_color * final_light;
+    FragColor = vec4(final_color, 1.0);
 
-   vec3 final_color = color * final_light;
-   
-   FragColor = vec4(final_color, 1.0);
-
-   if(u_fog) FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
-   
+    if(u_fog) FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
 }

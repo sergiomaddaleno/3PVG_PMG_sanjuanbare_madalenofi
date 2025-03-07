@@ -36,7 +36,9 @@ public:
 	void initCubeMap();
 
 	void active(unsigned int num = 0);
-	void bind();
+	void bind2D();
+	void bindCubeMap();
+
 	void render(ECSManager& ecs, Shader shader, LightComponent lc);
 
 	float near_plane, far_plane;

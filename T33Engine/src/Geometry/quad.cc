@@ -1,5 +1,7 @@
 
 #include "Geometry/quad.h"
+#include "utils.h"
+
 #include "../deps/stb_image.h"
 #include "../Perlin/SimplexNoise.h"
 
@@ -14,8 +16,7 @@ Quad::Quad()
     order_(), data_(),
     size_(0.0f), use_texture_(true),
     texture_path_("../stages/assets/textures/materials/brick_wall/brickwall.jpg"),
-    normal_map_path_("../stages/assets/textures/materials/brick_wall/brickwall_normal.jpg"),
-    color_({ 0.5f, 0.5f, 0.5f })
+    normal_map_path_("../stages/assets/textures/materials/brick_wall/brickwall_normal.jpg")
 {}
 
 Quad::~Quad()
@@ -96,7 +97,6 @@ void Quad::bind()
     glBindVertexArray(0);
 }
 
-
 void Quad::setTexture(std::string texture_path)
 {
     texture_path_ = texture_path;
@@ -125,8 +125,11 @@ glm::vec3* Quad::GetVertex()
 void Quad::draw()
 {
     if (use_texture_) {
-        texture_.active();
+        texture_.active(TextureID::TI_Albedo);
         texture_.bind2D();
+
+        normal_map_.active(TextureID::TI_Normal);
+        normal_map_.bind2D();
     }
 
     /*int i = 0;

@@ -141,13 +141,8 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-			
-			
-			
-			int tex_id = 1;
-			gbuffer.setUniformValue(gbuffer.getUniformLocation("texture_diffuse"), ValueType::T_INT_1, &tex_id);
-
-			
+			int tex_id = TextureID::TI_Diffuse;
+			gbuffer.setUniformValue(gbuffer.getUniformLocation("texture_diffuse"), ValueType::T_INT_1, &tex_id);			
 		   
 			GLuint screen_tex_loc = glGetUniformLocation(gbuffer.getProgram(), "u_screen_tex");
 			glUniform1i(screen_tex_loc, 0);
@@ -188,15 +183,12 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
 
-
-	int tex_id = 1;
+	int tex_id = TextureID::TI_Position;
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gPosition"), ValueType::T_INT_1, &tex_id);
-	tex_id = 2;
+	tex_id = TextureID::TI_Normal;
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex_id);
-	tex_id = 3;
+	tex_id = TextureID::TI_Albedo;
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gAlbedoSpec"), ValueType::T_INT_1, &tex_id);
-	
-
 	
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_DEPTH_BUFFER_BIT);

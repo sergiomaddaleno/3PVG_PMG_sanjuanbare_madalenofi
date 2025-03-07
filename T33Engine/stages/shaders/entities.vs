@@ -12,6 +12,7 @@ out vec2 uv;
 out vec3 normal;
 out vec3 FragPos;
 
+//Shadows
 uniform mat4 u_light_space;
 out vec4 FragPosLight;
 
