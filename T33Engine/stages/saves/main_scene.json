@@ -7,60 +7,26 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -50.94547653198242,
-   23.90631103515625,
-   1.48390531539917
+   -44.61130142211914,
+   16.646814346313477,
+   -2.7199831008911133
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.004999999888241291,
   "Use_perspective_matrix": true,
   "View_direction": [
-   1.0,
-   0.0,
-   0.0
+   0.9593484401702881,
+   -0.281594842672348,
+   0.018839186057448387
   ]
  },
  "Entities": [
   {
-   "Entity_id": 0,
-   "Name_component": {
-    "Entity_name": "Terrain [0]"
+   "Identifier_component": {
+    "Entity_id": 0,
+    "Entity_name": "Directional Light [0]"
    },
-   "Render_component": {
-    "Render_type": 1,
-    "Terrain": {
-     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
-     "Texture_path": "../stages/assets/textures/images/grass.png",
-     "height_mult": 0.18700000643730164,
-     "is_centered": true,
-     "num_cols": 50,
-     "num_rows": 50,
-     "size": 1.0,
-     "use_perlin_noise": false
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 1,
    "Light_component": {
     "light": {
      "Ambient_color": [
@@ -82,16 +48,16 @@
      ],
      "Direction": [
       [
-       0.0,
-       -0.9578263163566589,
-       -0.2873479127883911
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
       ]
      ],
      "Light_color": [
       [
-       8.026415824890137,
-       8.025612831115723,
-       8.025612831115723
+       10.0,
+       10.0,
+       10.0
       ]
      ],
      "Linear_attenuation": [
@@ -128,15 +94,49 @@
      ],
      "Type": 0
     }
-   },
-   "Name_component": {
-    "Entity_name": "Directional Light [0]"
    }
   },
   {
-   "Entity_id": 2,
-   "Name_component": {
-    "Entity_name": "Mario"
+   "Identifier_component": {
+    "Entity_id": 1,
+    "Entity_name": "Terrain [0]"
+   },
+   "Render_component": {
+    "Render_type": 1,
+    "Terrain": {
+     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
+     "Texture_path": "../stages/assets/textures/images/grass.png",
+     "height_mult": 1.0,
+     "is_centered": true,
+     "num_cols": 50,
+     "num_rows": 50,
+     "size": 1.0,
+     "use_perlin_noise": true
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 2,
+    "Entity_name": "Mesh [0]"
    },
    "Render_component": {
     "Mesh": {
@@ -147,32 +147,97 @@
    },
    "Transform_component": {
     "Position": [
-     -11.174692153930664,
-     -1.1617634296417236,
-     10.758328437805176
+     -9.547403335571289,
+     0.5466796159744263,
+     13.072508811950684
     ],
     "Rotation": [
      0.0,
-     -0.684744119644165,
+     -0.7068952918052673,
      0.0,
-     0.7287835478782654
+     0.7073181867599487
     ],
     "Scale": [
-     1.0000001192092896,
+     0.9999998807907104,
      1.0,
-     1.0000001192092896
+     0.9999998807907104
     ]
    }
   },
   {
-   "Entity_id": 3,
-   "Name_component": {
+   "Identifier_component": {
+    "Entity_id": 3,
+    "Entity_name": "Quad [1]"
+   },
+   "Render_component": {
+    "Quad": {
+     "Texture_path": "../stages/assets/textures/materials/brick_wall/brickwall.jpg",
+     "size": 1.0
+    },
+    "Render_type": 5
+   },
+   "Transform_component": {
+    "Position": [
+     0.09497112780809402,
+     5.192156791687012,
+     0.1409008800983429
+    ],
+    "Rotation": [
+     6.178442646387339e-08,
+     0.7297669053077698,
+     6.178442646387339e-08,
+     -0.6836960315704346
+    ],
+    "Scale": [
+     4.006931304931641,
+     4.513526916503906,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 4,
+    "Entity_name": "Cube8v [0]"
+   },
+   "Render_component": {
+    "Cube": {
+     "Is_centered": true,
+     "Texture_path": "../stages\\assets\\textures\\apple\\red.jpg",
+     "cube_24v": false,
+     "cube_8v": true,
+     "size": 1.0
+    },
+    "Render_type": 3
+   },
+   "Transform_component": {
+    "Position": [
+     -9.686514854431152,
+     2.9109954833984375,
+     -7.854733467102051
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 5,
     "Entity_name": "Sphere [0]"
    },
    "Render_component": {
     "Render_type": 2,
     "Sphere": {
-     "Texture_path": "../stages\\assets\\textures\\apple\\red.jpg",
+     "Texture_path": "../stages/assets/textures/images/blue.png",
      "num_heights": 60,
      "num_revs": 60,
      "size": 1.0
@@ -180,80 +245,15 @@
    },
    "Transform_component": {
     "Position": [
-     -4.491018295288086,
-     2.767496109008789,
-     -2.4647016525268555
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 4,
-   "Name_component": {
-    "Entity_name": "Cube24v [0]"
-   },
-   "Render_component": {
-    "Cube": {
-     "Is_centered": false,
-     "Texture_path": "../stages/assets/textures/images/blue.png",
-     "cube_24v": true,
-     "cube_8v": false,
-     "size": 1.9420000314712524
-    },
-    "Render_type": 4
-   },
-   "Transform_component": {
-    "Position": [
-     0.14533472061157227,
-     5.03639554977417,
-     -10.344361305236816
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Entity_id": 5,
-   "Name_component": {
-    "Entity_name": "Quad [0]"
-   },
-   "Render_component": {
-    "Quad": {
-     "Texture_path": "../stages/assets/textures/materials/brick_wall/brickwall.jpg",
-     "size": 4.709000110626221
-    },
-    "Render_type": 5
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     10.168638229370117,
+     -8.371593475341797,
+     2.627809762954712,
      0.0
     ],
     "Rotation": [
-     6.179286060614686e-08,
-     0.7266819477081299,
-     6.179286060614686e-08,
-     -0.686974048614502
+     0.0,
+     0.0,
+     0.0,
+     1.0
     ],
     "Scale": [
      1.0,

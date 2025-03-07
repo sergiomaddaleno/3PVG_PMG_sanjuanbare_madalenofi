@@ -2,10 +2,7 @@
 #include "Managers/ui_manager.h"
 #include "utils.h"
 #include "Render/post_processing.h"
-#include "Components/render_component.h"
-#include "Components/light_component.h"
-#include "Components/transform_component.h"
-#include "Components\name_component.h"
+#include "Components/components.h"
 
 #include "Render/skybox.h"
 #include "Algorithms/l_system.h"
@@ -341,8 +338,8 @@ void UIManager::HierarchyWindow() {
     auto li = ecs_.getComponentList<LightComponent>().begin();
     auto liend = ecs_.getComponentList<LightComponent>().end();
 
-    auto ni = ecs_.getComponentList<NameComponent>().begin();
-    auto niend = ecs_.getComponentList<NameComponent>().end();
+    auto ni = ecs_.getComponentList<IdentifierComponent>().begin();
+    auto niend = ecs_.getComponentList<IdentifierComponent>().end();
 
     int entity_id = 0;
     
@@ -369,17 +366,19 @@ void UIManager::HierarchyWindow() {
 void UIManager::InspectorWindow() {
     ImGui::Begin("Inspector");
 
-    if (ecs_.has_component<NameComponent>(selected_entity)) {
+    if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
 
-        bool open = ImGui::CollapsingHeader("##NameComponent", ImGuiTreeNodeFlags_DefaultOpen);
+        bool open = ImGui::CollapsingHeader("##IdentifierComponent", ImGuiTreeNodeFlags_DefaultOpen);
         ImGui::SameLine();
         ImGui::Image(m_TagIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
         ImGui::SameLine();
-        ImGui::Text("Name Component");
+        ImGui::Text("Identifier Component");
 
         if (open) {
-            auto& name_comp = ecs_.get_component<NameComponent>(selected_entity);
+            auto& name_comp = ecs_.get_component<IdentifierComponent>(selected_entity);
             ImGui::Dummy({ 0.0f, 3.0f });
+
+            ImGui::Text("ID: %d", name_comp->id);
 
             if (name_comp->name.empty()) name_comp->name = "Entity"; 
 
@@ -961,7 +960,7 @@ void UIManager::InspectorWindow() {
         if (ecs_.has_component<RenderComponent>(selected_entity)) {
             ImGui::Text("- Render component");
         }
-        if (ecs_.has_component<NameComponent>(selected_entity)) {
+        if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
             ImGui::Text("- Name component");
         }
         ImGui::Dummy(ImVec2(0.0f, 3.0f));
@@ -1043,8 +1042,22 @@ void UIManager::InspectorWindow() {
 
     if (ImGui::Button("Delete Entity") || input_->isKeyPressed(Input::SUPR)) {
         
-        if (ecs_.has_component<NameComponent>(selected_entity)) {
+        if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
             ecs_.destroy_entity(selected_entity);
+
+            int new_id = 0;
+            size_t max_components = std::max({
+                ecs_.getComponentList<RenderComponent>().size(),
+                ecs_.getComponentList<TransformComponent>().size(),
+                ecs_.getComponentList<LightComponent>().size(),
+                ecs_.getComponentList<IdentifierComponent>().size()
+            });
+
+            for (size_t i = 0; i < max_components; ++i) {
+                if (ecs_.has_component<IdentifierComponent>(i)) {
+                    ecs_.get_component<IdentifierComponent>(i)->id = new_id++;
+                }
+            }
         }
 
     }

@@ -7,10 +7,7 @@
 #include "Render/light.h"
 #include "Render/skybox.h"
 
-#include "Components\transform_component.h"
-#include "Components\render_component.h"
-#include "Components\light_component.h"
-#include "Components/name_component.h"
+#include "Components/components.h"
 
 #include "global_data.h"
 
@@ -60,17 +57,22 @@ nlohmann::json SaveManager::serialize(Camera& cam, Skybox& skybox)
     auto ri = ecs_.getComponentList<RenderComponent>().begin();
     auto ti = ecs_.getComponentList<TransformComponent>().begin();
     auto li = ecs_.getComponentList<LightComponent>().begin();
-    auto ni = ecs_.getComponentList<NameComponent>().begin();
+    auto ni = ecs_.getComponentList<IdentifierComponent>().begin();
 
     auto riend = ecs_.getComponentList<RenderComponent>().end();
     auto tiend = ecs_.getComponentList<TransformComponent>().end();
     auto liend = ecs_.getComponentList<LightComponent>().end();
-    auto niend = ecs_.getComponentList<NameComponent>().end();
+    auto niend = ecs_.getComponentList<IdentifierComponent>().end();
 
-    for (size_t i = 0; i < ecs_.getEntityCount(); ++i) {
+    size_t max_components = std::max({ 
+      ecs_.getComponentList<RenderComponent>().size(),
+      ecs_.getComponentList<TransformComponent>().size(),
+      ecs_.getComponentList<LightComponent>().size(),
+      ecs_.getComponentList<IdentifierComponent>().size()
+        });
+
+    for (size_t i = 0; i < max_components; ++i) {
         nlohmann::json entity_json;
-
-        entity_json["Entity_id"] = static_cast<int>(i);
 
         if (ri != riend) {
             if (ri->has_value()) {
@@ -95,7 +97,7 @@ nlohmann::json SaveManager::serialize(Camera& cam, Skybox& skybox)
 
         if (ni != niend) {
             if (ni->has_value()) {
-                entity_json["Name_component"] = (*ni)->serialize();
+                entity_json["Identifier_component"] = (*ni)->serialize();
             }
             ++ni;
         }
@@ -175,9 +177,12 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
 
     for (const auto& entity : j["Entities"]) {
 
+        int entity_id = entity["Identifier_component"]["Entity_id"].get<int>();
+
         if (entity.contains("Render_component")) {
 
             const auto& tc_jsonc = entity["Transform_component"];
+
             TransformComponent tc;
 
             tc.position = parseVec3(tc_jsonc["Position"]);
@@ -210,11 +215,9 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
                 if (cube_8v) rs_.createCube8v(tc, cube_size, cube_is_centered);
                 if (cube_24v) rs_.createCube24v(tc, cube_size);
 
-                int entity_id = entity["Entity_id"].get<int>();
                 auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
-                if (render_comp && render_comp->cube_) {
-                    render_comp->cube_->setTexture(cube_tex_path);
-                }
+                render_comp->cube_->setTexture(cube_tex_path);
+
                 break;
             }
 
@@ -225,11 +228,8 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
 
                 rs_.createQuad(tc, quad_size);
 
-                int entity_id = entity["Entity_id"].get<int>();
                 auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
-                if (render_comp && render_comp->quad_) {
-                    render_comp->quad_->setTexture(quad_tex_path);
-                }
+                render_comp->quad_->setTexture(quad_tex_path);
                 break;
             }
 
@@ -242,11 +242,8 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
 
                 rs_.createSphere(tc, sphere_num_heights, sphere_num_revs, sphere_size);
                 
-                int entity_id = entity["Entity_id"].get<int>();
                 auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
-                if (render_comp && render_comp->sphere_) {
-                    render_comp->sphere_->setTexture(sphere_tex_path);
-                }
+                render_comp->sphere_->setTexture(sphere_tex_path);
                 break;
             }
 
@@ -269,13 +266,8 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
                     terrain_is_centered,
                     terrain_use_perlin_noise);
                 
-                int entity_id = entity["Entity_id"].get<int>();
-                auto& render_comp = ecs_.get_component<RenderComponent>(entity);
-                if (render_comp && render_comp->terrain_) {
-                    render_comp->terrain_->setHeightMap(heightmap_path);
-                    render_comp->terrain_->setTexture(terrain_tex_path);
-                }
-                
+                auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
+                render_comp->terrain_->setTexture(terrain_tex_path);
                 break;
             }
             }
@@ -323,18 +315,19 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
 
         // ---
 
-        if (entity.contains("Name_component")) {
+        if (entity.contains("Identifier_component")) {
 
-            auto ni = rs_.ecs_.getComponentList<NameComponent>().begin();
-            auto niend = rs_.ecs_.getComponentList<NameComponent>().end();
+            auto ni = ecs_.getComponentList<IdentifierComponent>().begin();
+            auto niend = ecs_.getComponentList<IdentifierComponent>().end();
             for (const auto& entity : j["Entities"]) {
-                if (entity.contains("Name_component")) {
-                    const auto& nc = entity["Name_component"];
+                if (entity.contains("Identifier_component")) {
+                    const auto& nc = entity["Identifier_component"];
 
                     if (ni != niend) {
                         if (ni->has_value()) {
                             auto& name_comp = *ni;
                             name_comp->name = nc["Entity_name"];
+                            name_comp->id = nc["Entity_id"];
                             ++ni;
                         }
                     }
