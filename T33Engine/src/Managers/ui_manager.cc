@@ -601,7 +601,20 @@ void UIManager::InspectorWindow() {
 
                 ImGui::Separator();
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
-                ImGui::Checkbox("Use Normal map", &render_comp->quad_->use_normal_map_);
+
+                static bool use_normal_map_global = false;
+                if (ImGui::Checkbox("Use Normal map", &use_normal_map_global)) {
+                    auto ri = ecs_.getComponentList<RenderComponent>().begin();
+                    auto riend = ecs_.getComponentList<RenderComponent>().end();
+
+                    for (; ri != riend; ++ri) {
+                        if (ri->has_value()) {
+                            auto& loc_render_comp = *ri;
+                            if(loc_render_comp->type_ == RenderType::RT_Quad)
+                            loc_render_comp->quad_->use_normal_map_ = use_normal_map_global;
+                        }
+                    }
+                }
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.75f, 0.5f, 1.0f, 1.0f)); 
@@ -1078,21 +1091,8 @@ void UIManager::InspectorWindow() {
         if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
             ecs_.destroy_entity(selected_entity);
 
-            int new_id = 0;
-            size_t max_components = std::max({
-                ecs_.getComponentList<RenderComponent>().size(),
-                ecs_.getComponentList<TransformComponent>().size(),
-                ecs_.getComponentList<LightComponent>().size(),
-                ecs_.getComponentList<IdentifierComponent>().size()
-            });
-
-            for (size_t i = 0; i < max_components; ++i) {
-                if (ecs_.has_component<IdentifierComponent>(i)) {
-                    ecs_.get_component<IdentifierComponent>(i)->id = new_id++;
-                }
-            }
+            ResetIds();
         }
-
     }
 
     ImGui::End();
@@ -1265,30 +1265,40 @@ void UIManager::TopBarWindow() {
                 if (ImGui::MenuItem("Sphere")) {
                     rs_.createSphere();
                     rs_.init();
+                    ResetIds();
+
                     AddConsoleMessage("Sphere added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 8v")) {
                     rs_.createCube8v();
                     rs_.init();
+                    ResetIds();
+
                     AddConsoleMessage("Cube 8v added to scene");
                 }
 
                 if (ImGui::MenuItem("Cube 24v")) {
                     rs_.createCube24v();
                     rs_.init();
+                    ResetIds();
+
                     AddConsoleMessage("Cube 24v added to scene");
                 }
 
                 if (ImGui::MenuItem("Quad")) {
                     rs_.createQuad();
                     rs_.init();
+                    ResetIds();
+
                     AddConsoleMessage("Quad added to scene");
                 }
 
                 if (ImGui::MenuItem("Terrain")) {
                     rs_.createTerrain();
                     rs_.init();
+                    ResetIds();
+
                     AddConsoleMessage("Terrain Light added to scene");
                 }
 
@@ -1300,18 +1310,24 @@ void UIManager::TopBarWindow() {
                 if (ImGui::MenuItem("Point Light")) {
                     rs_.createPointLight();
                     rs_.init();
+                    ResetIds();
+
                     AddConsoleMessage("Point Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Spot Light")) {
                     rs_.createSpotLight();
                     rs_.init();
+                    ResetIds();
+
                     AddConsoleMessage("Spot Light added to scene");
                 }
 
                 if (ImGui::MenuItem("Directional Light")) {
                     rs_.createDirectionalLight();
                     rs_.init();
+                    ResetIds();
+
                     AddConsoleMessage("Directional Light added to scene");
                 }
 
@@ -1724,6 +1740,23 @@ void UIManager::AddConsoleMessage(const std::string& message)
     }
 }
 
+void UIManager::ResetIds()
+{
+    int new_id = 0;
+    size_t max_components = std::max({
+        ecs_.getComponentList<RenderComponent>().size(),
+        ecs_.getComponentList<TransformComponent>().size(),
+        ecs_.getComponentList<LightComponent>().size(),
+        ecs_.getComponentList<IdentifierComponent>().size()
+        });
+
+    for (size_t i = 0; i < max_components; ++i) {
+        if (ecs_.has_component<IdentifierComponent>(i)) {
+            ecs_.get_component<IdentifierComponent>(i)->id = new_id++;
+        }
+    }
+}
+
 void UIManager::LoadSceneWindow()
 {
     ImGui::Begin("Load Scene");
@@ -1813,6 +1846,7 @@ void UIManager::AddMeshWindow()
             rs_.createMesh(obj_file_path, texture_folder_path);
             rs_.init();
 
+            ResetIds();
             AddConsoleMessage(obj_file_name + " added to scene");
 
             obj_file_path.clear();
