@@ -37,6 +37,9 @@ void Light::setUniforms(Shader& shader)
     loc = shader.getUniformLocation("u_light.pos_");
     shader.setUniformValue(loc, ValueType::T_FLOAT_3, &pos_);
 
+    loc = shader.getUniformLocation("u_light_pos_");
+    shader.setUniformValue(loc, ValueType::T_FLOAT_3, &pos_);
+
     loc = shader.getUniformLocation("u_light.dir_");
     shader.setUniformValue(loc, ValueType::T_FLOAT_3, &dir_);
 

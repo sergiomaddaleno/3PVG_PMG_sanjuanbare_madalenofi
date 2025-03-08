@@ -234,7 +234,6 @@ void ShadowMap::renderCubeMap(ECSManager& ecs, Shader shader, Shader GeomtryShad
 
 void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
-
     switch(lc.light.type_) {
     case Light::LightType::LT_Spot: {
 
@@ -258,9 +257,9 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
     }
     case Light::LightType::LT_Point:
     {
-        geometry_.useProgram();
+        //geometry_.useProgram();
 
-        float aspect = (float) shadow_width_ / (float) shadow_height_;
+        /*float aspect = (float) shadow_width_ / (float) shadow_height_;
         lightProjection = glm::perspective(glm::radians(90.0f), aspect, near_plane, far_plane);
 
         std::vector<glm::mat4> shadowTransforms;
@@ -278,7 +277,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
             std::string uniformName = "shadowMatrices[" + std::to_string(i) + "]";
             geometry_.setUniformValue(geometry_.getUniformLocation(uniformName.c_str()), ValueType::T_MAT_4x4, glm::value_ptr(shadowTransforms[i]));
-        }
+        }*/
 
         break;
     }

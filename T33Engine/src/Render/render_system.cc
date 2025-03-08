@@ -71,6 +71,7 @@ void RenderSystem::init() {
             case RenderType::RT_Quad:
                 render_comp->quad_->bind();
                 render_comp->quad_->setTexture(render_comp->quad_->texture_path_);
+                render_comp->quad_->setNormalMap(render_comp->quad_->normal_map_path_);
                 break;
 
             case RenderType::RT_Cube8v:
@@ -205,7 +206,8 @@ void RenderSystem::forwardRender(Camera cam) {
                     case RenderType::RT_Quad:
                     {
                         render_comp->quad_->draw();
-
+                        int use = render_comp->quad_->use_normal_map_;
+                        shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"), ValueType::T_INT_1, &use);
                         //render_comp->quad_->wave_.setUniforms(shader);
                     }
                     break;
@@ -542,10 +544,14 @@ static const char* VertexVertexForBuild = GLSL(
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aTexCoord;
+layout(location = 3) in vec3 aTangent;
+layout(location = 4) in vec3 aBitangent;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+
+uniform vec3 u_camera_position;
 
 out vec2 uv;
 out vec3 normal;
@@ -554,6 +560,13 @@ out vec3 FragPos;
 //Shadows
 uniform mat4 u_light_space;
 out vec4 FragPosLight;
+
+uniform vec3 u_light_pos_;
+
+//Normal mapping
+out vec3 TangentLightPos;
+out vec3 TangentViewPos;
+out vec3 TangentFragPos;
 
 // fog
 out float visibility;
@@ -581,20 +594,38 @@ vec3 waveEffect(vec3 position) {
     return position;
 }
 
+void TBN(vec3 lightPos, vec3 viewPos) {
+    mat3 normalMatrix = transpose(inverse(mat3(model)));
+    vec3 T = normalize(normalMatrix * aTangent);
+    vec3 N = normalize(normalMatrix * aNormal);
+
+    T = normalize(T - dot(T, N) * N);
+    vec3 B = cross(N, T);
+
+    mat3 TBN = transpose(mat3(T, B, N));
+    TangentLightPos = TBN * lightPos;
+    TangentViewPos = TBN * viewPos;
+    TangentFragPos = TBN * FragPos;
+}
+
 void main()
 {
     vec3 local_pos = waveEffect(aPos);
+    vec4 world_pos = model * vec4(local_pos, 1.0);
 
     uv = aTexCoord;
     normal = mat3(transpose(inverse(model))) * aNormal;
     FragPos = vec3(model * vec4(local_pos, 1.0));
     FragPosLight = u_light_space * vec4(FragPos, 1.0);
 
-    vec4 world_pos = model * vec4(local_pos, 1.0);
+    //Fog
     vec4 pos_relative_to_cam = view * world_pos;
     float distance = length(pos_relative_to_cam.xyz);
     visibility = exp(-pow((distance * u_density), u_gradient));
     visibility = clamp(visibility, 0.0, 1.0);
+
+    //TBN
+    TBN(u_light_pos_, u_camera_position);
 
     gl_Position = projection * view * vec4(FragPos, 1.0);
 
@@ -626,20 +657,26 @@ in vec2 uv;
 in vec3 FragPos;
 out vec4 FragColor;
 
+uniform vec3 u_camera_position;
+
 //Samplers
 uniform sampler2D u_texture;
 uniform sampler2D u_normal_map;
 uniform sampler2D u_shadow_map;
 uniform samplerCube u_depth_map;
 
-vec3 mapped_normal = normal;
+uniform bool u_use_normal_map;
 
 //Light
 uniform LightInfo u_light;
-uniform vec3 u_camera_position;
 uniform vec3 u_ambient;
 uniform float u_far_plane;
 in vec4 FragPosLight;
+
+//TBN
+in vec3 TangentLightPos;
+in vec3 TangentViewPos;
+in vec3 TangentFragPos;
 
 //Fog
 uniform bool u_fog;
@@ -652,11 +689,11 @@ vec3 PointLight(LightInfo lc) {
     float distance = length(lc.pos_ - FragPos);
     float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
 
-    float diffuseStrength = max(dot(lightDir, mapped_normal), 0.0);
+    float diffuseStrength = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation;
 
     vec3 viewDir = normalize(u_camera_position - FragPos);
-    vec3 reflectDir = reflect(-lightDir, mapped_normal);
+    vec3 reflectDir = reflect(-lightDir, normal);
     float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
 
     vec3 specular = specStrength * lc.light_color_ * attenuation;
@@ -664,22 +701,23 @@ vec3 PointLight(LightInfo lc) {
     return (diffuse + specular);
 }
 
-vec3 SpotLight(LightInfo lc) {
+vec3 SpotLight(LightInfo lc, vec3 normal) {
+    normal = normalize(normal);
     vec3 lightDir = normalize(lc.pos_ - FragPos);
     float cutOff = cos(radians(lc.spot_angle_));
     float outerCutOff = cos(radians(lc.spot_angle_ + lc.spot_softness_));
-    float theta = dot(lightDir, normalize(-lc.dir_));
+    float theta = dot(lightDir, normalize(lc.dir_));
 
     float distance = length(lc.pos_ - FragPos);
     float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
 
     float intensity = smoothstep(outerCutOff, cutOff, theta);
 
-    float diffuseStrength = max(dot(lightDir, mapped_normal), 0.0);
+    float diffuseStrength = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation * intensity;
 
     vec3 viewDir = normalize(u_camera_position - FragPos);
-    vec3 reflectDir = reflect(-lightDir, mapped_normal);
+    vec3 reflectDir = reflect(-lightDir, normal);
     float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
     vec3 specular = lc.spec_color_ * specStrength * attenuation * intensity;
 
@@ -696,7 +734,7 @@ vec3 DirectionalLight(LightInfo lc) {
     vec3 diffuse = diff * lc.light_color_ * lc.diff_color_ * lc.strength_;
 
     vec3 view_dir = normalize(u_camera_position - FragPos);
-    vec3 reflect_dir = reflect(-light_dir, mapped_normal);
+    vec3 reflect_dir = reflect(-light_dir, normal);
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), lc.shininess_);
     vec3 specular = spec * lc.spec_color_;
 
@@ -757,15 +795,25 @@ void main() {
     float shadow = ShadowCalculation(FragPosLight);
     float shadow_pl = ShadowCalculationPoint(FragPosLight.xyz, u_light.pos_);
 
-    mapped_normal = texture(u_normal_map, uv).rgb;
-    mapped_normal = normalize(normal * 2.0 - 1.0);
+    vec3 mapped_normal = texture(u_normal_map, uv).rgb;
+    mapped_normal = normalize(mapped_normal * 2.0 - 1.0);
 
     if (u_light.type_ == 0) {
         final_light += DirectionalLight(u_light) * shadow;
     }
 
     if (u_light.type_ == 1) {
-        final_light += SpotLight(u_light) * shadow;
+        vec3 my_normal;
+
+        if (u_use_normal_map) {
+            mat3 TBN = mat3(TangentLightPos, TangentViewPos, TangentFragPos);
+            my_normal = normalize(TBN * mapped_normal);
+        }
+        else {
+            my_normal = normal;
+        }
+
+        final_light += SpotLight(u_light, my_normal) * shadow;
     }
 
     if (u_light.type_ == 2) {

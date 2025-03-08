@@ -523,10 +523,6 @@ void UIManager::InspectorWindow() {
 
             ImGui::Separator();
             ImGui::Dummy(ImVec2(0.0f, 2.0f));
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.3f, 0.2f, 1.0f));
-            ImGui::Text("Texture settings");
-            ImGui::PopStyleColor();
-            ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
             switch (render_comp->type_) {
                 case RenderType::RT_Mesh:
@@ -556,7 +552,7 @@ void UIManager::InspectorWindow() {
 
             static std::string texture_file_path;
             static std::string texture_file_name;
-            if (ImGui::Button(!texture_file_path.empty() ? texture_file_name.c_str() : ".png / .jpg drop here", { 150.0f, 40.0f })) {}
+            if (ImGui::Button(!texture_file_path.empty() ? texture_file_name.c_str() : ".png/.jpg drop texture here", { 200.0f, 40.0f })) {}
 
             if (ImGui::BeginDragDropTarget()) {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -568,10 +564,11 @@ void UIManager::InspectorWindow() {
                 }
                 ImGui::EndDragDropTarget();
             }
+
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
             if (ImGui::Button("Compile Texture")) {
-                
+
                 switch (render_comp->type_) {
                 case RenderType::RT_Mesh:
                     break;
@@ -596,6 +593,45 @@ void UIManager::InspectorWindow() {
 
                 texture_file_path.clear();
                 texture_file_name.clear();
+            }
+            
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+            if (render_comp->type_ == RenderType::RT_Quad) {
+
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::Checkbox("Use Normal map", &render_comp->quad_->use_normal_map_);
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.75f, 0.5f, 1.0f, 1.0f)); 
+                ImGui::Text("Change/Add Normal map");
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::PopStyleColor();
+
+                static std::string normalmap_file_path;
+                static std::string normalmap_file_name;
+
+                if (ImGui::Button(!normalmap_file_path.empty() ? normalmap_file_name.c_str() : ".png/.jpg drop normal here", { 200.0f, 40.0f })) {}
+
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                        std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                        if ((filePath.extension() == ".png") || (filePath.extension() == ".jpg")) {
+                            normalmap_file_path = filePath.string();
+                            normalmap_file_name = filePath.filename().string();
+                        }
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+                if (ImGui::Button("Compile Normal map")) {
+                    render_comp->quad_->setNormalMap(normalmap_file_path);
+
+                    normalmap_file_path.clear();
+                    normalmap_file_name.clear();
+                }
             }
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
@@ -956,10 +992,11 @@ void UIManager::InspectorWindow() {
             ImGui::Text("- Render component");
         }
         if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
-            ImGui::Text("- Name component");
+            ImGui::Text("- Identifier component");
         }
         ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
+        /*
         const char* addComponents[] = { "Transform Component", "Light Component", "Render Component" };
         static int addCurrentItem = -1;
 
@@ -1026,6 +1063,7 @@ void UIManager::InspectorWindow() {
             }
             ImGui::EndCombo();
         }
+        */
     }
 
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
@@ -1401,7 +1439,7 @@ void UIManager::PostProcessWindow()
     static std::string vertex_file_path;
     static std::string vertex_file_name;
     static char* vertex_content = nullptr;
-    if (ImGui::Button(!vertex_file_path.empty() ? vertex_file_name.c_str() : ".vs Drop here", { 200.0f, 40.0f })) {}
+    if (ImGui::Button(!vertex_file_path.empty() ? vertex_file_name.c_str() : ".vs drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -1418,7 +1456,7 @@ void UIManager::PostProcessWindow()
     static std::string fragment_file_path;
     static std::string fragment_file_name;
     static char* fragment_content = nullptr;
-    if (ImGui::Button(!fragment_file_path.empty() ? fragment_file_name.c_str() : ".fs Drop here", { 200.0f, 40.0f })) {}
+    if (ImGui::Button(!fragment_file_path.empty() ? fragment_file_name.c_str() : ".fs drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -1739,7 +1777,7 @@ void UIManager::AddMeshWindow()
     static std::string obj_file_name;
     static std::string texture_folder_path;
     static std::string texture_folder_name;
-    if (ImGui::Button(!obj_file_path.empty() ? obj_file_name.c_str() : ".obj Drop here", { 200.0f, 40.0f })) {}
+    if (ImGui::Button(!obj_file_path.empty() ? obj_file_name.c_str() : ".obj drop here", { 200.0f, 40.0f })) {}
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {

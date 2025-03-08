@@ -2,6 +2,8 @@
 #include "utils.h"
 #include "Core/shader.h"
 
+#include <../deps/glm/glm.hpp>
+
 #include <memory> 
 #include <iostream>
 #include <cassert>

@@ -46,7 +46,9 @@ class Quad {
   float size_;
   Texture texture_;
   Texture normal_map_;
+
   bool use_texture_;
+  bool use_normal_map_;
 
   std::string texture_path_;
   std::string normal_map_path_;

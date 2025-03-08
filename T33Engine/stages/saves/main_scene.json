@@ -7,18 +7,18 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -2.7223777770996094,
-   7.13427209854126,
-   3.0143582820892334
+   -1.7563340663909912,
+   7.800843238830566,
+   2.413604736328125
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.0010000000474974513,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.5244832038879395,
-   -0.05526858568191528,
-   -0.8496250510215759
+   0.12056159973144531,
+   -0.23497620224952698,
+   -0.9644952416419983
   ]
  },
  "Entities": [
@@ -98,6 +98,7 @@
    "Render_component": {
     "Quad": {
      "Texture_path": "../stages/assets/textures/materials/brick_wall/brickwall.jpg",
+     "NormalMap_path": "../stages/assets/textures/materials/brick_wall/brickwall_normal.jpg",
      "size": 1.0
     },
     "Render_type": 5
@@ -191,15 +192,15 @@
   {
    "Identifier_component": {
     "Entity_id": 6,
-    "Entity_name": "Directional Light [0]"
+    "Entity_name": "Spot Light [0]"
    },
    "Light_component": {
     "light": {
      "Ambient_color": [
       [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
+       0.0,
+       0.0,
+       0.0
       ]
      ],
      "Constant_attenuation": [
@@ -214,52 +215,70 @@
      ],
      "Direction": [
       [
-       -0.18814417719841003,
-       -0.9407208561897278,
-       -0.28221628069877625
+       0.13198047876358032,
+       7.588467809682697e-08,
+       -0.9912521839141846
       ]
      ],
      "Light_color": [
       [
-       10.0,
-       10.0,
-       10.0
+       150.0,
+       150.0,
+       150.0
       ]
      ],
      "Linear_attenuation": [
-      0.0
+      0.699999988079071
      ],
      "Position": [
+      [
+       -1.813002347946167,
+       7.543361663818359,
+       5.224761962890625
+      ]
+     ],
+     "Quadratic_attenuation": [
+      1.7999999523162842
+     ],
+     "Shininnes": [
+      32.0
+     ],
+     "Specular_color": [
       [
        0.0,
        0.0,
        0.0
       ]
      ],
-     "Quadratic_attenuation": [
-      0.0
-     ],
-     "Shininnes": [
-      34.0
-     ],
-     "Specular_color": [
-      [
-       1.0,
-       1.0,
-       0.949999988079071
-      ]
-     ],
      "Spot_angle": [
-      0.0
+      45.0
      ],
      "Spot_softness": [
-      0.0
+      10.0
      ],
      "Strength": [
-      0.0
+      1.0
      ],
-     "Type": 0
+     "Type": 1
     }
+   },
+   "Transform_component": {
+    "Position": [
+     -1.813002347946167,
+     7.543361663818359,
+     5.224761962890625
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
    }
   }
  ],

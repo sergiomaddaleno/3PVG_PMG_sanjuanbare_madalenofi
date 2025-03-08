@@ -57,36 +57,7 @@ private:
 	RenderSystem& rs_;
 
 	//---
-
 	Light li;
-
-	int terrain_num_rows;
-	int terrain_num_cols;
-	float terrain_height_mult;
-	float terrain_size;
-	bool terrain_is_centered;
-	bool terrain_use_perlin_noise;
-	std::string terrain_tex_path;
-	std::string heightmap_path;
-
-	int sphere_num_heights;
-	int sphere_num_revs;
-	float sphere_size;
-	std::string sphere_tex_path;
-
-	float cube_size;
-	bool cube_is_centered;
-	bool cube_8v;
-	bool cube_24v;
-	std::string cube_tex_path;
-
-	float quad_size;
-	std::string quad_tex_path;
-
-	char* dds_file;
-	char* sb_vertex;
-	char* sb_fragment;
-	float skybox_angle;
 };
 
 

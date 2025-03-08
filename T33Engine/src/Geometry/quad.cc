@@ -14,8 +14,9 @@
 Quad::Quad()
     : VAO(0), VBO(0), EBO(0),
     order_(), data_(),
-    size_(0.0f), use_texture_(true),
-    texture_path_("../stages/assets/textures/materials/brick_wall/brickwall.jpg"),
+    size_(0.0f), 
+    use_texture_(true), use_normal_map_(false),
+    texture_path_("../stages/assets/textures/images/blue.png"),
     normal_map_path_("../stages/assets/textures/materials/brick_wall/brickwall_normal.jpg")
 {}
 
@@ -45,8 +46,54 @@ void Quad::init(const float quad_size) {
     glm::vec2 uvs[] = {
         {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f}
     };
-   
-    data_.reserve(4 * 8); 
+
+    //-------------------------------------
+    //For normal mapping
+    
+    //First triangle
+    glm::vec3 edge1 = positions[1] - positions[0];
+    glm::vec3 edge2 = positions[2] - positions[0];
+    glm::vec2 deltaUV1 = uvs[1] - uvs[0];
+    glm::vec2 deltaUV2 = uvs[2] - uvs[0];
+
+    //Apply Formula
+    float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+    glm::vec3 tangent1, bitangent1;
+    tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+    tangent1 = glm::normalize(tangent1);
+
+    bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+    bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+    bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+    bitangent1 = glm::normalize(bitangent1);
+
+    //---
+
+    //Second triangle
+    edge1 = positions[2] - positions[0];
+    edge2 = positions[3] - positions[0];
+    deltaUV1 = uvs[2] - uvs[0];
+    deltaUV2 = uvs[3] - uvs[0];
+
+    //Apply Formula
+    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+    glm::vec3 tangent2, bitangent2;
+    tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+    //tangent2 = glm::normalize(tangent2);
+
+    bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+    bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+    bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+    //bitangent2 = glm::normalize(bitangent2);
+    //-------------------------------------
+
+    data_.reserve(4 * 8);
     for (int i = 0; i < 4; ++i) {
         data_.push_back(positions[i].x);
         data_.push_back(positions[i].y);
@@ -58,6 +105,27 @@ void Quad::init(const float quad_size) {
 
         data_.push_back(uvs[i].x);
         data_.push_back(uvs[i].y);
+
+        //---
+
+        if (i == 0 || i == 1 || i == 2) {
+            data_.push_back(tangent1.x);
+            data_.push_back(tangent1.y);
+            data_.push_back(tangent1.z);
+
+            data_.push_back(bitangent1.x);
+            data_.push_back(bitangent1.y);
+            data_.push_back(bitangent1.z);
+        }
+        else {
+            data_.push_back(tangent2.x);
+            data_.push_back(tangent2.y);
+            data_.push_back(tangent2.z);
+
+            data_.push_back(bitangent2.x);
+            data_.push_back(bitangent2.y);
+            data_.push_back(bitangent2.z);
+        }
     }
 
     unsigned int order[] = {
@@ -83,15 +151,22 @@ void Quad::bind()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, order_.size() * sizeof(int), order_.data(), GL_STATIC_DRAW);
 
     //---
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(3 * sizeof(float)));
 
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(6 * sizeof(float)));
     //---
+    
+    //For normal mapping
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(8 * sizeof(float)));
+
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(11 * sizeof(float)));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -127,7 +202,9 @@ void Quad::draw()
     if (use_texture_) {
         texture_.active(TextureID::TI_Albedo);
         texture_.bind2D();
+    }
 
+    if (use_normal_map_) {
         normal_map_.active(TextureID::TI_Normal);
         normal_map_.bind2D();
     }
@@ -152,6 +229,7 @@ nlohmann::json Quad::serialize() const
 
     json_data["size"] = size_;
     json_data["Texture_path"] = texture_path_;
+    json_data["NormalMap_path"] = normal_map_path_;
 
     return json_data;
 }

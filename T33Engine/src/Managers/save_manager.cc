@@ -21,27 +21,8 @@ SaveManager::SaveManager(ECSManager& ecs_, RenderSystem& rs_)
     : current_scene_file(""),
     number_of_scenes(0),
     li(),
-    terrain_num_rows(0),
-    terrain_num_cols(0),
-    terrain_height_mult(0.0f),
-    terrain_size(0.0f),
-    terrain_is_centered(true),
-    terrain_use_perlin_noise(true),
-    sphere_num_heights(0),
-    sphere_num_revs(0),
-    sphere_size(0.0f),
-    cube_size(0.0f),
-    cube_is_centered(false),
-    cube_8v(false),
-    cube_24v(false),
-    quad_size(0.0f),
-    dds_file(nullptr),
-    sb_vertex(nullptr),
-    sb_fragment(nullptr),
-    skybox_angle(0.0f),
     ecs_(ecs_),
     rs_(rs_)
-
 {
 }
 
@@ -199,6 +180,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
             case RenderType::RT_Mesh: {
                 std::string mesh_path = entity["Render_component"]["Mesh"].value("Mesh_path", "");
                 std::string texture_folder = entity["Render_component"]["Mesh"].value("Texture_folder", "");
+
                 rs_.createMesh(mesh_path, texture_folder, tc);
                 break;
             }
@@ -206,68 +188,50 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
             case RenderType::RT_Cube8v:
             case RenderType::RT_Cube24v: {
                 const auto& cube = entity["Render_component"]["Cube"];
-                cube_8v = cube["cube_8v"];
-                cube_24v = cube["cube_24v"];
-                cube_size = cube["size"];
-                cube_is_centered = cube["Is_centered"];
-                cube_tex_path = cube["Texture_path"];
 
-                if (cube_8v) rs_.createCube8v(tc, cube_size, cube_is_centered);
-                if (cube_24v) rs_.createCube24v(tc, cube_size);
+                if (cube["cube_8v"]) rs_.createCube8v(tc, cube["size"], cube["Is_centered"]);
+                if (cube["cube_24v"]) rs_.createCube24v(tc, cube["size"]);
 
                 auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
-                render_comp->cube_->setTexture(cube_tex_path);
-
+                render_comp->cube_->setTexture(cube["Texture_path"]);
                 break;
             }
 
             case RenderType::RT_Quad: {
                 const auto& quad = entity["Render_component"]["Quad"];
-                quad_size = quad["size"];
-                quad_tex_path = quad["Texture_path"];
 
-                rs_.createQuad(tc, quad_size);
+                rs_.createQuad(tc, quad["size"]);
 
                 auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
-                render_comp->quad_->setTexture(quad_tex_path);
+                render_comp->quad_->setTexture(quad["Texture_path"]);
+                render_comp->quad_->setNormalMap(quad["NormalMap_path"]);
                 break;
             }
 
             case RenderType::RT_Sphere: {
                 const auto& sphere = entity["Render_component"]["Sphere"];
-                sphere_num_heights = sphere["num_heights"];
-                sphere_num_revs = sphere["num_revs"];
-                sphere_size = sphere["size"];
-                sphere_tex_path = sphere["Texture_path"];
 
-                rs_.createSphere(tc, sphere_num_heights, sphere_num_revs, sphere_size);
+                rs_.createSphere(tc, sphere["num_heights"], sphere["num_revs"], sphere["size"]);
                 
                 auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
-                render_comp->sphere_->setTexture(sphere_tex_path);
+                render_comp->sphere_->setTexture(sphere["Texture_path"]);
                 break;
             }
 
             case RenderType::RT_Terrain: {
                 const auto& terrain = entity["Render_component"]["Terrain"];
-                terrain_num_rows = terrain["num_rows"];
-                terrain_num_cols = terrain["num_cols"];
-                terrain_height_mult = terrain["height_mult"];
-                terrain_size = terrain["size"];
-                terrain_is_centered = terrain["is_centered"];
-                terrain_use_perlin_noise = terrain["use_perlin_noise"];
-                terrain_tex_path = terrain["Texture_path"];
-                heightmap_path = terrain["Heightmap_path"];
 
                 rs_.createTerrain(tc,
-                    terrain_num_cols,
-                    terrain_num_rows,
-                    terrain_height_mult,
-                    terrain_size,
-                    terrain_is_centered,
-                    terrain_use_perlin_noise);
+                    terrain["num_cols"],
+                    terrain["num_rows"],
+                    terrain["height_mult"],
+                    terrain["size"],
+                    terrain["is_centered"],
+                    terrain["use_perlin_noise"]);
                 
                 auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
-                render_comp->terrain_->setTexture(terrain_tex_path);
+                render_comp->terrain_->setTexture(terrain["Texture_path"]);
+                render_comp->terrain_->setHeightMap(terrain["Heightmap_path"]);
                 break;
             }
             }
