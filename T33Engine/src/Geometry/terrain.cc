@@ -256,14 +256,6 @@ void Terrain::setTexture(std::string file_path)
     texture_path_ = file_path;
 
     texture_.loadTexture(file_path);
-
-    /*texture_.clear();
-    for (auto& loc_text : files_path) {
-        Texture tempTexture;
-        tempTexture.loadTexture(loc_text);
-        texture_.push_back(tempTexture);
-    }
-    texture_count_ = (int)texture_.size();*/
 }
 
 void Terrain::setHeightMap(std::string file_path) {

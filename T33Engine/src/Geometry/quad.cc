@@ -17,7 +17,7 @@ Quad::Quad()
     size_(0.0f), 
     use_texture_(true), use_normal_map_(false),
     texture_path_("../stages/assets/textures/images/blue.png"),
-    normal_map_path_("../stages/assets/textures/materials/brick_wall/brickwall_normal.jpg")
+    normal_map_path_("")
 {}
 
 Quad::~Quad()
@@ -176,14 +176,6 @@ void Quad::setTexture(std::string texture_path)
 {
     texture_path_ = texture_path;
     texture_.loadTexture(texture_path);
-
-    /*texture_.clear();
-    for (auto& loc_text : files_path) {
-        Texture tempTexture;
-        tempTexture.loadTexture(loc_text);
-        texture_.push_back(tempTexture);
-    }
-    texture_count_ = (int)texture_.size();*/
 }
 
 void Quad::setNormalMap(std::string normal_map_path)
@@ -208,13 +200,6 @@ void Quad::draw()
         normal_map_.active(TextureID::TI_Normal);
         normal_map_.bind2D();
     }
-
-    /*int i = 0;
-    for (auto& tex : texture_) {
-        tex.active(i);
-        tex.bind2D();
-        i++;
-    }*/
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

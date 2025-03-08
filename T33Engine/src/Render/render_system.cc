@@ -71,7 +71,6 @@ void RenderSystem::init() {
             case RenderType::RT_Quad:
                 render_comp->quad_->bind();
                 render_comp->quad_->setTexture(render_comp->quad_->texture_path_);
-                render_comp->quad_->setNormalMap(render_comp->quad_->normal_map_path_);
                 break;
 
             case RenderType::RT_Cube8v:

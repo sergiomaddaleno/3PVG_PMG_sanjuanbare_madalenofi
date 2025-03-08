@@ -191,13 +191,6 @@ void Cube::draw()
         texture_.bind2D();
     }
 
-    /*int i = 0;
-    for (auto& tex : texture_) {
-        tex.active(i);
-        tex.bind2D();
-        i++;
-    }*/
-
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
@@ -210,14 +203,6 @@ void Cube::setTexture(std::string file_path)
     texture_path_ = file_path;
 
     texture_.loadTexture(file_path);
-
-    /*texture_.clear();
-    for (auto& loc_text : files_path) {
-        Texture tempTexture;
-        tempTexture.loadTexture(loc_text);
-        texture_.push_back(tempTexture);
-    }
-    texture_count_ = (int)texture_.size();*/
 }
 
 glm::vec3* Cube::GetVertexCube8v()

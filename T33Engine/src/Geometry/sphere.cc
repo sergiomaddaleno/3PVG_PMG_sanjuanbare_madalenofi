@@ -131,13 +131,6 @@ void Sphere::draw()
         texture_.bind2D();
     }
 
-    /*int i = 0;
-    for (auto& tex : texture_) {
-        tex.active(i);
-        tex.bind2D();
-        i++;
-    }*/
-
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (num_heights_ * num_revs_) * 6, GL_UNSIGNED_INT, 0);
 
@@ -150,14 +143,6 @@ void Sphere::setTexture(std::string file_path)
     texture_path_ = file_path;
 
     texture_.loadTexture(file_path);
-
-    /*texture_.clear();
-    for (auto& loc_text : files_path) {
-        Texture tempTexture;
-        tempTexture.loadTexture(loc_text);
-        texture_.push_back(tempTexture);
-    }
-    texture_count_ = (int)texture_.size();*/
 }
 
 std::vector<float> Sphere::GetVertexSphere()
