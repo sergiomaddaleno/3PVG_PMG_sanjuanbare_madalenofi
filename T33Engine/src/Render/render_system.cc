@@ -123,6 +123,9 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     tex_id = TextureID::TI_Normal;
     shader.setUniformValue(shader.getUniformLocation("u_normal_map"), ValueType::T_INT_1, &tex_id);
 
+    tex_id = TextureID::TI_Parallax;
+    shader.setUniformValue(shader.getUniformLocation("u_parallax_map"), ValueType::T_INT_1, &tex_id);
+
     shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &global.use_fog);
     shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &global.fog_density);
     shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &global.fog_gradient);
@@ -205,8 +208,15 @@ void RenderSystem::forwardRender(Camera cam) {
                     case RenderType::RT_Quad:
                     {
                         render_comp->quad_->draw();
+
                         int use = render_comp->quad_->use_normal_map_;
-                        shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"), ValueType::T_INT_1, &use);
+                        shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"), 
+                            ValueType::T_INT_1, &use);
+
+                        float scale = render_comp->quad_->parallax_scale_;
+                        shader.setUniformValue(shader.getUniformLocation("u_parallax_scale"),
+                            ValueType::T_FLOAT_1, &scale);
+                        
                         //render_comp->quad_->wave_.setUniforms(shader);
                     }
                     break;

@@ -7,18 +7,18 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -1.7563340663909912,
-   7.800843238830566,
-   2.413604736328125
+   1.560347318649292,
+   8.157610893249512,
+   4.733229160308838
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.0010000000474974513,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.12056159973144531,
-   -0.23497620224952698,
-   -0.9644952416419983
+   -0.41690242290496826,
+   -0.14932282269001007,
+   -0.8966019749641418
   ]
  },
  "Entities": [
@@ -97,8 +97,9 @@
    },
    "Render_component": {
     "Quad": {
-     "Texture_path": "../stages/assets/textures/materials/brick_wall/brickwall.jpg",
-     "NormalMap_path": "../stages/assets/textures/materials/brick_wall/brickwall_normal.jpg",
+     "NormalMap_path": "../stages\\assets\\textures\\materials\\brick_wall_2\\bricks2_normal.jpg",
+     "ParallaxMap_path": "../stages\\assets\\textures\\materials\\brick_wall_2\\bricks2_disp.jpg",
+     "Texture_path": "../stages\\assets\\textures\\materials\\brick_wall_2\\bricks2.jpg",
      "size": 1.0
     },
     "Render_type": 5
@@ -116,9 +117,9 @@
      1.0
     ],
     "Scale": [
-     1.0,
-     1.0,
-     1.0
+     0.9999897480010986,
+     0.9999897480010986,
+     0.9999997615814209
     ]
    }
   },
@@ -215,9 +216,9 @@
      ],
      "Direction": [
       [
-       0.13198047876358032,
-       7.588467809682697e-08,
-       -0.9912521839141846
+       0.0,
+       0.0,
+       1.0
       ]
      ],
      "Light_color": [

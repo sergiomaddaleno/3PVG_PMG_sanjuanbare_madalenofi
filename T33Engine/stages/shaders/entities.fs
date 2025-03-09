@@ -29,10 +29,13 @@ uniform vec3 u_camera_position;
 //Samplers
 uniform sampler2D u_texture;
 uniform sampler2D u_normal_map;
+uniform sampler2D u_parallax_map;
 uniform sampler2D u_shadow_map;
 uniform samplerCube u_depth_map;
 
 uniform bool u_use_normal_map;
+uniform float u_parallax_scale;
+vec3 mapped_normal = normal;
 
 //Light
 uniform LightInfo u_light;
@@ -68,8 +71,7 @@ vec3 PointLight(LightInfo lc) {
     return (diffuse + specular);
 }
 
-vec3 SpotLight(LightInfo lc, vec3 normal) {
-    normal = normalize(normal);
+vec3 SpotLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
     float cutOff = cos(radians(lc.spot_angle_));
     float outerCutOff = cos(radians(lc.spot_angle_ + lc.spot_softness_));
@@ -108,6 +110,38 @@ vec3 DirectionalLight(LightInfo lc) {
     vec3 ambient = lc.ambient_color_ * lc.light_color_;
 
     return ambient + diffuse + specular;
+}
+
+//Normal mapping
+vec3 NormalMappingSpot(LightInfo lc){
+    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
+    float cutOff = cos(radians(lc.spot_angle_));
+    float outerCutOff = cos(radians(lc.spot_angle_ + lc.spot_softness_));
+    float theta = dot(lightDir, normalize(lc.dir_));
+
+    float distance = length(TangentLightPos - TangentFragPos);
+    float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
+
+    float intensity = smoothstep(outerCutOff, cutOff, theta);
+
+    float diffuseStrength = max(dot(lightDir, mapped_normal), 0.0);
+    vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation * intensity;
+
+    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    vec3 reflectDir = reflect(-lightDir, mapped_normal);
+    float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
+    vec3 specular = lc.spec_color_ * specStrength * attenuation * intensity;
+
+    vec3 ambient = lc.ambient_color_ * u_ambient * intensity;
+
+    return ambient + diffuse + specular;
+}
+
+//parallax mapping
+vec2 ParallaxMapping(vec2 tex_coords, vec3 view_dir){
+    float height = texture(u_parallax_map, tex_coords).r;
+    vec2 p = view_dir.xy / view_dir.z * (height * u_parallax_scale);
+    return tex_coords - p;
 }
 
 // --- Shadows
@@ -162,31 +196,38 @@ void main() {
     float shadow = ShadowCalculation(FragPosLight);
     float shadow_pl = ShadowCalculationPoint(FragPosLight.xyz, u_light.pos_);
 
-    vec3 mapped_normal = texture(u_normal_map, uv).rgb;
+    //Parallax mapping
+    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    vec2 texCoords = uv;
+
+    texCoords = ParallaxMapping(texCoords, viewDir);
+
+    //Normal mapping
+    mapped_normal = texture(u_normal_map, texCoords).rgb;
     mapped_normal = normalize(mapped_normal * 2.0 - 1.0);
 
+    //Lights + shadows
     if (u_light.type_ == 0) {
         final_light += DirectionalLight(u_light) * shadow ; 
     }
     
     if (u_light.type_ == 1) {
-        vec3 my_normal;
-    
+
         if (u_use_normal_map) {
             mat3 TBN = mat3(TangentLightPos, TangentViewPos, TangentFragPos); 
-            my_normal = normalize(TBN * mapped_normal);
-        } else {
-            my_normal = normal;
-        }
+            mapped_normal = normalize(TBN * mapped_normal);
 
-        final_light += SpotLight(u_light, my_normal) * shadow; 
+            final_light += NormalMappingSpot(u_light) * shadow; 
+        } else {
+            final_light += SpotLight(u_light) * shadow; 
+        }
     }
     
     if (u_light.type_ == 2) {
         final_light += PointLight(u_light) * shadow;  
     }
 
-    vec3 texture_color = texture(u_texture, uv).rgb;
+    vec3 texture_color = texture(u_texture, texCoords).rgb;
 
     vec3 final_color = texture_color * final_light;
     FragColor = vec4(final_color, 1.0);

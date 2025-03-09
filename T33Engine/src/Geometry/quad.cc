@@ -14,10 +14,10 @@
 Quad::Quad()
     : VAO(0), VBO(0), EBO(0),
     order_(), data_(),
-    size_(0.0f), 
-    use_texture_(true), use_normal_map_(false),
+    size_(0.0f), parallax_scale_(0.0f),
+    use_texture_(true), use_normal_map_(false), use_parallax_map_(false),
     texture_path_("../stages/assets/textures/images/blue.png"),
-    normal_map_path_("")
+    normal_map_path_(""), parallax_map_path_("")
 {}
 
 Quad::~Quad()
@@ -184,6 +184,12 @@ void Quad::setNormalMap(std::string normal_map_path)
     normal_map_.loadTexture(normal_map_path_);
 }
 
+void Quad::setParallaxMap(std::string parallax_map_path)
+{
+    parallax_map_path_ = parallax_map_path;
+    parallax_map_.loadTexture(parallax_map_path_);
+}
+
 glm::vec3* Quad::GetVertex()
 {
     return vertex;
@@ -200,6 +206,11 @@ void Quad::draw()
         normal_map_.active(TextureID::TI_Normal);
         normal_map_.bind2D();
     }
+    
+    if (use_parallax_map_) {
+        parallax_map_.active(TextureID::TI_Parallax);
+        parallax_map_.bind2D();
+    }
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -215,6 +226,7 @@ nlohmann::json Quad::serialize() const
     json_data["size"] = size_;
     json_data["Texture_path"] = texture_path_;
     json_data["NormalMap_path"] = normal_map_path_;
+    json_data["ParallaxMap_path"] = parallax_map_path_;
 
     return json_data;
 }

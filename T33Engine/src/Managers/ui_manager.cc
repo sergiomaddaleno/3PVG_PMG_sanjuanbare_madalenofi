@@ -645,6 +645,58 @@ void UIManager::InspectorWindow() {
                     normalmap_file_path.clear();
                     normalmap_file_name.clear();
                 }
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                //---------------
+
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                static bool use_parallax_map_global = false;
+                if (ImGui::Checkbox("Use Parallax map", &use_parallax_map_global)) {
+                    auto ri = ecs_.getComponentList<RenderComponent>().begin();
+                    auto riend = ecs_.getComponentList<RenderComponent>().end();
+
+                    for (; ri != riend; ++ri) {
+                        if (ri->has_value()) {
+                            auto& loc_render_comp = *ri;
+                            if (loc_render_comp->type_ == RenderType::RT_Quad)
+                                loc_render_comp->quad_->use_parallax_map_ = use_parallax_map_global;
+                        }
+                    }
+                }
+                ImGui::DragFloat("Parallax Scale", &render_comp->quad_->parallax_scale_, 0.01f, 0.0f, 1.0f);
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.75f, 0.40f, 0.40f, 1.0f));
+                ImGui::Text("Change/Add Parallax map");
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::PopStyleColor();
+
+                static std::string parallaxmap_file_path;
+                static std::string parallaxmap_file_name;
+
+                if (ImGui::Button(!parallaxmap_file_path.empty() ? parallaxmap_file_name.c_str() : ".png/.jpg drop parallax here", { 200.0f, 40.0f })) {}
+
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                        std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                        if ((filePath.extension() == ".png") || (filePath.extension() == ".jpg")) {
+                            parallaxmap_file_path = filePath.string();
+                            parallaxmap_file_name = filePath.filename().string();
+                        }
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+                if (ImGui::Button("Compile Parallax map")) {
+                    render_comp->quad_->setParallaxMap(parallaxmap_file_path);
+
+                    parallaxmap_file_path.clear();
+                    parallaxmap_file_name.clear();
+                }
             }
 
             ImGui::Dummy(ImVec2(0.0f, 5.0f));

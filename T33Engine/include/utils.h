@@ -23,6 +23,7 @@ enum TextureID {
 	TI_Normal,
 	TI_Specular,
 	TI_Position,
+	TI_Parallax
 };
 
 enum FrameBufferID {

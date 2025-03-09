@@ -33,7 +33,8 @@ class Quad {
    void bind();
    void draw();
    void setTexture(std::string texture_path);
-   void setNormalMap(std::string texture_path);
+   void setNormalMap(std::string normal_map_path);
+   void setParallaxMap(std::string parallax_map_path);
 
    glm::vec3* GetVertex();
 
@@ -41,21 +42,25 @@ class Quad {
 
    //---
 
-  GLuint VAO, VBO, EBO;
-
   float size_;
+  float parallax_scale_;
+
   Texture texture_;
   Texture normal_map_;
+  Texture parallax_map_;
 
   bool use_texture_;
   bool use_normal_map_;
+  bool use_parallax_map_;
 
   std::string texture_path_;
   std::string normal_map_path_;
+  std::string parallax_map_path_;
 
   GerstnerWave wave_;
 
 private:
+  GLuint VAO, VBO, EBO;
 
   std::vector<int> order_;
   std::vector<float> data_;

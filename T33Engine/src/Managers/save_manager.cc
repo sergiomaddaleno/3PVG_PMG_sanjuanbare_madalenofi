@@ -205,6 +205,8 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
                 auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
                 render_comp->quad_->setTexture(quad["Texture_path"]);
                 render_comp->quad_->setNormalMap(quad["NormalMap_path"]);
+                render_comp->quad_->setParallaxMap(quad["ParallaxMap_path"]);
+
                 break;
             }
 
