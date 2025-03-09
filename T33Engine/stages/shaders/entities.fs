@@ -34,6 +34,7 @@ uniform sampler2D u_shadow_map;
 uniform samplerCube u_depth_map;
 
 uniform bool u_use_normal_map;
+uniform bool u_use_parallax_map;
 uniform float u_parallax_scale;
 vec3 mapped_normal = normal;
 
@@ -200,7 +201,12 @@ void main() {
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     vec2 texCoords = uv;
 
-    texCoords = ParallaxMapping(texCoords, viewDir);
+    if(u_use_parallax_map){
+        texCoords = ParallaxMapping(texCoords, viewDir);
+
+        if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+        discard;
+    }
 
     //Normal mapping
     mapped_normal = texture(u_normal_map, texCoords).rgb;

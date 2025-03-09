@@ -213,6 +213,10 @@ void RenderSystem::forwardRender(Camera cam) {
                         shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"), 
                             ValueType::T_INT_1, &use);
 
+                        use = render_comp->quad_->use_parallax_map_;
+                        shader.setUniformValue(shader.getUniformLocation("u_use_parallax_map"),
+                            ValueType::T_INT_1, &use);
+
                         float scale = render_comp->quad_->parallax_scale_;
                         shader.setUniformValue(shader.getUniformLocation("u_parallax_scale"),
                             ValueType::T_FLOAT_1, &scale);
