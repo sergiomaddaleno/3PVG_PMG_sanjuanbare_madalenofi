@@ -35,6 +35,7 @@ uniform samplerCube u_depth_map;
 
 uniform bool u_use_normal_map;
 uniform bool u_use_parallax_map;
+uniform int u_parallax_type;
 uniform float u_parallax_scale;
 vec3 mapped_normal = normal;
 
@@ -145,6 +146,61 @@ vec2 ParallaxMapping(vec2 tex_coords, vec3 view_dir){
     return tex_coords - p;
 }
 
+vec2 SteepParallaxMapping(vec2 tex_coords, vec3 view_dir){
+    
+    const float minLayers = 8;
+    const float maxLayers = 32;
+    float num_layers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), view_dir)));
+
+    float layer_depth = 1.0 / num_layers;
+    float current_layer_depth = 0.0;
+
+    vec2 p = view_dir.xy * u_parallax_scale;
+    vec2 delta_tex_coords = p / num_layers;
+
+    vec2 current_texcoords = tex_coords;
+    float current_parallaxmap = texture(u_parallax_map, current_texcoords).r;
+
+    while(current_layer_depth < current_parallaxmap){
+        current_texcoords -= delta_tex_coords;
+        current_parallaxmap = texture(u_parallax_map, current_texcoords).r;
+        current_layer_depth += layer_depth;
+    }
+
+    return current_texcoords;
+}
+
+vec2 ParallaxOcclusionMapping(vec2 tex_coords, vec3 view_dir){
+    
+    const float minLayers = 8;
+    const float maxLayers = 32;
+    float num_layers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), view_dir)));
+
+    float layer_depth = 1.0 / num_layers;
+    float current_layer_depth = 0.0;
+
+    vec2 p = view_dir.xy * u_parallax_scale;
+    vec2 delta_tex_coords = p / num_layers;
+
+    vec2 current_texcoords = tex_coords;
+    float current_parallaxmap = texture(u_parallax_map, current_texcoords).r;
+
+    while(current_layer_depth < current_parallaxmap){
+        current_texcoords -= delta_tex_coords;
+        current_parallaxmap = texture(u_parallax_map, current_texcoords).r;
+        current_layer_depth += layer_depth;
+    }
+
+    vec2 prev_texcoords = current_texcoords + delta_tex_coords;
+    float after_depth = current_parallaxmap - current_layer_depth;
+    float before_depth = texture(u_parallax_map, prev_texcoords).r - current_layer_depth + layer_depth;
+
+    float weight = after_depth / (after_depth - before_depth);
+    vec2 final_texcoords = prev_texcoords * weight + current_texcoords * (1.0 - weight);
+
+    return final_texcoords;
+}
+
 // --- Shadows
 
 //percentage-closer filtering
@@ -202,7 +258,9 @@ void main() {
     vec2 texCoords = uv;
 
     if(u_use_parallax_map){
-        texCoords = ParallaxMapping(texCoords, viewDir);
+        if(u_parallax_type == 0) texCoords = ParallaxMapping(texCoords, viewDir);
+        if(u_parallax_type == 1) texCoords = SteepParallaxMapping(texCoords, viewDir);
+        if(u_parallax_type == 2) texCoords = ParallaxOcclusionMapping(texCoords, viewDir);
 
         if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
         discard;

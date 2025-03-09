@@ -15,6 +15,7 @@
 #include "Core/texture.h"
 #include "Geometry/wave.h"
 #include <../nlohmann/json.hpp>
+#include "utils.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -58,6 +59,8 @@ class Quad {
   std::string parallax_map_path_;
 
   GerstnerWave wave_;
+
+  ParallaxType parallax_type;
 
 private:
   GLuint VAO, VBO, EBO;

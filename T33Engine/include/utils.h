@@ -26,6 +26,12 @@ enum TextureID {
 	TI_Parallax
 };
 
+enum ParallaxType {
+	ParallaxMapping,
+	SteepParallaxMapping,
+	ParallaxOcclusionMapping,
+};
+
 enum FrameBufferID {
 	FB_Main,
 	FB_Quad,

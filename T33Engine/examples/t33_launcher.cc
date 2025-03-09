@@ -17,7 +17,7 @@ void init() {
 
     global.save_manager.loadFromFile("../stages/saves/main_scene.json");
 
-    initShader(global.render_system.shader, "../stages/shaders/entities.vs", "../stages/shaders/entities.fs");
+    initShader(global.render_system.shader, "../stages/shaders/forward_shading.vs", "../stages/shaders/forward_shading.fs");
     initShader(global.render_system.deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
     initShader(global.render_system.deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
 

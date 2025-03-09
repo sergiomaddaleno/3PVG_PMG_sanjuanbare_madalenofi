@@ -647,25 +647,62 @@ void UIManager::InspectorWindow() {
                 }
 
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
                 //---------------
 
                 ImGui::Separator();
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
                 static bool use_parallax_map_global = false;
-                if (ImGui::Checkbox("Use Parallax map", &use_parallax_map_global)) {
+                ImGui::Checkbox("Use Parallax map", &use_parallax_map_global);
+
+                if (ImGui::IsItemEdited()) {
                     auto ri = ecs_.getComponentList<RenderComponent>().begin();
                     auto riend = ecs_.getComponentList<RenderComponent>().end();
 
                     for (; ri != riend; ++ri) {
                         if (ri->has_value()) {
                             auto& loc_render_comp = *ri;
-                            if (loc_render_comp->type_ == RenderType::RT_Quad)
+                            if (loc_render_comp->type_ == RenderType::RT_Quad && loc_render_comp->quad_) {
                                 loc_render_comp->quad_->use_parallax_map_ = use_parallax_map_global;
+                            }
                         }
                     }
                 }
-                ImGui::DragFloat("Parallax Scale", &render_comp->quad_->parallax_scale_, 0.01f, 0.0f, 1.0f);
+
+                static float global_parallax_scale = 0.05f;
+                ImGui::DragFloat("Parallax Scale", &global_parallax_scale, 0.01f, 0.0f, 1.0f);
+
+                static int global_parallax_type = 0;
+                const char* parallaxTypes[] = { "Basic Parallax", "Steep Parallax", "Parallax Occlusion" };
+                global_parallax_type = std::clamp(global_parallax_type, 0, IM_ARRAYSIZE(parallaxTypes) - 1);
+
+                const char* currentType = parallaxTypes[global_parallax_type];
+
+                if (ImGui::BeginCombo("Parallax Type", currentType)) {
+                    for (int n = 0; n < IM_ARRAYSIZE(parallaxTypes); ++n) {
+                        bool is_selected = (global_parallax_type == n);
+                        if (ImGui::Selectable(parallaxTypes[n], is_selected)) {
+                            global_parallax_type = n;
+                        }
+                        if (is_selected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
+                }
+
+                auto ri = ecs_.getComponentList<RenderComponent>().begin();
+                auto riend = ecs_.getComponentList<RenderComponent>().end();
+
+                for (; ri != riend; ++ri) {
+                    if (ri->has_value()) {
+                        auto& loc_render_comp = *ri;
+                        if (loc_render_comp->type_ == RenderType::RT_Quad && loc_render_comp->quad_) {
+                            loc_render_comp->quad_->parallax_scale_ = global_parallax_scale;
+                            loc_render_comp->quad_->parallax_type = static_cast<ParallaxType>(global_parallax_type);
+                        }
+                    }
+                }
 
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
