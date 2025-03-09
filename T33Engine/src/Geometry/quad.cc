@@ -14,7 +14,7 @@
 Quad::Quad()
     : VAO(0), VBO(0), EBO(0),
     order_(), data_(),
-    size_(0.0f), parallax_scale_(0.0f),
+    size_(0.0f), parallax_scale_(0.08f),
     use_texture_(true), use_normal_map_(false), use_parallax_map_(false),
     texture_path_("../stages/assets/textures/images/blue.png"),
     normal_map_path_(""), parallax_map_path_("")
