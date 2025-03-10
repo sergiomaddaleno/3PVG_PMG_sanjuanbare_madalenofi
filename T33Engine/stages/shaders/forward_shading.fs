@@ -77,7 +77,7 @@ vec3 SpotLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
     float cutOff = cos(radians(lc.spot_angle_));
     float outerCutOff = cos(radians(lc.spot_angle_ + lc.spot_softness_));
-    float theta = dot(lightDir, normalize(lc.dir_));
+    float theta = dot(lightDir, normalize(-lc.dir_));
 
     float distance = length(lc.pos_ - FragPos);
     float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
