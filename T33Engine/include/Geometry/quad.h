@@ -21,9 +21,10 @@
 #include <GLFW/glfw3.h>
 
  /**
-  * @class Quad
-  * @brief Represents a 2D quad.
-  */
+ * @class Quad
+ * @brief Represents a 2D quad with rendering capabilities.
+ *        Supports texture, normal and parallax mapping.
+ */
 class Quad {
  public:
      Quad();

@@ -14,6 +14,10 @@
 #include <Core/input.h>
 #include <../deps/glm/glm.hpp>
 
+ /**
+  * @class WindowSystem
+  * @brief Manages initialization and cleanup of the global windowing system.
+  */
 class WindowSystem {
 
 public:
@@ -26,6 +30,10 @@ private:
 	WindowSystem() {}
 };
 
+/**
+ * @class Window
+ * @brief Encapsulates an OpenGL window using GLFW and handles window-related operations.
+ */
 class Window {
 
 public:

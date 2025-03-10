@@ -15,6 +15,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+ /**
+  * @class Texture
+  * @brief Encapsulates texture loading, generation, and binding for OpenGL.
+  */
 class Texture {
 
 public:

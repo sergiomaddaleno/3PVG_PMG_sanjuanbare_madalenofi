@@ -1,0 +1,27 @@
+var class_sphere =
+[
+    [ "Sphere", "class_sphere.html#a890a63ff583cb88e7ec4e840b4ef5eb9", null ],
+    [ "~Sphere", "class_sphere.html#a569c071e50a3e11f678630ee1a17737e", null ],
+    [ "bind", "class_sphere.html#a08313bb594ee913ff7e49ba36e436911", null ],
+    [ "draw", "class_sphere.html#a34a34167b7544c95155d3ff30638d045", null ],
+    [ "GetVertexSphere", "class_sphere.html#ac01c8cd23a4cb17946121a9a971942ef", null ],
+    [ "init", "class_sphere.html#a43cd97352853826ca9bf3b6483642b56", null ],
+    [ "serialize", "class_sphere.html#a33c577e28ec2e38eb186857f1614590b", null ],
+    [ "setTexture", "class_sphere.html#ade64e6174d0ecdc1ba75016879c61bfe", null ],
+    [ "data_", "class_sphere.html#a0903addf65d0b7a26997635606384172", null ],
+    [ "EBO", "class_sphere.html#a24b62492f20d4da620ad0606329e9df9", null ],
+    [ "normals_sphere_", "class_sphere.html#a1e8844c8f0e3e2f8b9183000fbc7daa9", null ],
+    [ "num_heights_", "class_sphere.html#a210cacfd6c900fc44b0a80998b26cdcd", null ],
+    [ "num_revs_", "class_sphere.html#a97ea9373894c8ae1cd3db0aeab57881c", null ],
+    [ "num_vertex_", "class_sphere.html#a87118f74e8a724dbc20b5e9e7058fcdc", null ],
+    [ "order_", "class_sphere.html#a38bab065723cbcfb511a74df50925534", null ],
+    [ "size_", "class_sphere.html#af3a821a0c3c6199dc5cfacc8291aef69", null ],
+    [ "texture_", "class_sphere.html#a1b2bb5c4fc3feeef0e89823b4ec259fa", null ],
+    [ "texture_path_", "class_sphere.html#aecf30cf6885ae6fa1705f1ebe75661fc", null ],
+    [ "use_texture_", "class_sphere.html#a797c85dbe59d439fe541cc37f953438c", null ],
+    [ "uv_sphere_", "class_sphere.html#ac6df82f31def49fd3882df2d1dd9f3e7", null ],
+    [ "VAO", "class_sphere.html#ade176be753eca073e84530257a3c04e9", null ],
+    [ "VBO", "class_sphere.html#afa220b88791c3f8d5da09933a6e60273", null ],
+    [ "vertex_sphere_", "class_sphere.html#a548f1cea3cd23114899c0365f0586caa", null ],
+    [ "wave_", "class_sphere.html#af4d40fcae69e37481118d201a59a4748", null ]
+];

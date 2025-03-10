@@ -1508,6 +1508,10 @@ void UIManager::TopBarWindow() {
             ImGui::EndMenu();
         }
 
+        float spacing = ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("T33Engine - Sergio Madaleno Figueroa & Fede Sanjuan").x;
+        ImGui::Dummy(ImVec2(spacing, 0));
+        ImGui::SameLine();
+        ImGui::Text("T33Engine - Sergio Madaleno Figueroa & Fede Sanjuan");
 
         ImGui::EndMenuBar();
     }

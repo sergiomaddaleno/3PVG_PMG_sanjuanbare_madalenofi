@@ -97,11 +97,13 @@ public:
 	int entity_pointlight;
 	int entity_dirlight;
 
-private:
+	//Dont use
+	void compileShaderForBuild();
 
+private:
 	void setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
 
-	void compileShaderForBuild();
+
 };
 
 #endif // __RENDER_SYSTEM__

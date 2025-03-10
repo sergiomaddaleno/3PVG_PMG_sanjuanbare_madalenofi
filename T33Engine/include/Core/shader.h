@@ -12,6 +12,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+ /**
+  * @enum ValueType
+  * @brief Enumeration of supported uniform value types for shaders.
+  */
 enum ValueType {
     T_NONE = 0x0,
     T_FLOAT_1,
@@ -33,6 +37,10 @@ enum ValueType {
     T_SAMPLER_3D,
 };
 
+/**
+ * @class Shader
+ * @brief Encapsulates OpenGL shader compilation and usage.
+ */
 class Shader {
 
 public:

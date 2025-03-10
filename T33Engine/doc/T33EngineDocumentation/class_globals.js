@@ -1,0 +1,27 @@
+var class_globals =
+[
+    [ "Globals", "class_globals.html#a3b78cfdbe2809ad8b6b722969dda4425", null ],
+    [ "cam", "class_globals.html#a9049bd4123954a5c8bcd7f4fdfac5175", null ],
+    [ "deferred_shading", "class_globals.html#a18d17892d94b16a7b8cd86be25e0ff4e", null ],
+    [ "ecs", "class_globals.html#afc11b808fd58b3ca93fe685493860680", null ],
+    [ "far_clip_plane", "class_globals.html#af484beb24465b14767760a179361f28e", null ],
+    [ "fog_density", "class_globals.html#aff37d9f94bf39a0070b41b20af8595bc", null ],
+    [ "fog_gradient", "class_globals.html#a454e7ef1a4329ff2528f8430bfd3109f", null ],
+    [ "fov", "class_globals.html#a351ca30e227d178c8e3b4bb8522f0896", null ],
+    [ "full_screen", "class_globals.html#aea3ebafb8a484e1358235847dd1e9761", null ],
+    [ "grid", "class_globals.html#a2b7a8dac9fee7bc5dea2c9252cf8f89f", null ],
+    [ "is_playing", "class_globals.html#a7290db00adc53dbd42026002de7f2b93", null ],
+    [ "near_clip_plane", "class_globals.html#af3171773fa53fe66e0ee161c9a1be24a", null ],
+    [ "ortho_height", "class_globals.html#a5f558c907d847d0e03ac392a54a55a6d", null ],
+    [ "ortho_width", "class_globals.html#a257abc715a1d5c759f53a358956d7c2a", null ],
+    [ "post_process", "class_globals.html#a2ff6a5c0ef8e56f4f45692c725fbc403", null ],
+    [ "render_system", "class_globals.html#a10148468082c5b167366f9585133b9f8", null ],
+    [ "save_manager", "class_globals.html#a6c4e1baf5675f22f5e43775a9e4500e2", null ],
+    [ "sky_colour", "class_globals.html#a553052a5ba410d1516cc7117696cfc12", null ],
+    [ "skybox", "class_globals.html#a325d4fd7de88347970e3e455018bff71", null ],
+    [ "ui_manager", "class_globals.html#a22e3c2218b0c3ec7339109d94b0ddb9c", null ],
+    [ "use_fog", "class_globals.html#ade28a06867f95668f92d4d6daabbd151", null ],
+    [ "use_skybox", "class_globals.html#ad1a7e08a586658005330c7894947a138", null ],
+    [ "window_height", "class_globals.html#a10be28b149a990acf83e7fdf54fb7fcc", null ],
+    [ "window_width", "class_globals.html#a71888f474fef82968d704c1f2817321a", null ]
+];
