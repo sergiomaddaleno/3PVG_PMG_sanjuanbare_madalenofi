@@ -288,7 +288,7 @@ void main() {
     }
     
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light) * shadow;  
+        final_light += PointLight(u_light);  
     }
 
     vec3 texture_color = texture(u_texture, texCoords).rgb;

@@ -49,7 +49,7 @@ public:
 
 private:
 	void renderScene(ECSManager& ecs, Shader shader, LightComponent lc);
-	void renderCubeMap(ECSManager& ecs, Shader shader, Shader GeomtryShader, LightComponent lc);
+	void renderCubeMap(ECSManager& ecs, Shader shader, LightComponent lc);
 
 	unsigned int depthMapFBO;
 	unsigned int depthMap;

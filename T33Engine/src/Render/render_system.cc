@@ -90,10 +90,12 @@ void RenderSystem::init() {
                         light_comp->shadow_map_.init(); break;
 
                     case Light::LightType::LT_Point:
-                        light_comp->shadow_map_.initCubeMap(); break;
+                        light_comp->shadow_map_.init();
+                        break;
                     }
                 }
             }
+            
         }
     }
     

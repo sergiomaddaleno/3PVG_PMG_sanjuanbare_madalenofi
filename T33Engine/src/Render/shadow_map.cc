@@ -54,7 +54,6 @@ void ShadowMap::init()
 
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
-
 }
 
 void ShadowMap::initCubeMap()
@@ -80,10 +79,7 @@ void ShadowMap::initCubeMap()
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
 
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 1);
 }
 
 void ShadowMap::active(unsigned int num)
@@ -103,7 +99,7 @@ void ShadowMap::bind2D()
 void ShadowMap::bindCubeMap()
 {
     if (depthMap != 0) {
-        glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
     }
 }
 
@@ -172,18 +168,17 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
     glViewport(0, 0, global.window_width, global.window_height);
 }
 
-void ShadowMap::renderCubeMap(ECSManager& ecs, Shader shader, Shader GeomtryShader, LightComponent lc) {
+void ShadowMap::renderCubeMap(ECSManager& ecs, Shader shader, LightComponent lc) {
 
     glEnable(GL_DEPTH_TEST);
     shader.useProgram();
 
-    shader.setUniformValue(shader.getUniformLocation("lightPos"), ValueType::T_FLOAT_3, glm::value_ptr(lc.light.pos_));
     shader.setUniformValue(shader.getUniformLocation("u_far_plane"), ValueType::T_FLOAT_1, &far_plane);
 
-    int tex_id = TextureID::TI_ShadowMap;
-    shader.setUniformValue(shader.getUniformLocation("u_depth_map"), ValueType::T_INT_1, &tex_id);
-    active(tex_id);
-    bind2D();
+   // int tex_id = TextureID::TI_ShadowMapCubeMap;
+   // shader.setUniformValue(shader.getUniformLocation("u_depth_map"), ValueType::T_INT_1, &tex_id);
+   // active(tex_id);
+    bindCubeMap();
 
     glViewport(0, 0, shadow_width_, shadow_height_);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -228,7 +223,7 @@ void ShadowMap::renderCubeMap(ECSManager& ecs, Shader shader, Shader GeomtryShad
         }
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 1);
     glViewport(0, 0, global.window_width, global.window_height);
 }
 
@@ -243,6 +238,8 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
         lightView = glm::lookAt(lc.light.pos_, lc.light.pos_ + lc.light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
         lightSpaceMatrix = lightProjection * lightView;
 
+        renderScene(ecs, shader, lc);
+
         break;
     }
     case Light::LightType::LT_Directional:
@@ -253,13 +250,15 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
         lightSpaceMatrix = lightProjection * lightView;
 
+        renderScene(ecs, shader, lc);
+        
         break;
     }
     case Light::LightType::LT_Point:
     {
-        //geometry_.useProgram();
+        /*geometry_.useProgram();
 
-        /*float aspect = (float) shadow_width_ / (float) shadow_height_;
+        float aspect = (float) shadow_width_ / (float) shadow_height_;
         lightProjection = glm::perspective(glm::radians(90.0f), aspect, near_plane, far_plane);
 
         std::vector<glm::mat4> shadowTransforms;
@@ -277,11 +276,12 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
             std::string uniformName = "shadowMatrices[" + std::to_string(i) + "]";
             geometry_.setUniformValue(geometry_.getUniformLocation(uniformName.c_str()), ValueType::T_MAT_4x4, glm::value_ptr(shadowTransforms[i]));
+        
+            renderCubeMap(ecs, shader, lc);
         }*/
 
         break;
     }
     }
 
-    renderScene(ecs, shader, lc);
 }
