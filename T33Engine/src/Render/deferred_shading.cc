@@ -141,7 +141,7 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-			int tex_id = TextureID::TI_Diffuse;
+			int tex_id = TextureID::TI_Albedo;
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("texture_diffuse"), ValueType::T_INT_1, &tex_id);			
 		   
 			GLuint screen_tex_loc = glGetUniformLocation(gbuffer.getProgram(), "u_screen_tex");
@@ -215,9 +215,6 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	glDisable(GL_BLEND);
 	glUseProgram(0);
 	
-
-	
-
 	// ----------------------------------------------------------------------------------
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
