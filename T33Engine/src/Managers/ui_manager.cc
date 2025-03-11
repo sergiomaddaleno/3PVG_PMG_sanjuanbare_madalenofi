@@ -1062,7 +1062,7 @@ void UIManager::InspectorWindow() {
                 light_comp->shadow_map_.shadow_height_ = shadow_height;
                 light_comp->shadow_map_.directional_size_ = directional_size;
 
-                light_comp->shadow_map_.init();
+                light_comp->shadow_map_.init2D();
             }
             ImGui::Dummy(ImVec2(0.0f, 2.0f));
             ImGui::Separator();

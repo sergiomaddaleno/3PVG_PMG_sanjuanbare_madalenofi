@@ -7,18 +7,18 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   8.799176216125488,
-   10.410256385803223,
-   9.120169639587402
+   11.973617553710938,
+   13.856222152709961,
+   10.879758834838867
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.0010000000474974513,
   "Use_perspective_matrix": true,
   "View_direction": [
-   -0.6846666932106018,
-   -0.3016859292984009,
-   -0.663488507270813
+   -0.7861899137496948,
+   -0.48630642890930176,
+   -0.38132864236831665
   ]
  },
  "Entities": [
@@ -32,7 +32,7 @@
     "Terrain": {
      "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
      "Texture_path": "../stages/assets/textures/images/grass.png",
-     "height_mult": 1.0,
+     "height_mult": 0.0,
      "is_centered": true,
      "num_cols": 50,
      "num_rows": 50,
@@ -74,7 +74,7 @@
    "Transform_component": {
     "Position": [
      -9.547403335571289,
-     1.4547303915023804,
+     0.7595114707946777,
      13.072508811950684
     ],
     "Rotation": [
@@ -226,7 +226,7 @@
   {
    "Identifier_component": {
     "Entity_id": 6,
-    "Entity_name": "Directional Light [0]"
+    "Entity_name": "Point Light [1]"
    },
    "Light_component": {
     "light": {
@@ -249,39 +249,39 @@
      ],
      "Direction": [
       [
-       -0.18814417719841003,
-       -0.9407208561897278,
-       -0.28221628069877625
+       0.0,
+       0.0,
+       1.0
       ]
      ],
      "Light_color": [
       [
-       10.0,
-       10.0,
-       10.0
+       150.0,
+       150.0,
+       150.0
       ]
      ],
      "Linear_attenuation": [
-      0.0
+      0.699999988079071
      ],
      "Position": [
+      [
+       -1.7952320575714111,
+       8.480290412902832,
+       10.14150333404541
+      ]
+     ],
+     "Quadratic_attenuation": [
+      1.7999999523162842
+     ],
+     "Shininnes": [
+      32.0
+     ],
+     "Specular_color": [
       [
        0.0,
        0.0,
        0.0
-      ]
-     ],
-     "Quadratic_attenuation": [
-      0.0
-     ],
-     "Shininnes": [
-      34.0
-     ],
-     "Specular_color": [
-      [
-       1.0,
-       1.0,
-       0.949999988079071
       ]
      ],
      "Spot_angle": [
@@ -291,10 +291,120 @@
       0.0
      ],
      "Strength": [
-      0.0
+      1.0
      ],
-     "Type": 0
+     "Type": 2
     }
+   },
+   "Transform_component": {
+    "Position": [
+     -1.7952320575714111,
+     8.480290412902832,
+     10.14150333404541
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 7,
+    "Entity_name": "Spot Light [0]"
+   },
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       0.0,
+       0.0,
+       1.0
+      ]
+     ],
+     "Light_color": [
+      [
+       150.0,
+       150.0,
+       150.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.699999988079071
+     ],
+     "Position": [
+      [
+       -6.143569469451904,
+       6.125542640686035,
+       -6.005216121673584
+      ]
+     ],
+     "Quadratic_attenuation": [
+      1.7999999523162842
+     ],
+     "Shininnes": [
+      32.0
+     ],
+     "Specular_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Spot_angle": [
+      45.0
+     ],
+     "Spot_softness": [
+      10.0
+     ],
+     "Strength": [
+      1.0
+     ],
+     "Type": 1
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     -6.143569469451904,
+     6.125542640686035,
+     -6.005216121673584
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
    }
   }
  ],

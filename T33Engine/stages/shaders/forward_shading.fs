@@ -31,7 +31,7 @@ uniform sampler2D u_texture;
 uniform sampler2D u_normal_map;
 uniform sampler2D u_parallax_map;
 uniform sampler2D u_shadow_map;
-uniform samplerCube u_depth_map;
+uniform samplerCube u_shadow_map_cube;
 
 uniform bool u_use_normal_map;
 uniform bool u_use_parallax_map;
@@ -236,15 +236,15 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
     vec3 fragToLight = fragPos - lightPos;
-    float currentDepth = length(fragToLight); 
+    float closestDepth = texture(u_shadow_map_cube, fragToLight).r;
     
-    float closestDepth = texture(u_depth_map, fragToLight).r;
     closestDepth *= u_far_plane; 
+    float currentDepth = length(fragToLight); 
 
     float bias = 0.05; 
     float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
-    return 1.0 - shadow; 
+    return shadow; 
 }
 
 void main() {
@@ -288,7 +288,7 @@ void main() {
     }
     
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light);  
+        final_light += PointLight(u_light) * shadow_pl;  
     }
 
     vec3 texture_color = texture(u_texture, texCoords).rgb;

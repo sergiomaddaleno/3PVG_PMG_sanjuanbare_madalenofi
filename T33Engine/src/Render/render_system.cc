@@ -87,10 +87,11 @@ void RenderSystem::init() {
                     switch (light_comp->light.type_) {
                     case Light::LightType::LT_Spot:
                     case Light::LightType::LT_Directional:
-                        light_comp->shadow_map_.init(); break;
+                        light_comp->shadow_map_.init2D(); 
+                        break;
 
                     case Light::LightType::LT_Point:
-                        light_comp->shadow_map_.init();
+                        light_comp->shadow_map_.initCubeMap();
                         break;
                     }
                 }

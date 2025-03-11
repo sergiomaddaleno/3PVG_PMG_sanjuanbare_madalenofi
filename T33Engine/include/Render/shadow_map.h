@@ -32,7 +32,7 @@ public:
 	ShadowMap();
 	~ShadowMap();
 
-	void init();
+	void init2D();
 	void initCubeMap();
 
 	void active(unsigned int num = 0);

@@ -23,7 +23,8 @@ enum TextureID {
 	TI_Normal,
 	TI_Specular,
 	TI_Position,
-	TI_Parallax
+	TI_Parallax,
+	TI_ShadowMapCube,
 };
 
 enum ParallaxType {

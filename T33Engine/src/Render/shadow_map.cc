@@ -35,7 +35,9 @@ ShadowMap::~ShadowMap()
     
 }
 
-void ShadowMap::init()
+
+
+void ShadowMap::init2D()
 {
     glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthMap);
@@ -62,6 +64,7 @@ void ShadowMap::initCubeMap()
     geometry_.compileGeometry(vs_geometry);
     free(vs_geometry);
 
+    glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 
@@ -78,6 +81,9 @@ void ShadowMap::initCubeMap()
 
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
+
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
 }
@@ -98,7 +104,7 @@ void ShadowMap::bind2D()
 
 void ShadowMap::bindCubeMap()
 {
-    if (depthMap != 0) {
+    if (depthCubemap != 0) {
         glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
     }
 }
@@ -114,9 +120,9 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));
 
     int tex_id = TextureID::TI_ShadowMap;
-    shader.setUniformValue(shader.getUniformLocation("u_depth_map"), ValueType::T_INT_1, &tex_id);
     active(tex_id);
     bind2D();
+    shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &tex_id);
 
     glViewport(0, 0, shadow_width_, shadow_height_);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -171,14 +177,15 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
 void ShadowMap::renderCubeMap(ECSManager& ecs, Shader shader, LightComponent lc) {
 
     glEnable(GL_DEPTH_TEST);
-    shader.useProgram();
+    glCullFace(GL_FRONT);
 
+    shader.useProgram();
     shader.setUniformValue(shader.getUniformLocation("u_far_plane"), ValueType::T_FLOAT_1, &far_plane);
 
-   // int tex_id = TextureID::TI_ShadowMapCubeMap;
-   // shader.setUniformValue(shader.getUniformLocation("u_depth_map"), ValueType::T_INT_1, &tex_id);
-   // active(tex_id);
+    int tex_id = TextureID::TI_ShadowMapCube;
+    active(tex_id);
     bindCubeMap();
+    shader.setUniformValue(shader.getUniformLocation("u_shadow_map_cube"), ValueType::T_INT_1, &tex_id);
 
     glViewport(0, 0, shadow_width_, shadow_height_);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -224,6 +231,9 @@ void ShadowMap::renderCubeMap(ECSManager& ecs, Shader shader, LightComponent lc)
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
+    glCullFace(GL_BACK);
+    glDrawBuffer(GL_BACK);
+    glReadBuffer(GL_BACK);
     glViewport(0, 0, global.window_width, global.window_height);
 }
 
@@ -256,7 +266,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
     }
     case Light::LightType::LT_Point:
     {
-        /*geometry_.useProgram();
+        geometry_.useProgram();
 
         float aspect = (float) shadow_width_ / (float) shadow_height_;
         lightProjection = glm::perspective(glm::radians(90.0f), aspect, near_plane, far_plane);
@@ -276,9 +286,9 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
             std::string uniformName = "shadowMatrices[" + std::to_string(i) + "]";
             geometry_.setUniformValue(geometry_.getUniformLocation(uniformName.c_str()), ValueType::T_MAT_4x4, glm::value_ptr(shadowTransforms[i]));
-        
-            renderCubeMap(ecs, shader, lc);
-        }*/
+        }
+
+        renderCubeMap(ecs, shader, lc);
 
         break;
     }
