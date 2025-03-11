@@ -176,11 +176,11 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	deferred_shading.useProgram();
 
-	glActiveTexture(GL_TEXTURE1);
+	glActiveTexture(GL_TEXTURE0 + TextureID::TI_Position);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
-	glActiveTexture(GL_TEXTURE2);
+	glActiveTexture(GL_TEXTURE0 + TextureID::TI_Normal);
 	glBindTexture(GL_TEXTURE_2D, gNormal);
-	glActiveTexture(GL_TEXTURE3);
+	glActiveTexture(GL_TEXTURE0 + TextureID::TI_Albedo);
 	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
 
 	int tex_id = TextureID::TI_Position;
