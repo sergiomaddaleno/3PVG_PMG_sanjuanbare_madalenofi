@@ -47,7 +47,7 @@ char* ReadFile(const char* file_path = nullptr);
 /**
  * @brief Initializes a shader program by reading and compiling.
  */
-void initShader(Shader& shader, std::string vertrex_path, std::string fragment_path);
+void initShader(Shader& shader, const std::string vertrex_path, const std::string fragment_path, const std::string geometry_path = "");
 
 /**
  * @brief Checks for OpenGL errors and prints them if any.

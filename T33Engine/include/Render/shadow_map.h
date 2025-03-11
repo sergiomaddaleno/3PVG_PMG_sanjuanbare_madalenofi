@@ -55,8 +55,6 @@ private:
 	unsigned int depthMap;
 	unsigned int depthCubemap;
 
-	Shader geometry_;
-
 	glm::mat4 lightProjection;
 	glm::mat4 lightView;
 	glm::mat4 lightSpaceMatrix;

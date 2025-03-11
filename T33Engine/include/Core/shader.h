@@ -48,8 +48,7 @@ public:
     Shader();
     ~Shader();
 
-	void compile(const char* vertex_src, const char* fragment_src);
-    void compileGeometry(const char* geometry_src);
+	void compile(const char* vertex_src, const char* fragment_src, const char* geometry_src = nullptr);
 
 	void useProgram();
 	bool isCompiled() const;

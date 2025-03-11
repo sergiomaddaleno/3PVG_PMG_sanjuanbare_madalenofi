@@ -41,15 +41,23 @@ char* ReadFile(const char* file_path) {
     return nullptr;
 }
 
-void initShader(Shader& shader, std::string vertrex_path, std::string fragment_path)
+void initShader(Shader& shader, const std::string vertrex_path, const std::string fragment_path, const std::string geometry_path)
 {
     char* vs_entities = (char*)ReadFile(vertrex_path.c_str());
     char* fs_entities = (char*)ReadFile(fragment_path.c_str());
+    char* vs_geometry = nullptr;
 
-    shader.compile(vs_entities, fs_entities);
+    if (!geometry_path.empty()) {
+        vs_geometry = (char*)ReadFile(geometry_path.c_str());
+        shader.compile(vs_entities, fs_entities, vs_geometry);
+    }
+    else {
+        shader.compile(vs_entities, fs_entities);
+    }
 
     free(vs_entities);
     free(fs_entities);
+    if (vs_geometry) free(vs_geometry);
 }
 
 void CheckGPUErrors(const char* file, int line) {
@@ -78,7 +86,6 @@ void CheckShaderErrors(GLuint shader, const char* shaderType)
     if (!success) {
         glGetShaderInfoLog(shader, 1024, NULL, infoLog);
         std::cout << "ERROR::SHADER::" << shaderType << "::COMPILATION_FAILED\n" << infoLog << std::endl;
-        assert(false);
     }
 }
 
@@ -90,7 +97,6 @@ void CheckProgramErrors(GLuint program) {
     if (!success) {
         glGetProgramInfoLog(program, 1024, NULL, infoLog);
         std::cout << "ERROR::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-        assert(false);
     }
 }
 

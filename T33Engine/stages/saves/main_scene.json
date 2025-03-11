@@ -7,18 +7,18 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   11.973617553710938,
-   13.856222152709961,
-   10.879758834838867
+   8.409008979797363,
+   12.023240089416504,
+   10.127116203308105
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 0.0010000000474974513,
   "Use_perspective_matrix": true,
   "View_direction": [
-   -0.7861899137496948,
-   -0.48630642890930176,
-   -0.38132864236831665
+   -0.757533073425293,
+   -0.47225749492645264,
+   -0.4506845474243164
   ]
  },
  "Entities": [
@@ -226,7 +226,7 @@
   {
    "Identifier_component": {
     "Entity_id": 6,
-    "Entity_name": "Point Light [1]"
+    "Entity_name": "Directional Light [0]"
    },
    "Light_component": {
     "light": {
@@ -249,39 +249,39 @@
      ],
      "Direction": [
       [
-       0.0,
-       0.0,
-       1.0
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
       ]
      ],
      "Light_color": [
       [
-       150.0,
-       150.0,
-       150.0
+       10.0,
+       10.0,
+       10.0
       ]
      ],
      "Linear_attenuation": [
-      0.699999988079071
+      0.0
      ],
      "Position": [
-      [
-       -1.7952320575714111,
-       8.480290412902832,
-       10.14150333404541
-      ]
-     ],
-     "Quadratic_attenuation": [
-      1.7999999523162842
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular_color": [
       [
        0.0,
        0.0,
        0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
       ]
      ],
      "Spot_angle": [
@@ -291,120 +291,10 @@
       0.0
      ],
      "Strength": [
-      1.0
+      0.0
      ],
-     "Type": 2
+     "Type": 0
     }
-   },
-   "Transform_component": {
-    "Position": [
-     -1.7952320575714111,
-     8.480290412902832,
-     10.14150333404541
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Identifier_component": {
-    "Entity_id": 7,
-    "Entity_name": "Spot Light [0]"
-   },
-   "Light_component": {
-    "light": {
-     "Ambient_color": [
-      [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
-      ]
-     ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       0.0,
-       0.0,
-       1.0
-      ]
-     ],
-     "Light_color": [
-      [
-       150.0,
-       150.0,
-       150.0
-      ]
-     ],
-     "Linear_attenuation": [
-      0.699999988079071
-     ],
-     "Position": [
-      [
-       -6.143569469451904,
-       6.125542640686035,
-       -6.005216121673584
-      ]
-     ],
-     "Quadratic_attenuation": [
-      1.7999999523162842
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Spot_angle": [
-      45.0
-     ],
-     "Spot_softness": [
-      10.0
-     ],
-     "Strength": [
-      1.0
-     ],
-     "Type": 1
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     -6.143569469451904,
-     6.125542640686035,
-     -6.005216121673584
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
    }
   }
  ],

@@ -56,14 +56,12 @@ void ShadowMap::init2D()
 
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 1);
 }
 
 void ShadowMap::initCubeMap()
 {
-    char* vs_geometry = (char*)ReadFile("../stages/shaders/geometry.gs");
-    geometry_.compileGeometry(vs_geometry);
-    free(vs_geometry);
-
     glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
@@ -90,9 +88,7 @@ void ShadowMap::initCubeMap()
 
 void ShadowMap::active(unsigned int num)
 {
-    if (depthMap != 0) {
-        glActiveTexture(GL_TEXTURE0 + num);
-    }
+    glActiveTexture(GL_TEXTURE0 + num);
 }
 
 void ShadowMap::bind2D()
@@ -232,8 +228,6 @@ void ShadowMap::renderCubeMap(ECSManager& ecs, Shader shader, LightComponent lc)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
     glCullFace(GL_BACK);
-    glDrawBuffer(GL_BACK);
-    glReadBuffer(GL_BACK);
     glViewport(0, 0, global.window_width, global.window_height);
 }
 
@@ -266,8 +260,6 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
     }
     case Light::LightType::LT_Point:
     {
-        geometry_.useProgram();
-
         float aspect = (float) shadow_width_ / (float) shadow_height_;
         lightProjection = glm::perspective(glm::radians(90.0f), aspect, near_plane, far_plane);
 
@@ -279,16 +271,17 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
         shadowTransforms.push_back(lightProjection * glm::lookAt(lc.light.pos_, lc.light.pos_ + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
         shadowTransforms.push_back(lightProjection * glm::lookAt(lc.light.pos_, lc.light.pos_ + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
+        shader.useProgram();
+
         for (unsigned int i = 0; i < 6; i++)
         {
-            GLenum face = GL_TEXTURE_CUBE_MAP_POSITIVE_X + i;
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, face, depthCubemap, 0);
 
             std::string uniformName = "shadowMatrices[" + std::to_string(i) + "]";
-            geometry_.setUniformValue(geometry_.getUniformLocation(uniformName.c_str()), ValueType::T_MAT_4x4, glm::value_ptr(shadowTransforms[i]));
-        }
+            shader.setUniformValue(shader.getUniformLocation(uniformName.c_str()), ValueType::T_MAT_4x4, glm::value_ptr(shadowTransforms[i]));
+            
+            renderCubeMap(ecs, shader, lc);
 
-        renderCubeMap(ecs, shader, lc);
+        }
 
         break;
     }
