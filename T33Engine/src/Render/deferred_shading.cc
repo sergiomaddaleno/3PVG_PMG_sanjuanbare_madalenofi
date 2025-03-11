@@ -203,8 +203,27 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	for (; li != liend; ++li) {
 		if (li->has_value()) {
 			auto& light_comp = *li;
+			//pass to calculate shadow
+			bool useDepthMap = true;
+			int useDepthMapInt = useDepthMap ? 1 : 0;
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_useDepthMap"), ValueType::T_INT_1, &useDepthMapInt);
+
+			light_comp->shadow_map_.render(ecs, deferred_shading,*light_comp);
+
+			//pass to light
+
+			 useDepthMap = false;
+			 useDepthMapInt = useDepthMap ? 1 : 0;
+			
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_useDepthMap"), ValueType::T_INT_1, &useDepthMapInt);
 			light_comp->light.setUniforms(deferred_shading);
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
+
+			glm::mat4 view = cam.getViewMatrix();
+			glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();
+
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
 
 			renderQuad();

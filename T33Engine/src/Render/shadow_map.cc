@@ -106,7 +106,7 @@ void ShadowMap::bindCubeMap()
 }
 
 void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
-
+    
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_FRONT);
     shader.useProgram();

@@ -33,7 +33,7 @@ uniform float u_far_plane;
 
 uniform vec3 u_camera_position;
 in vec4 FragPosLight;
-vec3 FragPos;
+out vec3 FragPos;
 vec3 normal;
 vec3 Diffuse;
 
@@ -143,7 +143,8 @@ float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
 }
 
 void main()
-{             
+{     
+    
     FragPos = texture(gPosition, uv).rgb;
     normal = texture(gNormal, uv).rgb;
     Diffuse = texture(gAlbedoSpec, uv).rgb;
@@ -151,7 +152,7 @@ void main()
     vec3 final_light = u_ambient;
 
     if (u_light.type_ == 0) {
-        final_light += DirectionalLight(u_light)* shadow; 
+        final_light += DirectionalLight(u_light) * shadow; 
     }
     
     if (u_light.type_ == 1) {
@@ -163,6 +164,6 @@ void main()
     }
    
 
-    vec3 final_color = Diffuse * final_light;
+    vec3 final_color =  final_light;
     FragColor = vec4(final_color, 1.0);
 }
