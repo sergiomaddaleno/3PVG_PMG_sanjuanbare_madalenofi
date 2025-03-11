@@ -47,6 +47,7 @@ public:
 	unsigned int countfaces = 0;
 	float directional_size_;
 
+	Shader simple_depth;
 private:
 	void renderScene(ECSManager& ecs, Shader shader, LightComponent lc);
 	void renderCubeMap(ECSManager& ecs, Shader shader, LightComponent lc);
