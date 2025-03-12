@@ -115,7 +115,7 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(lightView));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(lightProjection));
 
-    int tex_id = TextureID::TI_ShadowMap;
+    int tex_id = TI_ShadowMap;
     active(tex_id);
     bind2D();
     shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &tex_id);

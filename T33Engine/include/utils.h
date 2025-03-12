@@ -17,13 +17,14 @@
 class Shader;
 
 enum TextureID {
-	TI_ShadowMap,
-	TI_Albedo,
-	TI_Normal,
-	TI_Specular,
+	TI_Diffuse,
 	TI_Position,
+	TI_Normal,
+	TI_Albedo,
+	TI_ShadowMap,
 	TI_Parallax,
 	TI_ShadowMapCube,
+	
 };
 
 enum ParallaxType {

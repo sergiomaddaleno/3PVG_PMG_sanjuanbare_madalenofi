@@ -30,10 +30,10 @@ struct LightInfo {
 uniform LightInfo u_light;
 uniform vec3 u_ambient;
 uniform float u_far_plane;
-
+uniform mat4 u_light_space;
 uniform vec3 u_camera_position;
-in vec4 FragPosLight;
-out vec3 FragPos;
+vec4 FragPosLight;
+vec3 FragPos;
 vec3 normal;
 vec3 Diffuse;
 
@@ -148,6 +148,10 @@ void main()
     FragPos = texture(gPosition, uv).rgb;
     normal = texture(gNormal, uv).rgb;
     Diffuse = texture(gAlbedoSpec, uv).rgb;
+
+    FragPosLight = u_light_space * vec4(FragPos, 1.0);
+
+
     float shadow = ShadowCalculation(FragPosLight);
     vec3 final_light = u_ambient;
 
@@ -164,6 +168,6 @@ void main()
     }
    
 
-    vec3 final_color =  final_light;
+    vec3 final_color =  Diffuse *final_light;
     FragColor = vec4(final_color, 1.0);
 }

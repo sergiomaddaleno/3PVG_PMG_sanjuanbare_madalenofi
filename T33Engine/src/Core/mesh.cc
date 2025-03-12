@@ -130,9 +130,11 @@ void Mesh::draw() {
         if (!mesh.textures.empty()) {
 
             if (use_texture_) {
-                mesh.textures[0].active();
+                mesh.textures[0].active(TextureID::TI_Diffuse);
                 mesh.textures[0].bind2D();
             }
+             
+            
 
             glBindVertexArray(mesh.VAO);
             glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);

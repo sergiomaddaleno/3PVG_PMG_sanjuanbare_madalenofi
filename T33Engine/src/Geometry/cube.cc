@@ -187,7 +187,7 @@ void Cube::bind()
 void Cube::draw()
 {
     if (use_texture_) {
-        texture_.active(TextureID::TI_Albedo);
+        texture_.active(TextureID::TI_Diffuse);
         texture_.bind2D();
     }
 

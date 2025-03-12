@@ -94,7 +94,7 @@ void Deferred::init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
 
-	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
 	glDrawBuffers(3, attachments);
 
 	glGenRenderbuffers(1, &rboDepth);
@@ -141,7 +141,7 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-			int tex_id = TextureID::TI_Albedo;
+			int tex_id = 0;
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("texture_diffuse"), ValueType::T_INT_1, &tex_id);			
 		   
 			GLuint screen_tex_loc = glGetUniformLocation(gbuffer.getProgram(), "u_screen_tex");
@@ -176,18 +176,18 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	deferred_shading.useProgram();
 
-	glActiveTexture(GL_TEXTURE0 + TextureID::TI_Position);
+	glActiveTexture(GL_TEXTURE0 + TI_Position);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
-	glActiveTexture(GL_TEXTURE0 + TextureID::TI_Normal);
+	glActiveTexture(GL_TEXTURE0 + TI_Normal);
 	glBindTexture(GL_TEXTURE_2D, gNormal);
-	glActiveTexture(GL_TEXTURE0 + TextureID::TI_Albedo);
+	glActiveTexture(GL_TEXTURE0 + TI_Albedo);
 	glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
 
-	int tex_id = TextureID::TI_Position;
+	int tex_id = TI_Position;
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gPosition"), ValueType::T_INT_1, &tex_id);
-	tex_id = TextureID::TI_Normal;
+	tex_id = TI_Normal;
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex_id);
-	tex_id = TextureID::TI_Albedo;
+	tex_id = TI_Albedo;
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gAlbedoSpec"), ValueType::T_INT_1, &tex_id);
 	
 	glEnable(GL_DEPTH_TEST);

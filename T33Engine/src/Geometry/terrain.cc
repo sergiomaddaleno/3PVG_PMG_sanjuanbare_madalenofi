@@ -268,7 +268,7 @@ void Terrain::setHeightMap(std::string file_path) {
 void Terrain::draw(){
 
     if(use_texture_){
-        texture_.active(TextureID::TI_Albedo);
+        texture_.active(TextureID::TI_Diffuse);
         texture_.bind2D();
     }
 

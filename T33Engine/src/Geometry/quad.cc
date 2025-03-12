@@ -198,7 +198,7 @@ glm::vec3* Quad::GetVertex()
 void Quad::draw()
 {
     if (use_texture_) {
-        texture_.active(TextureID::TI_Albedo);
+        texture_.active(TextureID::TI_Diffuse);
         texture_.bind2D();
     }
 
