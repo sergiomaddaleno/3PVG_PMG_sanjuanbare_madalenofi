@@ -1143,7 +1143,12 @@ void UIManager::InspectorWindow() {
                     light_comp->shadow_map_.shadow_height_ = shadow_height;
                     light_comp->shadow_map_.directional_size_ = directional_size;
 
-                    light_comp->shadow_map_.init2D();
+                    if (!light_comp->light.type_ == Light::LightType::LT_Point) {
+                        light_comp->shadow_map_.init2D();
+                    }
+                    else {
+                        light_comp->shadow_map_.initCubeMap();
+                    }
                 }
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 ImGui::Separator();

@@ -130,7 +130,7 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
     bindCubeMap();
     shader.setUniformValue(shader.getUniformLocation("u_shadow_map_cube"), ValueType::T_INT_1, &tex_id);
 
-    if (lc.light.type_ != 2) {
+    if (lc.light.type_ != Light::LT_Point) {
         glViewport(0, 0, shadow_width_, shadow_height_);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
