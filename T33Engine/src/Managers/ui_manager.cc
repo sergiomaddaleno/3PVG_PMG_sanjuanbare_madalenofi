@@ -919,6 +919,87 @@ void UIManager::InspectorWindow() {
                     ImGui::SliderFloat("Direction Y", &terrain.wave_.direction_.y, -1.0f, 1.0f);
                 }
                 break;
+                case ::RT_Sphere:
+                {
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.378f, 0.547f, 0.902f, 1.0f));
+                    ImGui::Text("Wave Options");
+                    ImGui::PopStyleColor();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                    auto& sphere = *ecs_.get_component<RenderComponent>(selected_entity)->sphere_;
+                    ImGui::Checkbox("Use Wave Effect", &sphere.wave_.use_wave_);
+
+                    ImGui::SliderFloat("Amplitude", &sphere.wave_.amplitude_, 0.0f, 1.0f);
+                    ImGui::SliderFloat("Length", &sphere.wave_.wave_length_, 0.1f, 10.0f);
+                    ImGui::SliderFloat("Speed", &sphere.wave_.speed_, 0.1f, 5.0f);
+
+                    ImGui::SliderFloat("Direction X", &sphere.wave_.direction_.x, -1.0f, 1.0f);
+                    ImGui::SliderFloat("Direction Y", &sphere.wave_.direction_.y, -1.0f, 1.0f);
+                }
+                break;
+                case ::RT_Quad:
+                {
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.378f, 0.547f, 0.902f, 1.0f));
+                    ImGui::Text("Wave Options");
+                    ImGui::PopStyleColor();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                    auto& quad = *ecs_.get_component<RenderComponent>(selected_entity)->quad_;
+                    ImGui::Checkbox("Use Wave Effect", &quad.wave_.use_wave_);
+
+                    ImGui::SliderFloat("Amplitude", &quad.wave_.amplitude_, 0.0f, 1.0f);
+                    ImGui::SliderFloat("Length", &quad.wave_.wave_length_, 0.1f, 10.0f);
+                    ImGui::SliderFloat("Speed", &quad.wave_.speed_, 0.1f, 5.0f);
+
+                    ImGui::SliderFloat("Direction X", &quad.wave_.direction_.x, -1.0f, 1.0f);
+                    ImGui::SliderFloat("Direction Y", &quad.wave_.direction_.y, -1.0f, 1.0f);
+                }
+                break;
+                case ::RT_Mesh:
+                {
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.378f, 0.547f, 0.902f, 1.0f));
+                    ImGui::Text("Wave Options");
+                    ImGui::PopStyleColor();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                    auto& mesh = *ecs_.get_component<RenderComponent>(selected_entity)->mesh_;
+                    ImGui::Checkbox("Use Wave Effect", &mesh.wave_.use_wave_);
+
+                    ImGui::SliderFloat("Amplitude", &mesh.wave_.amplitude_, 0.0f, 1.0f);
+                    ImGui::SliderFloat("Length", &mesh.wave_.wave_length_, 0.1f, 10.0f);
+                    ImGui::SliderFloat("Speed", &mesh.wave_.speed_, 0.1f, 5.0f);
+
+                    ImGui::SliderFloat("Direction X", &mesh.wave_.direction_.x, -1.0f, 1.0f);
+                    ImGui::SliderFloat("Direction Y", &mesh.wave_.direction_.y, -1.0f, 1.0f);
+                }
+                break;
+                case ::RT_Cube8v:
+                case ::RT_Cube24v:
+                {
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.378f, 0.547f, 0.902f, 1.0f));
+                    ImGui::Text("Wave Options");
+                    ImGui::PopStyleColor();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                    auto& cube = *ecs_.get_component<RenderComponent>(selected_entity)->cube_;
+                    ImGui::Checkbox("Use Wave Effect", &cube.wave_.use_wave_);
+
+                    ImGui::SliderFloat("Amplitude", &cube.wave_.amplitude_, 0.0f, 1.0f);
+                    ImGui::SliderFloat("Length", &cube.wave_.wave_length_, 0.1f, 10.0f);
+                    ImGui::SliderFloat("Speed", &cube.wave_.speed_, 0.1f, 5.0f);
+
+                    ImGui::SliderFloat("Direction X", &cube.wave_.direction_.x, -1.0f, 1.0f);
+                    ImGui::SliderFloat("Direction Y", &cube.wave_.direction_.y, -1.0f, 1.0f);
+                }
+                break;
                 }
             }
         }

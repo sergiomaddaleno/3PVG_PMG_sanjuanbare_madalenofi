@@ -17,7 +17,7 @@
 #include "../deps/stb_image.h"
 
 Mesh::Mesh() : VAO(0), VBO(0), EBO(0), materialID(0),
-use_texture_(true), color_({0.5f, 0.5f, 0.5f}) {}
+use_texture_(true) {}
 
 Mesh::~Mesh()
 {

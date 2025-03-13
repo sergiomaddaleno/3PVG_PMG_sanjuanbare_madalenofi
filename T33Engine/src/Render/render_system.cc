@@ -178,6 +178,7 @@ void RenderSystem::forwardRender(Camera cam) {
                     case RenderType::RT_Mesh:
                     {
                         for (auto& mesh : render_comp->mesh_->meshes) {
+                            render_comp->mesh_->wave_.setUniforms(shader, (float)glfwGetTime());
                             render_comp->mesh_->draw();
                         }
                     }
@@ -185,31 +186,29 @@ void RenderSystem::forwardRender(Camera cam) {
 
                     case RenderType::RT_Terrain:
                     {
-                        render_comp->terrain_->draw();
-
                         render_comp->terrain_->wave_.setUniforms(shader, (float)glfwGetTime());
+                        render_comp->terrain_->draw();
                     }
                     break;
 
                     case RenderType::RT_Sphere:
-                    {
+                    {                        
+                        render_comp->sphere_->wave_.setUniforms(shader, (float)glfwGetTime());
                         render_comp->sphere_->draw();
-
-                        //render_comp->sphere_->wave_.setUniforms(shader);
                     }
                     break;
 
                     case RenderType::RT_Cube8v:
                     case RenderType::RT_Cube24v:
                     {
+                        render_comp->cube_->wave_.setUniforms(shader, (float)glfwGetTime());
                         render_comp->cube_->draw();
-
-                        //render_comp->cube_->wave_.setUniforms(shader);
                     }
                     break;
 
                     case RenderType::RT_Quad:
                     {
+                        render_comp->quad_->wave_.setUniforms(shader, (float)glfwGetTime());
                         render_comp->quad_->draw();
 
                         int use = render_comp->quad_->use_normal_map_;

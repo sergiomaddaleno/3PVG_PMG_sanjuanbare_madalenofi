@@ -16,6 +16,7 @@
 #include "texture.h"
 #include "Core/camera.h"
 #include "Core/shader.h"
+#include "Geometry/wave.h"
 
 #include <../deps/glm/glm.hpp>
 #include "../deps/nlohmann/json.hpp"
@@ -51,8 +52,8 @@ public:
     Shader shader;
     // ---
 
+    GerstnerWave wave_;
     bool use_texture_;
-    glm::vec3 color_;
 
     std::vector<Mesh> meshes;
     std::string mesh_path;
