@@ -8,7 +8,7 @@ uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 uniform sampler2D u_shadow_map;
 uniform samplerCube u_depth_map;
-
+uniform int option;
 struct LightInfo {
     int type_;
     vec3 pos_;
@@ -166,8 +166,18 @@ void main()
     if (u_light.type_ == 2) {
         final_light += PointLight(u_light);  
     }
-   
+   vec3 final_color;
+    if(option==0){
+    final_color =  Diffuse *final_light;
+    }
 
-    vec3 final_color =  Diffuse *final_light;
+    if(option==1){
+      final_color =  normal;
+    }
+
+    if(option==2){
+      final_color =  FragPos;
+    }
+
     FragColor = vec4(final_color, 1.0);
 }
