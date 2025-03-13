@@ -50,7 +50,6 @@ public:
 	Shader simple_depth;
 private:
 	void renderScene(ECSManager& ecs, Shader shader, LightComponent lc);
-	void renderCubeMap(ECSManager& ecs, Shader shader, LightComponent lc);
 
 	unsigned int depthMapFBO;
 	unsigned int depthMap;
