@@ -242,7 +242,7 @@ float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
     float currentDepth = length(fragToLight); 
 
     float bias = 0.05; 
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
 
     return shadow; 
 }

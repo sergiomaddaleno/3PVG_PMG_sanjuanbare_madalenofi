@@ -130,45 +130,47 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
     bindCubeMap();
     shader.setUniformValue(shader.getUniformLocation("u_shadow_map_cube"), ValueType::T_INT_1, &tex_id);
 
-    glViewport(0, 0, shadow_width_, shadow_height_);
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glClear(GL_DEPTH_BUFFER_BIT);
+    if (lc.light.type_ != 2) {
+        glViewport(0, 0, shadow_width_, shadow_height_);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
-    auto ri = ecs.getComponentList<RenderComponent>().begin();
-    auto ti = ecs.getComponentList<TransformComponent>().begin();
-    auto riend = ecs.getComponentList<RenderComponent>().end();
-    auto tiend = ecs.getComponentList<TransformComponent>().end();
+        auto ri = ecs.getComponentList<RenderComponent>().begin();
+        auto ti = ecs.getComponentList<TransformComponent>().begin();
+        auto riend = ecs.getComponentList<RenderComponent>().end();
+        auto tiend = ecs.getComponentList<TransformComponent>().end();
 
-    for (; ri != riend && ti != tiend; ++ri, ++ti) {
-        if (ri->has_value() && ti->has_value()) {
-            auto& render_comp = *ri;
-            auto& transform_comp = *ti;
+        for (; ri != riend && ti != tiend; ++ri, ++ti) {
+            if (ri->has_value() && ti->has_value()) {
+                auto& render_comp = *ri;
+                auto& transform_comp = *ti;
 
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, transform_comp->position);
-            model = model * glm::mat4_cast(transform_comp->rotation);
-            model = glm::scale(model, transform_comp->scale);
-            shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, transform_comp->position);
+                model = model * glm::mat4_cast(transform_comp->rotation);
+                model = glm::scale(model, transform_comp->scale);
+                shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
 
-            switch (render_comp->type_) {
-            case RenderType::RT_Mesh:
-                for (auto& mesh : render_comp->mesh_->meshes) {
-                    render_comp->mesh_->draw();
+                switch (render_comp->type_) {
+                case RenderType::RT_Mesh:
+                    for (auto& mesh : render_comp->mesh_->meshes) {
+                        render_comp->mesh_->draw();
+                    }
+                    break;
+                case RenderType::RT_Terrain:
+                    render_comp->terrain_->draw();
+                    break;
+                case RenderType::RT_Sphere:
+                    render_comp->sphere_->draw();
+                    break;
+                case RenderType::RT_Cube8v:
+                case RenderType::RT_Cube24v:
+                    render_comp->cube_->draw();
+                    break;
+                case RenderType::RT_Quad:
+                    render_comp->quad_->draw();
+                    break;
                 }
-                break;
-            case RenderType::RT_Terrain:
-                render_comp->terrain_->draw();
-                break;
-            case RenderType::RT_Sphere:
-                render_comp->sphere_->draw();
-                break;
-            case RenderType::RT_Cube8v:
-            case RenderType::RT_Cube24v:
-                render_comp->cube_->draw();
-                break;
-            case RenderType::RT_Quad:
-                render_comp->quad_->draw();
-                break;
             }
         }
     }
@@ -179,6 +181,8 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
     glReadBuffer(GL_BACK);
     glViewport(0, 0, global.window_width, global.window_height);
 }
+
+
 
 void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
@@ -191,6 +195,8 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
         lightView = glm::lookAt(lc.light.pos_, lc.light.pos_ + lc.light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
         lightSpaceMatrix = lightProjection * lightView;
 
+        renderScene(ecs, shader, lc);
+
         break;
     }
     case Light::LightType::LT_Directional:
@@ -201,10 +207,14 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
         lightSpaceMatrix = lightProjection * lightView;
 
+        renderScene(ecs, shader, lc);
+
         break;
     }
     case Light::LightType::LT_Point:
     {
+        
+
         float aspect = (float) shadow_width_ / (float) shadow_height_;
         lightProjection = glm::perspective(glm::radians(90.0f), aspect, near_plane, far_plane);
 
@@ -216,6 +226,9 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
         shadowTransforms.push_back(lightProjection * glm::lookAt(lc.light.pos_, lc.light.pos_ + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
         shadowTransforms.push_back(lightProjection * glm::lookAt(lc.light.pos_, lc.light.pos_ + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
+        glViewport(0, 0, shadow_width_, shadow_height_);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
         simple_depth.useProgram();
 
         for (unsigned int i = 0; i < 6; i++)
@@ -227,13 +240,55 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
         simple_depth.setUniformValue(simple_depth.getUniformLocation("u_far_plane"), ValueType::T_FLOAT_1, &far_plane);
         simple_depth.setUniformValue(simple_depth.getUniformLocation("u_light_pos"), ValueType::T_FLOAT_3, &lc.light.pos_);
 
-        renderScene(ecs, simple_depth, lc);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 1);
+      
+        auto ri = ecs.getComponentList<RenderComponent>().begin();
+        auto ti = ecs.getComponentList<TransformComponent>().begin();
+        auto riend = ecs.getComponentList<RenderComponent>().end();
+        auto tiend = ecs.getComponentList<TransformComponent>().end();
 
+        for (; ri != riend && ti != tiend; ++ri, ++ti) {
+            if (ri->has_value() && ti->has_value()) {
+                auto& render_comp = *ri;
+                auto& transform_comp = *ti;
+
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, transform_comp->position);
+                model = model * glm::mat4_cast(transform_comp->rotation);
+                model = glm::scale(model, transform_comp->scale);
+                simple_depth.setUniformValue(simple_depth.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+
+                switch (render_comp->type_) {
+                case RenderType::RT_Mesh:
+                    for (auto& mesh : render_comp->mesh_->meshes) {
+                        render_comp->mesh_->draw();
+                    }
+                    break;
+                case RenderType::RT_Terrain:
+                    render_comp->terrain_->draw();
+                    break;
+                case RenderType::RT_Sphere:
+                    render_comp->sphere_->draw();
+                    break;
+                case RenderType::RT_Cube8v:
+                case RenderType::RT_Cube24v:
+                    render_comp->cube_->draw();
+                    break;
+                case RenderType::RT_Quad:
+                    render_comp->quad_->draw();
+                    break;
+                }
+            }
+        }
+
+       
+        renderScene(ecs, shader, lc);
+       
+      
         break;
+        
     }
     }
-
-    renderScene(ecs, shader, lc);
+   
+    
 }
