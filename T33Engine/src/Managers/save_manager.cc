@@ -357,7 +357,7 @@ std::string SaveManager::newFile()
                 {"Fov", 45.0f},
                 {"Scroll_speed", 1.0f},
                 {"Sensitivity", 1.0f},
-                {"Speed", 0.05f},
+                {"Speed", 10.0f},
                 {"Aspect_ratio", 1.777f},
                 {"Near_clip_plane", 0.1f},
                 {"Far_clip_plane", 1000.0f},

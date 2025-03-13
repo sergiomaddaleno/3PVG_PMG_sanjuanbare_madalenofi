@@ -1143,12 +1143,7 @@ void UIManager::InspectorWindow() {
                     light_comp->shadow_map_.shadow_height_ = shadow_height;
                     light_comp->shadow_map_.directional_size_ = directional_size;
 
-                    if (!light_comp->light.type_ == Light::LightType::LT_Point) {
-                        light_comp->shadow_map_.init2D();
-                    }
-                    else {
-                        light_comp->shadow_map_.initCubeMap();
-                    }
+                    light_comp->shadow_map_.init2D();
                 }
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 ImGui::Separator();
@@ -1555,7 +1550,7 @@ void UIManager::TopBarWindow() {
             }
 
             static float speed = global.cam.getSpeed();
-            if (ImGui::SliderFloat("Speed", &speed, 0.001f, 1.0f)) {
+            if (ImGui::SliderFloat("Speed", &speed, 1.0f, 50.0f)) {
                 global.cam.setSpeed(speed);
             }
 

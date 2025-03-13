@@ -13,7 +13,7 @@
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
-  "Speed": 0.02800000086426735,
+  "Speed": 10.0,
   "Use_perspective_matrix": true,
   "View_direction": [
    0.06459824740886688,

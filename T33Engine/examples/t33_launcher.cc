@@ -70,6 +70,7 @@ int main(int, char**) {
         global.ui_manager.Render();
 
         if (window->closePressed(input)) done = true;
+        lastTime = currentTime;
     }
 
     return 0;
