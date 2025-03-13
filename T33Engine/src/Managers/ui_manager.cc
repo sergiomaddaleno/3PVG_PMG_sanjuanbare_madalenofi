@@ -59,7 +59,6 @@ UIManager::UIManager(ECSManager& ecs, RenderSystem& rs)
     m_PuzzleIcon(),
     m_DeleteIcon(),
     post_process_compiled(false),
-    load_scene_window(false),
     add_mesh_window(false),
     ecs_(ecs),
     rs_(rs),
@@ -196,7 +195,6 @@ void UIManager::Render() {
         if (post_process_window) PostProcessWindow();
         if (skybox_window) SkyboxWindow();
         if (fog_window) FogWindow();
-        if (load_scene_window) LoadSceneWindow();
         if (add_mesh_window) AddMeshWindow();
         if (l_system_window) LSystemWindow();
 
@@ -1335,6 +1333,13 @@ void UIManager::ContentBrowserWindow() {
             if (directoryEntry.is_directory())
                 m_CurrentDirectory /= path.filename();
 
+            if (path.extension() == ".json") {
+                global.save_manager.setCurrentScene(path.string());
+                global.save_manager.loadFromFile(global.save_manager.getCurrentScene());
+
+                AddConsoleMessage(path.string() + " loaded");
+            }
+
         }
         ImGui::TextWrapped(filenameString.c_str());
 
@@ -1377,11 +1382,6 @@ void UIManager::TopBarWindow() {
                 }
 
                 AddConsoleMessage("Saving current scene");
-            }
-
-            if (ImGui::BeginMenu("Load Scene")) {
-                ImGui::Checkbox("Load Scene Window", &load_scene_window);
-                ImGui::EndMenu();
             }
 
             if (ImGui::MenuItem("New Scene  [CTRL + N]")) {
@@ -1949,47 +1949,6 @@ void UIManager::ResetIds()
             ecs_.get_component<IdentifierComponent>(i)->id = new_id++;
         }
     }
-}
-
-void UIManager::LoadSceneWindow()
-{
-    ImGui::Begin("Load Scene");
-
-    ImGui::Dummy(ImVec2(0.0f, 5.0f));
-    ImGui::Text("Drag and Drop json file:");
-    ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-    static std::string scene_file_path;
-    static std::string scene_file_name;
-    std::filesystem::path filePath;
-    if (ImGui::Button(!scene_file_path.empty() ? scene_file_name.c_str() : ".json Drop here", { 200.0f, 40.0f })) {}
-
-    if (ImGui::BeginDragDropTarget()) {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-            filePath = (const wchar_t*)payload->Data;
-            if (filePath.extension() == ".json") {
-                scene_file_path = filePath.string();
-                scene_file_name = filePath.filename().string();
-            }
-        }
-        ImGui::EndDragDropTarget();
-    }
-
-    ImGui::Dummy(ImVec2(0.0f, 3.0f));
-    ImGui::Separator();
-    ImGui::Dummy(ImVec2(0.0f, 3.0f));
-
-    if (ImGui::Button("Load Scene")) {
-        global.save_manager.setCurrentScene(scene_file_path);
-        global.save_manager.loadFromFile(global.save_manager.getCurrentScene());
-
-        AddConsoleMessage(scene_file_path + " loaded");
-
-        scene_file_path.clear();
-        scene_file_name.clear();
-    }
-
-    ImGui::End();
 }
 
 void UIManager::AddMeshWindow()

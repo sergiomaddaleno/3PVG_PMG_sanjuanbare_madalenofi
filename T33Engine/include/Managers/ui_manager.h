@@ -50,7 +50,6 @@ public:
     void FogWindow();
     void SkyboxWindow();
     void ConsoleWindow();
-    void LoadSceneWindow();
     void AddMeshWindow();
 
     void LSystemWindow();
@@ -88,7 +87,6 @@ private:
     bool console_window;
     bool fog_window;
     bool l_system_window;
-    bool load_scene_window;
     bool add_mesh_window;
 
     Shader new_pp_shader;
