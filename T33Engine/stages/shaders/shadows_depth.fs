@@ -1,6 +1,6 @@
 #version 330 core
 
-in vec4 FragPos;
+in vec3 FragPos;
 
 uniform vec3 u_light_pos;
 uniform float u_far_plane;

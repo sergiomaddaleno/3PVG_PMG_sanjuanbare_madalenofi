@@ -62,7 +62,7 @@ void ShadowMap::init2D()
 
 void ShadowMap::initCubeMap()
 {
-    initShader(simple_depth, "../stages/shaders/deferred_Shading.vs", "../stages/shaders/deferred_Shading.fs", "../stages/shaders/deferred_Shading.gs");
+    initShader(simple_depth, "../stages/shaders/shadows_depth.vs", "../stages/shaders/shadows_depth.fs", "../stages/shaders/shadows_depth.gs");
 
     glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthCubemap);
