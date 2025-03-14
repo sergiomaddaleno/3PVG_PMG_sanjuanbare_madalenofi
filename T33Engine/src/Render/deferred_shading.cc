@@ -221,7 +221,7 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			light_comp->light.setUniforms(deferred_shading);
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
 
-			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("option"), ValueType::T_INT_1, &global.selectedOption);
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_deferred_option"), ValueType::T_INT_1, &global.deferred_option);
 
 			glm::mat4 view = cam.getViewMatrix();
 			glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();

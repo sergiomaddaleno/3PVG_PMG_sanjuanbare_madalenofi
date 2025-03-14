@@ -367,8 +367,8 @@ void UIManager::HierarchyWindow() {
 
 void UIManager::InspectorWindow() {
     ImGui::Begin("Inspector");
-    if (!global.deferred_shading) {
-        if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
+ 
+    if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
 
             bool open = ImGui::CollapsingHeader("##IdentifierComponent", ImGuiTreeNodeFlags_DefaultOpen);
             ImGui::SameLine();
@@ -393,7 +393,7 @@ void UIManager::InspectorWindow() {
 
         }
 
-        if (ecs_.has_component<TransformComponent>(selected_entity)) {
+    if (ecs_.has_component<TransformComponent>(selected_entity)) {
 
             bool open = ImGui::CollapsingHeader("##TransformComponent", ImGuiTreeNodeFlags_DefaultOpen);
             ImGui::SameLine();
@@ -461,7 +461,7 @@ void UIManager::InspectorWindow() {
             }
         }
 
-        if (ecs_.has_component<RenderComponent>(selected_entity)) {
+    if (ecs_.has_component<RenderComponent>(selected_entity)) {
 
             auto& render_comp = ecs_.get_component<RenderComponent>(selected_entity);
 
@@ -1037,7 +1037,7 @@ void UIManager::InspectorWindow() {
             }
         }
 
-        if (ecs_.has_component<LightComponent>(selected_entity)) {
+    if (ecs_.has_component<LightComponent>(selected_entity)) {
 
             bool open = ImGui::CollapsingHeader("##LightComponent", ImGuiTreeNodeFlags_DefaultOpen);
             ImGui::SameLine();
@@ -1184,15 +1184,15 @@ void UIManager::InspectorWindow() {
             }
         }
 
-        // ---
+    // ---
 
-        bool open = ImGui::CollapsingHeader("##Components", ImGuiTreeNodeFlags_DefaultOpen);
-        ImGui::SameLine();
-        ImGui::Image(m_PuzzleIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-        ImGui::SameLine();
-        ImGui::Text("Components");
+    bool open = ImGui::CollapsingHeader("##Components", ImGuiTreeNodeFlags_DefaultOpen);
+    ImGui::SameLine();
+    ImGui::Image(m_PuzzleIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+    ImGui::SameLine();
+    ImGui::Text("Components");
 
-        if (open) {
+    if (open) {
             ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
             ImGui::Text("Entity has:");
@@ -1282,42 +1282,22 @@ void UIManager::InspectorWindow() {
             */
         }
 
-        ImGui::Dummy(ImVec2(0.0f, 2.0f));
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(0.0f, 2.0f));
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-        ImGui::Image(m_DeleteIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-        ImGui::SameLine();
+    ImGui::Image(m_DeleteIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+    ImGui::SameLine();
 
-        if (ImGui::Button("Delete Entity") || input_->isKeyPressed(Input::SUPR)) {
+    if (ImGui::Button("Delete Entity") || input_->isKeyPressed(Input::SUPR)) {
 
-            if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
-                ecs_.destroy_entity(selected_entity);
+        if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
+            ecs_.destroy_entity(selected_entity);
 
-                ResetIds();
-            }
+            ResetIds();
         }
     }
-else {
-
-  
-    ImGui::Text("Opciones del Deferred:");
     
-    if (ImGui::RadioButton("Albedo", global.selectedOption == 0)) {
-        global.selectedOption = 0;
-    }
-    if (ImGui::RadioButton("Normal", global.selectedOption == 1)) {
-        global.selectedOption = 1;
-    }
-    if (ImGui::RadioButton("Position", global.selectedOption == 2)) {
-        global.selectedOption = 2;
-    }
-
-
-
-
-    }
-
     ImGui::End();
 }
 
@@ -1656,6 +1636,33 @@ void UIManager::TopBarWindow() {
             }
 
             ImGui::EndMenu();
+        }
+
+        
+
+        if (global.deferred_shading) {
+
+            ImGui::SameLine();
+            ImGui::Spacing();
+            ImGui::SameLine();
+            ImVec2 p = ImGui::GetCursorScreenPos();
+            ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x, p.y), ImVec2(p.x, p.y + ImGui::GetTextLineHeight()), IM_COL32(255, 255, 255, 255), 1.0f);
+            ImGui::SameLine();
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            if (ImGui::RadioButton("Albedo", global.deferred_option == 0)) {
+                global.deferred_option = 0;
+            }
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Normal", global.deferred_option == 1)) {
+                global.deferred_option = 1;
+            }
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Position", global.deferred_option == 2)) {
+                global.deferred_option = 2;
+            }
         }
 
         float spacing = ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("T33Engine - Sergio Madaleno Figueroa & Fede Sanjuan").x;
