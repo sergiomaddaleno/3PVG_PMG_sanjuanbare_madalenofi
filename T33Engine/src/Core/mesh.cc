@@ -144,6 +144,17 @@ void Mesh::draw() {
     }
 }
 
+std::vector<float> Mesh::getVertex()
+{
+    std::vector<float> vertex_float;
+    for (const auto& vertex : vertices) {
+        vertex_float.push_back(vertex.pos.x);
+        vertex_float.push_back(vertex.pos.y);
+        vertex_float.push_back(vertex.pos.z);
+    }
+    return vertex_float;
+}
+
 Texture Mesh::getTexture(int index)
 {
     if (index >= 0 && index < textures.size()) {

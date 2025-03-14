@@ -34,8 +34,8 @@ public:
     void draw();
     void setTexture(std::string file_path);
 
-    glm::vec3* GetVertexCube8v();
-    glm::vec3* GetVertexCube24v();
+    std::vector<float> GetVertexCube8v();
+    std::vector<float> GetVertexCube24v();
 
     nlohmann::json serialize() const;
 

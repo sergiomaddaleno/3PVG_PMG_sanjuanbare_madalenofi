@@ -54,6 +54,10 @@ public:
 
 	//----------------------------------
 
+	void spawnEntitiesInTerrain(
+		int terrain_id, RenderType spawn_type,
+		float spawn_prob = 0.002f, float y_spawn_height = -4.0f);
+
 	size_t createMesh(std::string file, std::string textureFolder, 
 		TransformComponent tc = TransformComponent());
 

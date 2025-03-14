@@ -21,7 +21,7 @@
 
 #include <memory> 
 #include <iostream>
-
+#include <random>
 
 RenderSystem::RenderSystem(ECSManager& ecs_)
     : shader(),
@@ -61,6 +61,7 @@ void RenderSystem::init() {
             case RenderType::RT_Terrain:
                 render_comp->terrain_->bind();
                 render_comp->terrain_->setTexture(render_comp->terrain_->texture_path_);
+
                 break;
 
             case RenderType::RT_Sphere:
@@ -257,7 +258,64 @@ void RenderSystem::setup()
     ecs_.add_component_type<LightComponent>();
 }
 
-size_t RenderSystem::createMesh(std::string file, std::string textureFolder, 
+void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type, float spawn_prob, float y_spawn_height)
+{
+    std::vector<glm::vec3> spawn_positions;
+
+    auto& render_comp = ecs_.get_component<RenderComponent>(terrain_id);
+    auto& transf_comp = ecs_.get_component<TransformComponent>(terrain_id);
+
+    if (render_comp->type_ == RenderType::RT_Terrain) {
+        std::vector<float> model_vertices = render_comp->terrain_->GetVertexTerrain();
+
+        glm::vec3 terrain_position = transf_comp->position;
+        glm::quat terrain_rotation = transf_comp->rotation;
+        glm::vec3 terrain_scale = transf_comp->scale;
+
+        for (int i = 0; i < model_vertices.size() / 3; i++) {
+            glm::vec3 vertex = {
+                model_vertices.at(i * 3 + 0),
+                model_vertices.at(i * 3 + 1),
+                model_vertices.at(i * 3 + 2) 
+            };
+
+            glm::vec3 transf_vertex = terrain_rotation * (vertex * terrain_scale);
+
+            glm::vec3 final_pos = transf_vertex + terrain_position;
+
+            if (vertex.y > y_spawn_height && (float)rand() / RAND_MAX < spawn_prob) {
+                spawn_positions.push_back(final_pos);
+            }
+        }
+    }
+
+    for (const auto& position : spawn_positions) {
+        size_t entity;
+        switch (spawn_type) {
+        case RenderType::RT_Cube8v:
+            entity = createCube8v();
+            break;
+        case RenderType::RT_Cube24v:
+            entity = createCube24v();
+            break;
+        case RenderType::RT_Quad:
+            entity = createQuad();
+            break;
+        case RenderType::RT_Sphere:
+            entity = createSphere();
+            break;
+        }
+
+        auto& transform = ecs_.get_component<TransformComponent>(entity - 1);
+        if (transform) {
+            transform->position = position;
+        }
+    }
+
+    global.render_system.init();
+}
+
+size_t RenderSystem::createMesh(std::string file, std::string textureFolder,
     TransformComponent tc)
 {
     auto mesh = std::make_unique<Mesh>();

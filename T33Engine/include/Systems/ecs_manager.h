@@ -25,7 +25,6 @@ struct ComponentListBase {
 	virtual void remove_entity(size_t entity_id) = 0;
 	virtual void remove_all_entities() = 0;
 
-	virtual size_t get_entity(size_t entity_id) = 0;
 	virtual size_t get_entities() = 0;
 };
 
@@ -49,15 +48,12 @@ struct ComponentListDerived : ComponentListBase {
 		}
 	}
 
-	size_t get_entity(size_t entity_id) override {
-		if (entity_id < component_list_.size() && component_list_[entity_id].has_value()) {
-			return entity_id;
-		}
-		return 0;
-	}
-
 	size_t get_entities() override {
-		return component_list_.size();
+		size_t count = 0;
+		for (size_t i = 0; i < component_list_.size(); ++i) {
+			++count; 
+		}
+		return count;
 	}
 };
 
@@ -106,25 +102,14 @@ public:
 		}
 	}
 
-	size_t getEntity(size_t entity_id) {
-		for (auto& [key, component_list] : component_list_map_) {
-			auto* derived_list = static_cast<ComponentListDerived<std::any>*>(component_list.get());
-			if (derived_list) {
-				return derived_list->get_entity(entity_id);
-			}
-		}
-		return 0;
-	}
+	size_t get_entities() {
 
-	size_t getEntityCount() {
-		if (!component_list_map_.empty()) {
-			auto& component_list = component_list_map_.begin()->second;
-			auto* derived_list = static_cast<ComponentListDerived<std::any>*>(component_list.get());
+		for (auto& [key, component_list] : component_list_map_) {
+			auto* derived_list = dynamic_cast<ComponentListBase*>(component_list.get());
 			if (derived_list) {
 				return derived_list->get_entities();
 			}
 		}
-		return 0;
 	}
 
 	// delete_entity
@@ -223,31 +208,6 @@ public:
 		
 		return cld->component_list_[entity].has_value();
 	}
-
-	std::vector<size_t> getAllEntities() {
-		std::vector<size_t> entities;
-
-		// Recorremos todos los tipos de componentes en el mapa.
-		for (auto& [key, component_list] : component_list_map_) {
-			// Intentamos acceder a la lista de componentes de cualquier tipo.
-			// Aquí asumimos que si hay una lista de componentes, todas las entidades han sido asignadas de manera similar.
-			auto* derived_list = dynamic_cast<ComponentListBase*>(component_list.get());
-			if (derived_list) {
-				size_t entity_count = derived_list->get_entities();
-
-				// Recorremos todas las posibles entidades (por el número de elementos en la lista de componentes)
-				for (size_t entity_id = 0; entity_id < entity_count; ++entity_id) {
-					// Si al menos uno de los componentes de la entidad no es nulo, lo añadimos a la lista de entidades.
-					if (this->has_component<std::any>(entity_id)) {
-						entities.push_back(entity_id);
-					}
-				}
-			}
-		}
-
-		return entities;
-	}
-
 
 private:
 	typedef std::unordered_map<size_t, std::unique_ptr<ComponentListBase>> map_type;

@@ -205,14 +205,26 @@ void Cube::setTexture(std::string file_path)
     texture_.loadTexture(file_path);
 }
 
-glm::vec3* Cube::GetVertexCube8v()
+std::vector<float> Cube::GetVertexCube8v()
 {
-    return vertex_cube8v_;
+    std::vector<float> vertices;
+    for (const auto& vertex : vertex_cube8v_) {
+        vertices.push_back(vertex.x);
+        vertices.push_back(vertex.y);
+        vertices.push_back(vertex.z);
+    }
+    return vertices;
 }
 
-glm::vec3* Cube::GetVertexCube24v()
+std::vector<float> Cube::GetVertexCube24v()
 {
-    return vertex_cube24v_;
+    std::vector<float> vertices;
+    for (const auto& vertex : vertex_cube24v_) {
+        vertices.push_back(vertex.x);
+        vertices.push_back(vertex.y);
+        vertices.push_back(vertex.z);
+    }
+    return vertices;
 }
 
 nlohmann::json Cube::serialize() const

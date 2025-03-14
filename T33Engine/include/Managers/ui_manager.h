@@ -51,6 +51,7 @@ public:
     void SkyboxWindow();
     void ConsoleWindow();
     void AddMeshWindow();
+    void AddEntitiesTerrainWindow();
 
     void LSystemWindow();
 
@@ -88,6 +89,7 @@ private:
     bool fog_window;
     bool l_system_window;
     bool add_mesh_window;
+    bool add_entities_terrain_window;
 
     Shader new_pp_shader;
     bool post_process_compiled;

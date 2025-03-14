@@ -197,6 +197,7 @@ void UIManager::Render() {
         if (fog_window) FogWindow();
         if (add_mesh_window) AddMeshWindow();
         if (l_system_window) LSystemWindow();
+        if (add_entities_terrain_window) AddEntitiesTerrainWindow();
 
         global.grid.drawGrid(global.cam);
     }
@@ -282,7 +283,8 @@ void UIManager::ImguiWindow() {
         ImGui::DockBuilderDockWindow("Console", dock_bottom_right);
         ImGui::DockBuilderDockWindow("Load Scene", dock_right);
         ImGui::DockBuilderDockWindow("Add Mesh", dock_right); 
-        ImGui::DockBuilderDockWindow("L-System", dock_right);
+        ImGui::DockBuilderDockWindow("L-System", dock_right); 
+        ImGui::DockBuilderDockWindow("Spawn Entities", dock_right);
 
         ImGui::DockBuilderFinish(dockspace_id);
     }
@@ -1531,6 +1533,13 @@ void UIManager::TopBarWindow() {
                 ImGui::EndMenu();
             }
 
+            if (ImGui::BeginMenu("Spawn Entities in terrain")) {
+
+                ImGui::Checkbox(("Spawn Entities Window"), &add_entities_terrain_window);
+
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMenu();
         }
 
@@ -2007,6 +2016,57 @@ void UIManager::AddMeshWindow()
             texture_folder_path.clear();
             texture_folder_name.clear();
         }
+    }
+
+    ImGui::End();
+}
+
+void UIManager::AddEntitiesTerrainWindow()
+{
+    ImGui::Begin("Spawn Entities");
+
+    static int entity_id = 0;
+    static float spawn_prob = 0.008f;
+    static float spawn_height = -4.0f;
+
+    ImGui::Dummy({ 0.0f, 5.0f });
+    ImGui::InputInt("Terrain ID", &entity_id);
+    ImGui::Dummy({ 0.0f, 5.0f });
+    ImGui::InputFloat("Spawn probaility", &spawn_prob);
+    ImGui::Dummy({ 0.0f, 5.0f });
+    ImGui::InputFloat("Spawn height", &spawn_height);
+    ImGui::Dummy({ 0.0f, 5.0f });
+
+    const char* render_types[] = { "Sphere", "Cube8v", "Cube24v", "Quad"};
+    static int selected_type = 0;
+
+    if (ImGui::BeginCombo("Entity type", render_types[selected_type])) {
+        for (int n = 0; n < IM_ARRAYSIZE(render_types); ++n) {
+            bool is_selected = (selected_type == n);
+            if (ImGui::Selectable(render_types[n], is_selected)) {
+                selected_type = n; 
+            }
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    RenderType entity_type = RenderType::RT_Sphere;
+    switch (selected_type) {
+    case 0: entity_type = RenderType::RT_Sphere; break;
+    case 1: entity_type = RenderType::RT_Cube8v; break;
+    case 2: entity_type = RenderType::RT_Cube24v; break;
+    case 3: entity_type = RenderType::RT_Quad; break;
+    }
+
+    ImGui::Dummy({ 0.0f, 2.0f });
+    ImGui::Separator();
+    ImGui::Dummy({ 0.0f, 2.0f });
+
+    if(ImGui::Button("Spawn")) {
+        global.render_system.spawnEntitiesInTerrain(entity_id, entity_type, spawn_prob, spawn_height);
     }
 
     ImGui::End();

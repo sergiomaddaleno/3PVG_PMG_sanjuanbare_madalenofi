@@ -42,6 +42,7 @@ public:
     void bind();
     void draw();
 
+    std::vector<float> getVertex();
     Texture getTexture(int shape_index);
 
     nlohmann::json serialize() const;
