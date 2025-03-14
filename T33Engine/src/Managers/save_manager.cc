@@ -220,6 +220,23 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
                 break;
             }
 
+            case RenderType::RT_Surface: {
+                const auto& surface = entity["Render_component"]["Surface"];
+
+                std::vector<float> surface_points;
+                for (const auto& point : surface["Points"]) {
+                    surface_points.push_back(point[0].get<float>());
+                    surface_points.push_back(point[1].get<float>());
+                    surface_points.push_back(point[2].get<float>());
+                }
+
+                rs_.createSurface(surface_points, tc, surface["num_heights"], surface["num_revs"]);
+
+                auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
+                render_comp->surface_->setTexture(surface["Texture_path"]);
+                break;
+            }
+
             case RenderType::RT_Terrain: {
                 const auto& terrain = entity["Render_component"]["Terrain"];
 

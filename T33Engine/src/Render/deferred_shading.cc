@@ -109,7 +109,6 @@ void Deferred::init()
 
 void Deferred::render(ECSManager& ecs, Camera cam)
 {
-
 	// Geometry pass -------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 	glClearColor(0.0, 0.0, 0.0, 1.0); 
@@ -158,6 +157,9 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 				break;
 			case RenderType::RT_Sphere:
 				render_comp->sphere_->draw();
+				break;
+			case RenderType::RT_Surface:
+				render_comp->surface_->draw();
 				break;
 			case RenderType::RT_Cube8v:
 			case RenderType::RT_Cube24v:

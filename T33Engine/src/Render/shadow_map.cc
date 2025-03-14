@@ -35,8 +35,6 @@ ShadowMap::~ShadowMap()
     
 }
 
-
-
 void ShadowMap::init2D()
 {
     glGenFramebuffers(1, &depthMapFBO);
@@ -163,6 +161,9 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
                 case RenderType::RT_Sphere:
                     render_comp->sphere_->draw();
                     break;
+                case RenderType::RT_Surface:
+                    render_comp->surface_->draw();
+                    break;
                 case RenderType::RT_Cube8v:
                 case RenderType::RT_Cube24v:
                     render_comp->cube_->draw();
@@ -213,8 +214,6 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
     }
     case Light::LightType::LT_Point:
     {
-        
-
         float aspect = (float) shadow_width_ / (float) shadow_height_;
         lightProjection = glm::perspective(glm::radians(90.0f), aspect, near_plane, far_plane);
 
@@ -240,8 +239,6 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
         simple_depth.setUniformValue(simple_depth.getUniformLocation("u_far_plane"), ValueType::T_FLOAT_1, &far_plane);
         simple_depth.setUniformValue(simple_depth.getUniformLocation("u_light_pos"), ValueType::T_FLOAT_3, &lc.light.pos_);
 
-
-      
         auto ri = ecs.getComponentList<RenderComponent>().begin();
         auto ti = ecs.getComponentList<TransformComponent>().begin();
         auto riend = ecs.getComponentList<RenderComponent>().end();
@@ -270,6 +267,9 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
                 case RenderType::RT_Sphere:
                     render_comp->sphere_->draw();
                     break;
+                case RenderType::RT_Surface:
+                    render_comp->surface_->draw();
+                    break;
                 case RenderType::RT_Cube8v:
                 case RenderType::RT_Cube24v:
                     render_comp->cube_->draw();
@@ -280,15 +280,9 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
                 }
             }
         }
-
-       
         renderScene(ecs, shader, lc);
        
-      
         break;
-        
     }
     }
-   
-    
 }

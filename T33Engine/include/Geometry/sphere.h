@@ -38,25 +38,28 @@ class Sphere {
   nlohmann::json serialize() const;
 
   // --
-  GLuint VAO, VBO, EBO;
 
   int num_heights_, num_revs_;
   float size_;
+
   Texture texture_;
-
-  GerstnerWave wave_;
-  // --
-
-  int num_vertex_;
-  std::vector<float> vertex_sphere_;
-  std::vector<float> normals_sphere_;
-  std::vector<float> uv_sphere_;
-
-  std::vector<int> order_;
-  std::vector<float> data_;
   std::string texture_path_;
   bool use_texture_;
 
+  GerstnerWave wave_;
+  
+
+private:
+
+    GLuint VAO, VBO, EBO;
+
+    int num_vertex_;
+    std::vector<float> vertex_sphere_;
+    std::vector<float> normals_sphere_;
+    std::vector<float> uv_sphere_;
+
+    std::vector<int> order_;
+    std::vector<float> data_;
 };
 
 

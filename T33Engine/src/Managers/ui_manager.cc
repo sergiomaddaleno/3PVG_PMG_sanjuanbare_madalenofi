@@ -196,6 +196,7 @@ void UIManager::Render() {
         if (skybox_window) SkyboxWindow();
         if (fog_window) FogWindow();
         if (add_mesh_window) AddMeshWindow();
+        if (add_surface_window) AddSurfaceWindow();
         if (l_system_window) LSystemWindow();
         if (add_entities_terrain_window) AddEntitiesTerrainWindow();
 
@@ -281,8 +282,9 @@ void UIManager::ImguiWindow() {
         ImGui::DockBuilderDockWindow("Fog", dock_right);
         ImGui::DockBuilderDockWindow("SkyBox", dock_right);
         ImGui::DockBuilderDockWindow("Console", dock_bottom_right);
-        ImGui::DockBuilderDockWindow("Load Scene", dock_right);
+        ImGui::DockBuilderDockWindow("Load Scene", dock_right); 
         ImGui::DockBuilderDockWindow("Add Mesh", dock_right); 
+        ImGui::DockBuilderDockWindow("Add Surface", dock_right);
         ImGui::DockBuilderDockWindow("L-System", dock_right); 
         ImGui::DockBuilderDockWindow("Spawn Entities", dock_right);
 
@@ -534,6 +536,9 @@ void UIManager::InspectorWindow() {
                 case RenderType::RT_Sphere:
                     ImGui::Checkbox("Use Texture", &render_comp->sphere_->use_texture_);
                     break;
+                case RenderType::RT_Surface:
+                    ImGui::Checkbox("Use Texture", &render_comp->surface_->use_texture_);
+                    break;
                 case RenderType::RT_Quad:
                     ImGui::Checkbox("Use Texture", &render_comp->quad_->use_texture_);
                     break;
@@ -580,7 +585,9 @@ void UIManager::InspectorWindow() {
                     case RenderType::RT_Sphere:
                         render_comp->sphere_->setTexture(texture_file_path);
                         break;
-
+                    case RenderType::RT_Surface:
+                        render_comp->surface_->setTexture(texture_file_path);
+                        break;
                     case RenderType::RT_Quad:
                         render_comp->quad_->setTexture(texture_file_path);
                         break;
@@ -917,6 +924,7 @@ void UIManager::InspectorWindow() {
 
                     ImGui::SliderFloat("Direction X", &terrain.wave_.direction_.x, -1.0f, 1.0f);
                     ImGui::SliderFloat("Direction Y", &terrain.wave_.direction_.y, -1.0f, 1.0f);
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 }
                 break;
                 case ::RT_Sphere:
@@ -937,6 +945,28 @@ void UIManager::InspectorWindow() {
 
                     ImGui::SliderFloat("Direction X", &sphere.wave_.direction_.x, -1.0f, 1.0f);
                     ImGui::SliderFloat("Direction Y", &sphere.wave_.direction_.y, -1.0f, 1.0f);
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                }
+                break;
+                case ::RT_Surface:
+                {
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.378f, 0.547f, 0.902f, 1.0f));
+                    ImGui::Text("Wave Options");
+                    ImGui::PopStyleColor();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                    auto& surface = *ecs_.get_component<RenderComponent>(selected_entity)->surface_;
+                    ImGui::Checkbox("Use Wave Effect", &surface.wave_.use_wave_);
+
+                    ImGui::SliderFloat("Amplitude", &surface.wave_.amplitude_, 0.0f, 1.0f);
+                    ImGui::SliderFloat("Length", &surface.wave_.wave_length_, 0.1f, 10.0f);
+                    ImGui::SliderFloat("Speed", &surface.wave_.speed_, 0.1f, 5.0f);
+
+                    ImGui::SliderFloat("Direction X", &surface.wave_.direction_.x, -1.0f, 1.0f);
+                    ImGui::SliderFloat("Direction Y", &surface.wave_.direction_.y, -1.0f, 1.0f);
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 }
                 break;
                 case ::RT_Quad:
@@ -957,6 +987,7 @@ void UIManager::InspectorWindow() {
 
                     ImGui::SliderFloat("Direction X", &quad.wave_.direction_.x, -1.0f, 1.0f);
                     ImGui::SliderFloat("Direction Y", &quad.wave_.direction_.y, -1.0f, 1.0f);
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 }
                 break;
                 case ::RT_Mesh:
@@ -977,6 +1008,7 @@ void UIManager::InspectorWindow() {
 
                     ImGui::SliderFloat("Direction X", &mesh.wave_.direction_.x, -1.0f, 1.0f);
                     ImGui::SliderFloat("Direction Y", &mesh.wave_.direction_.y, -1.0f, 1.0f);
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 }
                 break;
                 case ::RT_Cube8v:
@@ -998,6 +1030,7 @@ void UIManager::InspectorWindow() {
 
                     ImGui::SliderFloat("Direction X", &cube.wave_.direction_.x, -1.0f, 1.0f);
                     ImGui::SliderFloat("Direction Y", &cube.wave_.direction_.y, -1.0f, 1.0f);
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 }
                 break;
                 }
@@ -1525,6 +1558,13 @@ void UIManager::TopBarWindow() {
 
                 ImGui::EndMenu();
             }
+
+            if (ImGui::BeginMenu("Add Surface")) {
+
+                ImGui::Checkbox(("Add surface Window"), &add_surface_window);
+
+                ImGui::EndMenu();
+            }
             
             if (ImGui::BeginMenu("Add Mesh")) {
 
@@ -2016,6 +2056,50 @@ void UIManager::AddMeshWindow()
             texture_folder_path.clear();
             texture_folder_name.clear();
         }
+    }
+
+    ImGui::End();
+}
+
+void UIManager::AddSurfaceWindow()
+{
+    ImGui::Begin("Add Surface");
+
+    static std::vector<float> points;
+    static int num_points = 1;
+
+    ImGui::Dummy({ 0.0f, 2.0f });
+    ImGui::SliderInt("Number of Points", &num_points, 1, 30);
+
+    if (points.size() != num_points * 3) {
+        points.resize(num_points * 3, 0.0f);
+    }
+
+    for (int i = 0; i < points.size(); i += 3) {
+        char label[32];
+        snprintf(label, 32, "Point %d", (i / 3) + 1);
+
+        ImGui::InputFloat3(label, &points[i]);
+    }
+    ImGui::Dummy({ 0.0f, 2.0f });
+
+    static int num_heights = 4;
+    static int num_revs = 4;
+    ImGui::InputInt("Num heights", &num_heights);
+    ImGui::InputInt("Num Revs", &num_revs);
+
+    ImGui::Dummy({ 0.0f, 2.0f });
+    ImGui::Separator();
+    ImGui::Dummy({ 0.0f, 2.0f });
+
+    if (ImGui::Button("Add surface")) {
+        TransformComponent tc;
+
+        rs_.createSurface(points, tc, num_heights, num_revs);
+        rs_.init();
+        ResetIds();
+
+        AddConsoleMessage("Surface added to scene");
     }
 
     ImGui::End();

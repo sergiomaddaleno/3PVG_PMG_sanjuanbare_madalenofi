@@ -10,6 +10,7 @@
 #include "Geometry/sphere.h"
 #include "Geometry/cube.h"
 #include "Geometry/quad.h"
+#include "Geometry/surface.h"
 
 #include "../deps/nlohmann/json.hpp"
 
@@ -20,6 +21,7 @@ enum RenderType {
     RT_Cube8v,
     RT_Cube24v,
     RT_Quad,
+    RT_Surface,
     RT_None
 };
 
@@ -31,6 +33,7 @@ struct RenderComponent {
     std::unique_ptr<Sphere>sphere_;
     std::unique_ptr<Cube>cube_;
     std::unique_ptr<Quad>quad_;
+    std::unique_ptr<Surface>surface_;
 
     RenderType type_;
 

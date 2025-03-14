@@ -72,6 +72,10 @@ public:
 	size_t createCube8v(TransformComponent tc = TransformComponent(),
 		const float size = 1.0f, bool is_centered = true);
 
+	size_t createSurface(std::vector<float> surface_points,
+		TransformComponent tc = TransformComponent(), 
+		const int num_heights = 4, const int num_revs = 4);
+
 	size_t createCube24v(TransformComponent tc = TransformComponent(),
 		const float size = 1.0f);
 
@@ -94,6 +98,7 @@ public:
 	int entity_mesh;
 	int entity_terrain;
 	int entity_sphere;
+	int entity_surface;
 	int entity_cube8v;
 	int entity_cube24v;
 	int entity_quad;

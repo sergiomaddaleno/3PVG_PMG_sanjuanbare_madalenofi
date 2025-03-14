@@ -13,6 +13,7 @@
 #include "Geometry/terrain.h"
 #include "Geometry/cube.h"
 #include "Geometry/quad.h"
+#include "Geometry/surface.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -78,6 +79,11 @@ void RenderSystem::init() {
             case RenderType::RT_Cube24v:
                 render_comp->cube_->bind();
                 render_comp->cube_->setTexture(render_comp->cube_->texture_path_);
+                break;
+
+            case RenderType::RT_Surface:
+                render_comp->surface_->bind();
+                render_comp->surface_->setTexture(render_comp->surface_->texture_path_);
                 break;
             }
             
@@ -196,6 +202,13 @@ void RenderSystem::forwardRender(Camera cam) {
                     {                        
                         render_comp->sphere_->wave_.setUniforms(shader, (float)glfwGetTime());
                         render_comp->sphere_->draw();
+                    }
+                    break;
+
+                    case RenderType::RT_Surface:
+                    {
+                        render_comp->surface_->wave_.setUniforms(shader, (float)glfwGetTime());
+                        render_comp->surface_->draw();
                     }
                     break;
 
@@ -400,6 +413,34 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
 
     entity_++;
     entity_sphere++;
+
+    return entity_;
+}
+
+size_t RenderSystem::createSurface(std::vector<float> surface_points, TransformComponent tc, const int num_heights, const int num_revs)
+{
+    auto surface = std::make_unique<Surface>();
+    surface->init(surface_points, num_heights, num_revs);
+
+    ecs_.add_component<IdentifierComponent>(entity_);
+    ecs_.add_component<RenderComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
+
+    //---
+
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Surface [" + std::to_string(entity_surface) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
+
+    auto& transform = ecs_.get_component<TransformComponent>(entity_);
+    transform->position = tc.position;
+    transform->rotation = tc.rotation;
+    transform->scale = tc.scale;
+
+    ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Surface;
+    ecs_.get_component<RenderComponent>(entity_)->surface_ = std::move(surface);
+
+    entity_++;
+    entity_surface++;
 
     return entity_;
 }
