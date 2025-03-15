@@ -60,7 +60,7 @@ void ShadowMap::init2D()
 
 void ShadowMap::initCubeMap()
 {
-    initShader(simple_depth, "../stages/shaders/shadows_depth.vs", "../stages/shaders/shadows_depth.fs", "../stages/shaders/shadows_depth.gs");
+    initSimpleDepthShader();
 
     glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthCubemap);
@@ -84,6 +84,11 @@ void ShadowMap::initCubeMap()
     glReadBuffer(GL_NONE);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
+}
+
+void ShadowMap::initSimpleDepthShader(std::string vertex_path, std::string fragment_path, std::string geometry_path)
+{
+    initShader(simple_depth, vertex_path, fragment_path, geometry_path);
 }
 
 void ShadowMap::active(unsigned int num)
@@ -183,8 +188,6 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
     glViewport(0, 0, global.window_width, global.window_height);
 }
 
-
-
 void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
     switch(lc.light.type_) {
@@ -280,6 +283,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
                 }
             }
         }
+
         renderScene(ecs, shader, lc);
        
         break;

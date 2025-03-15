@@ -251,6 +251,10 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
                 auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
                 render_comp->terrain_->setTexture(terrain["Texture_path"]);
                 render_comp->terrain_->setHeightMap(terrain["Heightmap_path"]);
+
+                render_comp->terrain_->init(terrain["num_cols"], terrain["num_rows"], terrain["height_mult"],
+                    terrain["size"], terrain["is_centered"], terrain["use_perlin_noise"]);
+
                 break;
             }
 

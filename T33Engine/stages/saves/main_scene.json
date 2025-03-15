@@ -16,9 +16,9 @@
   "Speed": 20.25,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.715641975402832,
-   -0.5939124822616577,
-   -0.3675929009914398
+   0.707043468952179,
+   -0.6032378077507019,
+   -0.36904433369636536
   ]
  },
  "Entities": [
@@ -354,80 +354,6 @@
      ],
      "Type": 0
     }
-   }
-  },
-  {
-   "Identifier_component": {
-    "Entity_id": 8,
-    "Entity_name": "Water 0"
-   },
-   "Render_component": {
-    "Render_type": 7,
-    "Water": {
-     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
-     "Texture_path": "../stages/assets/textures/images/blue.png",
-     "height_mult": 0.0,
-     "is_centered": true,
-     "num_cols": 50,
-     "num_rows": 50,
-     "size": 1.0,
-     "use_perlin_noise": true
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     -2.101907730102539,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Identifier_component": {
-    "Entity_id": 9,
-    "Entity_name": "Lava"
-   },
-   "Render_component": {
-    "Render_type": 7,
-    "Water": {
-     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
-     "Texture_path": "../stages\\assets\\textures\\apple\\red.jpg",
-     "height_mult": 0.0,
-     "is_centered": true,
-     "num_cols": 2,
-     "num_rows": 2,
-     "size": 1.0,
-     "use_perlin_noise": true
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     -5.131742477416992,
-     3.8458118438720703,
-     10.8390531539917
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     4.379924297332764,
-     1.0,
-     5.510981559753418
-    ]
    }
   }
  ],

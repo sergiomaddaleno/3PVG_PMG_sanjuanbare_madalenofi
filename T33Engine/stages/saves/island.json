@@ -1,0 +1,439 @@
+{
+ "Camera": {
+  "Aspect_ratio": 1.7769999504089355,
+  "Far_clip_plane": 1000.0,
+  "Fov": 45.0,
+  "Near_clip_plane": 0.10000000149011612,
+  "Ortho_height": 600.0,
+  "Ortho_width": 800.0,
+  "Position": [
+   -110.3112564086914,
+   22.974742889404297,
+   29.42471694946289
+  ],
+  "Scroll_speed": 1.0,
+  "Sensitivity": 1.0,
+  "Speed": 20.25,
+  "Use_perspective_matrix": true,
+  "View_direction": [
+   0.8304903507232666,
+   -0.12337503582239151,
+   -0.54319828748703
+  ]
+ },
+ "Entities": [
+  {
+   "Identifier_component": {
+    "Entity_id": 0,
+    "Entity_name": "Mario"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\Mario.obj",
+     "Texture_folder": "../stages\\assets\\textures\\mario"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     -9.560978889465332,
+     4.646917819976807,
+     -9.625251770019531
+    ],
+    "Rotation": [
+     0.011709405109286308,
+     -0.2624877393245697,
+     0.003185519017279148,
+     0.9648590087890625
+    ],
+    "Scale": [
+     0.9999998211860657,
+     0.9999998807907104,
+     0.9999997615814209
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 1,
+    "Entity_name": "Terrain [1]"
+   },
+   "Render_component": {
+    "Render_type": 1,
+    "Terrain": {
+     "Heightmap_path": "../stages\\assets\\textures\\heightmaps\\island.png",
+     "Texture_path": "../stages/assets/textures/images/grass.png",
+     "height_mult": 0.6259999871253967,
+     "is_centered": true,
+     "num_cols": 50,
+     "num_rows": 50,
+     "size": 3.7860000133514404,
+     "use_perlin_noise": false
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 2,
+    "Entity_name": "Water [2]"
+   },
+   "Render_component": {
+    "Render_type": 7,
+    "Water": {
+     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
+     "Texture_path": "../stages/assets/textures/images/blue.png",
+     "height_mult": 0.0,
+     "is_centered": true,
+     "num_cols": 50,
+     "num_rows": 50,
+     "size": 3.736999988555908,
+     "use_perlin_noise": true
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     -2.417285442352295,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 3,
+    "Entity_name": "Mesh [9]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     -45.432003021240234,
+     13.69374942779541,
+     -56.790000915527344
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 4,
+    "Entity_name": "Mesh [10]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     -30.288002014160156,
+     1.0172499418258667,
+     -56.790000915527344
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 5,
+    "Entity_name": "Mesh [11]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     49.217994689941406,
+     5.164499759674072,
+     -37.86000061035156
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 6,
+    "Entity_name": "Mesh [12]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     -53.00400161743164,
+     -0.15649999678134918,
+     -22.71600341796875
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 7,
+    "Entity_name": "Mesh [13]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     -34.07400131225586,
+     5.633999824523926,
+     -15.144004821777344
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 8,
+    "Entity_name": "Mesh [14]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     15.143997192382813,
+     5.007999897003174,
+     -3.7860031127929688
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 9,
+    "Entity_name": "Mesh [15]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     41.64600372314453,
+     -3.0517499446868896,
+     18.93000030517578
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 10,
+    "Entity_name": "Directional Light [1]"
+   },
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.18814417719841003,
+       -0.24434611201286316,
+       -0.1745329350233078
+      ]
+     ],
+     "Light_color": [
+      [
+       10.0,
+       10.0,
+       10.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Spot_softness": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   }
+  }
+ ],
+ "Skybox": {
+  "Cubemap_file_paths": [
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\right.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\left.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\bottom.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\top.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\front.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\back.png"
+  ],
+  "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
+  "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
+  "DDS_angle": -90.0,
+  "DDS_file_path": "../stages\\assets\\textures\\skybox\\sky.dds",
+  "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
+  "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
+  "Use_cubemap": false
+ }
+}

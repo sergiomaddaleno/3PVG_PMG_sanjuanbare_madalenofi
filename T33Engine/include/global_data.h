@@ -51,6 +51,7 @@ public:
     int deferred_option = 0;
 
     float alpha = 1.0f;
+    float alpha_blend = 0.8f;
 
     // -------------------------------------------------------------
     

@@ -54,10 +54,6 @@ public:
 
 	//----------------------------------
 
-	void spawnEntitiesInTerrain(
-		int terrain_id, RenderType spawn_type,
-		float spawn_prob = 0.002f, float y_spawn_height = -4.0f);
-
 	size_t createMesh(std::string file, std::string textureFolder, 
 		TransformComponent tc = TransformComponent());
 
@@ -91,6 +87,14 @@ public:
 	size_t createPointLight(Light li = Light(), bool default_light = true);
 
 	size_t createDirectionalLight(Light li = Light(), bool default_light = true);
+
+	void spawnEntitiesInTerrain(
+		int terrain_id, RenderType spawn_type,
+		float spawn_prob = 0.002f, float y_spawn_height = -4.0f);
+
+	void spawnMeshInTerrain(
+		int terrain_id, std::string file, std::string textureFolder,
+		float spawn_prob = 0.002f, float y_spawn_height = -4.0f);
 	
 	//-----------------------
 

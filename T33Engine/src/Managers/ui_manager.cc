@@ -813,6 +813,11 @@ void UIManager::InspectorWindow() {
                 case ::RT_Water:
                 {
                     ImGui::Separator();
+
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                    ImGui::SliderFloat("Alpha", &global.alpha_blend, 0.0f, 1.0f, "%0.03f");
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     ImGui::Text("Water Dimensions");
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
@@ -2194,7 +2199,7 @@ void UIManager::AddEntitiesTerrainWindow()
     ImGui::InputFloat("Spawn height", &spawn_height);
     ImGui::Dummy({ 0.0f, 5.0f });
 
-    const char* render_types[] = { "Sphere", "Cube8v", "Cube24v", "Quad"};
+    const char* render_types[] = { "Sphere", "Cube8v", "Cube24v", "Quad", "Mesh"};
     static int selected_type = 0;
 
     if (ImGui::BeginCombo("Entity type", render_types[selected_type])) {
@@ -2216,14 +2221,70 @@ void UIManager::AddEntitiesTerrainWindow()
     case 1: entity_type = RenderType::RT_Cube8v; break;
     case 2: entity_type = RenderType::RT_Cube24v; break;
     case 3: entity_type = RenderType::RT_Quad; break;
+    case 4: entity_type = RenderType::RT_Mesh; break;
+    }
+
+    static std::string obj_file_path;
+    static std::string obj_file_name;
+    static std::string texture_folder_path;
+    static std::string texture_folder_name;
+
+    if (entity_type == RenderType::RT_Mesh) {
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        ImGui::Text("Drag and Drop obj file:");
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+        if (ImGui::Button(!obj_file_path.empty() ? obj_file_name.c_str() : ".obj drop here", { 200.0f, 40.0f })) {}
+
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                if (filePath.extension() == ".obj") {
+                    obj_file_path = filePath.string();
+                    obj_file_name = filePath.filename().string();
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        if (ImGui::Button(!texture_folder_path.empty() ? texture_folder_name.c_str() : "Texture Folder Drop here", { 200.0f, 40.0f })) {}
+
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                if (std::filesystem::is_directory(filePath)) {
+                    texture_folder_path = filePath.string();
+                    texture_folder_name = filePath.filename().string();
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
     }
 
     ImGui::Dummy({ 0.0f, 2.0f });
     ImGui::Separator();
     ImGui::Dummy({ 0.0f, 2.0f });
 
-    if(ImGui::Button("Spawn")) {
-        global.render_system.spawnEntitiesInTerrain(entity_id, entity_type, spawn_prob, spawn_height);
+    if (entity_type == RenderType::RT_Mesh) {
+        if (ImGui::Button("Spawn")) {
+            global.render_system.spawnMeshInTerrain(entity_id, obj_file_path, texture_folder_path, spawn_prob, spawn_height);
+
+            ResetIds();
+            AddConsoleMessage(obj_file_name + " added to scene");
+
+            obj_file_path.clear();
+            obj_file_name.clear();
+            texture_folder_path.clear();
+            texture_folder_name.clear();
+        }
+    }
+    else {
+        if (ImGui::Button("Spawn")) {
+            global.render_system.spawnEntitiesInTerrain(entity_id, entity_type, spawn_prob, spawn_height);
+
+            ResetIds();
+            AddConsoleMessage("Entities added to scene");
+        }
     }
 
     ImGui::End();

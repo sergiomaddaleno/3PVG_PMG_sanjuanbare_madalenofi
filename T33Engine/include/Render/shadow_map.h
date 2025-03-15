@@ -35,6 +35,12 @@ public:
 	void init2D();
 	void initCubeMap();
 
+	void initSimpleDepthShader(
+		std::string vertex_path = "../stages/shaders/shadows_depth.vs",
+		std::string fragment_path = "../stages/shaders/shadows_depth.fs",
+		std::string geometry_path = "../stages/shaders/shadows_depth.gs"
+	);
+
 	void active(unsigned int num = 0);
 	void bind2D();
 	void bindCubeMap();

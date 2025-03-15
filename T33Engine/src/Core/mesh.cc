@@ -60,10 +60,16 @@ bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
                 vertex.normal.y = attrib.normals[3 * index.normal_index + 1];
                 vertex.normal.z = attrib.normals[3 * index.normal_index + 2];
             }
+            else {
+                vertex.normal = glm::vec3(0.0f, 0.0f, 0.0f);
+            }
 
             if (!attrib.texcoords.empty()) {
                 vertex.tex_coord.x = attrib.texcoords[2 * index.texcoord_index + 0];
                 vertex.tex_coord.y = attrib.texcoords[2 * index.texcoord_index + 1];
+            }
+            else {
+                vertex.tex_coord = glm::vec2(0.0f, 0.0f);
             }
 
             curr_mesh.vertices.push_back(vertex);

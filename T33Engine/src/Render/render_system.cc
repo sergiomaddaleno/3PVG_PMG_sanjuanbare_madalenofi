@@ -129,10 +129,6 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-    global.alpha = 1.0f;
-    float alpha_value = global.alpha;
-    shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &alpha_value);
-
     int tex_id = TextureID::TI_Diffuse;
     shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
 
@@ -141,6 +137,8 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
 
     tex_id = TextureID::TI_Parallax;
     shader.setUniformValue(shader.getUniformLocation("u_parallax_map"), ValueType::T_INT_1, &tex_id);
+
+    shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &global.alpha);
 
     shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &global.use_fog);
     shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &global.fog_density);
@@ -151,7 +149,7 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
 void RenderSystem::forwardRender(Camera cam) {
     
     glEnable(GL_DEPTH_TEST);
-    glClear( GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
 
     glBlendFunc(GL_ONE, GL_ZERO);
@@ -251,22 +249,20 @@ void RenderSystem::forwardRender(Camera cam) {
 
                     case RenderType::RT_Water:
                         // For Blend
-                        glEnable(GL_BLEND);
                         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-                        global.alpha = 0.5f;
-                        shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &global.alpha);
+                        shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &global.alpha_blend);
 
                         render_comp->water_->wave_.setUniforms(shader, (float)glfwGetTime());
                         render_comp->water_->draw();
 
+                        glBlendFunc(GL_ONE, GL_ZERO);
+
                         break;
                     }
-                        glDisable(GL_BLEND);
                 }
-
-                glBlendFunc(GL_ONE, GL_ONE);
             }
+            glBlendFunc(GL_ONE, GL_ONE);
         }
     }
     
@@ -337,6 +333,50 @@ void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type,
             entity = createSphere();
             break;
         }
+
+        auto& transform = ecs_.get_component<TransformComponent>(entity - 1);
+        if (transform) {
+            transform->position = position;
+        }
+    }
+
+    global.render_system.init();
+}
+
+void RenderSystem::spawnMeshInTerrain(int terrain_id, std::string file, std::string textureFolder, float spawn_prob, float y_spawn_height)
+{
+    std::vector<glm::vec3> spawn_positions;
+
+    auto& render_comp = ecs_.get_component<RenderComponent>(terrain_id);
+    auto& transf_comp = ecs_.get_component<TransformComponent>(terrain_id);
+
+    if (render_comp->type_ == RenderType::RT_Terrain) {
+        std::vector<float> model_vertices = render_comp->terrain_->GetVertexTerrain();
+
+        glm::vec3 terrain_position = transf_comp->position;
+        glm::quat terrain_rotation = transf_comp->rotation;
+        glm::vec3 terrain_scale = transf_comp->scale;
+
+        for (int i = 0; i < model_vertices.size() / 3; i++) {
+            glm::vec3 vertex = {
+                model_vertices.at(i * 3 + 0),
+                model_vertices.at(i * 3 + 1),
+                model_vertices.at(i * 3 + 2)
+            };
+
+            glm::vec3 transf_vertex = terrain_rotation * (vertex * terrain_scale);
+
+            glm::vec3 final_pos = transf_vertex + terrain_position;
+
+            if (vertex.y > y_spawn_height && (float)rand() / RAND_MAX < spawn_prob) {
+                spawn_positions.push_back(final_pos);
+            }
+        }
+    }
+
+    for (const auto& position : spawn_positions) {
+        size_t entity;
+        entity = createMesh(file, textureFolder);
 
         auto& transform = ecs_.get_component<TransformComponent>(entity - 1);
         if (transform) {
