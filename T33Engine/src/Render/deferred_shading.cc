@@ -168,6 +168,9 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			case RenderType::RT_Quad:
 				render_comp->quad_->draw();
 				break;
+			case RenderType::RT_Water:
+				render_comp->water_->draw();
+				break;
 			}
 		}
 	}

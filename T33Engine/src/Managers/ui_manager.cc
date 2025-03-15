@@ -533,6 +533,9 @@ void UIManager::InspectorWindow() {
                 case RenderType::RT_Terrain:
                     ImGui::Checkbox("Use Texture", &render_comp->terrain_->use_texture_);
                     break;
+                case RenderType::RT_Water:
+                    ImGui::Checkbox("Use Texture", &render_comp->water_->use_texture_);
+                    break;
                 case RenderType::RT_Sphere:
                     ImGui::Checkbox("Use Texture", &render_comp->sphere_->use_texture_);
                     break;
@@ -581,7 +584,9 @@ void UIManager::InspectorWindow() {
                     case RenderType::RT_Terrain:
                         render_comp->terrain_->setTexture(texture_file_path);
                         break;
-
+                    case RenderType::RT_Water:
+                        render_comp->water_->setTexture(texture_file_path);
+                        break;
                     case RenderType::RT_Sphere:
                         render_comp->sphere_->setTexture(texture_file_path);
                         break;
@@ -805,6 +810,38 @@ void UIManager::InspectorWindow() {
 
                     break;
                 }
+                case ::RT_Water:
+                {
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                    ImGui::Text("Water Dimensions");
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                    auto& water = *ecs_.get_component<RenderComponent>(selected_entity)->water_;
+
+                    static int temp_num_cols = water.num_cols_;
+                    static int temp_num_rows = water.num_rows_;
+                    static float temp_size = water.size_;
+                    static bool temp_is_centered = water.is_centered_;
+
+                    ImGui::InputInt("Number of Columns", &temp_num_cols);
+                    ImGui::InputInt("Number of Rows", &temp_num_rows);
+                    ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
+                    ImGui::Checkbox("Is Centered", &temp_is_centered);
+
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                    if (ImGui::Button("Apply Changes")) {
+
+                        water.init(temp_num_cols, temp_num_rows, 1.0f,
+                            temp_size, temp_is_centered, true);
+
+                        water.bind();
+                    }
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                    break;
+                }
                 case ::RT_Sphere:
                 {
                     ImGui::Separator();
@@ -924,6 +961,27 @@ void UIManager::InspectorWindow() {
 
                     ImGui::SliderFloat("Direction X", &terrain.wave_.direction_.x, -1.0f, 1.0f);
                     ImGui::SliderFloat("Direction Y", &terrain.wave_.direction_.y, -1.0f, 1.0f);
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                }
+                break;
+                case ::RT_Water:
+                {
+                    ImGui::Separator();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.378f, 0.547f, 0.902f, 1.0f));
+                    ImGui::Text("Wave Options");
+                    ImGui::PopStyleColor();
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                    auto& water = *ecs_.get_component<RenderComponent>(selected_entity)->water_;
+                    ImGui::Checkbox("Use Wave Effect", &water.wave_.use_wave_);
+
+                    ImGui::SliderFloat("Amplitude", &water.wave_.amplitude_, 0.0f, 1.0f);
+                    ImGui::SliderFloat("Length", &water.wave_.wave_length_, 0.1f, 10.0f);
+                    ImGui::SliderFloat("Speed", &water.wave_.speed_, 0.1f, 5.0f);
+
+                    ImGui::SliderFloat("Direction X", &water.wave_.direction_.x, -1.0f, 1.0f);
+                    ImGui::SliderFloat("Direction Y", &water.wave_.direction_.y, -1.0f, 1.0f);
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 }
                 break;
@@ -1504,7 +1562,15 @@ void UIManager::TopBarWindow() {
                     rs_.init();
                     ResetIds();
 
-                    AddConsoleMessage("Terrain Light added to scene");
+                    AddConsoleMessage("Terrain added to scene");
+                }
+
+                if (ImGui::MenuItem("Water")) {
+                    rs_.createWater();
+                    rs_.init();
+                    ResetIds();
+
+                    AddConsoleMessage("Water added to scene");
                 }
 
                 ImGui::EndMenu();

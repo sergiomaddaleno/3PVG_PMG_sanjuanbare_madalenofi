@@ -7,61 +7,24 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -28.071855545043945,
-   19.21860122680664,
-   8.200459480285645
+   -27.49665641784668,
+   25.09390640258789,
+   11.635130882263184
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
-  "Speed": 10.0,
+  "Speed": 20.25,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.7956408262252808,
-   -0.5436626076698303,
-   -0.26718276739120483
+   0.715641975402832,
+   -0.5939124822616577,
+   -0.3675929009914398
   ]
  },
  "Entities": [
   {
    "Identifier_component": {
     "Entity_id": 0,
-    "Entity_name": "Terrain [0]"
-   },
-   "Render_component": {
-    "Render_type": 1,
-    "Terrain": {
-     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
-     "Texture_path": "../stages/assets/textures/images/grass.png",
-     "height_mult": 0.5230000019073486,
-     "is_centered": true,
-     "num_cols": 50,
-     "num_rows": 50,
-     "size": 1.0,
-     "use_perlin_noise": false
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     1.069494366645813,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Identifier_component": {
-    "Entity_id": 1,
     "Entity_name": "Mario"
    },
    "Render_component": {
@@ -73,9 +36,9 @@
    },
    "Transform_component": {
     "Position": [
-     -9.547403335571289,
-     0.7595114707946777,
-     13.072508811950684
+     -9.560978889465332,
+     -0.16782164573669434,
+     -9.625251770019531
     ],
     "Rotation": [
      0.0,
@@ -92,7 +55,7 @@
   },
   {
    "Identifier_component": {
-    "Entity_id": 2,
+    "Entity_id": 1,
     "Entity_name": "box"
    },
    "Render_component": {
@@ -107,7 +70,7 @@
    "Transform_component": {
     "Position": [
      -1.1899484395980835,
-     7.173027515411377,
+     7.28684139251709,
      0.05704972892999649
     ],
     "Rotation": [
@@ -125,7 +88,7 @@
   },
   {
    "Identifier_component": {
-    "Entity_id": 3,
+    "Entity_id": 2,
     "Entity_name": "Cube8v [0]"
    },
    "Render_component": {
@@ -141,8 +104,8 @@
    "Transform_component": {
     "Position": [
      -9.686514854431152,
-     2.9109954833984375,
-     -7.854733467102051
+     0.08682966232299805,
+     -2.8044426441192627
     ],
     "Rotation": [
      0.0,
@@ -159,7 +122,7 @@
   },
   {
    "Identifier_component": {
-    "Entity_id": 4,
+    "Entity_id": 3,
     "Entity_name": "Sphere [0]"
    },
    "Render_component": {
@@ -192,7 +155,7 @@
   },
   {
    "Identifier_component": {
-    "Entity_id": 5,
+    "Entity_id": 4,
     "Entity_name": "brick"
    },
    "Render_component": {
@@ -225,8 +188,104 @@
   },
   {
    "Identifier_component": {
+    "Entity_id": 5,
+    "Entity_name": "Bucket"
+   },
+   "Render_component": {
+    "Render_type": 6,
+    "Surface": {
+     "Points": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       1.0,
+       0.0,
+       0.0
+      ],
+      [
+       1.0,
+       1.0,
+       0.0
+      ],
+      [
+       1.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Texture_path": "../stages\\assets\\textures\\apple\\red.jpg",
+     "num_heights": 4,
+     "num_revs": 4
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     -13.655104637145996,
+     5.731400489807129,
+     5.446749687194824
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
     "Entity_id": 6,
-    "Entity_name": "Directional Light [0]"
+    "Entity_name": "Terrain [1]"
+   },
+   "Render_component": {
+    "Render_type": 1,
+    "Terrain": {
+     "Heightmap_path": "../stages\\assets\\textures\\heightmaps\\volcano.png",
+     "Texture_path": "../stages/assets/textures/images/grass.png",
+     "height_mult": 0.5230000019073486,
+     "is_centered": true,
+     "num_cols": 50,
+     "num_rows": 50,
+     "size": 1.0,
+     "use_perlin_noise": false
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 7,
+    "Entity_name": "Directional Light [1]"
    },
    "Light_component": {
     "light": {
@@ -299,49 +358,27 @@
   },
   {
    "Identifier_component": {
-    "Entity_id": 7,
-    "Entity_name": "Surface [1]"
+    "Entity_id": 8,
+    "Entity_name": "Water 0"
    },
    "Render_component": {
-    "Render_type": 6,
-    "Surface": {
-     "Points": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ],
-      [
-       1.0,
-       0.0,
-       0.0
-      ],
-      [
-       1.0,
-       1.0,
-       0.0
-      ],
-      [
-       1.0,
-       0.0,
-       0.0
-      ],
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Texture_path": "../stages\\assets\\textures\\apple\\red.jpg",
-     "num_heights": 4,
-     "num_revs": 4
+    "Render_type": 7,
+    "Water": {
+     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
+     "Texture_path": "../stages/assets/textures/images/blue.png",
+     "height_mult": 0.0,
+     "is_centered": true,
+     "num_cols": 50,
+     "num_rows": 50,
+     "size": 1.0,
+     "use_perlin_noise": true
     }
    },
    "Transform_component": {
     "Position": [
-     -13.655104637145996,
-     5.731400489807129,
-     5.446749687194824
+     0.0,
+     -2.101907730102539,
+     0.0
     ],
     "Rotation": [
      0.0,
@@ -353,6 +390,43 @@
      1.0,
      1.0,
      1.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 9,
+    "Entity_name": "Lava"
+   },
+   "Render_component": {
+    "Render_type": 7,
+    "Water": {
+     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
+     "Texture_path": "../stages\\assets\\textures\\apple\\red.jpg",
+     "height_mult": 0.0,
+     "is_centered": true,
+     "num_cols": 2,
+     "num_rows": 2,
+     "size": 1.0,
+     "use_perlin_noise": true
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     -5.131742477416992,
+     3.8458118438720703,
+     10.8390531539917
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     4.379924297332764,
+     1.0,
+     5.510981559753418
     ]
    }
   }

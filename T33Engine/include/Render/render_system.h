@@ -66,6 +66,10 @@ public:
 		const float height_mult = 1.0f, const float size = 1.0f,
 		const bool is_centered = true, const bool use_perlin_noise = true);
 
+	size_t createWater(TransformComponent tc = TransformComponent(), 
+		const int num_cols = 2, const int num_rows = 2, 
+		const float size = 1.0f, const bool is_centered = true);
+
 	size_t createSphere(TransformComponent tc = TransformComponent(),
 		int num_heights_ = 60, int num_revs_ = 60, float size = 1.0f);
 
@@ -97,6 +101,7 @@ public:
 
 	int entity_mesh;
 	int entity_terrain;
+	int entity_water;
 	int entity_sphere;
 	int entity_surface;
 	int entity_cube8v;

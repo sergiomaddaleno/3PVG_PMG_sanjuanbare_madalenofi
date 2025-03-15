@@ -22,6 +22,7 @@ enum RenderType {
     RT_Cube24v,
     RT_Quad,
     RT_Surface,
+    RT_Water,
     RT_None
 };
 
@@ -30,6 +31,7 @@ struct RenderComponent {
     std::unique_ptr<Mesh> mesh_;
     Triangle triangle_;
     std::unique_ptr<Terrain>terrain_;
+    std::unique_ptr<Terrain>water_;
     std::unique_ptr<Sphere>sphere_;
     std::unique_ptr<Cube>cube_;
     std::unique_ptr<Quad>quad_;

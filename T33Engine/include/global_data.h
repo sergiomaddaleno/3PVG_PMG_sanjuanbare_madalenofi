@@ -50,6 +50,8 @@ public:
     bool deferred_shading = false;
     int deferred_option = 0;
 
+    float alpha = 1.0f;
+
     // -------------------------------------------------------------
     
     //Classes

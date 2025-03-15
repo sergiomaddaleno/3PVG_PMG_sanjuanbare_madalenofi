@@ -253,6 +253,20 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
                 render_comp->terrain_->setHeightMap(terrain["Heightmap_path"]);
                 break;
             }
+
+            case RenderType::RT_Water: {
+                const auto& water = entity["Render_component"]["Water"];
+
+                rs_.createWater(tc,
+                    water["num_cols"],
+                    water["num_rows"],
+                    water["size"],
+                    water["is_centered"]);
+
+                auto& render_comp = ecs_.get_component<RenderComponent>(entity_id);
+                render_comp->water_->setTexture(water["Texture_path"]);
+                break;
+            }
             }
         }
 

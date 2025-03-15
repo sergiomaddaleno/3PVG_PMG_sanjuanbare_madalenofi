@@ -62,9 +62,11 @@ void RenderSystem::init() {
             case RenderType::RT_Terrain:
                 render_comp->terrain_->bind();
                 render_comp->terrain_->setTexture(render_comp->terrain_->texture_path_);
-
                 break;
-
+            case RenderType::RT_Water:
+                render_comp->water_->bind();
+                render_comp->water_->setTexture(render_comp->water_->texture_path_);
+                break;
             case RenderType::RT_Sphere:
                 render_comp->sphere_->bind();
                 render_comp->sphere_->setTexture(render_comp->sphere_->texture_path_);
@@ -126,6 +128,10 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
+
+    global.alpha = 1.0f;
+    float alpha_value = global.alpha;
+    shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &alpha_value);
 
     int tex_id = TextureID::TI_Diffuse;
     shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
@@ -199,7 +205,7 @@ void RenderSystem::forwardRender(Camera cam) {
                     break;
 
                     case RenderType::RT_Sphere:
-                    {                        
+                    {
                         render_comp->sphere_->wave_.setUniforms(shader, (float)glfwGetTime());
                         render_comp->sphere_->draw();
                     }
@@ -226,7 +232,7 @@ void RenderSystem::forwardRender(Camera cam) {
                         render_comp->quad_->draw();
 
                         int use = render_comp->quad_->use_normal_map_;
-                        shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"), 
+                        shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"),
                             ValueType::T_INT_1, &use);
 
                         use = render_comp->quad_->use_parallax_map_;
@@ -240,14 +246,27 @@ void RenderSystem::forwardRender(Camera cam) {
                         int type = render_comp->quad_->parallax_type;
                         shader.setUniformValue(shader.getUniformLocation("u_parallax_type"),
                             ValueType::T_INT_1, &type);
-                        
-                        //render_comp->quad_->wave_.setUniforms(shader);
                     }
                     break;
+
+                    case RenderType::RT_Water:
+                        // For Blend
+                        glEnable(GL_BLEND);
+                        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+                        global.alpha = 0.5f;
+                        shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &global.alpha);
+
+                        render_comp->water_->wave_.setUniforms(shader, (float)glfwGetTime());
+                        render_comp->water_->draw();
+
+                        break;
                     }
+                        glDisable(GL_BLEND);
                 }
+
+                glBlendFunc(GL_ONE, GL_ONE);
             }
-            glBlendFunc(GL_ONE, GL_ONE);
         }
     }
     
@@ -385,6 +404,38 @@ size_t RenderSystem::createTerrain(TransformComponent tc,
 
     entity_++;
     entity_terrain++;
+
+    return entity_;
+}
+
+size_t RenderSystem::createWater(TransformComponent tc,
+    const int num_cols, const int num_rows, const float size,
+    const bool is_centered) {
+
+    auto water = std::make_unique<Terrain>();
+    water->init(num_cols, num_rows, 0.0f, size, is_centered, true);
+
+    water->setTexture("../stages/assets/textures/images/blue.png");
+    water->wave_.use_wave_ = true;
+
+    ecs_.add_component<IdentifierComponent>(entity_);
+    ecs_.add_component<RenderComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
+
+    //---
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Water [" + std::to_string(entity_water) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
+
+    auto& transform = ecs_.get_component<TransformComponent>(entity_);
+    transform->position = tc.position;
+    transform->rotation = tc.rotation;
+    transform->scale = tc.scale;
+
+    ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Water;
+    ecs_.get_component<RenderComponent>(entity_)->water_ = std::move(water);
+
+    entity_++;
+    entity_water++;
 
     return entity_;
 }
