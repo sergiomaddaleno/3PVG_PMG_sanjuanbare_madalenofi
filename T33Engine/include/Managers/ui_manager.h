@@ -83,6 +83,7 @@ private:
     float thumbnailSize;
     
     //--
+    bool show_fps;
 
     bool post_process_window;
     bool skybox_window;

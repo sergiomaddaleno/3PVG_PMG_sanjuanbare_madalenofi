@@ -1,0 +1,414 @@
+{
+ "Camera": {
+  "Aspect_ratio": 1.7769999504089355,
+  "Far_clip_plane": 1000.0,
+  "Fov": 45.0,
+  "Near_clip_plane": 0.10000000149011612,
+  "Ortho_height": 600.0,
+  "Ortho_width": 800.0,
+  "Position": [
+   -127.50358581542969,
+   30.916044235229492,
+   96.66316986083984
+  ],
+  "Scroll_speed": 1.0,
+  "Sensitivity": 1.0,
+  "Speed": 35.78099822998047,
+  "Use_perspective_matrix": true,
+  "View_direction": [
+   0.9735307693481445,
+   -0.193468376994133,
+   -0.1216878890991211
+  ]
+ },
+ "Entities": [
+  {
+   "Identifier_component": {
+    "Entity_id": 0,
+    "Entity_name": "Directional Light [0]"
+   },
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.0,
+       0.0,
+       1.0
+      ]
+     ],
+     "Light_color": [
+      [
+       10.0,
+       10.0,
+       10.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Spot_softness": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 1,
+    "Entity_name": "Sun"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages\\assets\\textures\\planets\\sunmap.jpg",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 5.679999828338623
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.13824057579040527,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     5.0,
+     5.0,
+     5.0
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 2,
+    "Entity_name": "Mercury"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages\\assets\\textures\\planets\\mercurymap.jpg",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     41.07158279418945
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     0.49799999594688416,
+     0.49799999594688416,
+     0.49799999594688416
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 3,
+    "Entity_name": "Venus"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages\\assets\\textures\\planets\\venusmap.jpg",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     46.59817886352539
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     0.6930000185966492,
+     0.6930000185966492,
+     0.6930000185966492
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 4,
+    "Entity_name": "Earth"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages\\assets\\textures\\planets\\earthmap1k.jpg",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     52.623069763183594
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.3009999990463257,
+     1.3009999990463257,
+     1.3009999990463257
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 5,
+    "Entity_name": "Mars"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages\\assets\\textures\\planets\\marsmap1k.jpg",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     58.96158981323242
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     0.6930000185966492,
+     0.6930000185966492,
+     0.6930000185966492
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 6,
+    "Entity_name": "Jupiter"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages\\assets\\textures\\planets\\jupitermap.jpg",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     78.58647918701172
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     14.586000442504883,
+     14.586000442504883,
+     14.586000442504883
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 7,
+    "Entity_name": "Saturn"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages\\assets\\textures\\planets\\saturnmap.jpg",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     113.15526580810547
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     12.295999526977539,
+     12.295999526977539,
+     12.295999526977539
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 8,
+    "Entity_name": "Uranus"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages\\assets\\textures\\planets\\uranusmap.jpg",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     137.22422790527344
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     5.215000152587891,
+     5.215000152587891,
+     5.215000152587891
+    ]
+   }
+  },
+  {
+   "Identifier_component": {
+    "Entity_id": 9,
+    "Entity_name": "Neptune"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages\\assets\\textures\\planets\\neptunemap.jpg",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     157.0464324951172
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     5.052000045776367,
+     5.052000045776367,
+     5.052000045776367
+    ]
+   }
+  }
+ ],
+ "Skybox": {
+  "Cubemap_file_paths": [
+   "../stages\\assets\\textures\\skybox\\cubemap\\space\\right.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\space\\left.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\space\\bottom.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\space\\top.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\space\\front.png",
+   "../stages\\assets\\textures\\skybox\\cubemap\\space\\back.png"
+  ],
+  "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
+  "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
+  "DDS_angle": -90.0,
+  "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
+  "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
+  "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
+  "Use_cubemap": true
+ }
+}

@@ -60,6 +60,7 @@ UIManager::UIManager(ECSManager& ecs, RenderSystem& rs)
     m_DeleteIcon(),
     post_process_compiled(false),
     add_mesh_window(false),
+    show_fps(false),
     ecs_(ecs),
     rs_(rs),
     input_(nullptr)
@@ -1446,8 +1447,15 @@ void UIManager::TopBarWindow() {
         ImGui::SameLine();
         if (ImGui::BeginMenu("Settings")) {
             
+            ImGui::Checkbox("FPS", &show_fps);
+
             if (ImGui::MenuItem("Toggle Full Screen [F11]")) {
                 window_->toggleFullScreen(*input_, Input::None, true);
+            }
+
+            if (ImGui::BeginMenu("Console")) {
+                ImGui::Checkbox("Console Window", &console_window);
+                ImGui::EndMenu();
             }
 
             if (ImGui::MenuItem("Save Scene [CTRL + S]")) {
@@ -1498,11 +1506,6 @@ void UIManager::TopBarWindow() {
                     curr_type_draw = 2;
                     glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
                 }
-                ImGui::EndMenu();
-            }
-
-            if (ImGui::BeginMenu("Console")) {
-                ImGui::Checkbox("Console Window", &console_window);
                 ImGui::EndMenu();
             }
 
@@ -1709,8 +1712,6 @@ void UIManager::TopBarWindow() {
             ImGui::EndMenu();
         }
 
-        
-
         if (global.deferred_shading) {
 
             ImGui::SameLine();
@@ -1734,6 +1735,21 @@ void UIManager::TopBarWindow() {
             if (ImGui::RadioButton("Position", global.deferred_option == 2)) {
                 global.deferred_option = 2;
             }
+        }
+
+        if (show_fps) {
+            ImGui::SameLine();
+            ImGui::Spacing();
+            ImGui::SameLine();
+            ImVec2 p = ImGui::GetCursorScreenPos();
+            ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x, p.y), ImVec2(p.x, p.y + ImGui::GetTextLineHeight()), IM_COL32(255, 255, 255, 255), 1.0f);
+            ImGui::SameLine();
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            ImGui::Text("FPS: %0.1f", 1000.0 / global.dt);
+            //ImGui::Text("Delta time: %0.3f ms", global.dt);
         }
 
         float spacing = ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("T33Engine - Sergio Madaleno Figueroa & Fede Sanjuan").x;

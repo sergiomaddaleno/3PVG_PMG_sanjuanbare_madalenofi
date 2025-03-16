@@ -37,13 +37,13 @@ int main(int, char**) {
 
     init();
 
-    float dt = 0.0f;
-    double currentTime = 0.0f;
+    double dt = 0.0;
     double lastTime = window->getTime();
     bool done = false;
     while (!done) {
         double currentTime = window->getTime();
-        float dt = float(currentTime - lastTime);
+        double dt = currentTime - lastTime;
+        global.dt = dt;
 
         window->updateWindow();
         window->toggleFullScreen(input);
