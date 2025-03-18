@@ -281,6 +281,7 @@ void RenderSystem::setup()
     entity_ = ecs_.create_entity();
 
     ecs_.add_component_type<IdentifierComponent>();
+    ecs_.add_component_type<HierarchyComponent>();
     ecs_.add_component_type<RenderComponent>();
     ecs_.add_component_type<TransformComponent>();
     ecs_.add_component_type<LightComponent>();
@@ -307,7 +308,8 @@ void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type,
                 model_vertices.at(i * 3 + 2) 
             };
 
-            glm::vec3 transf_vertex = terrain_rotation * (vertex * terrain_scale);
+            glm::vec3 transf_vertex = terrain_rotation * 
+                (vertex * terrain_scale);
 
             glm::vec3 final_pos = transf_vertex + terrain_position;
 
@@ -398,6 +400,7 @@ size_t RenderSystem::createMesh(std::string file, std::string textureFolder,
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<RenderComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
 
@@ -406,6 +409,7 @@ size_t RenderSystem::createMesh(std::string file, std::string textureFolder,
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
+    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -429,6 +433,7 @@ size_t RenderSystem::createTerrain(TransformComponent tc,
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<RenderComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
     ecs_.get_component<IdentifierComponent>(entity_)->name = "Terrain [" + std::to_string(entity_terrain) + "]";
@@ -436,6 +441,7 @@ size_t RenderSystem::createTerrain(TransformComponent tc,
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
+    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -461,6 +467,7 @@ size_t RenderSystem::createWater(TransformComponent tc,
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<RenderComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
     ecs_.get_component<IdentifierComponent>(entity_)->name = "Water [" + std::to_string(entity_water) + "]";
@@ -468,6 +475,7 @@ size_t RenderSystem::createWater(TransformComponent tc,
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
+    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -488,6 +496,7 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<RenderComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
 
@@ -496,6 +505,7 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
+    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -516,6 +526,7 @@ size_t RenderSystem::createSurface(std::vector<float> surface_points, TransformC
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<RenderComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
 
@@ -524,6 +535,7 @@ size_t RenderSystem::createSurface(std::vector<float> surface_points, TransformC
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
+    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -544,6 +556,7 @@ size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool 
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<RenderComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
     ecs_.get_component<IdentifierComponent>(entity_)->name = "Cube8v [" + std::to_string(entity_cube8v) + "]";
@@ -551,6 +564,7 @@ size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool 
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
+    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -571,6 +585,7 @@ size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<RenderComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
     ecs_.get_component<IdentifierComponent>(entity_)->name = "Cube24v [" + std::to_string(entity_cube24v) + "]";
@@ -578,6 +593,7 @@ size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
+    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -598,6 +614,7 @@ size_t RenderSystem::createQuad(TransformComponent tc, const float size)
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<RenderComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
     ecs_.get_component<IdentifierComponent>(entity_)->name = "Quad [" + std::to_string(entity_quad) + "]";
@@ -605,6 +622,7 @@ size_t RenderSystem::createQuad(TransformComponent tc, const float size)
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
+    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -623,6 +641,7 @@ size_t RenderSystem::createSpotLight(Light li, bool default_light)
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
     ecs_.add_component<LightComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
     ecs_.get_component<IdentifierComponent>(entity_)->name = "Spot Light [" + std::to_string(entity_spotlight) + "]";
@@ -672,6 +691,7 @@ size_t RenderSystem::createPointLight(Light li, bool default_light)
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
     ecs_.add_component<LightComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
     ecs_.get_component<IdentifierComponent>(entity_)->name = "Point Light [" + std::to_string(entity_spotlight) + "]";
@@ -714,6 +734,7 @@ size_t RenderSystem::createDirectionalLight(Light li, bool default_light)
 {
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<LightComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
 
     // ----
     ecs_.get_component<IdentifierComponent>(entity_)->name = "Directional Light [" + std::to_string(entity_dirlight) + "]";

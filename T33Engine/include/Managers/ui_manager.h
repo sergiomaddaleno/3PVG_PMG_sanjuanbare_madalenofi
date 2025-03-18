@@ -56,6 +56,7 @@ public:
 
     void LSystemWindow();
 
+    void HierarchyTree(const std::string& name, int entity_id);
     void AddConsoleMessage(const std::string& message);
     void ResetIds();
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity);

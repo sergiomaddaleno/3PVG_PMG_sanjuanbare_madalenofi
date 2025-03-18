@@ -13,6 +13,10 @@ struct TransformComponent {
     glm::quat rotation;  
     glm::vec3 scale;
 
+    glm::vec3 local_position;
+    glm::quat local_rotation;
+    glm::vec3 local_scale;
+
     void moveEntity(Input& input, float dt, float speed = 0.001f);
 
     // ---

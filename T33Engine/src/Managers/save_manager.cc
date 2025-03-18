@@ -39,18 +39,21 @@ nlohmann::json SaveManager::serialize(Camera& cam, Skybox& skybox)
     auto ti = ecs_.getComponentList<TransformComponent>().begin();
     auto li = ecs_.getComponentList<LightComponent>().begin();
     auto ni = ecs_.getComponentList<IdentifierComponent>().begin();
+    auto hi = ecs_.getComponentList<HierarchyComponent>().begin();
 
     auto riend = ecs_.getComponentList<RenderComponent>().end();
     auto tiend = ecs_.getComponentList<TransformComponent>().end();
     auto liend = ecs_.getComponentList<LightComponent>().end();
     auto niend = ecs_.getComponentList<IdentifierComponent>().end();
+    auto hiend = ecs_.getComponentList<HierarchyComponent>().end();
 
     size_t max_components = std::max({ 
       ecs_.getComponentList<RenderComponent>().size(),
       ecs_.getComponentList<TransformComponent>().size(),
       ecs_.getComponentList<LightComponent>().size(),
-      ecs_.getComponentList<IdentifierComponent>().size()
-        });
+      ecs_.getComponentList<IdentifierComponent>().size(),
+      ecs_.getComponentList<HierarchyComponent>().size()
+    });
 
     for (size_t i = 0; i < max_components; ++i) {
         nlohmann::json entity_json;
@@ -81,6 +84,13 @@ nlohmann::json SaveManager::serialize(Camera& cam, Skybox& skybox)
                 entity_json["Identifier_component"] = (*ni)->serialize();
             }
             ++ni;
+        }
+
+        if (hi != hiend) {
+            if (hi->has_value()) {
+                entity_json["Hierarchy_component"] = (*hi)->serialize();
+            }
+            ++hi;
         }
 
         if (!entity_json.empty()) {
@@ -330,6 +340,34 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
                             name_comp->name = nc["Entity_name"];
                             name_comp->id = nc["Entity_id"];
                             ++ni;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (entity.contains("Hierarchy_component")) {
+
+            auto hi = ecs_.getComponentList<HierarchyComponent>().begin();
+            auto hiend = ecs_.getComponentList<HierarchyComponent>().end();
+            for (const auto& entity : j["Entities"]) {
+                if (entity.contains("Hierarchy_component")) {
+                    const auto& hc = entity["Hierarchy_component"];
+
+                    if (hi != hiend) {
+                        if (hi->has_value()) {
+                            auto& hierarchy_comp = *hi;
+
+                            hierarchy_comp->clearChildren();
+                            hierarchy_comp->clearParents();
+
+                            std::vector<int> vec_child = hc["Child"].get<std::vector<int>>();
+                            hierarchy_comp->setChildren(vec_child);
+                            
+                            std::vector<int> vec_parent = hc["Parent"].get<std::vector<int>>();
+                            hierarchy_comp->setParents(vec_parent);
+
+                            ++hi;
                         }
                     }
                 }

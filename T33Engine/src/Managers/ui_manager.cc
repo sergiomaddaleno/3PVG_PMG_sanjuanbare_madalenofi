@@ -331,39 +331,130 @@ void UIManager::GameWindow() {
 void UIManager::HierarchyWindow() {
     ImGui::Begin("Hierarchy", nullptr);
 
-    //--
-    auto ri = ecs_.getComponentList<RenderComponent>().begin();
-    auto ti = ecs_.getComponentList<TransformComponent>().begin();
-
-    auto riend = ecs_.getComponentList<RenderComponent>().end();
-    auto tiend = ecs_.getComponentList<TransformComponent>().end();
-
-    auto li = ecs_.getComponentList<LightComponent>().begin();
-    auto liend = ecs_.getComponentList<LightComponent>().end();
-
     auto ni = ecs_.getComponentList<IdentifierComponent>().begin();
     auto niend = ecs_.getComponentList<IdentifierComponent>().end();
 
+    auto hi = ecs_.getComponentList<HierarchyComponent>().begin();
+    auto hiend = ecs_.getComponentList<HierarchyComponent>().end();
+
+    auto ti = ecs_.getComponentList<TransformComponent>().begin();
+    auto tiend = ecs_.getComponentList<TransformComponent>().end();
+
     int entity_id = 0;
-    
 
-    for (; ni != niend; ++ni, entity_id++) {
+    ImGui::Selectable("Root", false, ImGuiSelectableFlags_None, ImVec2(0, 20));
+    if (ImGui::BeginDragDropTarget()) {
+        const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY");
+        if (payload) {
+            int draggedEntityId = *reinterpret_cast<int*>(payload->Data);
+            auto& draggedHierarchy = ecs_.get_component<HierarchyComponent>(draggedEntityId);
 
-        if (ni->has_value() && ni != niend) {
+            if (!draggedHierarchy->getParents().empty()) {
+                auto previousParentId = draggedHierarchy->getParent();
+                auto& previousParentHierarchy = ecs_.get_component<HierarchyComponent>(previousParentId);
+                previousParentHierarchy->removeChild(draggedEntityId);
+                draggedHierarchy->clearParents();
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    for (; ni != niend && hi != hiend; ++ni, ++hi, entity_id++) {
+
+        if ((ni->has_value() && hi->has_value())) {
             auto& name_comp = *ni;
+            auto& hierarchy_comp = *hi;
 
-            ImGui::Image(m_EntityIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-            ImGui::SameLine();
+            if (hierarchy_comp->getParents().empty()) {
+                HierarchyTree(name_comp->name, entity_id);
+            }
 
-            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 4.0f);
+            if (ti != tiend && ti->has_value()) {
+                auto& transf_comp = *ti;
 
-            if (ImGui::Selectable(name_comp->name.c_str(), selected_entity == entity_id))
-                selected_entity = entity_id;
+                if (hierarchy_comp->hasParent()) {
+                    auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
+                    auto& parent_transform = ecs_.get_component<TransformComponent>(hierarchy_comp->getParent());
+
+                    if (selected_entity == entity_id) {
+                        child_transform->local_position = child_transform->position - parent_transform->position;
+                    }
+                    else {
+                        child_transform->position = parent_transform->position + child_transform->local_position;
+                    }
+                }
+                ++ti;
+            }
         }
     }
-    
 
     ImGui::End();
+}
+
+void UIManager::HierarchyTree(const std::string& name, int entity_id)
+{
+    ImGui::Image(m_EntityIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+    ImGui::SameLine();
+
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 4.0f);
+
+    ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_OpenOnArrow |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    if (selected_entity == entity_id)
+        flag |= ImGuiTreeNodeFlags_Selected;
+
+    if (ImGui::TreeNodeEx(name.c_str(), flag))
+    {
+        if (ImGui::IsItemClicked()) {
+            selected_entity = entity_id;
+        }
+
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+            ImGui::SetDragDropPayload("HIERARCHY", &entity_id, sizeof(int));
+            ImGui::Text(name.c_str());
+            ImGui::EndDragDropSource();
+        }
+
+        if (ImGui::BeginDragDropTarget()) {
+            const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY");
+            if (payload) {
+                int draggedEntityId = *reinterpret_cast<int*>(payload->Data);
+
+                auto& draggedHierarchy = ecs_.get_component<HierarchyComponent>(draggedEntityId);
+                auto& targetHierarchy = ecs_.get_component<HierarchyComponent>(entity_id);
+
+                if (!draggedHierarchy->hasChildren()) {
+
+                    if (!draggedHierarchy->getParents().empty()) {
+                        auto previousParentId = draggedHierarchy->getParent();
+                        auto& previousParentHierarchy = ecs_.get_component<HierarchyComponent>(previousParentId);
+                        if (!draggedHierarchy->hasParent()) {
+                            previousParentHierarchy->removeChild(draggedEntityId);
+                        }
+                    }
+
+                    if (!draggedHierarchy->hasParent()) {
+                        targetHierarchy->addChild(draggedEntityId);
+                        draggedHierarchy->clearParents();
+                        draggedHierarchy->addParent(entity_id);
+                    }
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        auto& hierarchy = ecs_.get_component<HierarchyComponent>(entity_id);
+        for (auto childId : hierarchy->getChildren()) {
+            auto& childNameComp = ecs_.get_component<IdentifierComponent>(childId);
+            if (childNameComp.has_value()) {
+                HierarchyTree(childNameComp->name, childId);
+            }
+        }
+
+        ImGui::TreePop();
+    }
 }
 
 void UIManager::InspectorWindow() {
@@ -1274,6 +1365,9 @@ void UIManager::InspectorWindow() {
             if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
                 ImGui::Text("- Identifier component");
             }
+            if (ecs_.has_component<HierarchyComponent>(selected_entity)) {
+                ImGui::Text("- Hierarchy component");
+            }
             ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
             /*
@@ -1354,13 +1448,30 @@ void UIManager::InspectorWindow() {
     ImGui::SameLine();
 
     if (ImGui::Button("Delete Entity") || input_->isKeyPressed(Input::SUPR)) {
+        if (ecs_.has_component<HierarchyComponent>(selected_entity)) {
+            auto& hierarchy = ecs_.get_component<HierarchyComponent>(selected_entity);
 
-        if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
-            ecs_.destroy_entity(selected_entity);
+            for (int parentId : hierarchy->getParents()) {
+                if (ecs_.has_component<HierarchyComponent>(parentId)) {
+                    ecs_.get_component<HierarchyComponent>(parentId)->removeChild(selected_entity);
+                }
+            }
 
-            ResetIds();
+            for (int childId : hierarchy->getChildren()) {
+                if (ecs_.has_component<HierarchyComponent>(childId)) {
+                    ecs_.get_component<HierarchyComponent>(childId)->removeParent(selected_entity);
+                }
+            }
+
+            hierarchy->clearParents();
+            hierarchy->clearChildren();
         }
+
+        ecs_.destroy_entity(selected_entity); 
+        selected_entity = 0; 
+        ResetIds();
     }
+
     
     ImGui::End();
 }
@@ -2065,7 +2176,6 @@ void UIManager::ConsoleWindow()
 
     ImGui::End();
 }
-
 
 void UIManager::AddConsoleMessage(const std::string& message)
 {

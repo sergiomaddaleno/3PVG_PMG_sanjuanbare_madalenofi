@@ -4,3 +4,4 @@
 #include "render_component.h"
 #include "scripting_component.h"
 #include "transform_component.h"
+#include "hierarchy_component.h"
