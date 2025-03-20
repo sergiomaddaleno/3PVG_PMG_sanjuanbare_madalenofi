@@ -499,6 +499,7 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
     ecs_.add_component<RenderComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
     ecs_.add_component<HierarchyComponent>(entity_);
+    //ecs_.add_component<PhysicsComponent>(entity_);
 
     //---
 
