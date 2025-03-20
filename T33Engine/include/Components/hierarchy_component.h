@@ -13,7 +13,7 @@ public:
 	void clearParents();
 
 	void addChild(int id);
-	int getChild(int id);
+	int getChild();
 	void removeChild(int id);
 	void clearChildren();
 

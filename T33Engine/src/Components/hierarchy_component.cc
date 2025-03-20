@@ -28,13 +28,9 @@ void HierarchyComponent::addChild(int id)
 	child_.push_back(id);
 }
 
-int HierarchyComponent::getChild(int id)
+int HierarchyComponent::getChild()
 {
-	if (!parent_.empty()) {
-		return parent_[id];
-	}
-
-	return 0;
+	return child_[0];
 }
 
 void HierarchyComponent::removeChild(int id)

@@ -376,6 +376,7 @@ void UIManager::HierarchyWindow() {
                     auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
                     auto& parent_transform = ecs_.get_component<TransformComponent>(hierarchy_comp->getParent());
 
+                    //-
                     if (selected_entity == entity_id) {
                         child_transform->local_position = child_transform->position - parent_transform->position;
                     }

@@ -7,22 +7,26 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -27.49665641784668,
-   25.09390640258789,
-   11.635130882263184
+   -27.260419845581055,
+   24.149660110473633,
+   9.458427429199219
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 20.25,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.707043468952179,
-   -0.6032378077507019,
-   -0.36904433369636536
+   0.7259339690208435,
+   -0.5678560733795166,
+   -0.3880198299884796
   ]
  },
  "Entities": [
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 0,
     "Entity_name": "Mario"
@@ -36,9 +40,9 @@
    },
    "Transform_component": {
     "Position": [
-     -9.560978889465332,
+     -11.871054649353027,
      -0.16782164573669434,
-     -9.625251770019531
+     -9.623868942260742
     ],
     "Rotation": [
      0.0,
@@ -54,6 +58,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 1,
     "Entity_name": "box"
@@ -69,9 +77,9 @@
    },
    "Transform_component": {
     "Position": [
-     -1.1899484395980835,
-     7.28684139251709,
-     0.05704972892999649
+     -1.8990678787231445,
+     7.119019508361816,
+     -0.03878927230834961
     ],
     "Rotation": [
      0.0,
@@ -87,6 +95,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 2,
     "Entity_name": "Cube8v [0]"
@@ -121,6 +133,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 3,
     "Entity_name": "Sphere [0]"
@@ -154,6 +170,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 4,
     "Entity_name": "brick"
@@ -187,6 +207,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 5,
     "Entity_name": "Bucket"
@@ -246,6 +270,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 6,
     "Entity_name": "Terrain [1]"
@@ -283,6 +311,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 7,
     "Entity_name": "Directional Light [1]"

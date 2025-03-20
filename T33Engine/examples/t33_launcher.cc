@@ -67,6 +67,10 @@ int main(int, char**) {
             global.render_system.forwardRender(global.cam);
         }
 
+        /*global.ecs.get_component<TransformComponent>(3)->position = 
+            global.ecs.get_component<TransformComponent>(3)->position 
+            + glm::vec3(cosf(glfwGetTime()), 0.0f, sinf(glfwGetTime()));*/
+
         global.ui_manager.Render();
 
         if (window->closePressed(input)) done = true;

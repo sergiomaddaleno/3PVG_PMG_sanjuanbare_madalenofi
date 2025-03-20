@@ -7,24 +7,33 @@
   "Ortho_height": 600.0,
   "Ortho_width": 800.0,
   "Position": [
-   -56.2021484375,
-   37.73550033569336,
-   58.804222106933594
+   -31.523983001708984,
+   21.030345916748047,
+   35.923583984375
   ],
   "Scroll_speed": 1.0,
   "Sensitivity": 1.0,
   "Speed": 35.78099822998047,
   "Use_perspective_matrix": true,
   "View_direction": [
-   0.840438187122345,
-   -0.5417328476905823,
-   0.013752853497862816
+   0.7231448292732239,
+   -0.359899640083313,
+   0.5895199775695801
   ]
  },
  "Entities": [
   {
    "Hierarchy_component": {
-    "Child": [],
+    "Child": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ],
     "Parent": []
    },
    "Identifier_component": {
@@ -62,7 +71,9 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": []
+    "Parent": [
+     0
+    ]
    },
    "Identifier_component": {
     "Entity_id": 1,
@@ -80,7 +91,7 @@
    "Transform_component": {
     "Position": [
      0.0,
-     0.0,
+     1.1440868377685547,
      41.07158279418945
     ],
     "Rotation": [
@@ -99,7 +110,9 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": []
+    "Parent": [
+     0
+    ]
    },
    "Identifier_component": {
     "Entity_id": 2,
@@ -117,7 +130,7 @@
    "Transform_component": {
     "Position": [
      0.0,
-     0.0,
+     1.1440868377685547,
      46.59817886352539
     ],
     "Rotation": [
@@ -138,7 +151,9 @@
     "Child": [
      9
     ],
-    "Parent": []
+    "Parent": [
+     0
+    ]
    },
    "Identifier_component": {
     "Entity_id": 3,
@@ -155,9 +170,9 @@
    },
    "Transform_component": {
     "Position": [
-     0.0,
-     0.0,
-     52.80235290527344
+     -0.5028569102287292,
+     1.1440868377685547,
+     52.05475616455078
     ],
     "Rotation": [
      0.0,
@@ -175,7 +190,9 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": []
+    "Parent": [
+     0
+    ]
    },
    "Identifier_component": {
     "Entity_id": 4,
@@ -193,7 +210,7 @@
    "Transform_component": {
     "Position": [
      0.0,
-     0.0,
+     1.1440868377685547,
      59.655033111572266
     ],
     "Rotation": [
@@ -212,7 +229,9 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": []
+    "Parent": [
+     0
+    ]
    },
    "Identifier_component": {
     "Entity_id": 5,
@@ -230,7 +249,7 @@
    "Transform_component": {
     "Position": [
      0.0,
-     0.0,
+     1.1440868377685547,
      78.58647918701172
     ],
     "Rotation": [
@@ -249,7 +268,9 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": []
+    "Parent": [
+     0
+    ]
    },
    "Identifier_component": {
     "Entity_id": 6,
@@ -267,7 +288,7 @@
    "Transform_component": {
     "Position": [
      0.0,
-     0.0,
+     1.1440868377685547,
      113.15526580810547
     ],
     "Rotation": [
@@ -286,7 +307,9 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": []
+    "Parent": [
+     0
+    ]
    },
    "Identifier_component": {
     "Entity_id": 7,
@@ -304,7 +327,7 @@
    "Transform_component": {
     "Position": [
      0.0,
-     0.0,
+     1.1440868377685547,
      137.22422790527344
     ],
     "Rotation": [
@@ -323,7 +346,9 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": []
+    "Parent": [
+     0
+    ]
    },
    "Identifier_component": {
     "Entity_id": 8,
@@ -341,7 +366,7 @@
    "Transform_component": {
     "Position": [
      0.0,
-     0.0,
+     1.1440868377685547,
      157.0464324951172
     ],
     "Rotation": [
@@ -379,9 +404,9 @@
    },
    "Transform_component": {
     "Position": [
-     0.0,
-     1.4295241832733154,
-     56.64253234863281
+     -0.02209329605102539,
+     2.57361102104187,
+     55.5604133605957
     ],
     "Rotation": [
      0.0,
