@@ -71,6 +71,8 @@ int main(int, char**) {
             global.ecs.get_component<TransformComponent>(3)->position 
             + glm::vec3(cosf(glfwGetTime()), 0.0f, sinf(glfwGetTime()));*/
 
+        global.physics_system.update();
+
         global.ui_manager.Render();
 
         if (window->closePressed(input)) done = true;

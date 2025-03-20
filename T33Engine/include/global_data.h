@@ -14,6 +14,7 @@
 #include "Render/post_processing.h"
 #include "Render/skybox.h"
 #include "Render/render_system.h"
+#include "Render/physics_system.h"
 #include "Systems/ecs_manager.h"
 #include "Managers/save_manager.h"
 #include "Managers/ui_manager.h"
@@ -60,6 +61,7 @@ public:
     Camera cam;
     ECSManager ecs;
     RenderSystem render_system;
+    PhysicsSystem physics_system;
     PostProcessing post_process;
     Skybox skybox;
     SaveManager save_manager;

@@ -36,6 +36,7 @@ RenderSystem::RenderSystem(ECSManager& ecs_)
     entity_spotlight(0),
     entity_pointlight(0),
     entity_dirlight(0),
+    entity_surface(0),
     ecs_(ecs_)
 {
 }
@@ -285,6 +286,7 @@ void RenderSystem::setup()
     ecs_.add_component_type<RenderComponent>();
     ecs_.add_component_type<TransformComponent>();
     ecs_.add_component_type<LightComponent>();
+    ecs_.add_component_type<PhysicsComponent>();
 }
 
 void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type, float spawn_prob, float y_spawn_height)

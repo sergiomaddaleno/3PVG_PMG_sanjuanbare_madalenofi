@@ -5,3 +5,4 @@
 #include "scripting_component.h"
 #include "transform_component.h"
 #include "hierarchy_component.h"
+#include "physics_component.h"
