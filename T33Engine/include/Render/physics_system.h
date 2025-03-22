@@ -10,18 +10,19 @@
 #define __PHYSICS_SYSTEM__
 
 #include "../Systems/ecs_manager.h"
+#include "Render/render_system.h"
+#include "Core/shader.h"
 
 class PhysicsSystem {
-
 public:
-	PhysicsSystem(ECSManager& ecs);
-	~PhysicsSystem();
+    PhysicsSystem(ECSManager& ecs, RenderSystem& rs);
+    ~PhysicsSystem();
 
-	void init();
-	void update();
+    void update();
 
 private:
-	ECSManager &ecs_;
+    ECSManager& ecs_;
+    RenderSystem& rs_; 
 };
 
 

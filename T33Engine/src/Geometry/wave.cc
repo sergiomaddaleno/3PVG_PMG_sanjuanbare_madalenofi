@@ -13,6 +13,28 @@ GerstnerWave::~GerstnerWave()
 {
 }
 
+std::vector<float> GerstnerWave::waveEffect(const std::vector<float>& aPos, float time) {
+    if (!use_wave_) return aPos;
+
+    std::vector<float> modifiedPos = aPos; 
+
+    float k = 6.28318530718f / wave_length_;
+    float omega = k * speed_;
+    glm::vec2 dir = glm::normalize(direction_);
+
+    for (size_t i = 0; i < aPos.size() / 3; i++) {
+        float x = aPos[i * 3 + 0];
+        float y = aPos[i * 3 + 1];
+        float z = aPos[i * 3 + 2];
+
+        float wave = amplitude_ * sin(k * glm::dot(glm::vec2(x, z), dir) + omega * time);
+
+        modifiedPos[i * 3 + 1] = y + wave; 
+    }
+
+    return modifiedPos;
+}
+
 void GerstnerWave::setUniforms(Shader& shader, float time)
 {
 	int usewave = use_wave_;

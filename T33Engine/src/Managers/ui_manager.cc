@@ -168,6 +168,7 @@ void UIManager::Init(Window* window, Input* input) {
     m_PlayIcon.loadTexture("../stages/assets/textures/imgui/play.png");
     m_StopIcon.loadTexture("../stages/assets/textures/imgui/stop.png");
     m_AlgorithmIcon.loadTexture("../stages/assets/textures/imgui/algorithm.png");
+    m_PhysicsmIcon.loadTexture("../stages/assets/textures/imgui/physics.png");
 
     //---
 
@@ -1340,6 +1341,28 @@ void UIManager::InspectorWindow() {
             }
         }
 
+    if (ecs_.has_component<PhysicsComponent>(selected_entity)) {
+
+            bool open = ImGui::CollapsingHeader("##PhysicsComponent", ImGuiTreeNodeFlags_DefaultOpen);
+            ImGui::SameLine();
+            ImGui::Image(m_PhysicsmIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+            ImGui::SameLine();
+            ImGui::Text("Physics Component");
+
+            if (open) {
+
+                auto& physics = *ecs_.get_component<PhysicsComponent>(selected_entity);
+                
+                ImGui::Text("Gravity");
+                ImGui::SliderFloat("Y##Gravity", &physics.gravity.y, -100.0f, 100.0f);
+
+                ImGui::Spacing();
+                ImGui::InputFloat("Mass##Physics", &physics.mass, 0.1f, 1.0f, "%.2f");
+                ImGui::InputFloat("Floor Height", &physics.floor_height, 0.1f, 1.0f, "%.2f");
+                ImGui::SliderFloat("Bounce Factor", &physics.bounce_factor, 0.0f, 1.0f);
+            }
+        }
+
     // ---
 
     bool open = ImGui::CollapsingHeader("##Components", ImGuiTreeNodeFlags_DefaultOpen);
@@ -1349,46 +1372,48 @@ void UIManager::InspectorWindow() {
     ImGui::Text("Components");
 
     if (open) {
-            ImGui::Dummy(ImVec2(0.0f, 3.0f));
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-            ImGui::Text("Entity has:");
-            ImGui::Dummy(ImVec2(0.0f, 3.0f));
+        ImGui::Text("Entity has:");
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-            if (ecs_.has_component<TransformComponent>(selected_entity)) {
-                ImGui::Text("- Transform component");
-            }
-            if (ecs_.has_component<LightComponent>(selected_entity)) {
-                ImGui::Text("- Light component");
-            }
-            if (ecs_.has_component<RenderComponent>(selected_entity)) {
-                ImGui::Text("- Render component");
-            }
-            if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
-                ImGui::Text("- Identifier component");
-            }
-            if (ecs_.has_component<HierarchyComponent>(selected_entity)) {
-                ImGui::Text("- Hierarchy component");
-            }
-            ImGui::Dummy(ImVec2(0.0f, 3.0f));
+        if (ecs_.has_component<TransformComponent>(selected_entity)) {
+            ImGui::Text("- Transform component");
+        }
+        if (ecs_.has_component<LightComponent>(selected_entity)) {
+            ImGui::Text("- Light component");
+        }
+        if (ecs_.has_component<RenderComponent>(selected_entity)) {
+            ImGui::Text("- Render component");
+        }
+        if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
+            ImGui::Text("- Identifier component");
+        }
+        if (ecs_.has_component<HierarchyComponent>(selected_entity)) {
+            ImGui::Text("- Hierarchy component");
+        }
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-            /*
-            const char* addComponents[] = { "Transform Component", "Light Component", "Render Component" };
-            static int addCurrentItem = -1;
 
-            if (ImGui::BeginCombo("Add Component", addCurrentItem >= 0 ? addComponents[addCurrentItem] : "Select Component to Add")) {
-                for (int i = 0; i < IM_ARRAYSIZE(addComponents); i++) {
-                    bool hasComponent = false;
-                    switch (i) {
-                    case 0: hasComponent = ecs_.has_component<TransformComponent>(selected_entity); break;
-                    case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
-                    case 2: hasComponent = ecs_.has_component<RenderComponent>(selected_entity); break;
-                    }
+        const char* addComponents[] = { "Physics Component", "Light Component" };
+        static int addCurrentItem = -1;
 
-                    if (!hasComponent) {
-                        if (ImGui::Selectable(addComponents[i], addCurrentItem == i)) {
-                            switch (i) {
-                            case 0: ecs_.add_component<TransformComponent>(selected_entity); break;
-                            case 1: ecs_.add_component<LightComponent>(selected_entity);
+        if (ImGui::BeginCombo("Add Component", addCurrentItem >= 0 ? addComponents[addCurrentItem] : "Select Component to Add")) {
+            for (int i = 0; i < IM_ARRAYSIZE(addComponents); i++) {
+                bool hasComponent = false;
+                switch (i) {
+                case 0: hasComponent = ecs_.has_component<PhysicsComponent>(selected_entity); break;
+                case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
+                }
+
+                if (!hasComponent) {
+                    if (ImGui::Selectable(addComponents[i], addCurrentItem == i)) {
+                        switch (i) {
+                        case 0:
+                            ecs_.add_component<PhysicsComponent>(selected_entity);
+                            break;
+                        case 1:
+                            ecs_.add_component<LightComponent>(selected_entity);
                             {
                                 auto& light_comp = ecs_.get_component<LightComponent>(selected_entity);
                                 light_comp->light.type_ = Light::LightType::LT_Point;
@@ -1400,46 +1425,51 @@ void UIManager::InspectorWindow() {
                                 light_comp->light.constant_att_ = 1.0f;
                                 light_comp->light.shininess_ = 32.0f;
                                 light_comp->light.strength_ = 1.0f;
+
+                                global.render_system.init();
                             }
                             break;
-                            case 2: ecs_.add_component<RenderComponent>(selected_entity); break;
-                            }
-                            addCurrentItem = -1;
                         }
+                        addCurrentItem = -1; 
                     }
                 }
-                ImGui::EndCombo();
             }
-
-            ImGui::Dummy(ImVec2(0.0f, 3.0f));
-
-            const char* deleteComponents[] = { "Transform Component", "Light Component", "Render Component" };
-            static int deleteCurrentItem = -1;
-
-            if (ImGui::BeginCombo("Delete Component", deleteCurrentItem >= 0 ? deleteComponents[deleteCurrentItem] : "Select Component to Delete")) {
-                for (int i = 0; i < IM_ARRAYSIZE(deleteComponents); i++) {
-                    bool hasComponent = false;
-                    switch (i) {
-                    case 0: hasComponent = ecs_.has_component<TransformComponent>(selected_entity); break;
-                    case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
-                    case 2: hasComponent = ecs_.has_component<RenderComponent>(selected_entity); break;
-                    }
-
-                    if (hasComponent) {
-                        if (ImGui::Selectable(deleteComponents[i], deleteCurrentItem == i)) {
-                            switch (i) {
-                            case 0: ecs_.delete_component<TransformComponent>(selected_entity); break;
-                            case 1: ecs_.delete_component<LightComponent>(selected_entity); break;
-                            //case 2: ecs_.delete_component<RenderComponent>(selected_entity); break;
-                            }
-                            deleteCurrentItem = -1;
-                        }
-                    }
-                }
-                ImGui::EndCombo();
-            }
-            */
+            ImGui::EndCombo(); 
         }
+
+        ImGui::Dummy(ImVec2(0.0f, 3.0f)); 
+
+        // ---------------------- DELETE COMPONENT ----------------------
+
+        const char* deleteComponents[] = { "Physics Component", "Light Component" };
+        static int deleteCurrentItem = -1;
+
+        if (ImGui::BeginCombo("Delete Component", deleteCurrentItem >= 0 ? deleteComponents[deleteCurrentItem] : "Select Component to Delete")) {
+            for (int i = 0; i < IM_ARRAYSIZE(deleteComponents); i++) {
+                bool hasComponent = false;
+                switch (i) {
+                case 0: hasComponent = ecs_.has_component<PhysicsComponent>(selected_entity); break;
+                case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
+                }
+
+                if (hasComponent) {
+                    if (ImGui::Selectable(deleteComponents[i], deleteCurrentItem == i)) {
+                        switch (i) {
+                        case 0:
+                            ecs_.delete_component<PhysicsComponent>(selected_entity);
+                            break;
+                        case 1:
+                            ecs_.delete_component<LightComponent>(selected_entity);
+                            break;
+                        }
+                        deleteCurrentItem = -1;
+                    }
+                }
+            }
+            ImGui::EndCombo();
+        }
+    }
+
 
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
     ImGui::Separator();

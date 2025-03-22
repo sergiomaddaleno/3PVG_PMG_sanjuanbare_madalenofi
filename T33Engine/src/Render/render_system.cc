@@ -37,6 +37,7 @@ RenderSystem::RenderSystem(ECSManager& ecs_)
     entity_pointlight(0),
     entity_dirlight(0),
     entity_surface(0),
+    entity_water(0),
     ecs_(ecs_)
 {
 }
@@ -499,7 +500,6 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
     ecs_.add_component<RenderComponent>(entity_);
     ecs_.add_component<TransformComponent>(entity_);
     ecs_.add_component<HierarchyComponent>(entity_);
-    //ecs_.add_component<PhysicsComponent>(entity_);
 
     //---
 

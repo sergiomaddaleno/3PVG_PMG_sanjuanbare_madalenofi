@@ -32,6 +32,7 @@ class Sphere {
 
   void bind();
   void draw();
+
   void setTexture(std::string file_path);
   std::vector<float> GetVertexSphere();
 

@@ -3,16 +3,14 @@
 #include "Components/components.h"
 #include "global_data.h"
 
-PhysicsSystem::PhysicsSystem(ECSManager& ecs) : 
-	ecs_(ecs)
+
+PhysicsSystem::PhysicsSystem(ECSManager& ecs, RenderSystem& rs) : 
+	ecs_(ecs),
+	rs_(rs)
 {
 }
 
 PhysicsSystem::~PhysicsSystem()
-{
-}
-
-void PhysicsSystem::init()
 {
 }
 
@@ -35,10 +33,18 @@ void PhysicsSystem::update()
 			auto& transf_comp = *ti;
 			auto& render_comp = *ri;
 
-			physics_comp->acceleration = physics_comp->force / physics_comp->mass;
-			physics_comp->velocity -= (physics_comp->acceleration - physics_comp->gravity) * global.dt;
+			int floor_height = rs_.shader.getUniformLocation("u_floor_height");
+			rs_.shader.setUniformValue(floor_height, ValueType::T_FLOAT_1, &physics_comp->floor_height);
 
-			transf_comp->position.y -= physics_comp->velocity * global.dt;
+			physics_comp->acceleration = physics_comp->force / physics_comp->mass;
+			physics_comp->acceleration -= physics_comp->gravity;
+			physics_comp->velocity += physics_comp->acceleration * (float)global.dt;
+			transf_comp->position += physics_comp->velocity * (float)global.dt;
+
+			if (transf_comp->position.y <= floor_height) {
+				transf_comp->position.y = floor_height;
+				physics_comp->velocity.y *= -physics_comp->bounce_factor;
+			}
 		}
 	}
 }

@@ -123,7 +123,6 @@ void Sphere::bind()
     glBindVertexArray(0);
 }
 
-
 void Sphere::draw()
 {
     if (use_texture_) {

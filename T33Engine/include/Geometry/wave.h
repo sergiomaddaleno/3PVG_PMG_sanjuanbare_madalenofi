@@ -24,6 +24,7 @@ public:
     GerstnerWave();
     ~GerstnerWave();
 
+    std::vector<float> waveEffect(const std::vector<float>& aPos, float time);
     void setUniforms(Shader& shader, float time);
 
     float time_;

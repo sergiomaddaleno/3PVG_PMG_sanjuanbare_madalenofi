@@ -188,6 +188,7 @@ void Skybox::renderDDS(Camera cam) {
     glDrawElements(GL_TRIANGLES, sizeof(dds_indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
     glCullFace(GL_BACK);
@@ -215,6 +216,7 @@ void Skybox::renderCubeMap(Camera cam)
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glDepthFunc(GL_LESS);
 }
 

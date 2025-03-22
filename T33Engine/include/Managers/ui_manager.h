@@ -78,7 +78,7 @@ private:
     Texture m_DirectoryIcon, m_FileIcon, m_EntityIcon, m_BackIcon,
     m_ToolsIcon, m_LightIcon, m_CameraIcon, m_TransformIcon, m_SettingsIcon,
     m_TagIcon, m_RenderIcon, m_EditIcon, m_PuzzleIcon, m_DeleteIcon,
-    m_PlayIcon, m_StopIcon, m_AlgorithmIcon;
+    m_PlayIcon, m_StopIcon, m_AlgorithmIcon, m_PhysicsmIcon;
 
     float padding;
     float thumbnailSize;
