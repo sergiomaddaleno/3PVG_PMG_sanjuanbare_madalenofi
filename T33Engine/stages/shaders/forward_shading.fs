@@ -140,6 +140,23 @@ vec3 NormalMappingSpot(LightInfo lc){
     return ambient + diffuse + specular;
 }
 
+vec3 NormalMappingPoint(LightInfo lc){
+    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
+    float distance = length(TangentLightPos - TangentFragPos);
+    float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
+
+    float diffuseStrength = max(dot(lightDir, mapped_normal), 0.0);
+    vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation;
+
+    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    vec3 reflectDir = reflect(-lightDir, mapped_normal);
+    float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
+
+    vec3 specular = specStrength * lc.light_color_ * attenuation;
+
+    return (diffuse + specular);
+}
+
 //parallax mapping
 vec2 ParallaxMapping(vec2 tex_coords, vec3 view_dir){
     float height = texture(u_parallax_map, tex_coords).r;
@@ -289,7 +306,15 @@ void main() {
     }
     
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light) * shadow_pl;  
+
+        if (u_use_normal_map) {
+            mat3 TBN = mat3(TangentLightPos, TangentViewPos, TangentFragPos); 
+            mapped_normal = normalize(TBN * mapped_normal);
+
+            final_light += NormalMappingPoint(u_light) * shadow_pl; 
+        } else {
+            final_light += PointLight(u_light) * shadow_pl; 
+        }
     }
 
     vec3 texture_color = texture(u_texture, texCoords).rgb;
