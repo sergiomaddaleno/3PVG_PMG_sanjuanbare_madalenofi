@@ -891,13 +891,14 @@ in vec3 FragPos;
 out vec4 FragColor;
 
 uniform vec3 u_camera_position;
+uniform float u_alpha;
 
 //Samplers
 uniform sampler2D u_texture;
 uniform sampler2D u_normal_map;
 uniform sampler2D u_parallax_map;
 uniform sampler2D u_shadow_map;
-uniform samplerCube u_depth_map;
+uniform samplerCube u_shadow_map_cube;
 
 uniform bool u_use_normal_map;
 uniform bool u_use_parallax_map;
@@ -943,7 +944,7 @@ vec3 SpotLight(LightInfo lc) {
     vec3 lightDir = normalize(lc.pos_ - FragPos);
     float cutOff = cos(radians(lc.spot_angle_));
     float outerCutOff = cos(radians(lc.spot_angle_ + lc.spot_softness_));
-    float theta = dot(lightDir, normalize(lc.dir_));
+    float theta = dot(lightDir, normalize(-lc.dir_));
 
     float distance = length(lc.pos_ - FragPos);
     float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
@@ -1003,6 +1004,23 @@ vec3 NormalMappingSpot(LightInfo lc) {
     vec3 ambient = lc.ambient_color_ * u_ambient * intensity;
 
     return ambient + diffuse + specular;
+}
+
+vec3 NormalMappingPoint(LightInfo lc) {
+    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
+    float distance = length(TangentLightPos - TangentFragPos);
+    float attenuation = 1.0 / (lc.constant_att_ + lc.linear_att * distance + lc.quad_att_ * distance * distance);
+
+    float diffuseStrength = max(dot(lightDir, mapped_normal), 0.0);
+    vec3 diffuse = lc.light_color_ * diffuseStrength * attenuation;
+
+    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    vec3 reflectDir = reflect(-lightDir, mapped_normal);
+    float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
+
+    vec3 specular = specStrength * lc.light_color_ * attenuation;
+
+    return (diffuse + specular);
 }
 
 //parallax mapping
@@ -1102,15 +1120,15 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
     vec3 fragToLight = fragPos - lightPos;
+    float closestDepth = texture(u_shadow_map_cube, fragToLight).r;
+
+    closestDepth *= u_far_plane;
     float currentDepth = length(fragToLight);
 
-    float closestDepth = texture(u_depth_map, fragToLight).r;
-    closestDepth *= u_far_plane;
-
     float bias = 0.05;
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
 
-    return 1.0 - shadow;
+    return shadow;
 }
 
 void main() {
@@ -1155,15 +1173,24 @@ void main() {
     }
 
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light) * shadow;
+
+        if (u_use_normal_map) {
+            mat3 TBN = mat3(TangentLightPos, TangentViewPos, TangentFragPos);
+            mapped_normal = normalize(TBN * mapped_normal);
+
+            final_light += NormalMappingPoint(u_light) * shadow_pl;
+        }
+        else {
+            final_light += PointLight(u_light) * shadow_pl;
+        }
     }
 
     vec3 texture_color = texture(u_texture, texCoords).rgb;
 
     vec3 final_color = texture_color * final_light;
-    FragColor = vec4(final_color, 1.0);
+    FragColor = vec4(final_color, u_alpha);
 
-    if (u_fog) FragColor = mix(vec4(u_sky_colour, 1.0), FragColor, visibility);
+    if (u_fog) FragColor = mix(vec4(u_sky_colour, u_alpha), FragColor, visibility);
 }
 );
 
