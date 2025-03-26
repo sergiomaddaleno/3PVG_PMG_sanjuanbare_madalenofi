@@ -27,6 +27,7 @@
 RenderSystem::RenderSystem(ECSManager& ecs_)
     : shader(),
     entity_(0),
+    entity_camera(0),
     entity_mesh(0),
     entity_terrain(0),
     entity_sphere(0),
@@ -148,7 +149,7 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &global.sky_colour);
 }
 
-void RenderSystem::forwardRender(Camera cam) {
+void RenderSystem::forwardRender(Input &input, double dt) {
     
     glEnable(GL_DEPTH_TEST);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -161,110 +162,121 @@ void RenderSystem::forwardRender(Camera cam) {
     auto li = ecs_.getComponentList<LightComponent>().begin();
     auto liend = ecs_.getComponentList<LightComponent>().end();
 
+    auto ci = ecs_.getComponentList<CameraComponent>().begin();
+    auto ciend = ecs_.getComponentList<CameraComponent>().end();
+
     shader.useProgram();
 
-    for (; li != liend; ++li) {
-        if (li->has_value()) {
-            auto& light_comp = *li;
+    for (; ci != ciend; ++li) {
+        if (ci->has_value()) {
+            auto& camera_comp = *ci;
 
-            light_comp->shadow_map_.render(ecs_, shader, *light_comp);
+            camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
 
-            shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
-            
-            light_comp->light.setUniforms(shader);
-            
-            // ---------------------------------------------------------------
+            for (; li != liend; ++li) {
+                if (li->has_value()) {
+                    auto& light_comp = *li;
 
-            auto ri = ecs_.getComponentList<RenderComponent>().begin();
-            auto ti = ecs_.getComponentList<TransformComponent>().begin();
-            auto riend = ecs_.getComponentList<RenderComponent>().end();
-            auto tiend = ecs_.getComponentList<TransformComponent>().end();
+                    light_comp->shadow_map_.render(ecs_, shader, *light_comp);
 
-            for (; ri != riend && ti != tiend; ++ri, ++ti) {
-                if (ri->has_value() && ti->has_value()) {
-                    auto& render_comp = *ri;
-                    auto& transform_comp = *ti;
+                    shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(camera_comp->camera.getPosition()));
 
-                    setUniforms(*transform_comp, shader, *light_comp, cam);
+                    light_comp->light.setUniforms(shader);
 
-                    switch (render_comp->type_) {
-                    case RenderType::RT_Mesh:
-                    {
-                        for (auto& mesh : render_comp->mesh_->meshes) {
-                            render_comp->mesh_->wave_.setUniforms(shader, (float)glfwGetTime());
-                            render_comp->mesh_->draw();
+                    // ---------------------------------------------------------------
+
+                    auto ri = ecs_.getComponentList<RenderComponent>().begin();
+                    auto ti = ecs_.getComponentList<TransformComponent>().begin();
+                    auto riend = ecs_.getComponentList<RenderComponent>().end();
+                    auto tiend = ecs_.getComponentList<TransformComponent>().end();
+
+                    for (; ri != riend && ti != tiend; ++ri, ++ti) {
+                        if (ri->has_value() && ti->has_value()) {
+                            auto& render_comp = *ri;
+                            auto& transform_comp = *ti;
+
+                            setUniforms(*transform_comp, shader, *light_comp, camera_comp->camera);
+
+                            switch (render_comp->type_) {
+                            case RenderType::RT_Mesh:
+                            {
+                                for (auto& mesh : render_comp->mesh_->meshes) {
+                                    render_comp->mesh_->wave_.setUniforms(shader, (float)glfwGetTime());
+                                    render_comp->mesh_->draw();
+                                }
+                            }
+                            break;
+
+                            case RenderType::RT_Terrain:
+                            {
+                                render_comp->terrain_->wave_.setUniforms(shader, (float)glfwGetTime());
+                                render_comp->terrain_->draw();
+                            }
+                            break;
+
+                            case RenderType::RT_Sphere:
+                            {
+                                render_comp->sphere_->wave_.setUniforms(shader, (float)glfwGetTime());
+                                render_comp->sphere_->draw();
+                            }
+                            break;
+
+                            case RenderType::RT_Surface:
+                            {
+                                render_comp->surface_->wave_.setUniforms(shader, (float)glfwGetTime());
+                                render_comp->surface_->draw();
+                            }
+                            break;
+
+                            case RenderType::RT_Cube8v:
+                            case RenderType::RT_Cube24v:
+                            {
+                                render_comp->cube_->wave_.setUniforms(shader, (float)glfwGetTime());
+                                render_comp->cube_->draw();
+                            }
+                            break;
+
+                            case RenderType::RT_Quad:
+                            {
+                                render_comp->quad_->wave_.setUniforms(shader, (float)glfwGetTime());
+                                render_comp->quad_->draw();
+
+                                int use = render_comp->quad_->use_normal_map_;
+                                shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"),
+                                    ValueType::T_INT_1, &use);
+
+                                use = render_comp->quad_->use_parallax_map_;
+                                shader.setUniformValue(shader.getUniformLocation("u_use_parallax_map"),
+                                    ValueType::T_INT_1, &use);
+
+                                float scale = render_comp->quad_->parallax_scale_;
+                                shader.setUniformValue(shader.getUniformLocation("u_parallax_scale"),
+                                    ValueType::T_FLOAT_1, &scale);
+
+                                int type = render_comp->quad_->parallax_type;
+                                shader.setUniformValue(shader.getUniformLocation("u_parallax_type"),
+                                    ValueType::T_INT_1, &type);
+                            }
+                            break;
+
+                            case RenderType::RT_Water:
+                                // For Blend
+                                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+                                shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &global.alpha_blend);
+
+                                render_comp->water_->wave_.setUniforms(shader, (float)glfwGetTime());
+                                render_comp->water_->draw();
+
+                                glBlendFunc(GL_ONE, GL_ZERO);
+
+                                break;
+                            }
                         }
                     }
-                    break;
-
-                    case RenderType::RT_Terrain:
-                    {
-                        render_comp->terrain_->wave_.setUniforms(shader, (float)glfwGetTime());
-                        render_comp->terrain_->draw();
-                    }
-                    break;
-
-                    case RenderType::RT_Sphere:
-                    {
-                        render_comp->sphere_->wave_.setUniforms(shader, (float)glfwGetTime());
-                        render_comp->sphere_->draw();
-                    }
-                    break;
-
-                    case RenderType::RT_Surface:
-                    {
-                        render_comp->surface_->wave_.setUniforms(shader, (float)glfwGetTime());
-                        render_comp->surface_->draw();
-                    }
-                    break;
-
-                    case RenderType::RT_Cube8v:
-                    case RenderType::RT_Cube24v:
-                    {
-                        render_comp->cube_->wave_.setUniforms(shader, (float)glfwGetTime());
-                        render_comp->cube_->draw();
-                    }
-                    break;
-
-                    case RenderType::RT_Quad:
-                    {
-                        render_comp->quad_->wave_.setUniforms(shader, (float)glfwGetTime());
-                        render_comp->quad_->draw();
-
-                        int use = render_comp->quad_->use_normal_map_;
-                        shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"),
-                            ValueType::T_INT_1, &use);
-
-                        use = render_comp->quad_->use_parallax_map_;
-                        shader.setUniformValue(shader.getUniformLocation("u_use_parallax_map"),
-                            ValueType::T_INT_1, &use);
-
-                        float scale = render_comp->quad_->parallax_scale_;
-                        shader.setUniformValue(shader.getUniformLocation("u_parallax_scale"),
-                            ValueType::T_FLOAT_1, &scale);
-
-                        int type = render_comp->quad_->parallax_type;
-                        shader.setUniformValue(shader.getUniformLocation("u_parallax_type"),
-                            ValueType::T_INT_1, &type);
-                    }
-                    break;
-
-                    case RenderType::RT_Water:
-                        // For Blend
-                        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-                        shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &global.alpha_blend);
-
-                        render_comp->water_->wave_.setUniforms(shader, (float)glfwGetTime());
-                        render_comp->water_->draw();
-
-                        glBlendFunc(GL_ONE, GL_ZERO);
-
-                        break;
-                    }
+                    glBlendFunc(GL_ONE, GL_ONE);
                 }
             }
-            glBlendFunc(GL_ONE, GL_ONE);
         }
     }
     
@@ -276,18 +288,6 @@ void RenderSystem::deferredRender(Camera cam)
 {
     deferred.resize(global.window_width, global.window_height);
     deferred.render(ecs_, cam);
-}
-
-void RenderSystem::setup()
-{
-    entity_ = ecs_.create_entity();
-
-    ecs_.add_component_type<IdentifierComponent>();
-    ecs_.add_component_type<HierarchyComponent>();
-    ecs_.add_component_type<RenderComponent>();
-    ecs_.add_component_type<TransformComponent>();
-    ecs_.add_component_type<LightComponent>();
-    ecs_.add_component_type<PhysicsComponent>();
 }
 
 void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type, float spawn_prob, float y_spawn_height)
@@ -390,6 +390,22 @@ void RenderSystem::spawnMeshInTerrain(int terrain_id, std::string file, std::str
     }
 
     global.render_system.init();
+}
+
+size_t RenderSystem::addCamera()
+{
+    ecs_.add_component<CameraComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<IdentifierComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
+
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Camera [" + std::to_string(entity_camera) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
+
+    entity_++;
+    entity_camera++;
+
+    return entity_;
 }
 
 size_t RenderSystem::createMesh(std::string file, std::string textureFolder,

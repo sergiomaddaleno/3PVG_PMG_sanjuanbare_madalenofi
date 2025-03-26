@@ -140,7 +140,6 @@ public:
 		return cld->component_list_[entity];
 	}
 
-
 	template<typename T>
 	std::optional<T>& add_component(size_t entity) {
 		size_t hash = typeid(T).hash_code();

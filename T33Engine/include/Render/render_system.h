@@ -21,11 +21,10 @@
 
 #include "../Systems/ecs_manager.h"
 #include "Core/camera.h"
+#include "Core/input.h"
 #include "Render/deferred_shading.h"
 
-#include "Components\transform_component.h"
-#include "Components\render_component.h"
-#include "Components\light_component.h"
+#include "Components/components.h"
 
 class Mesh;
 class Shader;
@@ -45,14 +44,25 @@ public:
 
 	void init();
 
-	void forwardRender(Camera cam = Camera());
+	void forwardRender(Input &input, double dt);
 
 	void deferredRender(Camera cam = Camera());
 
-	//call one time to create entites
-	void setup();
+	void setupEntities() {
+		entity_ = ecs_.create_entity();
+
+		ecs_.add_component_type<IdentifierComponent>();
+		ecs_.add_component_type<HierarchyComponent>();
+		ecs_.add_component_type<RenderComponent>();
+		ecs_.add_component_type<TransformComponent>();
+		ecs_.add_component_type<LightComponent>();
+		ecs_.add_component_type<PhysicsComponent>();
+		ecs_.add_component_type<CameraComponent>();
+	}
 
 	//----------------------------------
+
+	size_t addCamera();
 
 	size_t createMesh(std::string file, std::string textureFolder, 
 		TransformComponent tc = TransformComponent());
@@ -103,6 +113,7 @@ public:
 	ECSManager& ecs_;
 	size_t entity_;
 
+	int entity_camera;
 	int entity_mesh;
 	int entity_terrain;
 	int entity_water;

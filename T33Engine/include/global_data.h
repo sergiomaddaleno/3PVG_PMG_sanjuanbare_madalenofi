@@ -32,7 +32,7 @@ public:
     //Variables
     int window_width = 800;
     int window_height = 600;
-    bool full_screen = true;
+    bool full_screen = false;
     double dt = 0.0;
 
     float ortho_width = 45.0f;
@@ -58,7 +58,6 @@ public:
     // -------------------------------------------------------------
     
     //Classes
-    Camera cam;
     ECSManager ecs;
     RenderSystem render_system;
     PhysicsSystem physics_system;

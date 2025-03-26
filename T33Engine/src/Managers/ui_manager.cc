@@ -202,7 +202,7 @@ void UIManager::Render() {
         if (l_system_window) LSystemWindow();
         if (add_entities_terrain_window) AddEntitiesTerrainWindow();
 
-        global.grid.drawGrid(global.cam);
+        //global.grid.drawGrid(global.cam);
     }
 
     global.post_process.endRender();
@@ -487,6 +487,74 @@ void UIManager::InspectorWindow() {
 
         }
 
+    if (ecs_.has_component<CameraComponent>(selected_entity)) {
+
+        bool open = ImGui::CollapsingHeader("##CameraComponent", ImGuiTreeNodeFlags_DefaultOpen);
+        ImGui::SameLine();
+        ImGui::Image(m_CameraIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Text("Camera Component");
+
+        if (open) {
+            
+            auto& camera_comp = ecs_.get_component<CameraComponent>(selected_entity);
+
+            static glm::vec3 position = camera_comp->camera.getPosition();
+            if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f)) {
+                camera_comp->camera.setPosition(position);
+            }
+
+            static float sensitivity = camera_comp->camera.getSensitivity();
+            if (ImGui::SliderFloat("Sensitivity", &sensitivity, 0.1f, 1.0f)) {
+                camera_comp->camera.setSensitibity(sensitivity);
+            }
+
+            static float speed = camera_comp->camera.getSpeed();
+            if (ImGui::SliderFloat("Speed", &speed, 1.0f, 50.0f)) {
+                camera_comp->camera.setSpeed(speed);
+            }
+
+            static float fov = camera_comp->camera.getFov();
+            if (ImGui::SliderFloat("FOV", &fov, 1.0f, 120.0f)) {
+                camera_comp->camera.setFov(fov);
+            }
+
+            static float near_clip_plane = camera_comp->camera.getNearCliPlane();
+            if (ImGui::SliderFloat("Near Clip Plane", &near_clip_plane, 0.01f, 10.0f)) {
+                camera_comp->camera.setNearCliPlane(near_clip_plane);
+            }
+
+            static float far_clip_plane = camera_comp->camera.getFarCliPlane();
+            if (ImGui::SliderFloat("Far Clip Plane", &far_clip_plane, 10.0f, 1000.0f)) {
+                camera_comp->camera.setFarCliPlane(far_clip_plane);
+            }
+
+            static float scroll_speed = camera_comp->camera.getScrollSpeed();
+            if (ImGui::SliderFloat("Scroll Speed", &scroll_speed, 0.1f, 10.0f)) {
+                camera_comp->camera.setScrollSpeed(scroll_speed);
+            }
+
+            //--
+
+            static bool use_perspective = camera_comp->camera.getUsePerspectiveMatrix();
+            static bool use_orthographic = !use_perspective;
+
+            if (ImGui::Checkbox("Perspective Projection", &use_perspective)) {
+                if (use_perspective) {
+                    use_orthographic = false;
+                    camera_comp->camera.setUsePerspectiveMatrix(true);
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Checkbox("Orthographic Projection", &use_orthographic)) {
+                if (use_orthographic) {
+                    use_perspective = false;
+                    camera_comp->camera.setUsePerspectiveMatrix(false);
+                }
+            }
+        }
+    }
+
     if (ecs_.has_component<TransformComponent>(selected_entity)) {
 
             bool open = ImGui::CollapsingHeader("##TransformComponent", ImGuiTreeNodeFlags_DefaultOpen);
@@ -497,14 +565,15 @@ void UIManager::InspectorWindow() {
 
             if (open) {
                 auto& transf_comp = ecs_.get_component<TransformComponent>(selected_entity);
+                auto& camera_comp = ecs_.get_component<CameraComponent>(selected_entity);
 
-                if (global.cam.getUsePerspectiveMatrix()) {
+                if (camera_comp->camera.getUsePerspectiveMatrix()) {
                     ImGuizmo::SetOrthographic(false);
-                    Gizmo(global.cam.getViewMatrix(), global.cam.getPerspectiveMatrix(), selected_entity);
+                    Gizmo(camera_comp->camera.getViewMatrix(), camera_comp->camera.getPerspectiveMatrix(), selected_entity);
                 }
                 else {
                     ImGuizmo::SetOrthographic(true);
-                    Gizmo(global.cam.getViewMatrix(), global.cam.getOrthograficMatrix(), selected_entity);
+                    Gizmo(camera_comp->camera.getViewMatrix(), camera_comp->camera.getOrthograficMatrix(), selected_entity);
                 }
 
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
@@ -550,8 +619,6 @@ void UIManager::InspectorWindow() {
 
                 ImGui::Columns(1);
                 ImGui::Spacing();
-
-
             }
         }
 
@@ -1673,6 +1740,18 @@ void UIManager::TopBarWindow() {
         ImGui::SameLine();
         if (ImGui::BeginMenu("Tools")) {
 
+            if (ImGui::BeginMenu("Camera")) {
+
+                if (ImGui::MenuItem("Add camera")) {
+                    rs_.addCamera();
+                    ResetIds();
+
+                    AddConsoleMessage("Camera added");
+                }
+
+                ImGui::EndMenu();
+            }
+
             if (ImGui::BeginMenu("Add Geometry")) {
 
                 if (ImGui::MenuItem("Sphere")) {
@@ -1774,68 +1853,6 @@ void UIManager::TopBarWindow() {
                 ImGui::Checkbox(("Spawn Entities Window"), &add_entities_terrain_window);
 
                 ImGui::EndMenu();
-            }
-
-            ImGui::EndMenu();
-        }
-
-        ImGui::Image(m_CameraIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-        ImGui::SameLine();
-        ImGui::Spacing();
-        if (ImGui::BeginMenu("Camera")) {
-            
-            static glm::vec3 position = global.cam.getPosition();
-            if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f)) {
-                global.cam.setPosition(position);
-            }
-
-            static float sensitivity = global.cam.getSensitivity();
-            if (ImGui::SliderFloat("Sensitivity", &sensitivity, 0.1f, 1.0f)) {
-                global.cam.setSensitibity(sensitivity);
-            }
-
-            static float speed = global.cam.getSpeed();
-            if (ImGui::SliderFloat("Speed", &speed, 1.0f, 50.0f)) {
-                global.cam.setSpeed(speed);
-            }
-
-            static float fov = global.cam.getFov();
-            if (ImGui::SliderFloat("FOV", &fov, 1.0f, 120.0f)) {
-                global.cam.setFov(fov);
-            }
-
-            static float near_clip_plane = global.cam.getNearCliPlane();
-            if (ImGui::SliderFloat("Near Clip Plane", &near_clip_plane, 0.01f, 10.0f)) {
-                global.cam.setNearCliPlane(near_clip_plane);
-            }
-
-            static float far_clip_plane = global.cam.getFarCliPlane();
-            if (ImGui::SliderFloat("Far Clip Plane", &far_clip_plane, 10.0f, 1000.0f)) {
-                global.cam.setFarCliPlane(far_clip_plane);
-            }
-
-            static float scroll_speed = global.cam.getScrollSpeed();
-            if (ImGui::SliderFloat("Scroll Speed", &scroll_speed, 0.1f, 10.0f)) {
-                global.cam.setScrollSpeed(scroll_speed);
-            }
-
-            //--
-
-            static bool use_perspective = global.cam.getUsePerspectiveMatrix();
-            static bool use_orthographic = !use_perspective; 
-
-            if (ImGui::Checkbox("Perspective Projection", &use_perspective)) {
-                if (use_perspective) {
-                    use_orthographic = false;
-                    global.cam.setUsePerspectiveMatrix(true); 
-                }
-            }
-            ImGui::SameLine();
-            if (ImGui::Checkbox("Orthographic Projection", &use_orthographic)) {
-                if (use_orthographic) {
-                    use_perspective = false;
-                    global.cam.setUsePerspectiveMatrix(false);
-                }
             }
 
             ImGui::EndMenu();
@@ -2222,10 +2239,13 @@ void UIManager::ResetIds()
 {
     int new_id = 0;
     size_t max_components = std::max({
+        ecs_.getComponentList<IdentifierComponent>().size(),
+        ecs_.getComponentList<HierarchyComponent>().size(),
         ecs_.getComponentList<RenderComponent>().size(),
         ecs_.getComponentList<TransformComponent>().size(),
         ecs_.getComponentList<LightComponent>().size(),
-        ecs_.getComponentList<IdentifierComponent>().size()
+        ecs_.getComponentList<PhysicsComponent>().size(),
+        ecs_.getComponentList<CameraComponent>().size()
         });
 
     for (size_t i = 0; i < max_components; ++i) {

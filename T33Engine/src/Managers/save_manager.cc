@@ -30,7 +30,7 @@ SaveManager::~SaveManager()
 {
 }
 
-nlohmann::json SaveManager::serialize(Camera& cam, Skybox& skybox)
+nlohmann::json SaveManager::serialize(Skybox& skybox)
 {
     nlohmann::json j;
     j["Entities"] = nlohmann::json::array();
@@ -40,14 +40,17 @@ nlohmann::json SaveManager::serialize(Camera& cam, Skybox& skybox)
     auto li = ecs_.getComponentList<LightComponent>().begin();
     auto ni = ecs_.getComponentList<IdentifierComponent>().begin();
     auto hi = ecs_.getComponentList<HierarchyComponent>().begin();
+    auto ci = ecs_.getComponentList<CameraComponent>().begin();
 
     auto riend = ecs_.getComponentList<RenderComponent>().end();
     auto tiend = ecs_.getComponentList<TransformComponent>().end();
     auto liend = ecs_.getComponentList<LightComponent>().end();
     auto niend = ecs_.getComponentList<IdentifierComponent>().end();
     auto hiend = ecs_.getComponentList<HierarchyComponent>().end();
+    auto ciend = ecs_.getComponentList<CameraComponent>().end();
 
     size_t max_components = std::max({ 
+      ecs_.getComponentList<CameraComponent>().size(),
       ecs_.getComponentList<RenderComponent>().size(),
       ecs_.getComponentList<TransformComponent>().size(),
       ecs_.getComponentList<LightComponent>().size(),
@@ -93,6 +96,13 @@ nlohmann::json SaveManager::serialize(Camera& cam, Skybox& skybox)
             ++hi;
         }
 
+        if (ci != ciend) {
+            if (ci->has_value()) {
+                entity_json["Camera_component"] = (*ci)->serialize();
+            }
+            ++ci;
+        }
+
         if (!entity_json.empty()) {
             j["Entities"].push_back(entity_json);
         }
@@ -100,13 +110,12 @@ nlohmann::json SaveManager::serialize(Camera& cam, Skybox& skybox)
 
     //-----------------
 
-    j["Camera"] = cam.serialize(); 
     j["Skybox"] = skybox.serialize();
 
     return j;
 }
 
-void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skybox) {
+void SaveManager::deSerialize(const nlohmann::json& j, Skybox& skybox) {
 
     ecs_.remove_entities();
     rs_.entity_ = 0;
@@ -120,26 +129,7 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
     rs_.entity_spotlight = 0;
     rs_.entity_pointlight = 0;
     rs_.entity_dirlight = 0;
-
-    //-----------------------------------------------------------
-
-    const auto& camera = j["Camera"]; 
-
-    cam.setPosition(parseVec3(camera["Position"]));
-    cam.setFov(camera["Fov"]);
-    cam.setScrollSpeed(camera["Scroll_speed"]);
-    cam.setSensitibity(camera["Sensitivity"]);
-    cam.setSpeed(camera["Speed"]);
-    cam.setAspectRatio(camera["Aspect_ratio"]);
-    cam.setNearCliPlane(camera["Near_clip_plane"]);
-    cam.setFarCliPlane(camera["Far_clip_plane"]);
-    cam.setNearCliPlane(camera["Near_clip_plane"]);
-    cam.setFarCliPlane(camera["Far_clip_plane"]);
-    cam.setOrthoWidth(camera["Ortho_width"]);
-    cam.setOrthoHeight(camera["Ortho_height"]);
-    cam.setUsePerspectiveMatrix(camera["Use_perspective_matrix"]);
-    cam.setViewDir(parseVec3(camera["View_direction"]));
-    cam.initViewTarget();
+    rs_.entity_camera = 0;
     
     //-----------------------------------------------------------
     
@@ -373,13 +363,48 @@ void SaveManager::deSerialize(const nlohmann::json& j, Camera &cam, Skybox& skyb
                 }
             }
         }
+
+        if (entity.contains("Camera_component")) {
+
+            auto ci = ecs_.getComponentList<CameraComponent>().begin();
+            auto ciend = ecs_.getComponentList<CameraComponent>().end();
+            for (const auto& entity : j["Entities"]) {
+                if (entity.contains("Camera_component")) {
+                    const auto& cc = entity["Camera_component"];
+
+                    if (ci != ciend) {
+                        if (ci->has_value()) {
+                            auto& camera_comp = *ci;
+
+                            camera_comp->camera.setPosition(parseVec3(cc["Position"]));
+                            camera_comp->camera.setFov(cc["Fov"]);
+                            camera_comp->camera.setScrollSpeed(cc["Scroll_speed"]);
+                            camera_comp->camera.setSensitibity(cc["Sensitivity"]);
+                            camera_comp->camera.setSpeed(cc["Speed"]);
+                            camera_comp->camera.setAspectRatio(cc["Aspect_ratio"]);
+                            camera_comp->camera.setNearCliPlane(cc["Near_clip_plane"]);
+                            camera_comp->camera.setFarCliPlane(cc["Far_clip_plane"]);
+                            camera_comp->camera.setNearCliPlane(cc["Near_clip_plane"]);
+                            camera_comp->camera.setFarCliPlane(cc["Far_clip_plane"]);
+                            camera_comp->camera.setOrthoWidth(cc["Ortho_width"]);
+                            camera_comp->camera.setOrthoHeight(cc["Ortho_height"]);
+                            camera_comp->camera.setUsePerspectiveMatrix(cc["Use_perspective_matrix"]);
+                            camera_comp->camera.setViewDir(parseVec3(cc["View_direction"]));
+                            camera_comp->camera.initViewTarget();
+
+                            ++ci;
+                        }
+                    }
+                }
+            }
+        }
     }
     rs_.init();
 }
 
 void SaveManager::saveToFile(std::string filename)
 {
-    nlohmann::json j = serialize(global.cam, global.skybox);
+    nlohmann::json j = serialize(global.skybox);
     std::ofstream file(filename);
 
     if (file.is_open()) {
@@ -407,7 +432,7 @@ void SaveManager::loadFromFile(std::string filename) {
     file >> j;
     file.close();
 
-    deSerialize(j, global.cam, global.skybox);
+    deSerialize(j, global.skybox);
     printf("Loaded from %s\n", filename.c_str());
 }
 
@@ -423,23 +448,8 @@ std::string SaveManager::newFile()
 
     if (file.is_open()) {
         nlohmann::json defaultJson = {
-            {"Entities", nlohmann::json::array()},
-            {"Camera", {
-                {"Position", {0.0f, 0.0f, -10.0f}},
-                {"View_direction", {0.0f, 0.0f, -1.0f}},
-                {"Fov", 45.0f},
-                {"Scroll_speed", 1.0f},
-                {"Sensitivity", 1.0f},
-                {"Speed", 10.0f},
-                {"Aspect_ratio", 1.777f},
-                {"Near_clip_plane", 0.1f},
-                {"Far_clip_plane", 1000.0f},
-                {"Ortho_width", 800.0f},
-                {"Ortho_height", 600.0f},
-                {"Use_perspective_matrix", true},
-
-            }},
-           {"Skybox", {
+            {"Entities", nlohmann::json::array()}
+           ,{"Skybox", {
                 {"Use_cubemap", false},
                 {"DDS_file_path", "../stages/assets/textures/skybox/sky.dds"},
                 {"DDS_vertex_file", "../stages/shaders/skybox/skybox_dds.vs"},
@@ -455,7 +465,7 @@ std::string SaveManager::newFile()
                     "../stages/assets/textures/skybox/cubemap/nebulae/front.png",
                     "../stages/assets/textures/skybox/cubemap/nebulae/back.png"
                 }}
-            }}
+           }}
         };
 
         file << defaultJson.dump(4);

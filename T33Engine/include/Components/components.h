@@ -6,3 +6,4 @@
 #include "transform_component.h"
 #include "hierarchy_component.h"
 #include "physics_component.h"
+#include "camera_component.h"
