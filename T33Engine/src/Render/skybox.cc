@@ -191,7 +191,6 @@ void Skybox::renderDDS(Camera cam) {
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LESS);
     glCullFace(GL_BACK);
     glDisable(GL_CULL_FACE);
     glUseProgram(0);
@@ -220,7 +219,6 @@ void Skybox::renderCubeMap(Camera cam)
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LESS);
 }
 
 void Skybox::loadDDS(const char* dds_file, const char* vertex_file, const char* fragment_file)

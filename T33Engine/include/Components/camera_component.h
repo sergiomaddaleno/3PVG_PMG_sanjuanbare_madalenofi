@@ -8,8 +8,8 @@ struct CameraComponent {
 
     Camera camera;
 
-    float window_width=800.0f;
-    float window_height=600.0f;
+    int window_width = 800;
+    int window_height = 600;
 
     // ---
 

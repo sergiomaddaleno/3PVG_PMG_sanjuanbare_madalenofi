@@ -21,7 +21,8 @@ Light::Light() :
     constant_att_(0.0f),
     shininess_(0.0f),
     strength_(0.0f),
-    spot_angle_(0.0f)
+    spot_angle_(0.0f),
+    spot_softness_(0.0f)
 {
 }
 

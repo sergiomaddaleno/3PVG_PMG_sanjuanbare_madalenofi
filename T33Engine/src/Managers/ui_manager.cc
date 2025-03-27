@@ -51,6 +51,8 @@ UIManager::UIManager(ECSManager& ecs, RenderSystem& rs)
     padding(16.0f),
     thumbnailSize(128.0f),
     post_process_window(false),
+    add_entities_terrain_window(false),
+    add_surface_window(false),
     console_window(false),
     fog_window(false),
     l_system_window(false),
@@ -60,6 +62,7 @@ UIManager::UIManager(ECSManager& ecs, RenderSystem& rs)
     post_process_compiled(false),
     add_mesh_window(false),
     show_fps(false),
+    window_(),
     ecs_(ecs),
     rs_(rs),
     input_(nullptr)
@@ -372,17 +375,25 @@ void UIManager::HierarchyWindow() {
                 auto& transf_comp = *ti;
 
                 if (hierarchy_comp->hasParent()) {
-                    auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
-                    auto& parent_transform = ecs_.get_component<TransformComponent>(hierarchy_comp->getParent());
+                    auto parent_id = hierarchy_comp->getParent();
 
-                    //-
-                    if (selected_entity == entity_id) {
-                        child_transform->local_position = child_transform->position - parent_transform->position;
+                    if (ecs_.has_component<TransformComponent>(parent_id)) {
+                        auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
+                        auto& parent_transform = ecs_.get_component<TransformComponent>(parent_id);
+
+                        if (selected_entity == entity_id) {
+                            child_transform->local_position = child_transform->position - parent_transform->position;
+                        }
+                        else {
+                            child_transform->position = parent_transform->position + child_transform->local_position;
+                        }
                     }
                     else {
-                        child_transform->position = parent_transform->position + child_transform->local_position;
+                        auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
+                        child_transform->position = child_transform->local_position;
                     }
                 }
+
                 ++ti;
             }
         }
@@ -497,6 +508,8 @@ void UIManager::InspectorWindow() {
             
             auto& camera_comp = ecs_.get_component<CameraComponent>(selected_entity);
 
+            ImGui::Dummy({0.0f, 5.0f });
+
             static glm::vec3 position = camera_comp->camera.getPosition();
             if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f)) {
                 camera_comp->camera.setPosition(position);
@@ -533,6 +546,7 @@ void UIManager::InspectorWindow() {
             }
 
             //--
+            ImGui::Dummy({ 0.0f, 2.0f });
 
             static bool use_perspective = camera_comp->camera.getUsePerspectiveMatrix();
             static bool use_orthographic = !use_perspective;
@@ -550,6 +564,8 @@ void UIManager::InspectorWindow() {
                     camera_comp->camera.setUsePerspectiveMatrix(false);
                 }
             }
+
+            ImGui::Dummy({ 0.0f, 5.0f });
         }
     }
 
@@ -1554,147 +1570,169 @@ void UIManager::InspectorWindow() {
             }
         }
 
-    // ---
+    // -------
 
-    bool open = ImGui::CollapsingHeader("##Components", ImGuiTreeNodeFlags_DefaultOpen);
-    ImGui::SameLine();
-    ImGui::Image(m_PuzzleIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-    ImGui::SameLine();
-    ImGui::Text("Components");
+    static bool has_any_component = false;
 
-    if (open) {
-        ImGui::Dummy(ImVec2(0.0f, 3.0f));
+    if (ecs_.has_component<IdentifierComponent>(selected_entity) ||
+        ecs_.has_component<HierarchyComponent>(selected_entity) ||
+        ecs_.has_component<RenderComponent>(selected_entity) ||
+        ecs_.has_component<TransformComponent>(selected_entity) ||
+        ecs_.has_component<LightComponent>(selected_entity) ||
+        ecs_.has_component<PhysicsComponent>(selected_entity) ||
+        ecs_.has_component<CameraComponent>(selected_entity) ||
+        ecs_.has_component<SkyboxComponent>(selected_entity)
+        ) {
+        has_any_component = true;
+    }
+    else {
+        has_any_component = false;
+    }
 
-        ImGui::Text("Entity has:");
-        ImGui::Dummy(ImVec2(0.0f, 3.0f));
+    if (has_any_component) {
+        bool open = ImGui::CollapsingHeader("##Components", ImGuiTreeNodeFlags_DefaultOpen);
+        ImGui::SameLine();
+        ImGui::Image(m_PuzzleIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Text("Components");
 
-        if (ecs_.has_component<TransformComponent>(selected_entity)) {
-            ImGui::Text("- Transform component");
-        }
-        if (ecs_.has_component<LightComponent>(selected_entity)) {
-            ImGui::Text("- Light component");
-        }
-        if (ecs_.has_component<RenderComponent>(selected_entity)) {
-            ImGui::Text("- Render component");
-        }
-        if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
-            ImGui::Text("- Identifier component");
-        }
-        if (ecs_.has_component<HierarchyComponent>(selected_entity)) {
-            ImGui::Text("- Hierarchy component");
-        }
-        ImGui::Dummy(ImVec2(0.0f, 3.0f));
+        if (open) {
+            ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
+            ImGui::Text("Entity has:");
+            ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
+            if (ecs_.has_component<TransformComponent>(selected_entity)) {
+                ImGui::Text("- Transform component");
+            }
+            if (ecs_.has_component<LightComponent>(selected_entity)) {
+                ImGui::Text("- Light component");
+            }
+            if (ecs_.has_component<RenderComponent>(selected_entity)) {
+                ImGui::Text("- Render component");
+            }
+            if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
+                ImGui::Text("- Identifier component");
+            }
+            if (ecs_.has_component<HierarchyComponent>(selected_entity)) {
+                ImGui::Text("- Hierarchy component");
+            }
+            ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
 
-        const char* addComponents[] = { "Physics Component", "Light Component" };
-        static int addCurrentItem = -1;
+            const char* addComponents[] = { "Physics Component", "Light Component" };
+            static int addCurrentItem = -1;
 
-        if (ImGui::BeginCombo("Add Component", addCurrentItem >= 0 ? addComponents[addCurrentItem] : "Select Component to Add")) {
-            for (int i = 0; i < IM_ARRAYSIZE(addComponents); i++) {
-                bool hasComponent = false;
-                switch (i) {
-                case 0: hasComponent = ecs_.has_component<PhysicsComponent>(selected_entity); break;
-                case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
-                }
+            if (ImGui::BeginCombo("Add Component", addCurrentItem >= 0 ? addComponents[addCurrentItem] : "Select Component to Add")) {
+                for (int i = 0; i < IM_ARRAYSIZE(addComponents); i++) {
+                    bool hasComponent = false;
+                    switch (i) {
+                    case 0: hasComponent = ecs_.has_component<PhysicsComponent>(selected_entity); break;
+                    case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
+                    }
 
-                if (!hasComponent) {
-                    if (ImGui::Selectable(addComponents[i], addCurrentItem == i)) {
-                        switch (i) {
-                        case 0:
-                            ecs_.add_component<PhysicsComponent>(selected_entity);
-                            break;
-                        case 1:
-                            ecs_.add_component<LightComponent>(selected_entity);
-                            {
-                                auto& light_comp = ecs_.get_component<LightComponent>(selected_entity);
-                                light_comp->light.type_ = Light::LightType::LT_Point;
-                                light_comp->light.pos_ = ecs_.get_component<TransformComponent>(selected_entity)->position;
-                                light_comp->light.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
-                                light_comp->light.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
-                                light_comp->light.linear_att = 0.7f;
-                                light_comp->light.quad_att_ = 1.8f;
-                                light_comp->light.constant_att_ = 1.0f;
-                                light_comp->light.shininess_ = 32.0f;
-                                light_comp->light.strength_ = 1.0f;
+                    if (!hasComponent) {
+                        if (ImGui::Selectable(addComponents[i], addCurrentItem == i)) {
+                            switch (i) {
+                            case 0:
+                                ecs_.add_component<PhysicsComponent>(selected_entity);
+                                break;
+                            case 1:
+                                ecs_.add_component<LightComponent>(selected_entity);
+                                {
+                                    auto& light_comp = ecs_.get_component<LightComponent>(selected_entity);
+                                    light_comp->light.type_ = Light::LightType::LT_Point;
+                                    if (ecs_.has_component<TransformComponent>(selected_entity)) {
+                                        light_comp->light.pos_ = ecs_.get_component<TransformComponent>(selected_entity)->position;
+                                    } else{
+                                        light_comp->light.pos_ = { 0.0f, 0.0f, 0.0f };
+                                    }
+                                    light_comp->light.light_color_ = glm::vec3(150.0f, 150.0f, 150.0f);
+                                    light_comp->light.ambient_color_ = glm::vec3(0.1f, 0.1f, 0.1f);
+                                    light_comp->light.linear_att = 0.7f;
+                                    light_comp->light.quad_att_ = 1.8f;
+                                    light_comp->light.constant_att_ = 1.0f;
+                                    light_comp->light.shininess_ = 32.0f;
+                                    light_comp->light.strength_ = 1.0f;
 
-                                global.render_system.init();
+                                    global.render_system.init();
+                                }
+                                break;
                             }
-                            break;
+                            addCurrentItem = -1;
                         }
-                        addCurrentItem = -1; 
                     }
                 }
+                ImGui::EndCombo();
             }
-            ImGui::EndCombo(); 
+
+            ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
+            // ---------------------- DELETE COMPONENT ----------------------
+
+            const char* deleteComponents[] = { "Physics Component", "Light Component" };
+            static int deleteCurrentItem = -1;
+
+            if (ImGui::BeginCombo("Delete Component", deleteCurrentItem >= 0 ? deleteComponents[deleteCurrentItem] : "Select Component to Delete")) {
+                for (int i = 0; i < IM_ARRAYSIZE(deleteComponents); i++) {
+                    bool hasComponent = false;
+                    switch (i) {
+                    case 0: hasComponent = ecs_.has_component<PhysicsComponent>(selected_entity); break;
+                    case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
+                    }
+
+                    if (hasComponent) {
+                        if (ImGui::Selectable(deleteComponents[i], deleteCurrentItem == i)) {
+                            switch (i) {
+                            case 0:
+                                ecs_.delete_component<PhysicsComponent>(selected_entity);
+                                break;
+                            case 1:
+                                ecs_.delete_component<LightComponent>(selected_entity);
+                                break;
+                            }
+                            deleteCurrentItem = -1;
+                        }
+                    }
+                }
+                ImGui::EndCombo();
+            }
         }
 
-        ImGui::Dummy(ImVec2(0.0f, 3.0f)); 
 
-        // ---------------------- DELETE COMPONENT ----------------------
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-        const char* deleteComponents[] = { "Physics Component", "Light Component" };
-        static int deleteCurrentItem = -1;
+        ImGui::Image(m_DeleteIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
 
-        if (ImGui::BeginCombo("Delete Component", deleteCurrentItem >= 0 ? deleteComponents[deleteCurrentItem] : "Select Component to Delete")) {
-            for (int i = 0; i < IM_ARRAYSIZE(deleteComponents); i++) {
-                bool hasComponent = false;
-                switch (i) {
-                case 0: hasComponent = ecs_.has_component<PhysicsComponent>(selected_entity); break;
-                case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
-                }
+        if (ImGui::Button("Delete Entity") || input_->isKeyPressed(Input::SUPR)) {
+            if (ecs_.has_component<HierarchyComponent>(selected_entity)) {
+                auto& hierarchy = ecs_.get_component<HierarchyComponent>(selected_entity);
 
-                if (hasComponent) {
-                    if (ImGui::Selectable(deleteComponents[i], deleteCurrentItem == i)) {
-                        switch (i) {
-                        case 0:
-                            ecs_.delete_component<PhysicsComponent>(selected_entity);
-                            break;
-                        case 1:
-                            ecs_.delete_component<LightComponent>(selected_entity);
-                            break;
-                        }
-                        deleteCurrentItem = -1;
+                for (int parentId : hierarchy->getParents()) {
+                    if (ecs_.has_component<HierarchyComponent>(parentId)) {
+                        ecs_.get_component<HierarchyComponent>(parentId)->removeChild(selected_entity);
                     }
                 }
+
+                for (int childId : hierarchy->getChildren()) {
+                    if (ecs_.has_component<HierarchyComponent>(childId)) {
+                        ecs_.get_component<HierarchyComponent>(childId)->removeParent(selected_entity);
+                    }
+                }
+
+                hierarchy->clearParents();
+                hierarchy->clearChildren();
             }
-            ImGui::EndCombo();
+
+            ecs_.destroy_entity(selected_entity);
+            selected_entity = 0;
+            ResetIds();
         }
     }
 
-
-    ImGui::Dummy(ImVec2(0.0f, 2.0f));
-    ImGui::Separator();
-    ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-    ImGui::Image(m_DeleteIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-    ImGui::SameLine();
-
-    if (ImGui::Button("Delete Entity") || input_->isKeyPressed(Input::SUPR)) {
-        if (ecs_.has_component<HierarchyComponent>(selected_entity)) {
-            auto& hierarchy = ecs_.get_component<HierarchyComponent>(selected_entity);
-
-            for (int parentId : hierarchy->getParents()) {
-                if (ecs_.has_component<HierarchyComponent>(parentId)) {
-                    ecs_.get_component<HierarchyComponent>(parentId)->removeChild(selected_entity);
-                }
-            }
-
-            for (int childId : hierarchy->getChildren()) {
-                if (ecs_.has_component<HierarchyComponent>(childId)) {
-                    ecs_.get_component<HierarchyComponent>(childId)->removeParent(selected_entity);
-                }
-            }
-
-            hierarchy->clearParents();
-            hierarchy->clearChildren();
-        }
-
-        ecs_.destroy_entity(selected_entity); 
-        selected_entity = 0; 
-        ResetIds();
-    }
-
-    
     ImGui::End();
 }
 

@@ -17,8 +17,11 @@ Quad::Quad()
     size_(0.0f), parallax_scale_(0.08f),
     use_texture_(true), use_normal_map_(false), use_parallax_map_(false),
     texture_path_("../stages/assets/textures/images/blue.png"),
-    normal_map_path_(""), parallax_map_path_("")
-{}
+    normal_map_path_(""), parallax_map_path_(""),
+    parallax_type(ParallaxType::ParallaxMapping)
+{
+    std::fill_n(vertex, 3, glm::vec3(0.0f));
+}
 
 Quad::~Quad()
 {

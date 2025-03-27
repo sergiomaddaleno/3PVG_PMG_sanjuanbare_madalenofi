@@ -10,6 +10,9 @@ struct IdentifierComponent {
 	std::string name;
 
 	nlohmann::json serialize();
+
+	IdentifierComponent();
+	~IdentifierComponent();
 };
 
 #endif // !__IDENTIFIER_COMPONENT__

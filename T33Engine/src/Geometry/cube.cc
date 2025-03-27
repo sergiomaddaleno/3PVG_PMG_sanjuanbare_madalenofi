@@ -16,6 +16,8 @@ Cube::Cube()
     cube_8v_(false), cube_24v_(false),
     use_texture_(true), texture_path_("../stages/assets/textures/images/blue.png")
 {
+    std::fill_n(vertex_cube8v_, 8, glm::vec3(0.0f));
+    std::fill_n(vertex_cube24v_, 24, glm::vec3(0.0f));
 }
 
 Cube::~Cube()

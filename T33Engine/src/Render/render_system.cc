@@ -62,7 +62,6 @@ void RenderSystem::init() {
             case RenderType::RT_Mesh:
                 render_comp->mesh_->bind();
                 break;
-
             case RenderType::RT_Terrain:
                 render_comp->terrain_->bind();
                 render_comp->terrain_->setTexture(render_comp->terrain_->texture_path_);
@@ -75,18 +74,15 @@ void RenderSystem::init() {
                 render_comp->sphere_->bind();
                 render_comp->sphere_->setTexture(render_comp->sphere_->texture_path_);
                 break;
-
             case RenderType::RT_Quad:
                 render_comp->quad_->bind();
                 render_comp->quad_->setTexture(render_comp->quad_->texture_path_);
                 break;
-
             case RenderType::RT_Cube8v:
             case RenderType::RT_Cube24v:
                 render_comp->cube_->bind();
                 render_comp->cube_->setTexture(render_comp->cube_->texture_path_);
                 break;
-
             case RenderType::RT_Surface:
                 render_comp->surface_->bind();
                 render_comp->surface_->setTexture(render_comp->surface_->texture_path_);
@@ -102,7 +98,6 @@ void RenderSystem::init() {
                     case Light::LightType::LT_Directional:
                         light_comp->shadow_map_.init2D(); 
                         break;
-
                     case Light::LightType::LT_Point:
                         light_comp->shadow_map_.initCubeMap();
                         break;
@@ -208,7 +203,7 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                 camera_comp->window_width = global.window_width;
                 camera_comp->window_height = global.window_height;
 
-                camera_comp->camera.setAspectRatio(camera_comp->window_width / camera_comp->window_height);
+                camera_comp->camera.setAspectRatio((float)camera_comp->window_width / (float)camera_comp->window_height);
             }
             camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
 
@@ -258,28 +253,24 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                                 }
                             }
                             break;
-
                             case RenderType::RT_Terrain:
                             {
                                 render_comp->terrain_->wave_.setUniforms(shader, (float)glfwGetTime());
                                 render_comp->terrain_->draw();
                             }
                             break;
-
                             case RenderType::RT_Sphere:
                             {
                                 render_comp->sphere_->wave_.setUniforms(shader, (float)glfwGetTime());
                                 render_comp->sphere_->draw();
                             }
                             break;
-
                             case RenderType::RT_Surface:
                             {
                                 render_comp->surface_->wave_.setUniforms(shader, (float)glfwGetTime());
                                 render_comp->surface_->draw();
                             }
                             break;
-
                             case RenderType::RT_Cube8v:
                             case RenderType::RT_Cube24v:
                             {
@@ -287,7 +278,6 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                                 render_comp->cube_->draw();
                             }
                             break;
-
                             case RenderType::RT_Quad:
                             {
                                 render_comp->quad_->wave_.setUniforms(shader, (float)glfwGetTime());
@@ -310,7 +300,6 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                                     ValueType::T_INT_1, &type);
                             }
                             break;
-
                             case RenderType::RT_Water:
                                 // For Blend
                                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -401,7 +390,7 @@ void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type,
     }
 
     for (const auto& position : spawn_positions) {
-        size_t entity;
+        size_t entity = (size_t)0;
         switch (spawn_type) {
         case RenderType::RT_Cube8v:
             entity = createCube8v();
@@ -809,7 +798,7 @@ size_t RenderSystem::createPointLight(Light li, bool default_light)
     ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Point Light [" + std::to_string(entity_spotlight) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Point Light [" + std::to_string(entity_pointlight) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     ecs_.get_component<TransformComponent>(entity_)->position = li.pos_;

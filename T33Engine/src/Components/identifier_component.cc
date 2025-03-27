@@ -8,3 +8,13 @@ nlohmann::json IdentifierComponent::serialize()
 
 	return json_data;
 }
+
+IdentifierComponent::IdentifierComponent() :
+	id(0),
+	name()
+{
+}
+
+IdentifierComponent::~IdentifierComponent()
+{
+}
