@@ -14,6 +14,9 @@
 #include <GL/glew.h> 
 #include <GLFW/glfw3.h>
 
+#include "../deps/nlohmann/json.hpp"
+#include <../deps/glm/glm.hpp>
+
 class Shader;
 
 enum TextureID {
@@ -66,5 +69,9 @@ void CheckShaderErrors(GLuint shader, const char* shaderType);
  * @brief Checks for shader program linking errors and prints them if any.
  */
 void CheckProgramErrors(GLuint program);
+
+glm::vec3 parseVec3(const nlohmann::json& j);
+
+glm::quat parseQuat(const nlohmann::json& j);
 
 #endif // __UTILS__

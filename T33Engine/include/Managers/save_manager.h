@@ -41,9 +41,6 @@ public:
 	std::string getCurrentScene() { return current_scene_file; }
 	void setCurrentScene(std::string scene_file) { current_scene_file = scene_file; }
 
-	glm::vec3 parseVec3(const nlohmann::json& j);
-	glm::quat parseQuat(const nlohmann::json& j);
-
 private:
 
 	nlohmann::json serialize(Skybox& skybox);
@@ -54,9 +51,6 @@ private:
 
 	ECSManager& ecs_;
 	RenderSystem& rs_;
-
-	//---
-	Light li;
 };
 
 

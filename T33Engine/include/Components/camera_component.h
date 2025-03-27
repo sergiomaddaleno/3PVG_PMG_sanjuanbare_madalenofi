@@ -13,7 +13,7 @@ struct CameraComponent {
 
     // ---
 
-    nlohmann::json serialize() const;
+    nlohmann::json serialize();
 
     CameraComponent();
     ~CameraComponent();

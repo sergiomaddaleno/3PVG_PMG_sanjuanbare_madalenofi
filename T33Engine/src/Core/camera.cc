@@ -167,3 +167,22 @@ nlohmann::json Camera::serialize()
 
     return json_data;
 }
+
+void Camera::deserialize(const nlohmann::json& cam)
+{
+    this->setPosition(parseVec3(cam["Position"]));
+    this->setFov(cam["Fov"]);
+    this->setScrollSpeed(cam["Scroll_speed"]);
+    this->setSensitibity(cam["Sensitivity"]);
+    this->setSpeed(cam["Speed"]);
+    this->setAspectRatio(cam["Aspect_ratio"]);
+    this->setNearCliPlane(cam["Near_clip_plane"]);
+    this->setFarCliPlane(cam["Far_clip_plane"]);
+    this->setNearCliPlane(cam["Near_clip_plane"]);
+    this->setFarCliPlane(cam["Far_clip_plane"]);
+    this->setOrthoWidth(cam["Ortho_width"]);
+    this->setOrthoHeight(cam["Ortho_height"]);
+    this->setUsePerspectiveMatrix(cam["Use_perspective_matrix"]);
+    this->setViewDir(parseVec3(cam["View_direction"]));
+    this->initViewTarget();
+}

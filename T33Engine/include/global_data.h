@@ -32,7 +32,7 @@ public:
     //Variables
     int window_width = 800;
     int window_height = 600;
-    bool full_screen = false;
+    bool full_screen = true;
     double dt = 0.0;
 
     float ortho_width = 45.0f;

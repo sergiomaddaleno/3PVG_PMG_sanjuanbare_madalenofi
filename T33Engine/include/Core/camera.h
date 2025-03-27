@@ -69,6 +69,7 @@ public:
 
 	//Save data
 	nlohmann::json serialize();
+	void deserialize(const nlohmann::json& cam);
 
 private:
 

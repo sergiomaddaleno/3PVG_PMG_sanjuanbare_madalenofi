@@ -1,0 +1,170 @@
+{
+ "Entities": [
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 0,
+    "Entity_name": "Sphere [0]"
+   },
+   "Render_component": {
+    "Render_type": 2,
+    "Sphere": {
+     "Texture_path": "../stages/assets/textures/images/blue.png",
+     "num_heights": 60,
+     "num_revs": 60,
+     "size": 1.0
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 1,
+    "Entity_name": "Directional Light [0]"
+   },
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
+      ]
+     ],
+     "Light_color": [
+      [
+       10.0,
+       10.0,
+       10.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Spot_softness": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   }
+  },
+  {
+   "Camera_component": {
+    "camera": {
+     "Aspect_ratio": 1.7777777910232544,
+     "Far_clip_plane": 100.0,
+     "Fov": 87.6500015258789,
+     "Near_clip_plane": 0.10000000149011612,
+     "Ortho_height": 45.0,
+     "Ortho_width": 45.0,
+     "Position": [
+      -10.52061939239502,
+      8.246233940124512,
+      6.499786376953125
+     ],
+     "Scroll_speed": 10.0,
+     "Sensitivity": 1.0,
+     "Speed": 36.20399856567383,
+     "Use_perspective_matrix": true,
+     "View_direction": [
+      0.673712968826294,
+      -0.5536389946937561,
+      -0.4894840121269226
+     ]
+    }
+   },
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 2,
+    "Entity_name": "Camera [0]"
+   }
+  }
+ ],
+ "Skybox": {
+  "Cubemap_file_paths": [
+   "../stages/assets/textures/skybox/cubemap/nebulae/right.png",
+   "../stages/assets/textures/skybox/cubemap/nebulae/left.png",
+   "../stages/assets/textures/skybox/cubemap/nebulae/top.png",
+   "../stages/assets/textures/skybox/cubemap/nebulae/bottom.png",
+   "../stages/assets/textures/skybox/cubemap/nebulae/front.png",
+   "../stages/assets/textures/skybox/cubemap/nebulae/back.png"
+  ],
+  "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
+  "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
+  "DDS_angle": -90.0,
+  "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
+  "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
+  "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
+  "Use_cubemap": false
+ }
+}

@@ -20,7 +20,6 @@
 SaveManager::SaveManager(ECSManager& ecs_, RenderSystem& rs_)
     : current_scene_file(""),
     number_of_scenes(0),
-    li(),
     ecs_(ecs_),
     rs_(rs_)
 {
@@ -279,6 +278,8 @@ void SaveManager::deSerialize(const nlohmann::json& j, Skybox& skybox) {
         if (entity.contains("Light_component")) {
             const auto& lc = entity["Light_component"]["light"];
 
+            Light li;
+
             li.pos_ = parseVec3(lc["Position"][0]);
             li.dir_ = parseVec3(lc["Direction"][0]);
             li.diff_color_ = parseVec3(lc["Diffusion_color"][0]);
@@ -366,37 +367,12 @@ void SaveManager::deSerialize(const nlohmann::json& j, Skybox& skybox) {
 
         if (entity.contains("Camera_component")) {
 
-            auto ci = ecs_.getComponentList<CameraComponent>().begin();
-            auto ciend = ecs_.getComponentList<CameraComponent>().end();
-            for (const auto& entity : j["Entities"]) {
-                if (entity.contains("Camera_component")) {
-                    const auto& cc = entity["Camera_component"];
+            const auto& cc = entity["Camera_component"]["camera"];
 
-                    if (ci != ciend) {
-                        if (ci->has_value()) {
-                            auto& camera_comp = *ci;
+            Camera cam;
+            cam.deserialize(cc);
 
-                            camera_comp->camera.setPosition(parseVec3(cc["Position"]));
-                            camera_comp->camera.setFov(cc["Fov"]);
-                            camera_comp->camera.setScrollSpeed(cc["Scroll_speed"]);
-                            camera_comp->camera.setSensitibity(cc["Sensitivity"]);
-                            camera_comp->camera.setSpeed(cc["Speed"]);
-                            camera_comp->camera.setAspectRatio(cc["Aspect_ratio"]);
-                            camera_comp->camera.setNearCliPlane(cc["Near_clip_plane"]);
-                            camera_comp->camera.setFarCliPlane(cc["Far_clip_plane"]);
-                            camera_comp->camera.setNearCliPlane(cc["Near_clip_plane"]);
-                            camera_comp->camera.setFarCliPlane(cc["Far_clip_plane"]);
-                            camera_comp->camera.setOrthoWidth(cc["Ortho_width"]);
-                            camera_comp->camera.setOrthoHeight(cc["Ortho_height"]);
-                            camera_comp->camera.setUsePerspectiveMatrix(cc["Use_perspective_matrix"]);
-                            camera_comp->camera.setViewDir(parseVec3(cc["View_direction"]));
-                            camera_comp->camera.initViewTarget();
-
-                            ++ci;
-                        }
-                    }
-                }
-            }
+            rs_.addCamera(cam);
         }
     }
     rs_.init();
@@ -480,16 +456,6 @@ std::string SaveManager::newFile()
     number_of_scenes++;
 
     return filename;
-}
-
-glm::vec3 SaveManager::parseVec3(const nlohmann::json& j)
-{
-    return glm::vec3(j[0], j[1], j[2]);
-}
-
-glm::quat SaveManager::parseQuat(const nlohmann::json& j)
-{
-    return glm::quat(j[3], j[0], j[1], j[2]);
 }
 
 

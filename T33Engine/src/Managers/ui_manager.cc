@@ -464,28 +464,28 @@ void UIManager::InspectorWindow() {
  
     if (ecs_.has_component<IdentifierComponent>(selected_entity)) {
 
-            bool open = ImGui::CollapsingHeader("##IdentifierComponent", ImGuiTreeNodeFlags_DefaultOpen);
-            ImGui::SameLine();
-            ImGui::Image(m_TagIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-            ImGui::SameLine();
-            ImGui::Text("Identifier Component");
+        bool open = ImGui::CollapsingHeader("##IdentifierComponent", ImGuiTreeNodeFlags_DefaultOpen);
+        ImGui::SameLine();
+        ImGui::Image(m_TagIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Text("Identifier Component");
 
-            if (open) {
-                auto& name_comp = ecs_.get_component<IdentifierComponent>(selected_entity);
-                ImGui::Dummy({ 0.0f, 3.0f });
+        if (open) {
+            auto& name_comp = ecs_.get_component<IdentifierComponent>(selected_entity);
+            ImGui::Dummy({ 0.0f, 3.0f });
 
-                ImGui::Text("ID: %d", name_comp->id);
+            ImGui::Text("ID: %d", name_comp->id);
 
+            if (name_comp->name.empty()) name_comp->name = "Entity";
+
+            if (ImGui::InputText("##NameInput", &name_comp->name)) {
                 if (name_comp->name.empty()) name_comp->name = "Entity";
-
-                if (ImGui::InputText("##NameInput", &name_comp->name)) {
-                    if (name_comp->name.empty()) name_comp->name = "Entity";
-                }
-
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
             }
 
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
         }
+
+    }
 
     if (ecs_.has_component<CameraComponent>(selected_entity)) {
 
@@ -565,15 +565,21 @@ void UIManager::InspectorWindow() {
 
             if (open) {
                 auto& transf_comp = ecs_.get_component<TransformComponent>(selected_entity);
-                auto& camera_comp = ecs_.get_component<CameraComponent>(selected_entity);
+                auto ci = ecs_.getComponentList<CameraComponent>().begin();
+                auto ciend = ecs_.getComponentList<CameraComponent>().end();
 
-                if (camera_comp->camera.getUsePerspectiveMatrix()) {
-                    ImGuizmo::SetOrthographic(false);
-                    Gizmo(camera_comp->camera.getViewMatrix(), camera_comp->camera.getPerspectiveMatrix(), selected_entity);
-                }
-                else {
-                    ImGuizmo::SetOrthographic(true);
-                    Gizmo(camera_comp->camera.getViewMatrix(), camera_comp->camera.getOrthograficMatrix(), selected_entity);
+                for (; ci != ciend; ++ci) {
+                    if (ci->has_value()) {
+                        auto& camera_comp = *ci;
+                        if (camera_comp->camera.getUsePerspectiveMatrix()) {
+                            ImGuizmo::SetOrthographic(false);
+                            Gizmo(camera_comp->camera.getViewMatrix(), camera_comp->camera.getPerspectiveMatrix(), selected_entity);
+                        }
+                        else {
+                            ImGuizmo::SetOrthographic(true);
+                            Gizmo(camera_comp->camera.getViewMatrix(), camera_comp->camera.getOrthograficMatrix(), selected_entity);
+                        }
+                    }
                 }
 
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));

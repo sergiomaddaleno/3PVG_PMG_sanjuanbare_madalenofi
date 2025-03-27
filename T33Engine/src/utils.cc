@@ -2,8 +2,6 @@
 #include "utils.h"
 #include "Core/shader.h"
 
-#include <../deps/glm/glm.hpp>
-
 #include <memory> 
 #include <iostream>
 #include <cassert>
@@ -98,6 +96,17 @@ void CheckProgramErrors(GLuint program) {
         glGetProgramInfoLog(program, 1024, NULL, infoLog);
         std::cout << "ERROR::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
+}
+
+glm::vec3 parseVec3(const nlohmann::json& j)
+
+{
+    return glm::vec3(j[0], j[1], j[2]);
+}
+
+glm::quat parseQuat(const nlohmann::json& j)
+{
+    return glm::quat(j[3], j[0], j[1], j[2]);
 }
 
 

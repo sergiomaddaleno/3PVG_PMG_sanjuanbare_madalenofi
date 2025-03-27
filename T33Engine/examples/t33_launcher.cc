@@ -15,7 +15,7 @@ void init() {
     global.post_process.initData();
     global.render_system.setupEntities();
 
-    //global.save_manager.loadFromFile("../stages/saves/solar_system.json");
+    global.save_manager.loadFromFile("../stages/saves/test.json");
 
     initShader(global.render_system.shader, "../stages/shaders/forward_shading.vs", "../stages/shaders/forward_shading.fs");
     initShader(global.render_system.deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
@@ -60,9 +60,9 @@ int main(int, char**) {
         //if (global.use_skybox) global.skybox.render(global.cam);
         
         if (global.deferred_shading){
-            //global.render_system.deferredRender(global.cam);
+            global.render_system.deferredRender(input, global.dt);
         }else{
-            //global.render_system.forwardRender(input, global.dt);
+            global.render_system.forwardRender(input, global.dt);
         }
 
         global.physics_system.update();

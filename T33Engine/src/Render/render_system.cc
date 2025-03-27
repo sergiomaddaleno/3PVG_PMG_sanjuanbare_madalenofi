@@ -167,7 +167,7 @@ void RenderSystem::forwardRender(Input &input, double dt) {
 
     shader.useProgram();
 
-    for (; ci != ciend; ++li) {
+    for (; ci != ciend; ++ci) {
         if (ci->has_value()) {
             auto& camera_comp = *ci;
 
@@ -284,10 +284,23 @@ void RenderSystem::forwardRender(Input &input, double dt) {
     glUseProgram(0);
 }
 
-void RenderSystem::deferredRender(Camera cam)
+void RenderSystem::deferredRender(Input& input, double dt)
 {
-    deferred.resize(global.window_width, global.window_height);
-    deferred.render(ecs_, cam);
+    auto ci = ecs_.getComponentList<CameraComponent>().begin();
+    auto ciend = ecs_.getComponentList<CameraComponent>().end();
+
+    shader.useProgram();
+
+    for (; ci != ciend; ++ci) {
+        if (ci->has_value()) {
+            auto& camera_comp = *ci;
+
+            camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
+
+            deferred.resize(global.window_width, global.window_height);
+            deferred.render(ecs_, camera_comp->camera);
+        }
+    }
 }
 
 void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type, float spawn_prob, float y_spawn_height)
@@ -392,15 +405,16 @@ void RenderSystem::spawnMeshInTerrain(int terrain_id, std::string file, std::str
     global.render_system.init();
 }
 
-size_t RenderSystem::addCamera()
+size_t RenderSystem::addCamera(Camera camera)
 {
     ecs_.add_component<CameraComponent>(entity_);
-    ecs_.add_component<TransformComponent>(entity_);
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<HierarchyComponent>(entity_);
 
     ecs_.get_component<IdentifierComponent>(entity_)->name = "Camera [" + std::to_string(entity_camera) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
+
+    ecs_.get_component<CameraComponent>(entity_)->camera = camera;
 
     entity_++;
     entity_camera++;

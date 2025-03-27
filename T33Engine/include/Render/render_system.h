@@ -46,7 +46,7 @@ public:
 
 	void forwardRender(Input &input, double dt);
 
-	void deferredRender(Camera cam = Camera());
+	void deferredRender(Input& input, double dt);
 
 	void setupEntities() {
 		entity_ = ecs_.create_entity();
@@ -62,7 +62,7 @@ public:
 
 	//----------------------------------
 
-	size_t addCamera();
+	size_t addCamera(Camera camera = Camera());
 
 	size_t createMesh(std::string file, std::string textureFolder, 
 		TransformComponent tc = TransformComponent());
