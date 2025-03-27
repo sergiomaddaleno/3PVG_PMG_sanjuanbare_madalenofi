@@ -510,37 +510,37 @@ void UIManager::InspectorWindow() {
 
             ImGui::Dummy({0.0f, 5.0f });
 
-            static glm::vec3 position = camera_comp->camera.getPosition();
+            glm::vec3 position = camera_comp->camera.getPosition();
             if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f)) {
                 camera_comp->camera.setPosition(position);
             }
 
-            static float sensitivity = camera_comp->camera.getSensitivity();
+            float sensitivity = camera_comp->camera.getSensitivity();
             if (ImGui::SliderFloat("Sensitivity", &sensitivity, 0.1f, 1.0f)) {
                 camera_comp->camera.setSensitibity(sensitivity);
             }
 
-            static float speed = camera_comp->camera.getSpeed();
+            float speed = camera_comp->camera.getSpeed();
             if (ImGui::SliderFloat("Speed", &speed, 1.0f, 50.0f)) {
                 camera_comp->camera.setSpeed(speed);
             }
 
-            static float fov = camera_comp->camera.getFov();
+            float fov = camera_comp->camera.getFov();
             if (ImGui::SliderFloat("FOV", &fov, 1.0f, 120.0f)) {
                 camera_comp->camera.setFov(fov);
             }
 
-            static float near_clip_plane = camera_comp->camera.getNearCliPlane();
+            float near_clip_plane = camera_comp->camera.getNearCliPlane();
             if (ImGui::SliderFloat("Near Clip Plane", &near_clip_plane, 0.01f, 10.0f)) {
                 camera_comp->camera.setNearCliPlane(near_clip_plane);
             }
 
-            static float far_clip_plane = camera_comp->camera.getFarCliPlane();
+            float far_clip_plane = camera_comp->camera.getFarCliPlane();
             if (ImGui::SliderFloat("Far Clip Plane", &far_clip_plane, 10.0f, 1000.0f)) {
                 camera_comp->camera.setFarCliPlane(far_clip_plane);
             }
 
-            static float scroll_speed = camera_comp->camera.getScrollSpeed();
+            float scroll_speed = camera_comp->camera.getScrollSpeed();
             if (ImGui::SliderFloat("Scroll Speed", &scroll_speed, 0.1f, 10.0f)) {
                 camera_comp->camera.setScrollSpeed(scroll_speed);
             }
@@ -548,8 +548,8 @@ void UIManager::InspectorWindow() {
             //--
             ImGui::Dummy({ 0.0f, 2.0f });
 
-            static bool use_perspective = camera_comp->camera.getUsePerspectiveMatrix();
-            static bool use_orthographic = !use_perspective;
+            bool use_perspective = camera_comp->camera.getUsePerspectiveMatrix();
+            bool use_orthographic = !use_perspective;
 
             if (ImGui::Checkbox("Perspective Projection", &use_perspective)) {
                 if (use_perspective) {
