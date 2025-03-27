@@ -20,8 +20,6 @@ void init() {
     initShader(global.render_system.shader, "../stages/shaders/forward_shading.vs", "../stages/shaders/forward_shading.fs");
     initShader(global.render_system.deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
     initShader(global.render_system.deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
-
-    global.grid.initGrid();
 }
 
 int main(int, char**) {
@@ -57,8 +55,6 @@ int main(int, char**) {
         global.post_process.resize(global.window_width, global.window_height);
         global.post_process.beginRender();
 
-        //if (global.use_skybox) global.skybox.render(global.cam);
-        
         if (global.deferred_shading){
             global.render_system.deferredRender(input, global.dt);
         }else{

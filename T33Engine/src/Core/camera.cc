@@ -7,6 +7,9 @@ const float PI = 3.141592653589793f;
 #include "Core/input.h"
 #include "Core/window.h"
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include "global_data.h"
 
 #include <../nlohmann/json.hpp>
@@ -24,13 +27,13 @@ Camera::Camera()
     accum_mouse_offset_(0.0f, 0.0f),
     speed_(5.0f),
     sensitivity_(1.0f),
-    fov_(global.fov),
-    aspect_ratio_((float)global.window_width / (float)global.window_height),
-    near_clip_plane_(global.near_clip_plane),
-    far_clip_plane_(global.far_clip_plane),
-    ortho_width_(global.ortho_width),
-    ortho_height_(global.ortho_height),
-    scroll_speed_(10.0f),
+    fov_(45.0f),
+    aspect_ratio_(800.0f / 600.0f),
+    near_clip_plane_(0.1f),
+    far_clip_plane_(200.0f),
+    ortho_width_(45.0f),
+    ortho_height_(45.0f),
+    scroll_speed_(1.0f),
     use_perspective_matrix_(true),
     view_(initViewTarget())
 {}

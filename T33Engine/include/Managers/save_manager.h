@@ -21,7 +21,6 @@
 class ECSManager;
 class RenderSystem;
 class Shader;
-class Skybox;
 
 /**
  * @class SaveManager
@@ -43,8 +42,8 @@ public:
 
 private:
 
-	nlohmann::json serialize(Skybox& skybox);
-	void deSerialize(const nlohmann::json& j, Skybox& skybox);
+	nlohmann::json serialize();
+	void deSerialize(const nlohmann::json& j);
 
 	std::string current_scene_file;
 	int number_of_scenes;

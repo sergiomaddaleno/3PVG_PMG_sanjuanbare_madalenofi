@@ -7,3 +7,4 @@
 #include "hierarchy_component.h"
 #include "physics_component.h"
 #include "camera_component.h"
+#include "skybox_component.h"

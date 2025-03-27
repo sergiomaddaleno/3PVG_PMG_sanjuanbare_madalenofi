@@ -109,10 +109,11 @@ float cubemap_vertices[] = {
 };
 
 Skybox::Skybox() : dds_angle_(-90.0f), cubemapVAO(0), cubemapVBO(0), skyboxVAO(0), VBO(0), EBO(0),
-dds_file_(), 
-dds_vertex_file_(), 
-dds_fragment_file_(),
-use_cubemap(true)
+dds_file_("../stages/assets/textures/skybox/sky.dds"),
+dds_vertex_file_("../stages/shaders/skybox/skybox_dds.vs"),
+dds_fragment_file_("../stages/shaders/skybox/skybox_dds.fs"),
+faces_files_({"","","","","","" }),
+use_cubemap(false)
 {}
 
 Skybox::~Skybox()
@@ -199,6 +200,7 @@ void Skybox::renderDDS(Camera cam) {
 void Skybox::renderCubeMap(Camera cam)
 {
     glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_FALSE);
 
     glm::mat4 view = glm::mat4(glm::mat3(cam.getViewMatrix()));
     glm::mat4 projection = cam.getPerspectiveMatrix();
@@ -217,6 +219,7 @@ void Skybox::renderCubeMap(Camera cam)
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
 }
 
@@ -368,5 +371,19 @@ nlohmann::json Skybox::serialize() const
     };
 
     return json_data;
+}
+
+void Skybox::deserialize(const nlohmann::json& sky)
+{
+    this->use_cubemap = sky["Use_cubemap"];
+
+    this->dds_file_ = sky["DDS_file_path"];
+    this->dds_fragment_file_ = sky["DDS_fragment_file"];
+    this->dds_vertex_file_ = sky["DDS_vertex_file"];
+    this->dds_angle_ = sky["DDS_angle"];
+
+    this->faces_files_ = sky["Cubemap_file_paths"];
+    this->cubemap_vertex_file_ = sky["Cubemap_vertex_file"];
+    this->cubemap_fragment_file_ = sky["Cubemap_fragment_file"];
 }
 

@@ -2,7 +2,9 @@
 
 nlohmann::json SkyboxComponent::serialize()
 {
-	return nlohmann::json();
+    nlohmann::json j;
+    j["skybox"] = skybox.serialize();
+    return j;
 }
 
 void SkyboxComponent::deserialize(const nlohmann::json& cam)

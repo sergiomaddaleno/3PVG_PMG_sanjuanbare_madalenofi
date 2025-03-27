@@ -39,6 +39,7 @@ public:
 	void render(Camera cam = Camera());
 
 	nlohmann::json serialize() const;
+	void deserialize(const nlohmann::json& sky);
 
 	bool use_cubemap;
 

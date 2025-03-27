@@ -29,7 +29,7 @@ SaveManager::~SaveManager()
 {
 }
 
-nlohmann::json SaveManager::serialize(Skybox& skybox)
+nlohmann::json SaveManager::serialize()
 {
     nlohmann::json j;
     j["Entities"] = nlohmann::json::array();
@@ -40,6 +40,7 @@ nlohmann::json SaveManager::serialize(Skybox& skybox)
     auto ni = ecs_.getComponentList<IdentifierComponent>().begin();
     auto hi = ecs_.getComponentList<HierarchyComponent>().begin();
     auto ci = ecs_.getComponentList<CameraComponent>().begin();
+    auto si = ecs_.getComponentList<SkyboxComponent>().begin();
 
     auto riend = ecs_.getComponentList<RenderComponent>().end();
     auto tiend = ecs_.getComponentList<TransformComponent>().end();
@@ -47,6 +48,7 @@ nlohmann::json SaveManager::serialize(Skybox& skybox)
     auto niend = ecs_.getComponentList<IdentifierComponent>().end();
     auto hiend = ecs_.getComponentList<HierarchyComponent>().end();
     auto ciend = ecs_.getComponentList<CameraComponent>().end();
+    auto siend = ecs_.getComponentList<SkyboxComponent>().end();
 
     size_t max_components = std::max({ 
       ecs_.getComponentList<CameraComponent>().size(),
@@ -54,6 +56,7 @@ nlohmann::json SaveManager::serialize(Skybox& skybox)
       ecs_.getComponentList<TransformComponent>().size(),
       ecs_.getComponentList<LightComponent>().size(),
       ecs_.getComponentList<IdentifierComponent>().size(),
+      ecs_.getComponentList<SkyboxComponent>().size(),
       ecs_.getComponentList<HierarchyComponent>().size()
     });
 
@@ -102,56 +105,39 @@ nlohmann::json SaveManager::serialize(Skybox& skybox)
             ++ci;
         }
 
+        if (si != siend) {
+            if (si->has_value()) {
+                entity_json["Skybox_component"] = (*si)->serialize();
+            }
+            ++si;
+        }
+
         if (!entity_json.empty()) {
             j["Entities"].push_back(entity_json);
         }
     }
 
-    //-----------------
-
-    j["Skybox"] = skybox.serialize();
-
     return j;
 }
 
-void SaveManager::deSerialize(const nlohmann::json& j, Skybox& skybox) {
+void SaveManager::deSerialize(const nlohmann::json& j) {
 
     ecs_.remove_entities();
     rs_.entity_ = 0;
 
+    rs_.entity_camera = 0;
+    rs_.entity_skybox = 0;
     rs_.entity_mesh = 0;
     rs_.entity_terrain = 0;
+    rs_.entity_water = 0;
     rs_.entity_sphere = 0;
+    rs_.entity_surface = 0;
     rs_.entity_cube8v = 0;
     rs_.entity_cube24v = 0;
     rs_.entity_quad = 0;
     rs_.entity_spotlight = 0;
     rs_.entity_pointlight = 0;
     rs_.entity_dirlight = 0;
-    rs_.entity_camera = 0;
-    
-    //-----------------------------------------------------------
-    
-    const auto& skybox_ = j["Skybox"];
-    skybox.use_cubemap = skybox_["Use_cubemap"];
-
-    skybox.dds_file_ = skybox_["DDS_file_path"];
-    skybox.dds_fragment_file_ = skybox_["DDS_fragment_file"];
-    skybox.dds_vertex_file_ = skybox_["DDS_vertex_file"];
-    skybox.dds_angle_ = skybox_["DDS_angle"];
-
-    skybox.faces_files_ = skybox_["Cubemap_file_paths"];
-    skybox.cubemap_vertex_file_ = skybox_["Cubemap_vertex_file"];
-    skybox.cubemap_fragment_file_ = skybox_["Cubemap_fragment_file"];
-
-    if (skybox.use_cubemap == true) {
-        skybox.loadCubeMap(skybox.faces_files_, skybox.cubemap_vertex_file_.c_str(), skybox.cubemap_fragment_file_.c_str());
-        skybox.initcubeMap();
-    }
-    else {
-        skybox.loadDDS(skybox.dds_file_.c_str(), skybox.dds_vertex_file_.c_str(), skybox.dds_fragment_file_.c_str());
-        skybox.initDDS();
-    }
     
     //-----------------------------------------------------------
 
@@ -374,13 +360,24 @@ void SaveManager::deSerialize(const nlohmann::json& j, Skybox& skybox) {
 
             rs_.addCamera(cam);
         }
+
+        if (entity.contains("Skybox_component")) {
+
+            const auto& sc = entity["Skybox_component"]["skybox"];
+
+            Skybox sky;
+            sky.deserialize(sc);
+
+            rs_.addSkybox(sky);
+        }
     }
+
     rs_.init();
 }
 
 void SaveManager::saveToFile(std::string filename)
 {
-    nlohmann::json j = serialize(global.skybox);
+    nlohmann::json j = serialize();
     std::ofstream file(filename);
 
     if (file.is_open()) {
@@ -408,7 +405,7 @@ void SaveManager::loadFromFile(std::string filename) {
     file >> j;
     file.close();
 
-    deSerialize(j, global.skybox);
+    deSerialize(j);
     printf("Loaded from %s\n", filename.c_str());
 }
 
@@ -424,24 +421,7 @@ std::string SaveManager::newFile()
 
     if (file.is_open()) {
         nlohmann::json defaultJson = {
-            {"Entities", nlohmann::json::array()}
-           ,{"Skybox", {
-                {"Use_cubemap", false},
-                {"DDS_file_path", "../stages/assets/textures/skybox/sky.dds"},
-                {"DDS_vertex_file", "../stages/shaders/skybox/skybox_dds.vs"},
-                {"DDS_fragment_file", "../stages/shaders/skybox/skybox_dds.fs"},
-                {"DDS_angle", -90.0f},
-                {"Cubemap_vertex_file", "../stages/shaders/skybox/skybox_cubemap.vs"},
-                {"Cubemap_fragment_file", "../stages/shaders/skybox/skybox_cubemap.fs"},
-                {"Cubemap_file_paths", {
-                    "../stages/assets/textures/skybox/cubemap/nebulae/right.png",
-                    "../stages/assets/textures/skybox/cubemap/nebulae/left.png",
-                    "../stages/assets/textures/skybox/cubemap/nebulae/top.png",
-                    "../stages/assets/textures/skybox/cubemap/nebulae/bottom.png",
-                    "../stages/assets/textures/skybox/cubemap/nebulae/front.png",
-                    "../stages/assets/textures/skybox/cubemap/nebulae/back.png"
-                }}
-           }}
+            {"Entities", nlohmann::json::array()} 
         };
 
         file << defaultJson.dump(4);

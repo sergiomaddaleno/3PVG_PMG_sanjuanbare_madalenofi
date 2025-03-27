@@ -48,7 +48,6 @@ public:
 
     void PostProcessWindow();
     void FogWindow();
-    void SkyboxWindow();
     void ConsoleWindow();
     void AddMeshWindow();
     void AddSurfaceWindow();
@@ -78,7 +77,7 @@ private:
     Texture m_DirectoryIcon, m_FileIcon, m_EntityIcon, m_BackIcon,
     m_ToolsIcon, m_LightIcon, m_CameraIcon, m_TransformIcon, m_SettingsIcon,
     m_TagIcon, m_RenderIcon, m_EditIcon, m_PuzzleIcon, m_DeleteIcon,
-    m_PlayIcon, m_StopIcon, m_AlgorithmIcon, m_PhysicsmIcon;
+    m_PlayIcon, m_StopIcon, m_AlgorithmIcon, m_PhysicsmIcon, m_SkyIcon;
 
     float padding;
     float thumbnailSize;
@@ -87,7 +86,6 @@ private:
     bool show_fps;
 
     bool post_process_window;
-    bool skybox_window;
     bool console_window;
     bool fog_window;
     bool l_system_window;

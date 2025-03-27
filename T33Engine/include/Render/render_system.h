@@ -22,6 +22,7 @@
 #include "../Systems/ecs_manager.h"
 #include "Core/camera.h"
 #include "Core/input.h"
+#include "Render/skybox.h"
 #include "Render/deferred_shading.h"
 
 #include "Components/components.h"
@@ -58,11 +59,14 @@ public:
 		ecs_.add_component_type<LightComponent>();
 		ecs_.add_component_type<PhysicsComponent>();
 		ecs_.add_component_type<CameraComponent>();
+		ecs_.add_component_type<SkyboxComponent>();
 	}
 
 	//----------------------------------
 
 	size_t addCamera(Camera camera = Camera());
+
+	size_t addSkybox(Skybox skybox = Skybox());
 
 	size_t createMesh(std::string file, std::string textureFolder, 
 		TransformComponent tc = TransformComponent());
@@ -114,6 +118,7 @@ public:
 	size_t entity_;
 
 	int entity_camera;
+	int entity_skybox;
 	int entity_mesh;
 	int entity_terrain;
 	int entity_water;
@@ -131,8 +136,6 @@ public:
 
 private:
 	void setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
-
-
 };
 
 #endif // __RENDER_SYSTEM__

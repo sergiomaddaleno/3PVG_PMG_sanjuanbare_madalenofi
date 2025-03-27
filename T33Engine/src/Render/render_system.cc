@@ -28,6 +28,7 @@ RenderSystem::RenderSystem(ECSManager& ecs_)
     : shader(),
     entity_(0),
     entity_camera(0),
+    entity_skybox(0),
     entity_mesh(0),
     entity_terrain(0),
     entity_sphere(0),
@@ -112,7 +113,38 @@ void RenderSystem::init() {
         }
     }
     
+    // ---
+
+    auto si = ecs_.getComponentList<SkyboxComponent>().begin();
+    auto siend = ecs_.getComponentList<SkyboxComponent>().end();
+
+    for (; si != siend; ++si) {
+        if (si->has_value()) {
+            auto& skybox_comp = *si;
+
+            if (skybox_comp->skybox.use_cubemap) {
+                skybox_comp->skybox.loadCubeMap(
+                    skybox_comp->skybox.faces_files_,
+                    skybox_comp->skybox.cubemap_vertex_file_.c_str(),
+                    skybox_comp->skybox.cubemap_fragment_file_.c_str()
+                );
+                skybox_comp->skybox.initcubeMap();
+            }
+            else {
+                skybox_comp->skybox.loadDDS(skybox_comp->skybox.dds_file_.c_str(),
+                    skybox_comp->skybox.dds_vertex_file_.c_str(),
+                    skybox_comp->skybox.dds_fragment_file_.c_str()
+                );
+                skybox_comp->skybox.initDDS();
+            }
+        }
+    }
+
+    // ---
+
     deferred.init();
+
+    global.grid.initGrid();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glUseProgram(0);
@@ -171,7 +203,27 @@ void RenderSystem::forwardRender(Input &input, double dt) {
         if (ci->has_value()) {
             auto& camera_comp = *ci;
 
+            if (global.window_width != camera_comp->window_width ||
+                global.window_height != camera_comp->window_height) {
+                camera_comp->window_width = global.window_width;
+                camera_comp->window_height = global.window_height;
+
+                camera_comp->camera.setAspectRatio(camera_comp->window_width / camera_comp->window_height);
+            }
             camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
+
+            auto si = ecs_.getComponentList<SkyboxComponent>().begin();
+            auto siend = ecs_.getComponentList<SkyboxComponent>().end();
+
+            for (; si != siend; ++si) {
+                if (si->has_value()) {
+                    auto& skybox_comp = *si;
+
+                    if (global.use_skybox) skybox_comp->skybox.render(camera_comp->camera);
+                }
+            }
+
+            if(!global.is_playing) global.grid.drawGrid(camera_comp->camera);
 
             for (; li != liend; ++li) {
                 if (li->has_value()) {
@@ -279,7 +331,7 @@ void RenderSystem::forwardRender(Input &input, double dt) {
             }
         }
     }
-    
+
     glDisable(GL_BLEND);
     glUseProgram(0);
 }
@@ -299,6 +351,19 @@ void RenderSystem::deferredRender(Input& input, double dt)
 
             deferred.resize(global.window_width, global.window_height);
             deferred.render(ecs_, camera_comp->camera);
+
+            /*auto si = ecs_.getComponentList<SkyboxComponent>().begin();
+            auto siend = ecs_.getComponentList<SkyboxComponent>().end();
+
+            for (; si != siend; ++si) {
+                if (si->has_value()) {
+                    auto& skybox_comp = *si;
+
+                    if (global.use_skybox) skybox_comp->skybox.render(camera_comp->camera);
+                }
+            }*/
+
+            if (!global.is_playing) global.grid.drawGrid(camera_comp->camera);
         }
     }
 }
@@ -418,6 +483,23 @@ size_t RenderSystem::addCamera(Camera camera)
 
     entity_++;
     entity_camera++;
+
+    return entity_;
+}
+
+size_t RenderSystem::addSkybox(Skybox skybox)
+{
+    ecs_.add_component<SkyboxComponent>(entity_);
+    ecs_.add_component<IdentifierComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
+
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Skybox [" + std::to_string(entity_skybox) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
+
+    ecs_.get_component<SkyboxComponent>(entity_)->skybox = skybox;
+
+    entity_++;
+    entity_skybox++;
 
     return entity_;
 }

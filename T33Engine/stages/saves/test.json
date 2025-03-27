@@ -125,18 +125,18 @@
      "Ortho_height": 45.0,
      "Ortho_width": 45.0,
      "Position": [
-      -10.52061939239502,
-      8.246233940124512,
-      6.499786376953125
+      -0.5733403563499451,
+      5.76547384262085,
+      8.386174201965332
      ],
      "Scroll_speed": 10.0,
      "Sensitivity": 1.0,
      "Speed": 36.20399856567383,
      "Use_perspective_matrix": true,
      "View_direction": [
-      0.673712968826294,
-      -0.5536389946937561,
-      -0.4894840121269226
+      0.28629282116889954,
+      -0.43727001547813416,
+      -0.8525440096855164
      ]
     }
    },
@@ -148,23 +148,35 @@
     "Entity_id": 2,
     "Entity_name": "Camera [0]"
    }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 3,
+    "Entity_name": "Skybox [0]"
+   },
+   "Skybox_component": {
+    "skybox": {
+     "Cubemap_file_paths": [
+      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\right.png",
+      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\left.png",
+      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\bottom.png",
+      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\top.png",
+      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\front.png",
+      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\back.png"
+     ],
+     "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
+     "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
+     "DDS_angle": -90.0,
+     "DDS_file_path": "../stages\\assets\\textures\\skybox\\board.dds",
+     "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
+     "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
+     "Use_cubemap": true
+    }
+   }
   }
- ],
- "Skybox": {
-  "Cubemap_file_paths": [
-   "../stages/assets/textures/skybox/cubemap/nebulae/right.png",
-   "../stages/assets/textures/skybox/cubemap/nebulae/left.png",
-   "../stages/assets/textures/skybox/cubemap/nebulae/top.png",
-   "../stages/assets/textures/skybox/cubemap/nebulae/bottom.png",
-   "../stages/assets/textures/skybox/cubemap/nebulae/front.png",
-   "../stages/assets/textures/skybox/cubemap/nebulae/back.png"
-  ],
-  "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
-  "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
-  "DDS_angle": -90.0,
-  "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
-  "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
-  "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
-  "Use_cubemap": false
- }
+ ]
 }

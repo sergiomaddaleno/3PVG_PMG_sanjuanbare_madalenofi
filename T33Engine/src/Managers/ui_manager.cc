@@ -51,7 +51,6 @@ UIManager::UIManager(ECSManager& ecs, RenderSystem& rs)
     padding(16.0f),
     thumbnailSize(128.0f),
     post_process_window(false),
-    skybox_window(false),
     console_window(false),
     fog_window(false),
     l_system_window(false),
@@ -169,7 +168,7 @@ void UIManager::Init(Window* window, Input* input) {
     m_StopIcon.loadTexture("../stages/assets/textures/imgui/stop.png");
     m_AlgorithmIcon.loadTexture("../stages/assets/textures/imgui/algorithm.png");
     m_PhysicsmIcon.loadTexture("../stages/assets/textures/imgui/physics.png");
-
+    m_SkyIcon.loadTexture("../stages/assets/textures/imgui/sky.png");
     //---
 
     input_ = input;
@@ -195,7 +194,6 @@ void UIManager::Render() {
 
         if (console_window) ConsoleWindow();
         if (post_process_window) PostProcessWindow();
-        if (skybox_window) SkyboxWindow();
         if (fog_window) FogWindow();
         if (add_mesh_window) AddMeshWindow();
         if (add_surface_window) AddSurfaceWindow();
@@ -551,6 +549,126 @@ void UIManager::InspectorWindow() {
                     use_perspective = false;
                     camera_comp->camera.setUsePerspectiveMatrix(false);
                 }
+            }
+        }
+    }
+
+    if (ecs_.has_component<SkyboxComponent>(selected_entity)) {
+
+        bool open = ImGui::CollapsingHeader("##SkyboxComponent", ImGuiTreeNodeFlags_DefaultOpen);
+        ImGui::SameLine();
+        ImGui::Image(m_SkyIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Text("Skybox Component");
+
+        if (open) {
+            auto& skybox_comp = ecs_.get_component<SkyboxComponent>(selected_entity);
+
+            ImGui::Dummy({ 0.0f, 5.0f });
+            ImGui::Checkbox("Activate", &global.use_skybox);
+            ImGui::SameLine();
+            ImGui::Checkbox("Use Cubemap / DDS", &skybox_comp->skybox.use_cubemap);
+            ImGui::Dummy({ 0.0f, 5.0f });
+
+            ImGui::Separator();
+
+            ImGui::Dummy({ 0.0f, 5.0f });
+            static bool temp_sb = skybox_comp->skybox.use_cubemap;
+            ImGui::Checkbox("Compile Cubemap / DDS", &temp_sb);
+            ImGui::Dummy({ 0.0f, 5.0f });
+
+            ImGui::Separator();
+            ImGui::Dummy({ 0.0f, 5.0f });
+
+            if (temp_sb) {
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+                ImGui::Text("Drag and Drop 6 Cubemap files");
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+                ImGui::Text("Use this order: right, left, bottom, top, front, back");
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+                static std::vector<std::string> cubemap_file_paths(6);
+                static std::vector<std::string> cubemap_file_names(6);
+
+                for (int i = 0; i < 6; i++) {
+                    ImGui::PushID(i);
+                    if (ImGui::Button(!cubemap_file_paths[i].empty() ? cubemap_file_names[i].c_str() : "Cubemap file", { 200.0f, 40.0f })) {}
+
+                    if (ImGui::BeginDragDropTarget()) {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                            std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                            if (filePath.extension() == ".png" || filePath.extension() == ".jpg") {
+                                cubemap_file_paths[i] = filePath.string();
+                                cubemap_file_names[i] = filePath.filename().string();
+                            }
+                        }
+                        ImGui::EndDragDropTarget();
+                    }
+                    ImGui::PopID();
+                }
+
+                ImGui::Dummy(ImVec2(0.0f, 3.0f));
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
+                if (ImGui::Button("Compile Cubemap")) {
+                    if (std::all_of(cubemap_file_paths.begin(), cubemap_file_paths.end(), [](const std::string& s) { return !s.empty(); })) {
+                        std::vector<std::string> full_paths;
+                        for (const auto& file : cubemap_file_paths) {
+                            full_paths.push_back(file);
+                        }
+                        skybox_comp->skybox.loadCubeMap(
+                            full_paths,
+                            "../stages/shaders/skybox/skybox_cubemap.vs",
+                            "../stages/shaders/skybox/skybox_cubemap.fs"
+                        );
+                        skybox_comp->skybox.initcubeMap();
+                        AddConsoleMessage("Cubemap compiled");
+
+                        //cubemap_file_paths.clear();
+                        //cubemap_file_names.clear();
+                    }
+                }
+                ImGui::Dummy({ 0.0f, 5.0f });
+            }
+            else {
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+                ImGui::Text("Drag and Drop .dds file");
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+                static std::string skybox_file_path;
+                static std::string skybox_file_name;
+                if (ImGui::Button(!skybox_file_path.empty() ? skybox_file_name.c_str() : ".dds Drop here", { 200.0f, 40.0f })) {}
+
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                        std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                        if (filePath.extension() == ".dds") {
+                            skybox_file_path = filePath.string();
+                            skybox_file_name = filePath.filename().string();
+                        }
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+
+                ImGui::Dummy(ImVec2(0.0f, 3.0f));
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
+                if (ImGui::Button("Compile DDS")) {
+                    skybox_comp->skybox.loadDDS(
+                        (skybox_file_path).c_str(),
+                        "../stages/shaders/skybox/skybox_dds.vs",
+                        "../stages/shaders/skybox/skybox_dds.fs"
+                    );
+                    skybox_comp->skybox.initDDS();
+
+                    AddConsoleMessage(skybox_file_name + " compiled");
+
+                    skybox_file_path.clear();
+                    skybox_file_name.clear();
+                }
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
             }
         }
     }
@@ -1589,7 +1707,6 @@ void UIManager::ContentBrowserWindow() {
         {
             m_CurrentDirectory = m_CurrentDirectory.parent_path();
         }
-
     }
 
     padding = 16.0f;
@@ -1734,11 +1851,6 @@ void UIManager::TopBarWindow() {
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("SkyBox")) {
-                ImGui::Checkbox("SkyBox Window", &skybox_window);
-                ImGui::EndMenu();
-            }
-
             ImGui::EndMenu();
         }
 
@@ -1746,16 +1858,19 @@ void UIManager::TopBarWindow() {
         ImGui::SameLine();
         if (ImGui::BeginMenu("Tools")) {
 
-            if (ImGui::BeginMenu("Camera")) {
+            if (ImGui::MenuItem("Add Camera")) {
+                rs_.addCamera();
+                ResetIds();
 
-                if (ImGui::MenuItem("Add camera")) {
-                    rs_.addCamera();
-                    ResetIds();
+                AddConsoleMessage("Camera added");
+            }
 
-                    AddConsoleMessage("Camera added");
-                }
+            if (ImGui::MenuItem("Add Skybox")) {
+                rs_.addSkybox();
+                rs_.init();
+                ResetIds();
 
-                ImGui::EndMenu();
+                AddConsoleMessage("Skybox added");
             }
 
             if (ImGui::BeginMenu("Add Geometry")) {
@@ -2080,121 +2195,6 @@ void UIManager::FogWindow()
         global.sky_colour.z = color[2];
     }
 
-
-    ImGui::End();
-}
-
-void UIManager::SkyboxWindow()
-{
-    ImGui::Begin("SkyBox");
-
-    ImGui::Dummy({ 0.0f, 5.0f });
-    ImGui::Checkbox("Activate", &global.use_skybox);
-    ImGui::SameLine();
-    ImGui::Checkbox("Use Cubemap / DDS", &global.skybox.use_cubemap);
-    ImGui::Dummy({ 0.0f, 5.0f });
-
-    ImGui::Separator();
-
-    ImGui::Dummy({ 0.0f, 5.0f });
-    static bool temp_sb = global.skybox.use_cubemap;
-    ImGui::Checkbox("Compile Cubemap / DDS", &temp_sb);
-    ImGui::Dummy({ 0.0f, 5.0f });
-
-    ImGui::Separator();
-    ImGui::Dummy({ 0.0f, 5.0f });
-
-    if (temp_sb) {
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-        ImGui::Text("Drag and Drop 6 Cubemap files");
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-        ImGui::Text("Use this order: right, left, bottom, top, front, back");
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-        static std::vector<std::string> cubemap_file_paths(6);
-        static std::vector<std::string> cubemap_file_names(6);
-
-        for (int i = 0; i < 6; i++) {
-            ImGui::PushID(i);
-            if (ImGui::Button(!cubemap_file_paths[i].empty() ? cubemap_file_names[i].c_str() : "Cubemap file", { 200.0f, 40.0f })) {}
-
-            if (ImGui::BeginDragDropTarget()) {
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                    std::filesystem::path filePath = (const wchar_t*)payload->Data;
-                    if (filePath.extension() == ".png" || filePath.extension() == ".jpg") {
-                        cubemap_file_paths[i] = filePath.string();
-                        cubemap_file_names[i] = filePath.filename().string();
-                    }
-                }
-                ImGui::EndDragDropTarget();
-            }
-            ImGui::PopID();
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 3.0f));
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(0.0f, 3.0f));
-
-        if (ImGui::Button("Compile Cubemap")) {
-            if (std::all_of(cubemap_file_paths.begin(), cubemap_file_paths.end(), [](const std::string& s) { return !s.empty(); })) {
-                std::vector<std::string> full_paths;
-                for (const auto& file : cubemap_file_paths) {
-                    full_paths.push_back(file);
-                }
-                global.skybox.loadCubeMap(
-                    full_paths,
-                    "../stages/shaders/skybox/skybox_cubemap.vs",
-                    "../stages/shaders/skybox/skybox_cubemap.fs"
-                );
-                global.skybox.initcubeMap();
-                AddConsoleMessage("Cubemap compiled");
-
-                //cubemap_file_paths.clear();
-                //cubemap_file_names.clear();
-            }
-        }
-    }
-    else {
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-        ImGui::Text("Drag and Drop .dds file");
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-        static std::string skybox_file_path;
-        static std::string skybox_file_name;
-        if (ImGui::Button(!skybox_file_path.empty() ? skybox_file_name.c_str() : ".dds Drop here", { 200.0f, 40.0f })) {}
-
-        if (ImGui::BeginDragDropTarget()) {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                std::filesystem::path filePath = (const wchar_t*)payload->Data;
-                if (filePath.extension() == ".dds") {
-                    skybox_file_path = filePath.string();
-                    skybox_file_name = filePath.filename().string();
-                }
-            }
-            ImGui::EndDragDropTarget();
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 3.0f));
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(0.0f, 3.0f));
-
-        if (ImGui::Button("Compile DDS")) {
-            global.skybox.loadDDS(
-                (skybox_file_path).c_str(),
-                "../stages/shaders/skybox/skybox_dds.vs",
-                "../stages/shaders/skybox/skybox_dds.fs"
-            );
-            global.skybox.initDDS();
-
-            AddConsoleMessage(skybox_file_name + " compiled");
-
-            skybox_file_path.clear();
-            skybox_file_name.clear();
-        }
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
-    }
-    
-    
 
     ImGui::End();
 }
