@@ -1,5 +1,6 @@
 
 #include "Managers/ui_manager.h"
+#include "Managers/engine.h"
 #include "utils.h"
 #include "Render/post_processing.h"
 #include "Components/components.h"
@@ -9,7 +10,6 @@
 
 #include "Managers/save_manager.h"
 #include "Core/window.h"
-#include "global_data.h"
 
 #include <iostream>
 #include <cmath>
@@ -44,7 +44,7 @@
 
 ImGui::FileBrowser fileDialog;
 
-UIManager::UIManager(ECSManager& ecs, RenderSystem& rs)
+UIManager::UIManager(Engine& engine, ECSManager& ecs, RenderSystem& rs)
     : selected_entity(0),
     m_BaseDirectory("../"),
     m_CurrentDirectory(m_BaseDirectory),
@@ -65,6 +65,7 @@ UIManager::UIManager(ECSManager& ecs, RenderSystem& rs)
     window_(),
     ecs_(ecs),
     rs_(rs),
+    engine_(engine),
     input_(nullptr)
 {
 }
@@ -169,7 +170,6 @@ void UIManager::Init(Window* window, Input* input) {
     m_DeleteIcon.loadTexture("../stages/assets/textures/imgui/delete.png");
     m_PlayIcon.loadTexture("../stages/assets/textures/imgui/play.png");
     m_StopIcon.loadTexture("../stages/assets/textures/imgui/stop.png");
-    m_AlgorithmIcon.loadTexture("../stages/assets/textures/imgui/algorithm.png");
     m_PhysicsmIcon.loadTexture("../stages/assets/textures/imgui/physics.png");
     m_SkyIcon.loadTexture("../stages/assets/textures/imgui/sky.png");
     //---
@@ -189,25 +189,22 @@ void UIManager::Render() {
 
     ImguiWindow();
 
-    if (!global.is_playing) {
+    if (!engine_.is_playing) {
         HierarchyWindow();
         InspectorWindow();
         ContentBrowserWindow();
         TopBarWindow();
 
         if (console_window) ConsoleWindow();
-        if (post_process_window) PostProcessWindow();
         if (fog_window) FogWindow();
+        if (post_process_window) PostProcessWindow();
         if (add_mesh_window) AddMeshWindow();
         if (add_surface_window) AddSurfaceWindow();
         if (l_system_window) LSystemWindow();
         if (add_entities_terrain_window) AddEntitiesTerrainWindow();
-
-        //global.grid.drawGrid(global.cam);
     }
 
-    global.post_process.endRender();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    engine_.post_process.endRender();
 
     GameWindow();
 
@@ -228,7 +225,7 @@ void UIManager::Render() {
 void UIManager::ImguiWindow() {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    if (global.is_playing) {
+    if (engine_.is_playing) {
         ImGui::SetNextWindowPos(viewport->WorkPos);
         ImGui::SetNextWindowSize(viewport->WorkSize);
         ImGui::SetNextWindowViewport(viewport->ID);
@@ -301,7 +298,7 @@ void UIManager::GameWindow() {
     ImVec2 button_size = { 20.0f, 20.0f };
     ImVec2 button_pos;
 
-    if (global.is_playing) {
+    if (engine_.is_playing) {
         ImGui::Begin("Main", nullptr);
     }
     else {
@@ -310,7 +307,7 @@ void UIManager::GameWindow() {
 
     ImVec2 window_size = ImGui::GetContentRegionAvail();
 
-    if (global.is_playing) {
+    if (engine_.is_playing) {
         button_pos = { (window_size.x - button_size.x) * 0.5f, 0.0f };
     }
     else {
@@ -319,12 +316,13 @@ void UIManager::GameWindow() {
 
     ImGui::SetCursorPos(button_pos);
 
-    ImTextureID icon = global.is_playing ? m_StopIcon.getID() : m_PlayIcon.getID();
+    ImTextureID icon = engine_.is_playing ? m_StopIcon.getID() : m_PlayIcon.getID();
     if (ImGui::ImageButton("Play", icon, button_size, { 0, 1 }, { 1, 0 })) {
-        global.is_playing = !global.is_playing;
+        engine_.is_playing = !engine_.is_playing;
+        rs_.is_playing = engine_.is_playing;
     }
 
-    GLuint captureTexture = global.post_process.frame_buffer_.GetColorTexture();
+    GLuint captureTexture = engine_.post_process.frame_buffer_.GetColorTexture();
     if (captureTexture) ImGui::Image((ImTextureID)(intptr_t)captureTexture, { window_size.x, window_size.y - (button_size.y + 7.0f)}, { 0.0f, 1.0f }, { 1.0f, 0.0f });
 
     ImGui::End();
@@ -581,7 +579,7 @@ void UIManager::InspectorWindow() {
             auto& skybox_comp = ecs_.get_component<SkyboxComponent>(selected_entity);
 
             ImGui::Dummy({ 0.0f, 5.0f });
-            ImGui::Checkbox("Activate", &global.use_skybox);
+            ImGui::Checkbox("Activate", &rs_.use_skybox);
             ImGui::SameLine();
             ImGui::Checkbox("Use Cubemap / DDS", &skybox_comp->skybox.use_cubemap);
             ImGui::Dummy({ 0.0f, 5.0f });
@@ -1116,7 +1114,7 @@ void UIManager::InspectorWindow() {
                     ImGui::Separator();
 
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
-                    ImGui::SliderFloat("Alpha", &global.alpha_blend, 0.0f, 1.0f, "%0.03f");
+                    ImGui::SliderFloat("Alpha", &rs_.alpha_blend, 0.0f, 1.0f, "%0.03f");
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
@@ -1655,7 +1653,7 @@ void UIManager::InspectorWindow() {
                                     light_comp->light.shininess_ = 32.0f;
                                     light_comp->light.strength_ = 1.0f;
 
-                                    global.render_system.init();
+                                    rs_.init();
                                 }
                                 break;
                             }
@@ -1783,8 +1781,8 @@ void UIManager::ContentBrowserWindow() {
                 m_CurrentDirectory /= path.filename();
 
             if (path.extension() == ".json") {
-                global.save_manager.setCurrentScene(path.string());
-                global.save_manager.loadFromFile(global.save_manager.getCurrentScene());
+                engine_.save_manager.setCurrentScene(path.string());
+                engine_.save_manager.loadFromFile(engine_.save_manager.getCurrentScene());
 
                 AddConsoleMessage(path.string() + " loaded");
             }
@@ -1830,18 +1828,18 @@ void UIManager::TopBarWindow() {
 
             if (ImGui::MenuItem("Save Scene [CTRL + S]")) {
 
-                if (global.save_manager.getCurrentScene().empty()) {
-                    global.save_manager.saveToFile("../stages/saves/scene_0.json");
+                if (engine_.save_manager.getCurrentScene().empty()) {
+                    engine_.save_manager.saveToFile("../stages/saves/scene_0.json");
                 }
                 else {
-                    global.save_manager.saveToFile(global.save_manager.getCurrentScene());
+                    engine_.save_manager.saveToFile(engine_.save_manager.getCurrentScene());
                 }
 
                 AddConsoleMessage("Saving current scene");
             }
 
             if (ImGui::MenuItem("New Scene  [CTRL + N]")) {
-                global.save_manager.newFile();
+                engine_.save_manager.newFile();
                 AddConsoleMessage("New scene created");
             }
 
@@ -1854,10 +1852,10 @@ void UIManager::TopBarWindow() {
 
             if (ImGui::BeginMenu("Render Type")) {
                 if (ImGui::MenuItem("Forward Render", nullptr)) {
-                    global.deferred_shading = false;
+                    rs_.use_deferred_shading = false;
                 }
                 if (ImGui::MenuItem("Deferred Render", nullptr)) {
-                    global.deferred_shading = true;
+                    rs_.use_deferred_shading = true;
                 }
                 ImGui::EndMenu();
             }
@@ -1886,6 +1884,11 @@ void UIManager::TopBarWindow() {
 
             if (ImGui::BeginMenu("Fog")) {
                 ImGui::Checkbox("Fog Window", &fog_window);
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("LSystem")) {
+                ImGui::Checkbox("LSystem Window", &l_system_window);
                 ImGui::EndMenu();
             }
 
@@ -2017,20 +2020,7 @@ void UIManager::TopBarWindow() {
             ImGui::EndMenu();
         }
 
-        ImGui::Image(m_AlgorithmIcon.getID(), { 22.0f, 22.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-        ImGui::SameLine();
-        ImGui::Spacing();
-        if (ImGui::BeginMenu("Algorithms")) {
-
-            if (ImGui::BeginMenu("LSystem")) {
-                ImGui::Checkbox("LSystem Window", &l_system_window);
-                ImGui::EndMenu();
-            }
-
-            ImGui::EndMenu();
-        }
-
-        if (global.deferred_shading) {
+        if (rs_.use_deferred_shading) {
 
             ImGui::SameLine();
             ImGui::Spacing();
@@ -2042,16 +2032,16 @@ void UIManager::TopBarWindow() {
             ImGui::Spacing();
             ImGui::Spacing();
 
-            if (ImGui::RadioButton("Albedo", global.deferred_option == 0)) {
-                global.deferred_option = 0;
+            if (ImGui::RadioButton("Albedo", rs_.deferred.deferred_option == 0)) {
+                rs_.deferred.deferred_option = 0;
             }
             ImGui::SameLine();
-            if (ImGui::RadioButton("Normal", global.deferred_option == 1)) {
-                global.deferred_option = 1;
+            if (ImGui::RadioButton("Normal", rs_.deferred.deferred_option == 1)) {
+                rs_.deferred.deferred_option = 1;
             }
             ImGui::SameLine();
-            if (ImGui::RadioButton("Position", global.deferred_option == 2)) {
-                global.deferred_option = 2;
+            if (ImGui::RadioButton("Position", rs_.deferred.deferred_option == 2)) {
+                rs_.deferred.deferred_option = 2;
             }
         }
 
@@ -2066,7 +2056,7 @@ void UIManager::TopBarWindow() {
             ImGui::Spacing();
             ImGui::Spacing();
 
-            ImGui::Text("FPS: %0.1f", 1000.0 / global.dt);
+            ImGui::Text("FPS: %0.1f", 1000.0 / engine_.dt);
             //ImGui::Text("Delta time: %0.3f ms", global.dt);
         }
 
@@ -2081,18 +2071,18 @@ void UIManager::TopBarWindow() {
     // ---
 
     if (input_->isKeyDown(Input::CTRL) && input_->isKeyPressed(Input::S)) {
-        if (global.save_manager.getCurrentScene().empty()) {
-            global.save_manager.saveToFile("../stages/saves/scene_0.json");
+        if (engine_.save_manager.getCurrentScene().empty()) {
+            engine_.save_manager.saveToFile("../stages/saves/scene_0.json");
         }
         else {
-            global.save_manager.saveToFile(global.save_manager.getCurrentScene());
+            engine_.save_manager.saveToFile(engine_.save_manager.getCurrentScene());
         }
 
         AddConsoleMessage("Saving current scene");
     }
 
     if (input_->isKeyDown(Input::CTRL) && input_->isKeyPressed(Input::N)) {
-        global.save_manager.newFile();
+        engine_.save_manager.newFile();
         AddConsoleMessage("New scene created");
     }
     ImGui::End();
@@ -2154,7 +2144,7 @@ void UIManager::PostProcessWindow()
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
     if (post_process_compiled) {
-        global.post_process.render(new_pp_shader);
+        engine_.post_process.render(new_pp_shader);
 
         static bool use_grey = false;
         static bool use_negative = false;
@@ -2174,11 +2164,11 @@ void UIManager::PostProcessWindow()
 
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-        if (use_grey) ImGui::DragFloat("Grey##1", &global.post_process.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
-        if (use_negative)  ImGui::DragFloat("Negative##1", &global.post_process.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
-        if (use_waves)  ImGui::DragFloat("Waves##1", &global.post_process.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
-        if (use_blur) ImGui::DragFloat("Blur##1", &global.post_process.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
-        if (use_kernel) ImGui::DragInt("Kernel types##1", &global.post_process.kernel_types_, 0.1f, 0, 2, "%d");
+        if (use_grey) ImGui::DragFloat("Grey##1", &engine_.post_process.grey_, 0.01f, 0.0f, 1.0f, "%.3f");
+        if (use_negative)  ImGui::DragFloat("Negative##1", &engine_.post_process.negative_, 0.01f, 0.5f, 1.0f, "%.3f");
+        if (use_waves)  ImGui::DragFloat("Waves##1", &engine_.post_process.waves_, 0.001f, 0.00f, 0.09f, "%.3f");
+        if (use_blur) ImGui::DragFloat("Blur##1", &engine_.post_process.blur_, 0.00001f, 0.00f, 0.035f, "%.3f");
+        if (use_kernel) ImGui::DragInt("Kernel types##1", &engine_.post_process.kernel_types_, 0.1f, 0, 2, "%d");
 
         ImGui::Dummy({ 0.0f, 5.0f });
         ImGui::Separator();
@@ -2213,24 +2203,24 @@ void UIManager::FogWindow()
     ImGui::Begin("Fog");
 
     ImGui::Dummy({ 0.0f, 5.0f });
-    ImGui::Checkbox("Activate", &global.use_fog);
+    ImGui::Checkbox("Activate", &rs_.use_fog);
     ImGui::Dummy({ 0.0f, 5.0f });
 
-    ImGui::DragFloat("Density", &global.fog_density, 0.001f, 0.0f, 2.0f, "%.3f");
-    ImGui::DragFloat("Gradient", &global.fog_gradient, 0.001f, 0.0f, 10.0f, "%.3f");
+    ImGui::DragFloat("Density", &rs_.fog_density, 0.001f, 0.0f, 2.0f, "%.3f");
+    ImGui::DragFloat("Gradient", &rs_.fog_gradient, 0.001f, 0.0f, 10.0f, "%.3f");
 
     ImGui::Dummy({ 0.0f, 5.0f });
     
     float color[3] = {
-                    global.sky_colour.r / 255.0f,
-                    global.sky_colour.g / 255.0f,
-                    global.sky_colour.b / 255.0f
+                    rs_.sky_colour.r / 255.0f,
+                    rs_.sky_colour.g / 255.0f,
+                    rs_.sky_colour.b / 255.0f
     };
 
     if (ImGui::ColorPicker3("Sky Colour", color)) {
-        global.sky_colour.x = color[0];
-        global.sky_colour.y = color[1];
-        global.sky_colour.z = color[2];
+        rs_.sky_colour.x = color[0];
+        rs_.sky_colour.y = color[1];
+        rs_.sky_colour.z = color[2];
     }
 
 
@@ -2488,7 +2478,7 @@ void UIManager::AddEntitiesTerrainWindow()
 
     if (entity_type == RenderType::RT_Mesh) {
         if (ImGui::Button("Spawn")) {
-            global.render_system.spawnMeshInTerrain(entity_id, obj_file_path, texture_folder_path, spawn_prob, spawn_height);
+            rs_.spawnMeshInTerrain(entity_id, obj_file_path, texture_folder_path, spawn_prob, spawn_height);
 
             ResetIds();
             AddConsoleMessage(obj_file_name + " added to scene");
@@ -2501,7 +2491,7 @@ void UIManager::AddEntitiesTerrainWindow()
     }
     else {
         if (ImGui::Button("Spawn")) {
-            global.render_system.spawnEntitiesInTerrain(entity_id, entity_type, spawn_prob, spawn_height);
+            rs_.spawnEntitiesInTerrain(entity_id, entity_type, spawn_prob, spawn_height);
 
             ResetIds();
             AddConsoleMessage("Entities added to scene");

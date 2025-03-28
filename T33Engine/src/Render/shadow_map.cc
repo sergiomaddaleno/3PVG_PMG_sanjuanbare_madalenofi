@@ -12,7 +12,6 @@
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
 #include "Components\light_component.h"
-#include "global_data.h"
 #include "utils.h"
 
 #include <../deps/glm/glm.hpp>
@@ -26,6 +25,7 @@
 ShadowMap::ShadowMap() : depthMapFBO(0), depthMap(0), 
     near_plane(1.0f), far_plane(100.0f), directional_size_(50.0f),
     shadow_width_(4098), shadow_height_(4098),
+    window_width_(800), window_height_(600),
     depthCubemap(0), lightProjection(1.0f), lightView(1.0f), lightSpaceMatrix(1.0f)
 {
 }
@@ -185,7 +185,7 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
     glCullFace(GL_BACK);
     glDrawBuffer(GL_BACK);
     glReadBuffer(GL_BACK);
-    glViewport(0, 0, global.window_width, global.window_height);
+    glViewport(0, 0, window_width_, window_height_);
 }
 
 void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
@@ -194,7 +194,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
     case Light::LightType::LT_Spot: {
 
         float spotLightFOV = lc.light.spot_angle_ * 2.0f;
-        lightProjection = glm::perspective(spotLightFOV, (float)global.window_width / (float)global.window_height, near_plane, far_plane);
+        lightProjection = glm::perspective(spotLightFOV, (float)window_width_ / (float)window_height_, near_plane, far_plane);
 
         lightView = glm::lookAt(lc.light.pos_, lc.light.pos_ + lc.light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
         lightSpaceMatrix = lightProjection * lightView;
@@ -288,5 +288,14 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
        
         break;
     }
+    }
+}
+
+void ShadowMap::resize(unsigned int window_width, unsigned int window_height)
+{
+    if (window_width_ != window_width || window_height_ != window_height) {
+
+        window_width_ = window_width;
+        window_height_ = window_height;
     }
 }

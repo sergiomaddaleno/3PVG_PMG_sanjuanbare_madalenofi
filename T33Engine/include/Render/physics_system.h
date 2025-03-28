@@ -20,6 +20,9 @@ public:
 
     void update();
 
+    double dt_;
+    bool stop_physics_;
+
 private:
     ECSManager& ecs_;
     RenderSystem& rs_; 

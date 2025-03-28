@@ -47,9 +47,11 @@ public:
 
 	void render(ECSManager& ecs, Shader shader, LightComponent lc);
 
+	void resize(unsigned int window_width, unsigned int window_height);
+
 	float near_plane, far_plane;
-	unsigned int shadow_width_;
-	unsigned int shadow_height_;
+	unsigned int shadow_width_, shadow_height_;
+	unsigned int window_width_, window_height_;
 	unsigned int countfaces = 0;
 	float directional_size_;
 

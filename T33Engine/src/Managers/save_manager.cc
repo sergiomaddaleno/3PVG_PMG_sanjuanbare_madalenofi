@@ -9,8 +9,6 @@
 
 #include "Components/components.h"
 
-#include "global_data.h"
-
 #include <../nlohmann/json.hpp>
 #include <iostream>
 #include <fstream>
@@ -125,19 +123,7 @@ void SaveManager::deSerialize(const nlohmann::json& j) {
     ecs_.remove_entities();
     rs_.entity_ = 0;
 
-    rs_.entity_camera = 0;
-    rs_.entity_skybox = 0;
-    rs_.entity_mesh = 0;
-    rs_.entity_terrain = 0;
-    rs_.entity_water = 0;
-    rs_.entity_sphere = 0;
-    rs_.entity_surface = 0;
-    rs_.entity_cube8v = 0;
-    rs_.entity_cube24v = 0;
-    rs_.entity_quad = 0;
-    rs_.entity_spotlight = 0;
-    rs_.entity_pointlight = 0;
-    rs_.entity_dirlight = 0;
+    rs_.entity_counts_ = {};
     
     //-----------------------------------------------------------
 

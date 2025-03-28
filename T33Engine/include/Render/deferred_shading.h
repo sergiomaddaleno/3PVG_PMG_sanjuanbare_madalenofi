@@ -41,6 +41,8 @@ public:
 
 	Shader gbuffer, deferred_shading;
 
+	int deferred_option;
+
 private:
 	unsigned int gBuffer, rboDepth;
 	unsigned int gPosition, gNormal, gAlbedoSpec, shadowMap;

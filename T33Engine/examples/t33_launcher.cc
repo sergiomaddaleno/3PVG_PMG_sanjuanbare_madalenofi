@@ -4,69 +4,30 @@
 #include <optional>
 #include <string>
 
+#include "Managers/engine.h"
 #include "Core/window.h"
 #include "Core/input.h"
-
-#include "global_data.h"
 #include "utils.h"
-
-void init() {
-
-    global.post_process.initData();
-    global.render_system.setupEntities();
-
-    global.save_manager.loadFromFile("../stages/saves/test.json");
-
-    initShader(global.render_system.shader, "../stages/shaders/forward_shading.vs", "../stages/shaders/forward_shading.fs");
-    initShader(global.render_system.deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
-    initShader(global.render_system.deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
-}
 
 int main(int, char**) {
 
-    auto window = Window::make(global.window_width, global.window_height, "T33Engine", global.full_screen);
-    window->setWindowActive();
-    window->initGLEW();
-    window->setResizeCallback();
-
+    auto window = Window::make(800, 600, "T33Engine", true);
     Input input{ window->getWindow() };
 
-    global.ui_manager.Init(&window.value(), &input);
+    Engine T33Engine{*window, input};
 
-    init();
+    T33Engine.init();
 
-    double dt = 0.0;
-    double lastTime = window->getTime();
+    T33Engine.save_manager.loadFromFile("../stages/saves/main_scene.json");
+
     bool done = false;
     while (!done) {
-        double currentTime = window->getTime();
-        double dt = currentTime - lastTime;
-        global.dt = dt;
+        T33Engine.beginFrame();
+        
 
-        window->updateWindow();
-        window->toggleFullScreen(input);
 
-        if (global.window_width != window->getWidth() ||
-            global.window_height != window->getHeight()) {
-            global.window_width = window->getWidth();
-            global.window_height = window->getHeight();
-        }
-
-        global.post_process.resize(global.window_width, global.window_height);
-        global.post_process.beginRender();
-
-        if (global.deferred_shading){
-            global.render_system.deferredRender(input, global.dt);
-        }else{
-            global.render_system.forwardRender(input, global.dt);
-        }
-
-        global.physics_system.update();
-
-        global.ui_manager.Render();
-
+        T33Engine.endFrame();
         if (window->closePressed(input)) done = true;
-        lastTime = currentTime;
     }
 
     return 0;

@@ -1,12 +1,11 @@
 
 #include "render/physics_system.h"
 #include "Components/components.h"
-#include "global_data.h"
-
 
 PhysicsSystem::PhysicsSystem(ECSManager& ecs, RenderSystem& rs) : 
 	ecs_(ecs),
-	rs_(rs)
+	rs_(rs), dt_(0.0),
+	stop_physics_(false)
 {
 }
 
@@ -33,14 +32,17 @@ void PhysicsSystem::update()
 			auto& transf_comp = *ti;
 			auto& render_comp = *ri;
 
-			physics_comp->acceleration = physics_comp->force / physics_comp->mass;
-			physics_comp->acceleration -= physics_comp->gravity;
-			physics_comp->velocity += physics_comp->acceleration * (float)global.dt;
-			transf_comp->position += physics_comp->velocity * (float)global.dt;
+			if (!stop_physics_) {
 
-			if (transf_comp->position.y <= physics_comp->floor_height) {
-				transf_comp->position.y = physics_comp->floor_height;
-				physics_comp->velocity.y *= -physics_comp->bounce_factor;
+				physics_comp->acceleration = physics_comp->force / physics_comp->mass;
+				physics_comp->acceleration -= physics_comp->gravity;
+				physics_comp->velocity += physics_comp->acceleration * (float)dt_;
+				transf_comp->position += physics_comp->velocity * (float)dt_;
+
+				if (transf_comp->position.y <= physics_comp->floor_height) {
+					transf_comp->position.y = physics_comp->floor_height;
+					physics_comp->velocity.y *= -physics_comp->bounce_factor;
+				}
 			}
 		}
 	}

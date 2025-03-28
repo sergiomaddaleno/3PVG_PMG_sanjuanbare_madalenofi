@@ -26,6 +26,9 @@ out vec4 FragColor;
 
 uniform vec3 u_camera_position;
 uniform float u_alpha;
+uniform bool u_light_in_scene;
+
+vec3 final_color = vec3(1.0, 1.0, 1.0);
 
 //Samplers
 uniform sampler2D u_texture;
@@ -318,9 +321,16 @@ void main() {
     }
 
     vec3 texture_color = texture(u_texture, texCoords).rgb;
-
-    vec3 final_color = texture_color * final_light;
-    FragColor = vec4(final_color, u_alpha);
-
-    if(u_fog) FragColor = mix(vec4(u_sky_colour, u_alpha), FragColor, visibility);
+    
+    if (u_light_in_scene) {
+        final_color = texture_color * final_light;
+    }else{
+        final_color = texture_color;
+    }
+    
+    if (u_fog) {
+        final_color = mix(u_sky_colour, final_color, visibility);
+    }
+    
+    FragColor = vec4(final_color, 1.0);
 }

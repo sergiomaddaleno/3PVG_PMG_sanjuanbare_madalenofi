@@ -6,7 +6,6 @@
 #include "Render/shadow_map.h"
 #include "Core/shader.h"
 #include "utils.h"
-#include "global_data.h"
 #include "Components/components.h"
 
 #include "Geometry/sphere.h"
@@ -27,20 +26,19 @@
 RenderSystem::RenderSystem(ECSManager& ecs_)
     : shader(),
     entity_(0),
-    entity_camera(0),
-    entity_skybox(0),
-    entity_mesh(0),
-    entity_terrain(0),
-    entity_sphere(0),
-    entity_cube8v(0),
-    entity_cube24v(0),
-    entity_quad(0),
-    entity_spotlight(0),
-    entity_pointlight(0),
-    entity_dirlight(0),
-    entity_surface(0),
-    entity_water(0),
-    ecs_(ecs_)
+    ecs_(ecs_),
+    window_width(800),
+    window_height(600),
+    use_deferred_shading(false),
+    alpha(1.0f),
+    alpha_blend(0.8f),
+    sky_colour(0.5f, 0.5f, 0.5f),
+    use_fog(false),
+    fog_density(0.1f),
+    fog_gradient(1.0f),
+    use_skybox(true),
+    is_playing(false),
+    light_in_scene(false)
 {
 }
 
@@ -139,13 +137,88 @@ void RenderSystem::init() {
 
     deferred.init();
 
-    global.grid.initGrid();
+    grid.initGrid();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glUseProgram(0);
 }
 
-void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam)
+
+
+void RenderSystem::renderScene(RenderComponent &rc)
+{
+    switch (rc.type_) {
+    case RenderType::RT_Mesh:
+    {
+        for (auto& mesh : rc.mesh_->meshes) {
+            rc.mesh_->wave_.setUniforms(shader, (float)glfwGetTime());
+            rc.mesh_->draw();
+        }
+    }
+    break;
+    case RenderType::RT_Terrain:
+    {
+        rc.terrain_->wave_.setUniforms(shader, (float)glfwGetTime());
+        rc.terrain_->draw();
+    }
+    break;
+    case RenderType::RT_Sphere:
+    {
+        rc.sphere_->wave_.setUniforms(shader, (float)glfwGetTime());
+        rc.sphere_->draw();
+    }
+    break;
+    case RenderType::RT_Surface:
+    {
+        rc.surface_->wave_.setUniforms(shader, (float)glfwGetTime());
+        rc.surface_->draw();
+    }
+    break;
+    case RenderType::RT_Cube8v:
+    case RenderType::RT_Cube24v:
+    {
+        rc.cube_->wave_.setUniforms(shader, (float)glfwGetTime());
+        rc.cube_->draw();
+    }
+    break;
+    case RenderType::RT_Quad:
+    {
+        rc.quad_->wave_.setUniforms(shader, (float)glfwGetTime());
+        rc.quad_->draw();
+
+        int use = rc.quad_->use_normal_map_;
+        shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"),
+            ValueType::T_INT_1, &use);
+
+        use = rc.quad_->use_parallax_map_;
+        shader.setUniformValue(shader.getUniformLocation("u_use_parallax_map"),
+            ValueType::T_INT_1, &use);
+
+        float scale = rc.quad_->parallax_scale_;
+        shader.setUniformValue(shader.getUniformLocation("u_parallax_scale"),
+            ValueType::T_FLOAT_1, &scale);
+
+        int type = rc.quad_->parallax_type;
+        shader.setUniformValue(shader.getUniformLocation("u_parallax_type"),
+            ValueType::T_INT_1, &type);
+    }
+    break;
+    case RenderType::RT_Water:
+        // For Blend
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &alpha_blend);
+
+        rc.water_->wave_.setUniforms(shader, (float)glfwGetTime());
+        rc.water_->draw();
+
+        glBlendFunc(GL_ONE, GL_ZERO);
+
+        break;
+    }
+}
+
+void RenderSystem::setUniforms(TransformComponent& tc, Shader& shader, Camera& cam)
 {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, tc.position);
@@ -159,6 +232,9 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
+    int loc_light_in_scene = light_in_scene;
+    shader.setUniformValue(shader.getUniformLocation("u_light_in_scene"), ValueType::T_INT_1, &loc_light_in_scene);
+
     int tex_id = TextureID::TI_Diffuse;
     shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
 
@@ -168,12 +244,13 @@ void RenderSystem::setUniforms(TransformComponent tc, Shader shader, LightCompon
     tex_id = TextureID::TI_Parallax;
     shader.setUniformValue(shader.getUniformLocation("u_parallax_map"), ValueType::T_INT_1, &tex_id);
 
-    shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &global.alpha);
+    shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &alpha);
 
-    shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &global.use_fog);
-    shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &global.fog_density);
-    shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &global.fog_gradient);
-    shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &global.sky_colour);
+    int loc_use_fog = use_fog;
+    shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &loc_use_fog);
+    shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &fog_density);
+    shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &fog_gradient);
+    shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &sky_colour);
 }
 
 void RenderSystem::forwardRender(Input &input, double dt) {
@@ -194,14 +271,16 @@ void RenderSystem::forwardRender(Input &input, double dt) {
 
     shader.useProgram();
 
+    light_in_scene = false;
+
     for (; ci != ciend; ++ci) {
         if (ci->has_value()) {
             auto& camera_comp = *ci;
 
-            if (global.window_width != camera_comp->window_width ||
-                global.window_height != camera_comp->window_height) {
-                camera_comp->window_width = global.window_width;
-                camera_comp->window_height = global.window_height;
+            if (window_width != camera_comp->window_width ||
+                window_height != camera_comp->window_height) {
+                camera_comp->window_width = window_width;
+                camera_comp->window_height = window_height;
 
                 camera_comp->camera.setAspectRatio((float)camera_comp->window_width / (float)camera_comp->window_height);
             }
@@ -214,17 +293,20 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                 if (si->has_value()) {
                     auto& skybox_comp = *si;
 
-                    if (global.use_skybox) skybox_comp->skybox.render(camera_comp->camera);
+                    if (use_skybox) skybox_comp->skybox.render(camera_comp->camera);
                 }
             }
 
-            if(!global.is_playing) global.grid.drawGrid(camera_comp->camera);
+            if (!is_playing) grid.drawGrid(camera_comp->camera);
 
             for (; li != liend; ++li) {
                 if (li->has_value()) {
                     auto& light_comp = *li;
 
+                    light_in_scene = true;
+
                     light_comp->shadow_map_.render(ecs_, shader, *light_comp);
+                    light_comp->shadow_map_.resize(window_width, window_height);
 
                     shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(camera_comp->camera.getPosition()));
 
@@ -242,81 +324,33 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                             auto& render_comp = *ri;
                             auto& transform_comp = *ti;
 
-                            setUniforms(*transform_comp, shader, *light_comp, camera_comp->camera);
+                            setUniforms(*transform_comp, shader, camera_comp->camera);
 
-                            switch (render_comp->type_) {
-                            case RenderType::RT_Mesh:
-                            {
-                                for (auto& mesh : render_comp->mesh_->meshes) {
-                                    render_comp->mesh_->wave_.setUniforms(shader, (float)glfwGetTime());
-                                    render_comp->mesh_->draw();
-                                }
-                            }
-                            break;
-                            case RenderType::RT_Terrain:
-                            {
-                                render_comp->terrain_->wave_.setUniforms(shader, (float)glfwGetTime());
-                                render_comp->terrain_->draw();
-                            }
-                            break;
-                            case RenderType::RT_Sphere:
-                            {
-                                render_comp->sphere_->wave_.setUniforms(shader, (float)glfwGetTime());
-                                render_comp->sphere_->draw();
-                            }
-                            break;
-                            case RenderType::RT_Surface:
-                            {
-                                render_comp->surface_->wave_.setUniforms(shader, (float)glfwGetTime());
-                                render_comp->surface_->draw();
-                            }
-                            break;
-                            case RenderType::RT_Cube8v:
-                            case RenderType::RT_Cube24v:
-                            {
-                                render_comp->cube_->wave_.setUniforms(shader, (float)glfwGetTime());
-                                render_comp->cube_->draw();
-                            }
-                            break;
-                            case RenderType::RT_Quad:
-                            {
-                                render_comp->quad_->wave_.setUniforms(shader, (float)glfwGetTime());
-                                render_comp->quad_->draw();
-
-                                int use = render_comp->quad_->use_normal_map_;
-                                shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"),
-                                    ValueType::T_INT_1, &use);
-
-                                use = render_comp->quad_->use_parallax_map_;
-                                shader.setUniformValue(shader.getUniformLocation("u_use_parallax_map"),
-                                    ValueType::T_INT_1, &use);
-
-                                float scale = render_comp->quad_->parallax_scale_;
-                                shader.setUniformValue(shader.getUniformLocation("u_parallax_scale"),
-                                    ValueType::T_FLOAT_1, &scale);
-
-                                int type = render_comp->quad_->parallax_type;
-                                shader.setUniformValue(shader.getUniformLocation("u_parallax_type"),
-                                    ValueType::T_INT_1, &type);
-                            }
-                            break;
-                            case RenderType::RT_Water:
-                                // For Blend
-                                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-                                shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &global.alpha_blend);
-
-                                render_comp->water_->wave_.setUniforms(shader, (float)glfwGetTime());
-                                render_comp->water_->draw();
-
-                                glBlendFunc(GL_ONE, GL_ZERO);
-
-                                break;
-                            }
+                            renderScene(*render_comp);
                         }
                     }
                     glBlendFunc(GL_ONE, GL_ONE);
                 }
+            }
+
+            if (!light_in_scene) {
+
+                auto ri = ecs_.getComponentList<RenderComponent>().begin();
+                auto ti = ecs_.getComponentList<TransformComponent>().begin();
+                auto riend = ecs_.getComponentList<RenderComponent>().end();
+                auto tiend = ecs_.getComponentList<TransformComponent>().end();
+
+                for (; ri != riend && ti != tiend; ++ri, ++ti) {
+                    if (ri->has_value() && ti->has_value()) {
+                        auto& render_comp = *ri;
+                        auto& transform_comp = *ti;
+
+                        setUniforms(*transform_comp, shader, camera_comp->camera);
+
+                        renderScene(*render_comp);
+                    }
+                }
+                glBlendFunc(GL_ONE, GL_ONE);
             }
         }
     }
@@ -338,7 +372,7 @@ void RenderSystem::deferredRender(Input& input, double dt)
 
             camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
 
-            deferred.resize(global.window_width, global.window_height);
+            deferred.resize(window_width, window_height);
             deferred.render(ecs_, camera_comp->camera);
 
             /*auto si = ecs_.getComponentList<SkyboxComponent>().begin();
@@ -352,7 +386,7 @@ void RenderSystem::deferredRender(Input& input, double dt)
                 }
             }*/
 
-            if (!global.is_playing) global.grid.drawGrid(camera_comp->camera);
+            if (!is_playing) grid.drawGrid(camera_comp->camera);
         }
     }
 }
@@ -412,7 +446,7 @@ void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type,
         }
     }
 
-    global.render_system.init();
+    this->init();
 }
 
 void RenderSystem::spawnMeshInTerrain(int terrain_id, std::string file, std::string textureFolder, float spawn_prob, float y_spawn_height)
@@ -456,7 +490,16 @@ void RenderSystem::spawnMeshInTerrain(int terrain_id, std::string file, std::str
         }
     }
 
-    global.render_system.init();
+    this->init();
+}
+
+void RenderSystem::resize(unsigned int width, unsigned int height)
+{
+    if (window_width != width || window_height != height) {
+
+        window_width = width;
+        window_height = height;
+    }
 }
 
 size_t RenderSystem::addCamera(Camera camera)
@@ -465,13 +508,13 @@ size_t RenderSystem::addCamera(Camera camera)
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<HierarchyComponent>(entity_);
 
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Camera [" + std::to_string(entity_camera) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Camera [" + std::to_string(entity_counts_.camera) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     ecs_.get_component<CameraComponent>(entity_)->camera = camera;
 
     entity_++;
-    entity_camera++;
+    entity_counts_.camera++;
 
     return entity_;
 }
@@ -482,13 +525,13 @@ size_t RenderSystem::addSkybox(Skybox skybox)
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<HierarchyComponent>(entity_);
 
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Skybox [" + std::to_string(entity_skybox) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Skybox [" + std::to_string(entity_counts_.skybox) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     ecs_.get_component<SkyboxComponent>(entity_)->skybox = skybox;
 
     entity_++;
-    entity_skybox++;
+    entity_counts_.skybox++;
 
     return entity_;
 }
@@ -508,7 +551,7 @@ size_t RenderSystem::createMesh(std::string file, std::string textureFolder,
 
     //---
 
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Mesh [" + std::to_string(entity_mesh) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Mesh [" + std::to_string(entity_counts_.mesh) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
@@ -521,7 +564,7 @@ size_t RenderSystem::createMesh(std::string file, std::string textureFolder,
     ecs_.get_component<RenderComponent>(entity_)->mesh_ = std::move(mesh);
 
     entity_++;
-    entity_mesh++;
+    entity_counts_.mesh++;
 
     return entity_;
 }
@@ -540,7 +583,7 @@ size_t RenderSystem::createTerrain(TransformComponent tc,
     ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Terrain [" + std::to_string(entity_terrain) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Terrain [" + std::to_string(entity_counts_.terrain) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
@@ -553,7 +596,7 @@ size_t RenderSystem::createTerrain(TransformComponent tc,
     ecs_.get_component<RenderComponent>(entity_)->terrain_ = std::move(terrain);
 
     entity_++;
-    entity_terrain++;
+    entity_counts_.terrain++;
 
     return entity_;
 }
@@ -574,7 +617,7 @@ size_t RenderSystem::createWater(TransformComponent tc,
     ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Water [" + std::to_string(entity_water) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Water [" + std::to_string(entity_counts_.water) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
@@ -587,7 +630,7 @@ size_t RenderSystem::createWater(TransformComponent tc,
     ecs_.get_component<RenderComponent>(entity_)->water_ = std::move(water);
 
     entity_++;
-    entity_water++;
+    entity_counts_.water++;
 
     return entity_;
 }
@@ -604,7 +647,7 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
 
     //---
 
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Sphere [" + std::to_string(entity_sphere) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Sphere [" + std::to_string(entity_counts_.sphere) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
@@ -617,7 +660,7 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
     ecs_.get_component<RenderComponent>(entity_)->sphere_ = std::move(sphere);
 
     entity_++;
-    entity_sphere++;
+    entity_counts_.sphere++;
 
     return entity_;
 }
@@ -634,7 +677,7 @@ size_t RenderSystem::createSurface(std::vector<float> surface_points, TransformC
 
     //---
 
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Surface [" + std::to_string(entity_surface) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Surface [" + std::to_string(entity_counts_.surface) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
@@ -647,7 +690,7 @@ size_t RenderSystem::createSurface(std::vector<float> surface_points, TransformC
     ecs_.get_component<RenderComponent>(entity_)->surface_ = std::move(surface);
 
     entity_++;
-    entity_surface++;
+    entity_counts_.surface++;
 
     return entity_;
 }
@@ -663,7 +706,7 @@ size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool 
     ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Cube8v [" + std::to_string(entity_cube8v) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Cube8v [" + std::to_string(entity_counts_.cube8v) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
@@ -676,7 +719,7 @@ size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool 
     ecs_.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
 
     entity_++;
-    entity_cube8v++;
+    entity_counts_.cube8v++;
 
     return entity_;
 }
@@ -692,7 +735,7 @@ size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
     ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Cube24v [" + std::to_string(entity_cube24v) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Cube24v [" + std::to_string(entity_counts_.cube24v) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
@@ -705,7 +748,7 @@ size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
     ecs_.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
 
     entity_++;
-    entity_cube24v++;
+    entity_counts_.cube24v++;
 
     return entity_;
 }
@@ -721,7 +764,7 @@ size_t RenderSystem::createQuad(TransformComponent tc, const float size)
     ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Quad [" + std::to_string(entity_quad) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Quad [" + std::to_string(entity_counts_.quad) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
@@ -734,7 +777,7 @@ size_t RenderSystem::createQuad(TransformComponent tc, const float size)
     ecs_.get_component<RenderComponent>(entity_)->quad_ = std::move(quad);
 
     entity_++;
-    entity_quad++;
+    entity_counts_.quad++;
 
     return entity_;
 
@@ -748,7 +791,7 @@ size_t RenderSystem::createSpotLight(Light li, bool default_light)
     ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Spot Light [" + std::to_string(entity_spotlight) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Spot Light [" + std::to_string(entity_counts_.spotlight) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     ecs_.add_component<TransformComponent>(entity_)->position = li.pos_;
@@ -785,7 +828,7 @@ size_t RenderSystem::createSpotLight(Light li, bool default_light)
     }
 
     entity_++;
-    entity_spotlight++;
+    entity_counts_.spotlight++;
 
     return entity_;
 }
@@ -798,7 +841,7 @@ size_t RenderSystem::createPointLight(Light li, bool default_light)
     ecs_.add_component<HierarchyComponent>(entity_);
 
     //---
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Point Light [" + std::to_string(entity_pointlight) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Point Light [" + std::to_string(entity_counts_.pointlight) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     ecs_.get_component<TransformComponent>(entity_)->position = li.pos_;
@@ -829,7 +872,7 @@ size_t RenderSystem::createPointLight(Light li, bool default_light)
     }
     
     entity_++;
-    entity_pointlight++;
+    entity_counts_.pointlight++;
 
     return entity_;
 }
@@ -841,7 +884,7 @@ size_t RenderSystem::createDirectionalLight(Light li, bool default_light)
     ecs_.add_component<HierarchyComponent>(entity_);
 
     // ----
-    ecs_.get_component<IdentifierComponent>(entity_)->name = "Directional Light [" + std::to_string(entity_dirlight) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Directional Light [" + std::to_string(entity_counts_.dirlight) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
 
     auto& light_comp = ecs_.get_component<LightComponent>(entity_);
@@ -868,7 +911,7 @@ size_t RenderSystem::createDirectionalLight(Light li, bool default_light)
     }
 
     entity_++;
-    entity_dirlight++;
+    entity_counts_.dirlight++;
     
     return entity_;
 }

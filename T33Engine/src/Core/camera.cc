@@ -10,8 +10,6 @@ const float PI = 3.141592653589793f;
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "global_data.h"
-
 #include <../nlohmann/json.hpp>
 #include "../deps/glm/gtx/transform.hpp"
 

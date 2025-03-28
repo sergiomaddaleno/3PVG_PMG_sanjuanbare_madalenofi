@@ -39,7 +39,7 @@ struct RenderComponent {
 
     RenderType type_;
 
-    // ---
+    //--
 
     nlohmann::json serialize() const;
 

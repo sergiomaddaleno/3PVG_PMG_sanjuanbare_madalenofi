@@ -11,7 +11,6 @@
 #include "Components\transform_component.h"
 #include "Components\render_component.h"
 #include "Components\light_component.h"
-#include "global_data.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -32,6 +31,7 @@ float quadVertices[] = {
 Deferred::Deferred() : gBuffer(0), rboDepth(0),
 	gPosition(0),gNormal(0), gAlbedoSpec(0), shadowMap(0),
 	quadVAO(0), quadVBO(0), u_light_space(0),
+	deferred_option(0),
 	width_(800), height_(600)
 {}
 
@@ -224,7 +224,7 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			light_comp->light.setUniforms(deferred_shading);
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
 
-			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_deferred_option"), ValueType::T_INT_1, &global.deferred_option);
+			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_deferred_option"), ValueType::T_INT_1, &deferred_option);
 
 			glm::mat4 view = cam.getViewMatrix();
 			glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();

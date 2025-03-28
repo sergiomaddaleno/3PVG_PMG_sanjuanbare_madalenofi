@@ -9,8 +9,7 @@
 #ifndef __UI_MANAGER__
 #define __UI_MANAGER__
 
-#include "Render/render_system.h"
-#include "../Systems/ecs_manager.h"
+#include "Core/window.h"
 #include "Core/texture.h"
 #include "Core/shader.h"
 #include "Core/input.h"
@@ -22,13 +21,17 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+class Engine;
+class ECSManager;
+class RenderSystem;
+
  /**
   * @class UIManager
   * @brief Manages the user interface elements.
   */
 class UIManager {
 public:
-    UIManager(ECSManager& ecs, RenderSystem& rs);
+    UIManager(Engine& engine, ECSManager& ecs, RenderSystem& rs);
     ~UIManager();
 
     void Init(Window* window, Input* input);
@@ -61,6 +64,7 @@ public:
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity);
 
 private:
+    Engine& engine_;
     ECSManager& ecs_;
     RenderSystem& rs_;
 
@@ -77,7 +81,7 @@ private:
     Texture m_DirectoryIcon, m_FileIcon, m_EntityIcon, m_BackIcon,
     m_ToolsIcon, m_LightIcon, m_CameraIcon, m_TransformIcon, m_SettingsIcon,
     m_TagIcon, m_RenderIcon, m_EditIcon, m_PuzzleIcon, m_DeleteIcon,
-    m_PlayIcon, m_StopIcon, m_AlgorithmIcon, m_PhysicsmIcon, m_SkyIcon;
+    m_PlayIcon, m_StopIcon, m_PhysicsmIcon, m_SkyIcon;
 
     float padding;
     float thumbnailSize;

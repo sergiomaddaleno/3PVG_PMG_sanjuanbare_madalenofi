@@ -42,6 +42,22 @@ enum FrameBufferID {
 	//...
 };
 
+struct EntityCounters {
+	int camera = 0;
+	int skybox = 0;
+	int mesh = 0;
+	int terrain = 0;
+	int water = 0;
+	int sphere = 0;
+	int surface = 0;
+	int cube8v = 0;
+	int cube24v = 0;
+	int quad = 0;
+	int spotlight = 0;
+	int pointlight = 0;
+	int dirlight = 0;
+};
+
 /**
  * @brief Reads the contents of a file and returns its content.
  */

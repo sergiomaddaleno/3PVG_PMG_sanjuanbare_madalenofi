@@ -62,6 +62,8 @@ public:
 		ecs_.add_component_type<SkyboxComponent>();
 	}
 
+	void resize(unsigned int width, unsigned int height);
+
 	//----------------------------------
 
 	size_t addCamera(Camera camera = Camera());
@@ -114,28 +116,38 @@ public:
 
 	Shader shader;
 	Deferred deferred;
+	Terrain grid;
 	ECSManager& ecs_;
+
 	size_t entity_;
 
-	int entity_camera;
-	int entity_skybox;
-	int entity_mesh;
-	int entity_terrain;
-	int entity_water;
-	int entity_sphere;
-	int entity_surface;
-	int entity_cube8v;
-	int entity_cube24v;
-	int entity_quad;
-	int entity_spotlight;
-	int entity_pointlight;
-	int entity_dirlight;
+	int window_width;
+	int window_height;
+
+	float alpha;
+	float alpha_blend;
+
+	bool use_deferred_shading;
+
+	glm::vec3 sky_colour;
+	bool use_fog;
+	float fog_density;
+	float fog_gradient;
+
+	bool use_skybox;
+	bool is_playing;
+
+	EntityCounters entity_counts_;
 
 	//Dont use
 	void compileShaderForBuild();
 
 private:
-	void setUniforms(TransformComponent tc, Shader shader, LightComponent light, Camera cam);
+	bool light_in_scene;
+
+	void renderScene(RenderComponent &rc);
+
+	void setUniforms(TransformComponent& tc, Shader& shader, Camera& cam);
 };
 
 #endif // __RENDER_SYSTEM__

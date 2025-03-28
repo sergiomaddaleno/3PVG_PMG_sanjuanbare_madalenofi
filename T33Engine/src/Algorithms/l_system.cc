@@ -3,7 +3,6 @@
 
 #include "Algorithms/l_system.h"
 #include "utils.h"
-#include "../include/global_data.h"
 
 #include "Render/render_system.h"
 #include "Systems/ecs_manager.h"
