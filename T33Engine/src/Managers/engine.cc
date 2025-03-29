@@ -31,6 +31,9 @@ void Engine::init()
 	initShader(render_system.deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
 	initShader(render_system.deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
 
+	render_system.deferred.init();
+	render_system.grid.init();
+
 	//render_system.compileShaderForBuild();
 }
 

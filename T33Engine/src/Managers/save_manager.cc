@@ -358,7 +358,9 @@ void SaveManager::deSerialize(const nlohmann::json& j) {
         }
     }
 
-    rs_.init();
+    rs_.initRenderTypes();
+    rs_.initLights();
+    rs_.initSkybox();
 }
 
 void SaveManager::saveToFile(std::string filename)

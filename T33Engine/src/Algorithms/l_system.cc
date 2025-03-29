@@ -97,7 +97,7 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
         }
     }
 
-    rs_.init();
+    rs_.initRenderTypes();
 }
 
 

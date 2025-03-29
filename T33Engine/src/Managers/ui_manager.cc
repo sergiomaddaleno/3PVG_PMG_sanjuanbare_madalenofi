@@ -1653,7 +1653,7 @@ void UIManager::InspectorWindow() {
                                     light_comp->light.shininess_ = 32.0f;
                                     light_comp->light.strength_ = 1.0f;
 
-                                    rs_.init();
+                                    rs_.initLights();
                                 }
                                 break;
                             }
@@ -1908,7 +1908,7 @@ void UIManager::TopBarWindow() {
 
             if (ImGui::MenuItem("Add Skybox")) {
                 rs_.addSkybox();
-                rs_.init();
+                rs_.initSkybox();
                 ResetIds();
 
                 AddConsoleMessage("Skybox added");
@@ -1918,7 +1918,7 @@ void UIManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Sphere")) {
                     rs_.createSphere();
-                    rs_.init();
+                    rs_.initRenderTypes();
                     ResetIds();
 
                     AddConsoleMessage("Sphere added to scene");
@@ -1926,7 +1926,7 @@ void UIManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Cube 8v")) {
                     rs_.createCube8v();
-                    rs_.init();
+                    rs_.initRenderTypes();
                     ResetIds();
 
                     AddConsoleMessage("Cube 8v added to scene");
@@ -1934,7 +1934,7 @@ void UIManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Cube 24v")) {
                     rs_.createCube24v();
-                    rs_.init();
+                    rs_.initRenderTypes();
                     ResetIds();
 
                     AddConsoleMessage("Cube 24v added to scene");
@@ -1942,7 +1942,7 @@ void UIManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Quad")) {
                     rs_.createQuad();
-                    rs_.init();
+                    rs_.initRenderTypes();
                     ResetIds();
 
                     AddConsoleMessage("Quad added to scene");
@@ -1950,7 +1950,7 @@ void UIManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Terrain")) {
                     rs_.createTerrain();
-                    rs_.init();
+                    rs_.initRenderTypes();
                     ResetIds();
 
                     AddConsoleMessage("Terrain added to scene");
@@ -1958,7 +1958,7 @@ void UIManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Water")) {
                     rs_.createWater();
-                    rs_.init();
+                    rs_.initRenderTypes();
                     ResetIds();
 
                     AddConsoleMessage("Water added to scene");
@@ -1971,7 +1971,7 @@ void UIManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Point Light")) {
                     rs_.createPointLight();
-                    rs_.init();
+                    rs_.initLights();
                     ResetIds();
 
                     AddConsoleMessage("Point Light added to scene");
@@ -1979,7 +1979,7 @@ void UIManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Spot Light")) {
                     rs_.createSpotLight();
-                    rs_.init();
+                    rs_.initLights();
                     ResetIds();
 
                     AddConsoleMessage("Spot Light added to scene");
@@ -1987,7 +1987,7 @@ void UIManager::TopBarWindow() {
 
                 if (ImGui::MenuItem("Directional Light")) {
                     rs_.createDirectionalLight();
-                    rs_.init();
+                    rs_.initLights();
                     ResetIds();
 
                     AddConsoleMessage("Directional Light added to scene");
@@ -2335,7 +2335,7 @@ void UIManager::AddMeshWindow()
         
         if (!obj_file_path.empty() && !texture_folder_path.empty()) {
             rs_.createMesh(obj_file_path, texture_folder_path);
-            rs_.init();
+            rs_.initRenderTypes();
 
             ResetIds();
             AddConsoleMessage(obj_file_name + " added to scene");
@@ -2385,7 +2385,7 @@ void UIManager::AddSurfaceWindow()
         TransformComponent tc;
 
         rs_.createSurface(points, tc, num_heights, num_revs);
-        rs_.init();
+        rs_.initRenderTypes();
         ResetIds();
 
         AddConsoleMessage("Surface added to scene");

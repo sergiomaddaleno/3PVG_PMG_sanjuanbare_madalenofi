@@ -43,10 +43,11 @@ public:
 	RenderSystem(ECSManager& ecs);
 	~RenderSystem();
 
-	void init();
+	void initRenderTypes();
+	void initLights();
+	void initSkybox();
 
 	void forwardRender(Input &input, double dt);
-
 	void deferredRender(Input& input, double dt);
 
 	void setupEntities() {

@@ -44,13 +44,10 @@ RenderSystem::RenderSystem(ECSManager& ecs_)
 
 RenderSystem::~RenderSystem() {}
 
-void RenderSystem::init() {
-    
-    auto ri = ecs_.getComponentList<RenderComponent>().begin();
-    auto li = ecs_.getComponentList<LightComponent>().begin();
+void RenderSystem::initRenderTypes() {
 
+    auto ri = ecs_.getComponentList<RenderComponent>().begin();
     auto riend = ecs_.getComponentList<RenderComponent>().end();
-    auto liend = ecs_.getComponentList<LightComponent>().end();
 
     for (; ri != riend; ++ri) {
         if (ri->has_value()) {
@@ -86,27 +83,33 @@ void RenderSystem::init() {
                 render_comp->surface_->setTexture(render_comp->surface_->texture_path_);
                 break;
             }
-            
-            for (; li != liend; ++li) {
-                if (li->has_value()) {
-                    auto& light_comp = *li;
-
-                    switch (light_comp->light.type_) {
-                    case Light::LightType::LT_Spot:
-                    case Light::LightType::LT_Directional:
-                        light_comp->shadow_map_.init2D(); 
-                        break;
-                    case Light::LightType::LT_Point:
-                        light_comp->shadow_map_.initCubeMap();
-                        break;
-                    }
-                }
-            }
-            
         }
     }
+}
+
+void RenderSystem::initLights() {
     
-    // ---
+    auto li = ecs_.getComponentList<LightComponent>().begin();
+    auto liend = ecs_.getComponentList<LightComponent>().end();
+
+    for (; li != liend; ++li) {
+        if (li->has_value()) {
+            auto& light_comp = *li;
+
+            switch (light_comp->light.type_) {
+            case Light::LightType::LT_Spot:
+            case Light::LightType::LT_Directional:
+                light_comp->shadow_map_.init2D();
+                break;
+            case Light::LightType::LT_Point:
+                light_comp->shadow_map_.initCubeMap();
+                break;
+            }
+        }
+    }
+}
+
+void RenderSystem::initSkybox() {
 
     auto si = ecs_.getComponentList<SkyboxComponent>().begin();
     auto siend = ecs_.getComponentList<SkyboxComponent>().end();
@@ -132,15 +135,6 @@ void RenderSystem::init() {
             }
         }
     }
-
-    // ---
-
-    deferred.init();
-
-    grid.initGrid();
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glUseProgram(0);
 }
 
 void RenderSystem::setUniforms(TransformComponent& tc, Shader& shader, Camera& cam)
@@ -439,7 +433,7 @@ void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type,
         }
     }
 
-    this->init();
+    this->initRenderTypes();
 }
 
 void RenderSystem::spawnMeshInTerrain(int terrain_id, std::string file, std::string textureFolder, float spawn_prob, float y_spawn_height)
@@ -483,7 +477,7 @@ void RenderSystem::spawnMeshInTerrain(int terrain_id, std::string file, std::str
         }
     }
 
-    this->init();
+    this->initRenderTypes();
 }
 
 void RenderSystem::resize(unsigned int width, unsigned int height)
