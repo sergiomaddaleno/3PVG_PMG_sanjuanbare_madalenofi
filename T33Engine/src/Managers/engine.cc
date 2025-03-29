@@ -32,7 +32,7 @@ void Engine::init()
 	initShader(render_system.deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
 
 	render_system.deferred.init();
-	render_system.grid.init();
+	render_system.grid.initGrid();
 
 	//render_system.compileShaderForBuild();
 }

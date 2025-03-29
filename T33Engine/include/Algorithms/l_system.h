@@ -37,6 +37,8 @@ public:
 	glm::quat starting_rot_;
 
 private:
+	void HierarchyTree(size_t entity_id);
+
 	glm::vec3 position_;
 	glm::quat rotation_;
 

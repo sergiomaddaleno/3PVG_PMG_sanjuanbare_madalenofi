@@ -7,7 +7,7 @@
 #include "Render/render_system.h"
 #include "Systems/ecs_manager.h"
 
-#include "Components\transform_component.h"
+#include "Components\components.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -52,6 +52,8 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
     std::stack<glm::vec3> position_stack;
     std::stack<glm::quat> rotation_stack;
 
+    size_t parent_entity = 0;
+
     for (char c : final_string) {
         switch (c) {
         case 'F': {
@@ -59,7 +61,22 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
             tc.position = position_;
             tc.rotation = rotation_;
             tc.scale = cube_size_;
-            rs_.createCube8v(tc, 1.0f, false);
+            size_t entity_id = rs_.createCube8v(tc, 1.0f, false);
+
+            entity_id--; 
+           
+            if (parent_entity == 0) {
+                parent_entity = entity_id;
+            }
+            else {
+                if (ecs_.has_component<HierarchyComponent>(parent_entity) && ecs_.has_component<HierarchyComponent>(entity_id)) {
+                    auto& childHierarchy = ecs_.get_component<HierarchyComponent>(entity_id);
+                    childHierarchy->addParent(parent_entity);
+
+                    auto& parentHierarchy = ecs_.get_component<HierarchyComponent>(parent_entity);
+                    parentHierarchy->addChild(entity_id);
+                }
+            }
 
             glm::vec3 forward = rotation_ * glm::vec3(0.0f, 1.0f, 0.0f);
             position_ += forward * (cube_size_.y * spacing_);
@@ -97,7 +114,24 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
         }
     }
 
+    if (parent_entity != 0) {
+        HierarchyTree(parent_entity);
+    }
+
     rs_.initRenderTypes();
 }
 
+void LSystem::HierarchyTree(size_t entity_id) {
+    if (ecs_.has_component<HierarchyComponent>(entity_id)) {
+        auto& hierarchy = ecs_.get_component<HierarchyComponent>(entity_id);
+
+        if (ecs_.has_component<IdentifierComponent>(entity_id)) {
+            auto& name_comp = ecs_.get_component<IdentifierComponent>(entity_id);
+        }
+
+        for (auto childId : hierarchy->getChildren()) {
+            HierarchyTree(childId);
+        }
+    }
+}
 
