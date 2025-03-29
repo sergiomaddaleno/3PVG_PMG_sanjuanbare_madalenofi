@@ -143,9 +143,175 @@ void RenderSystem::init() {
     glUseProgram(0);
 }
 
+void RenderSystem::setUniforms(TransformComponent& tc, Shader& shader, Camera& cam)
+{
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, tc.position);
+    model = model * glm::mat4_cast(tc.rotation);
+    model = glm::scale(model, tc.scale);
 
+    glm::mat4 view = cam.getViewMatrix();
+    glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();
 
-void RenderSystem::renderScene(RenderComponent &rc)
+    shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+    shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+    shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
+
+    int tex_id = TextureID::TI_Diffuse;
+    shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
+
+    tex_id = TextureID::TI_Normal;
+    shader.setUniformValue(shader.getUniformLocation("u_normal_map"), ValueType::T_INT_1, &tex_id);
+
+    tex_id = TextureID::TI_Parallax;
+    shader.setUniformValue(shader.getUniformLocation("u_parallax_map"), ValueType::T_INT_1, &tex_id);
+
+    shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &alpha);
+
+    int loc_use_fog = use_fog;
+    shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &loc_use_fog);
+    shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &fog_density);
+    shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &fog_gradient);
+    shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &sky_colour);
+}
+
+void RenderSystem::forwardRender(Input &input, double dt) {
+    
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_BLEND);
+
+    glBlendFunc(GL_ONE, GL_ZERO);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+
+    auto ci = ecs_.getComponentList<CameraComponent>().begin();
+    auto ciend = ecs_.getComponentList<CameraComponent>().end();
+
+    shader.useProgram();
+
+    for (; ci != ciend; ++ci) {
+        if (ci->has_value()) {
+            auto& camera_comp = *ci;
+
+            if (window_width != camera_comp->window_width ||
+                window_height != camera_comp->window_height) {
+                camera_comp->window_width = window_width;
+                camera_comp->window_height = window_height;
+                camera_comp->camera.setAspectRatio((float)camera_comp->window_width / (float)camera_comp->window_height);
+            }
+            camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
+
+            auto si = ecs_.getComponentList<SkyboxComponent>().begin();
+            auto siend = ecs_.getComponentList<SkyboxComponent>().end();
+            
+            for (; si != siend; ++si) {
+                if (si->has_value()) {
+                    auto& skybox_comp = *si;
+
+                    if (use_skybox) skybox_comp->skybox.render(camera_comp->camera);
+                }
+            }
+
+            if (!is_playing) grid.drawGrid(camera_comp->camera);
+
+            light_in_scene = false;
+
+            auto li = ecs_.getComponentList<LightComponent>().begin();
+            auto liend = ecs_.getComponentList<LightComponent>().end();
+            
+            for (; li != liend; ++li) {
+                if (li->has_value()) {
+                    auto& light_comp = *li;
+
+                    light_in_scene = true;
+
+                    light_comp->shadow_map_.render(ecs_, shader, *light_comp);
+                    light_comp->shadow_map_.resize(window_width, window_height);
+
+                    shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(camera_comp->camera.getPosition()));
+
+                    light_comp->light.setUniforms(shader);
+
+                    // ---------------------------------------------------------------
+
+                    auto ri = ecs_.getComponentList<RenderComponent>().begin();
+                    auto ti = ecs_.getComponentList<TransformComponent>().begin();
+                    auto riend = ecs_.getComponentList<RenderComponent>().end();
+                    auto tiend = ecs_.getComponentList<TransformComponent>().end();
+
+                    for (; ri != riend && ti != tiend; ++ri, ++ti) {
+                        if (ri->has_value() && ti->has_value()) {
+                            auto& render_comp = *ri;
+                            auto& transform_comp = *ti;
+
+                            setUniforms(*transform_comp, shader, camera_comp->camera);
+
+                            renderScene(*render_comp, shader);
+                        }
+                    }
+                    glBlendFunc(GL_ONE, GL_ONE);
+                }
+            }
+
+            if (!light_in_scene) {
+
+                texture_shader.useProgram();
+
+                auto ri = ecs_.getComponentList<RenderComponent>().begin();
+                auto ti = ecs_.getComponentList<TransformComponent>().begin();
+                auto riend = ecs_.getComponentList<RenderComponent>().end();
+                auto tiend = ecs_.getComponentList<TransformComponent>().end();
+
+                for (; ri != riend && ti != tiend; ++ri, ++ti) {
+                    if (ri->has_value() && ti->has_value()) {
+                        auto& render_comp = *ri;
+                        auto& transform_comp = *ti;
+
+                        setUniforms(*transform_comp, texture_shader, camera_comp->camera);
+
+                        renderScene(*render_comp, texture_shader);
+                    }
+                }
+            }
+        }
+    }
+
+    glDisable(GL_BLEND);
+    glUseProgram(0);
+}
+
+void RenderSystem::deferredRender(Input& input, double dt)
+{
+    auto ci = ecs_.getComponentList<CameraComponent>().begin();
+    auto ciend = ecs_.getComponentList<CameraComponent>().end();
+
+    for (; ci != ciend; ++ci) {
+        if (ci->has_value()) {
+            auto& camera_comp = *ci;
+
+            camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
+
+            deferred.resize(window_width, window_height);
+            deferred.render(ecs_, camera_comp->camera);
+
+            /*auto si = ecs_.getComponentList<SkyboxComponent>().begin();
+            auto siend = ecs_.getComponentList<SkyboxComponent>().end();
+
+            for (; si != siend; ++si) {
+                if (si->has_value()) {
+                    auto& skybox_comp = *si;
+
+                    if (global.use_skybox) skybox_comp->skybox.render(camera_comp->camera);
+                }
+            }*/
+
+            if (!is_playing) grid.drawGrid(camera_comp->camera);
+        }
+    }
+}
+
+void RenderSystem::renderScene(RenderComponent& rc, Shader& shader)
 {
     switch (rc.type_) {
     case RenderType::RT_Mesh:
@@ -215,179 +381,6 @@ void RenderSystem::renderScene(RenderComponent &rc)
         glBlendFunc(GL_ONE, GL_ZERO);
 
         break;
-    }
-}
-
-void RenderSystem::setUniforms(TransformComponent& tc, Shader& shader, Camera& cam)
-{
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, tc.position);
-    model = model * glm::mat4_cast(tc.rotation);
-    model = glm::scale(model, tc.scale);
-
-    glm::mat4 view = cam.getViewMatrix();
-    glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();
-
-    shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
-    shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
-    shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
-
-    int loc_light_in_scene = light_in_scene;
-    shader.setUniformValue(shader.getUniformLocation("u_light_in_scene"), ValueType::T_INT_1, &loc_light_in_scene);
-
-    int tex_id = TextureID::TI_Diffuse;
-    shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
-
-    tex_id = TextureID::TI_Normal;
-    shader.setUniformValue(shader.getUniformLocation("u_normal_map"), ValueType::T_INT_1, &tex_id);
-
-    tex_id = TextureID::TI_Parallax;
-    shader.setUniformValue(shader.getUniformLocation("u_parallax_map"), ValueType::T_INT_1, &tex_id);
-
-    shader.setUniformValue(shader.getUniformLocation("u_alpha"), ValueType::T_FLOAT_1, &alpha);
-
-    int loc_use_fog = use_fog;
-    shader.setUniformValue(shader.getUniformLocation("u_fog"), ValueType::T_INT_1, &loc_use_fog);
-    shader.setUniformValue(shader.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &fog_density);
-    shader.setUniformValue(shader.getUniformLocation("u_gradient"), ValueType::T_FLOAT_1, &fog_gradient);
-    shader.setUniformValue(shader.getUniformLocation("u_sky_colour"), ValueType::T_FLOAT_3, &sky_colour);
-}
-
-void RenderSystem::forwardRender(Input &input, double dt) {
-    
-    glEnable(GL_DEPTH_TEST);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_BLEND);
-
-    glBlendFunc(GL_ONE, GL_ZERO);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
-
-    auto li = ecs_.getComponentList<LightComponent>().begin();
-    auto liend = ecs_.getComponentList<LightComponent>().end();
-
-    auto ci = ecs_.getComponentList<CameraComponent>().begin();
-    auto ciend = ecs_.getComponentList<CameraComponent>().end();
-
-    shader.useProgram();
-
-    light_in_scene = false;
-
-    for (; ci != ciend; ++ci) {
-        if (ci->has_value()) {
-            auto& camera_comp = *ci;
-
-            if (window_width != camera_comp->window_width ||
-                window_height != camera_comp->window_height) {
-                camera_comp->window_width = window_width;
-                camera_comp->window_height = window_height;
-
-                camera_comp->camera.setAspectRatio((float)camera_comp->window_width / (float)camera_comp->window_height);
-            }
-            camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
-
-            auto si = ecs_.getComponentList<SkyboxComponent>().begin();
-            auto siend = ecs_.getComponentList<SkyboxComponent>().end();
-
-            for (; si != siend; ++si) {
-                if (si->has_value()) {
-                    auto& skybox_comp = *si;
-
-                    if (use_skybox) skybox_comp->skybox.render(camera_comp->camera);
-                }
-            }
-
-            if (!is_playing) grid.drawGrid(camera_comp->camera);
-
-            for (; li != liend; ++li) {
-                if (li->has_value()) {
-                    auto& light_comp = *li;
-
-                    light_in_scene = true;
-
-                    light_comp->shadow_map_.render(ecs_, shader, *light_comp);
-                    light_comp->shadow_map_.resize(window_width, window_height);
-
-                    shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(camera_comp->camera.getPosition()));
-
-                    light_comp->light.setUniforms(shader);
-
-                    // ---------------------------------------------------------------
-
-                    auto ri = ecs_.getComponentList<RenderComponent>().begin();
-                    auto ti = ecs_.getComponentList<TransformComponent>().begin();
-                    auto riend = ecs_.getComponentList<RenderComponent>().end();
-                    auto tiend = ecs_.getComponentList<TransformComponent>().end();
-
-                    for (; ri != riend && ti != tiend; ++ri, ++ti) {
-                        if (ri->has_value() && ti->has_value()) {
-                            auto& render_comp = *ri;
-                            auto& transform_comp = *ti;
-
-                            setUniforms(*transform_comp, shader, camera_comp->camera);
-
-                            renderScene(*render_comp);
-                        }
-                    }
-                    glBlendFunc(GL_ONE, GL_ONE);
-                }
-            }
-
-            if (!light_in_scene) {
-
-                auto ri = ecs_.getComponentList<RenderComponent>().begin();
-                auto ti = ecs_.getComponentList<TransformComponent>().begin();
-                auto riend = ecs_.getComponentList<RenderComponent>().end();
-                auto tiend = ecs_.getComponentList<TransformComponent>().end();
-
-                for (; ri != riend && ti != tiend; ++ri, ++ti) {
-                    if (ri->has_value() && ti->has_value()) {
-                        auto& render_comp = *ri;
-                        auto& transform_comp = *ti;
-
-                        setUniforms(*transform_comp, shader, camera_comp->camera);
-
-                        renderScene(*render_comp);
-                    }
-                }
-                glBlendFunc(GL_ONE, GL_ONE);
-            }
-        }
-    }
-
-    glDisable(GL_BLEND);
-    glUseProgram(0);
-}
-
-void RenderSystem::deferredRender(Input& input, double dt)
-{
-    auto ci = ecs_.getComponentList<CameraComponent>().begin();
-    auto ciend = ecs_.getComponentList<CameraComponent>().end();
-
-    shader.useProgram();
-
-    for (; ci != ciend; ++ci) {
-        if (ci->has_value()) {
-            auto& camera_comp = *ci;
-
-            camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
-
-            deferred.resize(window_width, window_height);
-            deferred.render(ecs_, camera_comp->camera);
-
-            /*auto si = ecs_.getComponentList<SkyboxComponent>().begin();
-            auto siend = ecs_.getComponentList<SkyboxComponent>().end();
-
-            for (; si != siend; ++si) {
-                if (si->has_value()) {
-                    auto& skybox_comp = *si;
-
-                    if (global.use_skybox) skybox_comp->skybox.render(camera_comp->camera);
-                }
-            }*/
-
-            if (!is_playing) grid.drawGrid(camera_comp->camera);
-        }
     }
 }
 

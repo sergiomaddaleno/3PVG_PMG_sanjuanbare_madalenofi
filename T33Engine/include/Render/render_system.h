@@ -115,6 +115,8 @@ public:
 	//-----------------------
 
 	Shader shader;
+	Shader texture_shader;
+
 	Deferred deferred;
 	Terrain grid;
 	ECSManager& ecs_;
@@ -145,7 +147,7 @@ public:
 private:
 	bool light_in_scene;
 
-	void renderScene(RenderComponent &rc);
+	void renderScene(RenderComponent& rc, Shader& shader);
 
 	void setUniforms(TransformComponent& tc, Shader& shader, Camera& cam);
 };
