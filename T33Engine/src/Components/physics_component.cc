@@ -17,5 +17,13 @@ PhysicsComponent::~PhysicsComponent()
 
 nlohmann::json PhysicsComponent::serialize()
 {
-    return nlohmann::json();
+    return {
+        {"gravity", {gravity.x, gravity.y, gravity.z}},
+        {"acceleration", {acceleration.x, acceleration.y, acceleration.z}},
+        {"force", {force.x, force.y, force.z}},
+        {"velocity", {velocity.x, velocity.y, velocity.z}},
+        {"mass", mass},
+        {"floor_height", floor_height},
+        {"bounce_factor", bounce_factor},
+    };
 }

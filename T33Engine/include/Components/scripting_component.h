@@ -4,13 +4,19 @@
 #include <string>
 #include <memory>
 
+#include "../deps/nlohmann/json.hpp"
+
 #include "Systems/scripting.h"
 #include "Render/scripting_system.h"
 
 struct ScriptingComponent {
     std::string script_path;
-    int entity_id = 0;
+    int entity_id;
 
+    nlohmann::json serialize() const;
+
+    ScriptingComponent();
+    ~ScriptingComponent();
 };
 
 

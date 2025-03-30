@@ -1549,25 +1549,27 @@ void UIManager::InspectorWindow() {
 
     if (ecs_.has_component<PhysicsComponent>(selected_entity)) {
 
-            bool open = ImGui::CollapsingHeader("##PhysicsComponent", ImGuiTreeNodeFlags_DefaultOpen);
-            ImGui::SameLine();
-            ImGui::Image(m_PhysicsmIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-            ImGui::SameLine();
-            ImGui::Text("Physics Component");
+        bool open = ImGui::CollapsingHeader("##PhysicsComponent", ImGuiTreeNodeFlags_DefaultOpen);
+        ImGui::SameLine();
+        ImGui::Image(m_PhysicsmIcon.getID(), { 20.0f, 20.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::SameLine();
+        ImGui::Text("Physics Component");
 
-            if (open) {
+        if (open) {
 
-                auto& physics = *ecs_.get_component<PhysicsComponent>(selected_entity);
-                
-                ImGui::Text("Gravity");
-                ImGui::SliderFloat("Y##Gravity", &physics.gravity.y, -100.0f, 100.0f);
+            auto& physics = *ecs_.get_component<PhysicsComponent>(selected_entity);
+            
+            ImGui::Text("Gravity");
+            ImGui::SliderFloat("Y##Gravity", &physics.gravity.y, -100.0f, 100.0f);
 
-                ImGui::Spacing();
-                ImGui::InputFloat("Mass##Physics", &physics.mass, 0.1f, 1.0f, "%.2f");
-                ImGui::InputFloat("Floor Height", &physics.floor_height, 0.1f, 1.0f, "%.2f");
-                ImGui::SliderFloat("Bounce Factor", &physics.bounce_factor, 0.0f, 1.0f);
-            }
+            ImGui::Spacing();
+            ImGui::InputFloat("Mass##Physics", &physics.mass, 0.1f, 1.0f, "%.2f");
+            ImGui::InputFloat("Floor Height", &physics.floor_height, 0.1f, 1.0f, "%.2f");
+            ImGui::SliderFloat("Bounce Factor", &physics.bounce_factor, 0.0f, 1.0f);
         }
+
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
+    }
 
     if (ecs_.has_component<ScriptingComponent>(selected_entity)) {
 

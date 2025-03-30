@@ -39,6 +39,8 @@ nlohmann::json SaveManager::serialize()
     auto hi = ecs_.getComponentList<HierarchyComponent>().begin();
     auto ci = ecs_.getComponentList<CameraComponent>().begin();
     auto si = ecs_.getComponentList<SkyboxComponent>().begin();
+    auto sci = ecs_.getComponentList<ScriptingComponent>().begin();
+    auto pi = ecs_.getComponentList<PhysicsComponent>().begin();
 
     auto riend = ecs_.getComponentList<RenderComponent>().end();
     auto tiend = ecs_.getComponentList<TransformComponent>().end();
@@ -47,6 +49,8 @@ nlohmann::json SaveManager::serialize()
     auto hiend = ecs_.getComponentList<HierarchyComponent>().end();
     auto ciend = ecs_.getComponentList<CameraComponent>().end();
     auto siend = ecs_.getComponentList<SkyboxComponent>().end();
+    auto sciend = ecs_.getComponentList<ScriptingComponent>().end();
+    auto piend = ecs_.getComponentList<PhysicsComponent>().end();
 
     size_t max_components = std::max({ 
       ecs_.getComponentList<CameraComponent>().size(),
@@ -55,7 +59,9 @@ nlohmann::json SaveManager::serialize()
       ecs_.getComponentList<LightComponent>().size(),
       ecs_.getComponentList<IdentifierComponent>().size(),
       ecs_.getComponentList<SkyboxComponent>().size(),
-      ecs_.getComponentList<HierarchyComponent>().size()
+      ecs_.getComponentList<HierarchyComponent>().size(),
+      ecs_.getComponentList<ScriptingComponent>().size(),
+      ecs_.getComponentList<PhysicsComponent>().size()
     });
 
     for (size_t i = 0; i < max_components; ++i) {
@@ -108,6 +114,20 @@ nlohmann::json SaveManager::serialize()
                 entity_json["Skybox_component"] = (*si)->serialize();
             }
             ++si;
+        }
+
+        if (sci != sciend) {
+            if (sci->has_value()) {
+                entity_json["Scripting_component"] = (*sci)->serialize();
+            }
+            ++sci;
+        }
+
+        if (pi != piend) {
+            if (pi->has_value()) {
+                entity_json["Physics_component"] = (*pi)->serialize();
+            }
+            ++pi;
         }
 
         if (!entity_json.empty()) {
@@ -295,13 +315,13 @@ void SaveManager::deSerialize(const nlohmann::json& j) {
             auto niend = ecs_.getComponentList<IdentifierComponent>().end();
             for (const auto& entity : j["Entities"]) {
                 if (entity.contains("Identifier_component")) {
-                    const auto& nc = entity["Identifier_component"];
+                    const auto& ic = entity["Identifier_component"];
 
                     if (ni != niend) {
                         if (ni->has_value()) {
-                            auto& name_comp = *ni;
-                            name_comp->name = nc["Entity_name"];
-                            name_comp->id = nc["Entity_id"];
+                            auto& ident_comp = *ni;
+                            ident_comp->name = ic["Entity_name"];
+                            ident_comp->id = ic["Entity_id"];
                             ++ni;
                         }
                     }
@@ -335,6 +355,33 @@ void SaveManager::deSerialize(const nlohmann::json& j) {
                     }
                 }
             }
+        }
+
+        if (entity.contains("Scripting_component")) {
+
+            ecs_.add_component<ScriptingComponent>(entity_id);
+
+            auto& script_comp = ecs_.get_component<ScriptingComponent>(entity_id);
+            const auto& sc = entity["Scripting_component"];
+
+            script_comp->script_path = sc["script_path"];
+            script_comp->entity_id = sc["entity_id"];
+        }
+
+        if (entity.contains("Physics_component")) {
+
+            ecs_.add_component<PhysicsComponent>(entity_id);
+
+            auto& physics_comp = ecs_.get_component<PhysicsComponent>(entity_id);
+            const auto& pc = entity["Physics_component"];
+
+            physics_comp->gravity = parseVec3(pc["gravity"]);
+            physics_comp->acceleration = parseVec3(pc["acceleration"]);
+            physics_comp->force = parseVec3(pc["force"]);
+            physics_comp->velocity = parseVec3(pc["velocity"]);
+            physics_comp->mass = pc["mass"];
+            physics_comp->floor_height = pc["floor_height"];
+            physics_comp->bounce_factor = pc["bounce_factor"];
         }
 
         if (entity.contains("Camera_component")) {
