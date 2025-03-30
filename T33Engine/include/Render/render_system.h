@@ -61,6 +61,7 @@ public:
 		ecs_.add_component_type<PhysicsComponent>();
 		ecs_.add_component_type<CameraComponent>();
 		ecs_.add_component_type<SkyboxComponent>();
+		ecs_.add_component_type<ScriptingComponent>();
 	}
 
 	void resize(unsigned int width, unsigned int height);

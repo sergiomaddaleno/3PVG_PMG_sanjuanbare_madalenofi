@@ -7,41 +7,6 @@
    },
    "Identifier_component": {
     "Entity_id": 0,
-    "Entity_name": "Mario"
-   },
-   "Render_component": {
-    "Mesh": {
-     "Mesh_path": "../stages\\assets\\obj\\Mario.obj",
-     "Texture_folder": "../stages\\assets\\textures\\mario"
-    },
-    "Render_type": 0
-   },
-   "Transform_component": {
-    "Position": [
-     -11.871054649353027,
-     -0.16782164573669434,
-     -9.623868942260742
-    ],
-    "Rotation": [
-     0.0,
-     -0.7068952918052673,
-     0.0,
-     0.7073181867599487
-    ],
-    "Scale": [
-     0.9999998807907104,
-     1.0,
-     0.9999998807907104
-    ]
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 1,
     "Entity_name": "box"
    },
    "Render_component": {
@@ -55,9 +20,9 @@
    },
    "Transform_component": {
     "Position": [
-     -1.8990678787231445,
+     -1.9010000228881836,
      7.119019508361816,
-     -0.03878927230834961
+     -3.2702112197875977
     ],
     "Rotation": [
      0.0,
@@ -78,7 +43,7 @@
     "Parent": []
    },
    "Identifier_component": {
-    "Entity_id": 2,
+    "Entity_id": 1,
     "Entity_name": "Cube8v [0]"
    },
    "Render_component": {
@@ -94,8 +59,8 @@
    "Transform_component": {
     "Position": [
      -9.686514854431152,
-     0.08682966232299805,
-     -2.8044426441192627
+     3.369457960128784,
+     -10.793911933898926
     ],
     "Rotation": [
      0.0,
@@ -116,7 +81,7 @@
     "Parent": []
    },
    "Identifier_component": {
-    "Entity_id": 3,
+    "Entity_id": 2,
     "Entity_name": "Sphere [0]"
    },
    "Render_component": {
@@ -153,7 +118,7 @@
     "Parent": []
    },
    "Identifier_component": {
-    "Entity_id": 4,
+    "Entity_id": 3,
     "Entity_name": "brick"
    },
    "Render_component": {
@@ -190,7 +155,7 @@
     "Parent": []
    },
    "Identifier_component": {
-    "Entity_id": 5,
+    "Entity_id": 4,
     "Entity_name": "Bucket"
    },
    "Render_component": {
@@ -253,7 +218,7 @@
     "Parent": []
    },
    "Identifier_component": {
-    "Entity_id": 6,
+    "Entity_id": 5,
     "Entity_name": "Terrain [1]"
    },
    "Render_component": {
@@ -294,7 +259,7 @@
     "Parent": []
    },
    "Identifier_component": {
-    "Entity_id": 7,
+    "Entity_id": 6,
     "Entity_name": "Directional Light [1]"
    },
    "Light_component": {
@@ -370,24 +335,24 @@
    "Camera_component": {
     "camera": {
      "Aspect_ratio": 1.7777777910232544,
-     "Far_clip_plane": 200.0,
+     "Far_clip_plane": 577.0869750976563,
      "Fov": 45.0,
      "Near_clip_plane": 0.10000000149011612,
      "Ortho_height": 45.0,
      "Ortho_width": 45.0,
      "Position": [
-      -24.2221622467041,
-      9.8844633102417,
-      4.384878158569336
+      -33.4611930847168,
+      18.03995132446289,
+      1.324376106262207
      ],
      "Scroll_speed": 1.0,
      "Sensitivity": 1.0,
      "Speed": 5.0,
      "Use_perspective_matrix": true,
      "View_direction": [
-      0.7491416335105896,
-      -0.03782562166452408,
-      -0.6613290309906006
+      0.8676251173019409,
+      -0.45420339703559875,
+      -0.2023017704486847
      ]
     }
    },
@@ -396,37 +361,8 @@
     "Parent": []
    },
    "Identifier_component": {
-    "Entity_id": 8,
+    "Entity_id": 7,
     "Entity_name": "Camera [0]"
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 9,
-    "Entity_name": "Skybox [0]"
-   },
-   "Skybox_component": {
-    "skybox": {
-     "Cubemap_file_paths": [
-      "",
-      "",
-      "",
-      "",
-      "",
-      ""
-     ],
-     "Cubemap_fragment_file": "",
-     "Cubemap_vertex_file": "",
-     "DDS_angle": -90.0,
-     "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
-     "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
-     "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
-     "Use_cubemap": false
-    }
    }
   }
  ]

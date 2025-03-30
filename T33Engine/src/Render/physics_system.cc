@@ -13,7 +13,7 @@ PhysicsSystem::~PhysicsSystem()
 {
 }
 
-void PhysicsSystem::update()
+void PhysicsSystem::update(float dt)
 {
 	auto pi = ecs_.getComponentList<PhysicsComponent>().begin();
 	auto piend = ecs_.getComponentList<PhysicsComponent>().end();
@@ -36,8 +36,8 @@ void PhysicsSystem::update()
 
 				physics_comp->acceleration = physics_comp->force / physics_comp->mass;
 				physics_comp->acceleration -= physics_comp->gravity;
-				physics_comp->velocity += physics_comp->acceleration * (float)dt_;
-				transf_comp->position += physics_comp->velocity * (float)dt_;
+				physics_comp->velocity += physics_comp->acceleration * dt;
+				transf_comp->position += physics_comp->velocity * dt;
 
 				if (transf_comp->position.y <= physics_comp->floor_height) {
 					transf_comp->position.y = physics_comp->floor_height;

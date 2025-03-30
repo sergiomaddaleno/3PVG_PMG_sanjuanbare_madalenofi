@@ -7,7 +7,10 @@ Engine::Engine(Window& window, Input& input) :
 	render_system(ecs),
 	ui_manager(*this, ecs, render_system),
 	save_manager(ecs, render_system),
-	physics_system(ecs, render_system)
+	physics_system(ecs, render_system),
+	scripting_system(ecs),
+	lastTime(0.0),
+	currentTime(0.0)
 {
 }
 
@@ -57,8 +60,9 @@ void Engine::beginFrame()
 		render_system.forwardRender(input, dt);
 	}
 
-	physics_system.update();
-	physics_system.dt_ = dt;
+	physics_system.update((float)dt);
+
+	scripting_system.update((float)dt);
 
 	ui_manager.Render();
 

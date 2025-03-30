@@ -6,6 +6,7 @@
 #include "Render/physics_system.h"
 #include "Systems/ecs_manager.h"
 #include "Render/render_system.h"
+#include "Render/scripting_system.h"
 #include "Geometry/terrain.h"
 #include "Render/post_processing.h"
 #include "Core/window.h"
@@ -32,6 +33,7 @@ public:
 	ECSManager ecs;
 	RenderSystem render_system;
 	PhysicsSystem physics_system;
+	ScriptingSystem scripting_system;
 
 	PostProcessing post_process;
 

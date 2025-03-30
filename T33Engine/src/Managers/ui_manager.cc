@@ -172,6 +172,7 @@ void UIManager::Init(Window* window, Input* input) {
     m_StopIcon.loadTexture("../stages/assets/textures/imgui/stop.png");
     m_PhysicsmIcon.loadTexture("../stages/assets/textures/imgui/physics.png");
     m_SkyIcon.loadTexture("../stages/assets/textures/imgui/sky.png");
+    m_LuaIcon.loadTexture("../stages/assets/textures/imgui/lua.png");
     //---
 
     input_ = input;
@@ -1568,6 +1569,50 @@ void UIManager::InspectorWindow() {
             }
         }
 
+    if (ecs_.has_component<ScriptingComponent>(selected_entity)) {
+
+        bool open = ImGui::CollapsingHeader("##ScriptingComponent", ImGuiTreeNodeFlags_DefaultOpen);
+        ImGui::SameLine();
+        ImGui::Image(m_LuaIcon.getID(), {20.0f, 20.0f}, {0.0f, 1.0f}, {1.0f, 0.0f});
+        ImGui::SameLine();
+        ImGui::Text("Scripting Component");
+
+        if (open) {
+
+            auto& ls_comp = ecs_.get_component<ScriptingComponent>(selected_entity);
+
+            static std::string lua_file_path;
+            static std::string lua_file_name;
+
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+            if (ImGui::Button(!lua_file_path.empty() ? lua_file_name.c_str() : ".lua drop here", { 200.0f, 40.0f })) {}
+
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                    std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                    if (filePath.extension() == ".lua") {
+                        lua_file_path = filePath.string();
+                        lua_file_name = filePath.filename().string();
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
+
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+            if (ImGui::Button("Read file")) {
+
+                ls_comp.value().script_path = lua_file_path;
+                ls_comp.value().entity_id = selected_entity;
+                engine_.scripting_system.init();
+            }
+            ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        }
+    }
+
     // -------
 
     static bool has_any_component = false;
@@ -1615,10 +1660,21 @@ void UIManager::InspectorWindow() {
             if (ecs_.has_component<HierarchyComponent>(selected_entity)) {
                 ImGui::Text("- Hierarchy component");
             }
+            if (ecs_.has_component<PhysicsComponent>(selected_entity)) {
+                ImGui::Text("- Physics component");
+            }
+            if (ecs_.has_component<ScriptingComponent>(selected_entity)) {
+                ImGui::Text("- Scripting component");
+            }
+            if (ecs_.has_component<CameraComponent>(selected_entity)) {
+                ImGui::Text("- Camera component");
+            }
+            if (ecs_.has_component<SkyboxComponent>(selected_entity)) {
+                ImGui::Text("- Skybox component");
+            }
             ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-
-            const char* addComponents[] = { "Physics Component", "Light Component" };
+            const char* addComponents[] = { "Physics Component", "Light Component", "Scripting Component" };
             static int addCurrentItem = -1;
 
             if (ImGui::BeginCombo("Add Component", addCurrentItem >= 0 ? addComponents[addCurrentItem] : "Select Component to Add")) {
@@ -1627,6 +1683,7 @@ void UIManager::InspectorWindow() {
                     switch (i) {
                     case 0: hasComponent = ecs_.has_component<PhysicsComponent>(selected_entity); break;
                     case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
+                    case 2: hasComponent = ecs_.has_component<ScriptingComponent>(selected_entity); break;
                     }
 
                     if (!hasComponent) {
@@ -1656,6 +1713,9 @@ void UIManager::InspectorWindow() {
                                     rs_.initLights();
                                 }
                                 break;
+                            case 2:
+                                ecs_.add_component<ScriptingComponent>(selected_entity);
+                                break;
                             }
                             addCurrentItem = -1;
                         }
@@ -1668,7 +1728,7 @@ void UIManager::InspectorWindow() {
 
             // ---------------------- DELETE COMPONENT ----------------------
 
-            const char* deleteComponents[] = { "Physics Component", "Light Component" };
+            const char* deleteComponents[] = { "Physics Component", "Light Component", "Scripting Component" };
             static int deleteCurrentItem = -1;
 
             if (ImGui::BeginCombo("Delete Component", deleteCurrentItem >= 0 ? deleteComponents[deleteCurrentItem] : "Select Component to Delete")) {
@@ -1677,6 +1737,7 @@ void UIManager::InspectorWindow() {
                     switch (i) {
                     case 0: hasComponent = ecs_.has_component<PhysicsComponent>(selected_entity); break;
                     case 1: hasComponent = ecs_.has_component<LightComponent>(selected_entity); break;
+                    case 2: hasComponent = ecs_.has_component<ScriptingComponent>(selected_entity); break;
                     }
 
                     if (hasComponent) {
@@ -1687,6 +1748,9 @@ void UIManager::InspectorWindow() {
                                 break;
                             case 1:
                                 ecs_.delete_component<LightComponent>(selected_entity);
+                                break;
+                            case 2:
+                                ecs_.delete_component<ScriptingComponent>(selected_entity);
                                 break;
                             }
                             deleteCurrentItem = -1;

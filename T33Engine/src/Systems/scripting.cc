@@ -31,6 +31,21 @@ void LuaScript::add_global(int(*function)(lua_State*), const std::string& name) 
 	lua_setglobal(s, name.c_str());
 }
 
+void LuaScript::call_function(const std::string& func_name, float dt)
+{
+	lua_getglobal(s, func_name.c_str());
+	if (lua_isfunction(s, -1)) {
+		lua_pushnumber(s, dt);
+		if (lua_pcall(s, 1, 0, 0) != LUA_OK) {
+			std::cerr << "Lua Error: " << lua_tostring(s, -1) << std::endl;
+			lua_pop(s, 1);
+		}
+	}
+	else {
+		lua_pop(s, 1);
+	}
+}
+
 // ---
 
 void LuaScript::get_table(const std::string& table_name) {
@@ -79,12 +94,12 @@ bool LuaScript::get_bool(const std::string& var_name) {
 	return value;
 }
 
-// ---
+void LuaScript::set_state(lua_State* new_state)
+{
+	if (state_) {
+		state_.reset();
+	}
 
-int multiply(lua_State* s) {
-	lua_Integer a = luaL_checkinteger(s, 1);
-	lua_Integer b = luaL_checkinteger(s, 2);
-	lua_Integer c = a * b;
-	lua_pushinteger(s, c);
-	return 1; // Devolver el numero de parametros que devuelve la funcion, en este caso 1
+	state_ = std::unique_ptr<lua_State, decltype(&lua_close)>(new_state, [](lua_State*) {});
+	s = new_state;
 }

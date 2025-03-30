@@ -18,7 +18,7 @@ public:
     PhysicsSystem(ECSManager& ecs, RenderSystem& rs);
     ~PhysicsSystem();
 
-    void update();
+    void update(float dt);
 
     double dt_;
     bool stop_physics_;

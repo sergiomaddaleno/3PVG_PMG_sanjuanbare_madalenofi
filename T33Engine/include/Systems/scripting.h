@@ -25,13 +25,14 @@
 class LuaScript {
 
 public:
-	LuaScript();
-	~LuaScript();
+	LuaScript(); 
+	~LuaScript(); 
 
 	void check(int error);
 	void run(const std::string& str);
 	void add_global(int(*function)(lua_State*), const std::string& name);
-	
+	void call_function(const std::string& func_name, float dt);
+
 	// --
 
 	void get_table(const std::string& table_name);
@@ -43,14 +44,14 @@ public:
 
 	int stack_size() { return lua_gettop(s); }
 	void pop(int count = 1) { lua_pop(s, count); }
+
 	lua_State* get_state() { return s; }
+	void set_state(lua_State* new_state);
 
 private:
 	std::unique_ptr<lua_State, decltype(&lua_close)> state_;
 	lua_State* s;
 };
-
-int multiply(lua_State* s);
 
 #endif // __SCRIPTING__
 
