@@ -25,11 +25,15 @@ public:
     void loadScript(ScriptingComponent& script_comp);
     void update(float dt);
 
-    int get_transform_component(lua_State* lua_state, size_t entity);
-    int set_transform_component(lua_State* lua_state, size_t entity);
+    int get_position_component(lua_State* lua_state, size_t entity);
+    int get_rotation_component(lua_State* lua_state, size_t entity);
+    int get_scale_component(lua_State* lua_state, size_t entity);
+
+    int set_position_component(lua_State* lua_state, size_t entity);
+    int set_rotation_component(lua_State* lua_state, size_t entity);
+    int set_scale_component(lua_State* lua_state, size_t entity);
 
 private:
-
     void registerTransform(lua_State* L, size_t entity_id);
 
     std::unordered_map<size_t, LuaScript> entity_scripts_;
