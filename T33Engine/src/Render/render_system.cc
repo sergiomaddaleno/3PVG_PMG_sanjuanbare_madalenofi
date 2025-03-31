@@ -494,6 +494,7 @@ size_t RenderSystem::addCamera(Camera camera)
     ecs_.add_component<CameraComponent>(entity_);
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<HierarchyComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
 
     ecs_.get_component<IdentifierComponent>(entity_)->name = "Camera [" + std::to_string(entity_counts_.camera) + "]";
     ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;

@@ -2603,6 +2603,14 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
                     light_comp->light.dir_ = glm::mat3(transform->rotation) * glm::vec3(0.0f, 0.0f, 1.0f);
                 }
 
+                if (ecs_.has_component<CameraComponent>(selected_entity)) {
+                    auto& camera_comp = ecs_.get_component<CameraComponent>(selected_entity);
+
+                    transform->position = camera_comp->camera.getPosition();
+
+                    camera_comp->camera.setPosition(transform->position);
+                }
+
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::translate(model, transform->position);
                 model = model * glm::mat4_cast(transform->rotation);
@@ -2611,9 +2619,11 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
                 float objectMatrix[16];
                 std::memcpy(objectMatrix, glm::value_ptr(model), sizeof(objectMatrix));
 
-                ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-                    mCurrentGizmoOperation, ImGuizmo::LOCAL,
-                    objectMatrix, nullptr);
+                //if (!ecs_.has_component<CameraComponent>(selected_entity)) {
+                    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
+                        mCurrentGizmoOperation, ImGuizmo::LOCAL,
+                        objectMatrix, nullptr);
+                //}
 
                 if (ImGuizmo::IsUsing()) {
                     glm::mat4 newModelMatrix = glm::make_mat4(objectMatrix);

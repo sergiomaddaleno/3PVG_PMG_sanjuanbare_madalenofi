@@ -46,6 +46,7 @@ public:
 	const float getFov() const{return fov_;}
 	float getScrollSpeed() const { return scroll_speed_; }
 	glm::vec3 getViewDir() const { return view_direction_; }
+	glm::quat getOrientation() const;
 	glm::vec3 getUp() const { return up_; }
 	const float getNearCliPlane() { return near_clip_plane_; }
 	const float getFarCliPlane() { return far_clip_plane_; }
@@ -65,6 +66,7 @@ public:
 
 	void setScrollSpeed(float scroll_speed) { scroll_speed_ = scroll_speed; }
 	void setViewDir(glm::vec3 view_direction) {view_direction_ = view_direction;}
+	void setOrientation(glm::quat orientation);
 	void setUp(glm::vec3 up) { up_ = up; }
 
 	//Save data
@@ -78,6 +80,7 @@ private:
 	glm::vec3 up_;
 
 	glm::mat4 view_;
+	glm::quat orientation_;
 
 	glm::vec2 pos_mouse;
 	glm::vec2 curr_mouse;

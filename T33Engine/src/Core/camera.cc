@@ -143,10 +143,24 @@ void Camera::update(Input& input, const double dt, const int window_width, const
 void Camera::setViewMatrix(const glm::mat4 view)
 {
     view_ = view;
+
+    this->initViewTarget();
+}
+
+glm::quat Camera::getOrientation() const
+{
+    return glm::quatLookAt(view_direction_, up_);
 }
 
 glm::mat4 Camera::getViewMatrix() const {
     return view_;
+}
+
+void Camera::setOrientation(glm::quat orientation)
+{
+    view_direction_ = orientation * glm::vec3(0.0f, 0.0f, -1.0f);
+    up_ = orientation * glm::vec3(0.0f, 1.0f, 0.0f);
+    view_ = initViewTarget();
 }
 
 nlohmann::json Camera::serialize()
