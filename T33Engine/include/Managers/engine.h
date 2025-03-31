@@ -11,6 +11,8 @@
 #include "Render/post_processing.h"
 #include "Core/window.h"
 #include "Core/input.h"
+#include "../src/clouds/CloudsModel.h"
+#include "../src/clouds/VolumetricClouds.h"
 
 class Engine {
 
@@ -36,6 +38,8 @@ public:
 	ScriptingSystem scripting_system;
 
 	PostProcessing post_process;
+
+	
 
 	//------------------
 

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <optional>
 #include <string>
-
+#include "../src/clouds/VolumetricClouds.h"
 #include "Managers/engine.h"
 #include "Core/window.h"
 #include "Core/input.h"
