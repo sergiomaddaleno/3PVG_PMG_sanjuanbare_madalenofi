@@ -66,7 +66,8 @@ UIManager::UIManager(Engine& engine, ECSManager& ecs, RenderSystem& rs)
     ecs_(ecs),
     rs_(rs),
     engine_(engine),
-    input_(nullptr)
+    input_(nullptr),
+    manipulate_world(true)
 {
 }
 
@@ -203,6 +204,9 @@ void UIManager::Render() {
         if (add_surface_window) AddSurfaceWindow();
         if (l_system_window) LSystemWindow();
         if (add_entities_terrain_window) AddEntitiesTerrainWindow();
+    }
+    else {
+        UpdateHierarchyTransforms();
     }
 
     engine_.post_process.endRender();
@@ -380,16 +384,12 @@ void UIManager::HierarchyWindow() {
                         auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
                         auto& parent_transform = ecs_.get_component<TransformComponent>(parent_id);
 
-                        if (selected_entity == entity_id) {
+                        if (!manipulate_world) {
                             child_transform->local_position = child_transform->position - parent_transform->position;
                         }
                         else {
                             child_transform->position = parent_transform->position + child_transform->local_position;
                         }
-                    }
-                    else {
-                        auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
-                        child_transform->position = child_transform->local_position;
                     }
                 }
 
@@ -700,6 +700,11 @@ void UIManager::InspectorWindow() {
                 auto& transf_comp = ecs_.get_component<TransformComponent>(selected_entity);
                 auto ci = ecs_.getComponentList<CameraComponent>().begin();
                 auto ciend = ecs_.getComponentList<CameraComponent>().end();
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::Checkbox("Manipulate World/Local", &manipulate_world);
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::Separator();
 
                 for (; ci != ciend; ++ci) {
                     if (ci->has_value()) {
@@ -2619,12 +2624,17 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
                 float objectMatrix[16];
                 std::memcpy(objectMatrix, glm::value_ptr(model), sizeof(objectMatrix));
 
-                //if (!ecs_.has_component<CameraComponent>(selected_entity)) {
+                if (manipulate_world) {
+                    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
+                        mCurrentGizmoOperation, ImGuizmo::WORLD,
+                        objectMatrix, nullptr);
+                }
+                else {
                     ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
                         mCurrentGizmoOperation, ImGuizmo::LOCAL,
                         objectMatrix, nullptr);
-                //}
-
+                }
+                
                 if (ImGuizmo::IsUsing()) {
                     glm::mat4 newModelMatrix = glm::make_mat4(objectMatrix);
                     glm::vec3 scale, translation, skew;
@@ -2736,4 +2746,36 @@ void UIManager::LSystemWindow() {
 
     ImGui::Dummy({ 0.0f, 5.0f });
     ImGui::End();
+}
+
+void UIManager::UpdateHierarchyTransforms() {
+    auto hi = ecs_.getComponentList<HierarchyComponent>().begin();
+    auto hiend = ecs_.getComponentList<HierarchyComponent>().end();
+
+    auto ti = ecs_.getComponentList<TransformComponent>().begin();
+    auto tiend = ecs_.getComponentList<TransformComponent>().end();
+
+    int entity_id = 0;
+
+    for (; hi != hiend; ++hi, entity_id++) {
+        if (hi->has_value()) {
+            auto& hierarchy_comp = *hi;
+
+            if (hierarchy_comp->hasParent()) {
+                int parent_id = hierarchy_comp->getParent();
+
+                if (ecs_.has_component<TransformComponent>(parent_id)) {
+                    auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
+                    auto& parent_transform = ecs_.get_component<TransformComponent>(parent_id);
+
+                    if (!manipulate_world) {
+                        child_transform->local_position = child_transform->position - parent_transform->position;
+                    }
+                    else {
+                        child_transform->position = parent_transform->position + child_transform->local_position;
+                    }
+                }
+            }
+        }
+    }
 }

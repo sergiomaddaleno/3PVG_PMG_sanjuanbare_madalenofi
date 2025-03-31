@@ -63,6 +63,8 @@ public:
     void ResetIds();
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity);
 
+    void UpdateHierarchyTransforms();
+
 private:
     Engine& engine_;
     ECSManager& ecs_;
@@ -88,6 +90,7 @@ private:
     
     //--
     bool show_fps;
+    bool manipulate_world;
 
     bool post_process_window;
     bool console_window;
