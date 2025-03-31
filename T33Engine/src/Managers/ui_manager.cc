@@ -1615,6 +1615,9 @@ void UIManager::InspectorWindow() {
                 ls_comp.value().script_path = lua_file_path;
                 ls_comp.value().entity_id = selected_entity;
                 engine_.scripting_system.init();
+
+                lua_file_path.clear();
+                lua_file_name.clear();
             }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
         }
@@ -1757,6 +1760,10 @@ void UIManager::InspectorWindow() {
                                 ecs_.delete_component<LightComponent>(selected_entity);
                                 break;
                             case 2:
+                                auto& se = ecs_.get_component<ScriptingComponent>(selected_entity);
+                                se->script_path.clear();
+                                se->entity_id = 0;
+
                                 ecs_.delete_component<ScriptingComponent>(selected_entity);
                                 break;
                             }

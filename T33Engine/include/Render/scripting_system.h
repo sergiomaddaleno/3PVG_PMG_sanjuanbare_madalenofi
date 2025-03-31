@@ -24,6 +24,7 @@ public:
 
     void loadScript(ScriptingComponent& script_comp);
     void update(float dt);
+    void removeScript(size_t entity_id);
 
     int get_position_component(lua_State* lua_state, size_t entity);
     int get_rotation_component(lua_State* lua_state, size_t entity);

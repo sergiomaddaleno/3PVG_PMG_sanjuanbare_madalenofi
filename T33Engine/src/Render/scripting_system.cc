@@ -43,12 +43,26 @@ void ScriptingSystem::loadScript(ScriptingComponent& script_comp) {
     lua_script.run(loc_lua_file);
 }
 
+void ScriptingSystem::removeScript(size_t entity_id) {
+    entity_scripts_.erase(entity_id);
+}
 
 void ScriptingSystem::update(float dt) {
+    
+    for (auto it = entity_scripts_.begin(); it != entity_scripts_.end(); ) {
+        if (!ecs_.has_component<ScriptingComponent>(it->first)) {
+            it = entity_scripts_.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+
     for (auto& [entity, lua_script] : entity_scripts_) {
         lua_script.call_function("update", dt);
     }
 }
+
 
 int ScriptingSystem::get_position_component(lua_State* lua_state, size_t entity) {
     if (ecs_.has_component<TransformComponent>(entity)) {
