@@ -11,6 +11,8 @@
 
 #include <optional>
 #include <string>
+#include "Core/shader.h"
+
 #include <../deps/glm/glm.hpp>
 
 #include <GL/glew.h>
@@ -37,8 +39,6 @@ public:
     Light();
     ~Light();
 
-    void setUniforms(Shader& shader);
-
     LightType type_;
 
     glm::vec3 pos_;
@@ -56,6 +56,49 @@ public:
     float strength_;
     float spot_angle_;
     float spot_softness_;
+
+    void setUniforms(Shader& shader) {
+        int loc = shader.getUniformLocation("u_light.type_");
+        shader.setUniformValue(loc, ValueType::T_INT_1, &type_);
+
+        loc = shader.getUniformLocation("u_light.pos_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_3, &pos_);
+
+        loc = shader.getUniformLocation("u_light_pos_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_3, &pos_);
+
+        loc = shader.getUniformLocation("u_light.dir_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_3, &dir_);
+
+        loc = shader.getUniformLocation("u_light.light_color_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_3, &light_color_);
+
+        loc = shader.getUniformLocation("u_light.ambient_color_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_3, &ambient_color_);
+
+        loc = shader.getUniformLocation("u_light.linear_att_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_1, &linear_att);
+
+        loc = shader.getUniformLocation("u_light.quad_att_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_1, &quad_att_);
+
+        loc = shader.getUniformLocation("u_light.constant_att_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_1, &constant_att_);
+
+        loc = shader.getUniformLocation("u_light.shininess_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_1, &shininess_);
+
+        loc = shader.getUniformLocation("u_light.strength_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_1, &strength_);
+
+        loc = shader.getUniformLocation("u_light.spot_angle_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_1, &spot_angle_);
+
+        loc = shader.getUniformLocation("u_light.spot_softness_");
+        shader.setUniformValue(loc, ValueType::T_FLOAT_1, &spot_softness_);
+
+        //shader.setUniformValue(shader.getUniformLocation("u_ambient"), ValueType::T_FLOAT_3, &global_ambient_color_);
+    }
 
     nlohmann::json serialize() const;
 };

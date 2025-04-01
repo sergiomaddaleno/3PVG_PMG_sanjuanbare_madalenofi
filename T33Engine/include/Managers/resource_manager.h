@@ -3,6 +3,7 @@
 
 #include "../Components/render_component.h"
 #include "../Render/light.h"
+#include "Core/texture.h"
 
 #include <unordered_map>
 #include <memory>
@@ -46,6 +47,20 @@ public:
 		return new_entity;
 	}
 
+	std::shared_ptr<std::string> GetFilePathMap(std::string file_path) {
+		auto& file_map = GetFilePath();
+
+		auto it = file_map.find(file_path);
+		if (it != file_map.end()) {
+			return it->second;
+		}
+
+		auto new_file = std::make_shared<std::string>();
+		file_map[file_path] = new_file;
+
+		return new_file;
+	}
+
 private:
 	ResourceManager() = default;
 	~ResourceManager() = default;
@@ -63,6 +78,11 @@ private:
 	static std::unordered_map<Light::LightType, std::shared_ptr<T>>& GetLightEntityMap() {
 		static std::unordered_map<Light::LightType, std::shared_ptr<T>> entity_map;
 		return entity_map;
+	}
+
+	static std::unordered_map<std::string, std::shared_ptr<std::string>>& GetFilePath() {
+		static std::unordered_map<std::string, std::shared_ptr<std::string>> file_path_map;
+		return file_path_map;
 	}
 
 };
