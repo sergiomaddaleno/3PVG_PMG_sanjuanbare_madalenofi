@@ -12,7 +12,7 @@
 #include <../deps/glm/glm.hpp>
 #include <vector>
 
-class Shader;
+#include "Core/shader.h"
 
 /**
  * @class GerstnerWave

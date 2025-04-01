@@ -1,6 +1,5 @@
 
 #include "Geometry/wave.h"
-#include "Core/shader.h"
 #include "Components/render_component.h"
 
 
