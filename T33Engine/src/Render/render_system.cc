@@ -8,6 +8,8 @@
 #include "utils.h"
 #include "Components/components.h"
 
+#include "Managers/resource_manager.h"
+
 #include "Geometry/sphere.h"
 #include "Geometry/terrain.h"
 #include "Geometry/cube.h"
@@ -527,7 +529,7 @@ size_t RenderSystem::addSkybox(Skybox skybox)
 size_t RenderSystem::createMesh(std::string file, std::string textureFolder,
     TransformComponent tc)
 {
-    auto mesh = std::make_unique<Mesh>();
+    std::shared_ptr<Mesh> mesh = ResourceManager::GetInstance().GetRenderEntity<Mesh>(RenderType::RT_Mesh);
     if (!mesh->loadOBJ(file, textureFolder)) {
         return -1;
     }
@@ -549,7 +551,7 @@ size_t RenderSystem::createMesh(std::string file, std::string textureFolder,
     transform->scale = tc.scale;
 
     ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Mesh;
-    ecs_.get_component<RenderComponent>(entity_)->mesh_ = std::move(mesh);
+    ecs_.get_component<RenderComponent>(entity_)->mesh_ = mesh;
 
     entity_++;
     entity_counts_.mesh++;
@@ -562,7 +564,9 @@ size_t RenderSystem::createTerrain(TransformComponent tc,
     const float height_mult, const float size, 
     const bool is_centered, const bool use_perlin_noise){
 
-    auto terrain = std::make_unique<Terrain>();
+    std::shared_ptr<Terrain> terrain = ResourceManager::GetInstance().GetRenderEntity<Terrain>(RenderType::RT_Terrain);
+
+    terrain->setTexture("../stages/assets/textures/images/grass.png");
     terrain->init(num_cols, num_rows, height_mult, size, is_centered, use_perlin_noise);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -581,7 +585,7 @@ size_t RenderSystem::createTerrain(TransformComponent tc,
     transform->scale = tc.scale;
 
     ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Terrain;
-    ecs_.get_component<RenderComponent>(entity_)->terrain_ = std::move(terrain);
+    ecs_.get_component<RenderComponent>(entity_)->terrain_ = terrain;
 
     entity_++;
     entity_counts_.terrain++;
@@ -593,10 +597,10 @@ size_t RenderSystem::createWater(TransformComponent tc,
     const int num_cols, const int num_rows, const float size,
     const bool is_centered) {
 
-    auto water = std::make_unique<Terrain>();
-    water->init(num_cols, num_rows, 0.0f, size, is_centered, true);
+    std::shared_ptr<Terrain> water = ResourceManager::GetInstance().GetRenderEntity<Terrain>(RenderType::RT_Water);
 
     water->setTexture("../stages/assets/textures/images/blue.png");
+    water->init(num_cols, num_rows, 0.0f, size, is_centered, true);
     water->wave_.use_wave_ = true;
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -615,7 +619,7 @@ size_t RenderSystem::createWater(TransformComponent tc,
     transform->scale = tc.scale;
 
     ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Water;
-    ecs_.get_component<RenderComponent>(entity_)->water_ = std::move(water);
+    ecs_.get_component<RenderComponent>(entity_)->water_ = water;
 
     entity_++;
     entity_counts_.water++;
@@ -625,7 +629,9 @@ size_t RenderSystem::createWater(TransformComponent tc,
 
 size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int num_revs_, float size)
 {
-    auto sphere = std::make_unique<Sphere>();
+    std::shared_ptr<Sphere> sphere = ResourceManager::GetInstance().GetRenderEntity<Sphere>(RenderType::RT_Sphere);
+
+    sphere->setTexture("../stages/assets/textures/images/blue.png");
     sphere->init(size, num_heights_, num_revs_);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -645,7 +651,7 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
     transform->scale = tc.scale;
 
     ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Sphere;
-    ecs_.get_component<RenderComponent>(entity_)->sphere_ = std::move(sphere);
+    ecs_.get_component<RenderComponent>(entity_)->sphere_ = sphere;
 
     entity_++;
     entity_counts_.sphere++;
@@ -655,7 +661,9 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
 
 size_t RenderSystem::createSurface(std::vector<float> surface_points, TransformComponent tc, const int num_heights, const int num_revs)
 {
-    auto surface = std::make_unique<Surface>();
+    std::shared_ptr<Surface> surface = ResourceManager::GetInstance().GetRenderEntity<Surface>(RenderType::RT_Surface);
+
+    surface->setTexture("../stages/assets/textures/images/blue.png");
     surface->init(surface_points, num_heights, num_revs);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -685,7 +693,9 @@ size_t RenderSystem::createSurface(std::vector<float> surface_points, TransformC
 
 size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool is_centered)
 {
-    auto cube = std::make_unique<Cube>();
+    std::shared_ptr<Cube> cube = ResourceManager::GetInstance().GetRenderEntity<Cube>(RenderType::RT_Cube8v);
+    
+    cube->setTexture("../stages/assets/textures/images/blue.png");
     cube->init8v(size, is_centered);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -704,7 +714,7 @@ size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool 
     transform->scale = tc.scale;
 
     ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube8v;
-    ecs_.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
+    ecs_.get_component<RenderComponent>(entity_)->cube_ = cube;
 
     entity_++;
     entity_counts_.cube8v++;
@@ -714,7 +724,9 @@ size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool 
 
 size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
 {
-    auto cube = std::make_unique<Cube>();
+    std::shared_ptr<Cube> cube = ResourceManager::GetInstance().GetRenderEntity<Cube>(RenderType::RT_Cube24v);
+
+    cube->setTexture("../stages/assets/textures/images/blue.png");
     cube->init24v(size);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -733,7 +745,7 @@ size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
     transform->scale = tc.scale;
 
     ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cube24v;
-    ecs_.get_component<RenderComponent>(entity_)->cube_ = std::move(cube);
+    ecs_.get_component<RenderComponent>(entity_)->cube_ = cube;
 
     entity_++;
     entity_counts_.cube24v++;
@@ -743,7 +755,9 @@ size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
 
 size_t RenderSystem::createQuad(TransformComponent tc, const float size)
 {
-    auto quad = std::make_unique<Quad>();
+    std::shared_ptr<Quad> quad = ResourceManager::GetInstance().GetRenderEntity<Quad>(RenderType::RT_Quad);
+    
+    quad->setTexture("../stages/assets/textures/images/blue.png");
     quad->init(size);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -762,7 +776,7 @@ size_t RenderSystem::createQuad(TransformComponent tc, const float size)
     transform->scale = tc.scale;
 
     ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Quad;
-    ecs_.get_component<RenderComponent>(entity_)->quad_ = std::move(quad);
+    ecs_.get_component<RenderComponent>(entity_)->quad_ = quad;
 
     entity_++;
     entity_counts_.quad++;

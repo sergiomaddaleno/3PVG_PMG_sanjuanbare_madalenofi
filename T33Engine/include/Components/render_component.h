@@ -28,16 +28,16 @@ enum RenderType {
 
 struct RenderComponent {
 
-    std::unique_ptr<Mesh> mesh_;
-    Triangle triangle_;
-    std::unique_ptr<Terrain>terrain_;
-    std::unique_ptr<Terrain>water_;
-    std::unique_ptr<Sphere>sphere_;
-    std::unique_ptr<Cube>cube_;
-    std::unique_ptr<Quad>quad_;
-    std::unique_ptr<Surface>surface_;
-
     RenderType type_;
+
+    std::shared_ptr<Mesh> mesh_;
+    std::shared_ptr<Terrain>terrain_;
+    std::shared_ptr<Terrain>water_;
+    std::shared_ptr<Sphere>sphere_;
+    std::shared_ptr<Cube>cube_;
+    std::shared_ptr<Quad>quad_;
+    std::shared_ptr<Surface>surface_;
+    Triangle triangle_;
 
     //--
 
