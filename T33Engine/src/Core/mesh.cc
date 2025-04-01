@@ -17,7 +17,8 @@
 #include "../deps/stb_image.h"
 
 Mesh::Mesh() : VAO(0), VBO(0), EBO(0), materialID(0),
-use_texture_(true) {}
+use_texture_(true)
+{}
 
 Mesh::~Mesh()
 {
@@ -27,7 +28,8 @@ Mesh::~Mesh()
 };
 
 
-bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
+bool Mesh::loadOBJ(const std::string& file,
+    const std::string& textureFolder)
 {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -36,6 +38,7 @@ bool Mesh::loadOBJ(const std::string& file, const std::string& textureFolder)
 
     mesh_path = file;
     texture_folder = textureFolder;
+
     bool obj = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file.c_str(), textureFolder.c_str());
     if (!obj) {
         printf("Failed to load OBJ file: ");
@@ -169,40 +172,6 @@ Texture Mesh::getTexture(int index)
 
     return Texture();
 }
-
-
-void Mesh::render(RenderComponent rc, TransformComponent tc, Camera cam)
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-
-    shader.useProgram();
-
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, tc.position);
-    model = model * glm::mat4_cast(tc.rotation);
-    model = glm::scale(model, tc.scale);
-
-    glm::mat4 view = cam.getViewMatrix();
-    glm::mat4 projection = cam.getPerspectiveMatrix();
-    glm::mat4 mvp = projection * view * model;
-
-    // For shaders ---
-    shader.setUniformValue(shader.getUniformLocation("mvp"), ValueType::T_MAT_4x4, glm::value_ptr(mvp));
-    shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
-    shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
-    shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
-
-    for (auto& mesh : rc.mesh_->meshes) {
-        rc.mesh_->draw();
-    }
-
-    glUseProgram(0);
-    glDeleteVertexArrays(1, &rc.mesh_->VAO);
-    glDeleteBuffers(1, &rc.mesh_->VBO);
-    glDeleteBuffers(1, &rc.mesh_->EBO);
-}
-
 
 nlohmann::json Mesh::serialize() const
 {

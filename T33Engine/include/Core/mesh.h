@@ -47,12 +47,6 @@ public:
 
     nlohmann::json serialize() const;
 
-    // ---
-    //Only used for example render
-    void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
-    Shader shader;
-    // ---
-
     GerstnerWave wave_;
     bool use_texture_;
 

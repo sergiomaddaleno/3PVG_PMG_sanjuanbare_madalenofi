@@ -4,6 +4,7 @@
 #include "../Components/render_component.h"
 #include "../Render/light.h"
 #include "Core/texture.h"
+#include "Core/mesh.h"
 
 #include <unordered_map>
 #include <memory>
@@ -17,8 +18,9 @@ public:
 		return instance;
 	}
 
+	//For al render types except Mesh
 	template<typename T>
-	std::shared_ptr<T> GetRenderEntity(RenderType type) {
+	std::shared_ptr<T> FindEntity(RenderType type) {
 		auto& entity_map = GetRenderEntityMap<T>();
 
 		auto it = entity_map.find(type);
@@ -32,22 +34,7 @@ public:
 		return new_entity;
 	}
 
-	template<typename T>
-	std::shared_ptr<T> GetLightEntityMap(Light::LightType type) {
-		auto& entity_map = GetEntityMap<T>();
-
-		auto it = entity_map.find(type);
-		if (it != entity_map.end()) {
-			return it->second;
-		}
-
-		auto new_entity = std::make_shared<T>();
-		entity_map[type] = new_entity;
-
-		return new_entity;
-	}
-
-	std::shared_ptr<std::string> GetFilePathMap(std::string file_path) {
+	std::shared_ptr<std::string> FindFilePath(std::string file_path) {
 		auto& file_map = GetFilePath();
 
 		auto it = file_map.find(file_path);
@@ -55,11 +42,26 @@ public:
 			return it->second;
 		}
 
-		auto new_file = std::make_shared<std::string>();
+		auto new_file = std::make_shared<std::string>(file_path);
 		file_map[file_path] = new_file;
 
 		return new_file;
 	}
+
+	//--
+
+	std::shared_ptr<Mesh> FindMesh(const std::shared_ptr<std::string>& path) {
+		auto it = mesh_entities_.find(*path);
+		if (it != mesh_entities_.end()) {
+			return it->second;
+		}
+		return nullptr;
+	}
+
+	void StoreMesh(const std::shared_ptr<std::string>& path, std::shared_ptr<Mesh> mesh) {
+		mesh_entities_[*path] = mesh;
+	}
+
 
 private:
 	ResourceManager() = default;
@@ -85,6 +87,11 @@ private:
 		return file_path_map;
 	}
 
+	static std::unordered_map<std::string, std::shared_ptr<Mesh>> mesh_entities_;
+
 };
+
+std::unordered_map<std::string, std::shared_ptr<Mesh>> ResourceManager::mesh_entities_;
+
 
 #endif // !__RESOURCE_MANAGER__

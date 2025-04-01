@@ -61,28 +61,22 @@ void RenderSystem::initRenderTypes() {
                 break;
             case RenderType::RT_Terrain:
                 render_comp->terrain_->bind();
-                render_comp->terrain_->setTexture(render_comp->terrain_->texture_path_);
                 break;
             case RenderType::RT_Water:
                 render_comp->water_->bind();
-                render_comp->water_->setTexture(render_comp->water_->texture_path_);
                 break;
             case RenderType::RT_Sphere:
                 render_comp->sphere_->bind();
-                render_comp->sphere_->setTexture(render_comp->sphere_->texture_path_);
                 break;
             case RenderType::RT_Quad:
                 render_comp->quad_->bind();
-                render_comp->quad_->setTexture(render_comp->quad_->texture_path_);
                 break;
             case RenderType::RT_Cube8v:
             case RenderType::RT_Cube24v:
                 render_comp->cube_->bind();
-                render_comp->cube_->setTexture(render_comp->cube_->texture_path_);
                 break;
             case RenderType::RT_Surface:
                 render_comp->surface_->bind();
-                render_comp->surface_->setTexture(render_comp->surface_->texture_path_);
                 break;
             }
         }
@@ -529,9 +523,21 @@ size_t RenderSystem::addSkybox(Skybox skybox)
 size_t RenderSystem::createMesh(std::string file, std::string textureFolder,
     TransformComponent tc)
 {
-    std::shared_ptr<Mesh> mesh = ResourceManager::GetInstance().GetRenderEntity<Mesh>(RenderType::RT_Mesh);
-    if (!mesh->loadOBJ(file, textureFolder)) {
-        return -1;
+    std::shared_ptr<Mesh> mesh;
+
+    auto file_path = ResourceManager::GetInstance().FindFilePath(file);
+    auto texture_path = ResourceManager::GetInstance().FindFilePath(textureFolder);
+
+    mesh = ResourceManager::GetInstance().FindMesh(file_path);
+
+    if (!mesh) {
+        mesh = ResourceManager::GetInstance().FindEntity<Mesh>(RenderType::RT_Mesh);
+
+        if (!mesh->loadOBJ(*file_path, *texture_path)) {
+            return -1;
+        }
+
+        ResourceManager::GetInstance().StoreMesh(file_path, mesh);
     }
     
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -564,9 +570,10 @@ size_t RenderSystem::createTerrain(TransformComponent tc,
     const float height_mult, const float size, 
     const bool is_centered, const bool use_perlin_noise){
 
-    std::shared_ptr<Terrain> terrain = ResourceManager::GetInstance().GetRenderEntity<Terrain>(RenderType::RT_Terrain);
+    std::shared_ptr<Terrain> terrain = ResourceManager::GetInstance().FindEntity<Terrain>(RenderType::RT_Terrain);
+    auto tex_file = ResourceManager::GetInstance().FindFilePath("../stages/assets/textures/images/grass.png");
 
-    terrain->setTexture("../stages/assets/textures/images/grass.png");
+    terrain->setTexture(*tex_file);
     terrain->init(num_cols, num_rows, height_mult, size, is_centered, use_perlin_noise);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -597,9 +604,10 @@ size_t RenderSystem::createWater(TransformComponent tc,
     const int num_cols, const int num_rows, const float size,
     const bool is_centered) {
 
-    std::shared_ptr<Terrain> water = ResourceManager::GetInstance().GetRenderEntity<Terrain>(RenderType::RT_Water);
+    std::shared_ptr<Terrain> water = ResourceManager::GetInstance().FindEntity<Terrain>(RenderType::RT_Water);
+    auto tex_file = ResourceManager::GetInstance().FindFilePath("../stages/assets/textures/images/blue.png");
 
-    water->setTexture("../stages/assets/textures/images/blue.png");
+    water->setTexture(*tex_file);
     water->init(num_cols, num_rows, 0.0f, size, is_centered, true);
     water->wave_.use_wave_ = true;
 
@@ -629,9 +637,10 @@ size_t RenderSystem::createWater(TransformComponent tc,
 
 size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int num_revs_, float size)
 {
-    std::shared_ptr<Sphere> sphere = ResourceManager::GetInstance().GetRenderEntity<Sphere>(RenderType::RT_Sphere);
-
-    sphere->setTexture("../stages/assets/textures/images/blue.png");
+    std::shared_ptr<Sphere> sphere = ResourceManager::GetInstance().FindEntity<Sphere>(RenderType::RT_Sphere);
+    auto tex_file = ResourceManager::GetInstance().FindFilePath("../stages/assets/textures/images/blue.png");
+    
+    sphere->setTexture(*tex_file);
     sphere->init(size, num_heights_, num_revs_);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -661,9 +670,10 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
 
 size_t RenderSystem::createSurface(std::vector<float> surface_points, TransformComponent tc, const int num_heights, const int num_revs)
 {
-    std::shared_ptr<Surface> surface = ResourceManager::GetInstance().GetRenderEntity<Surface>(RenderType::RT_Surface);
+    std::shared_ptr<Surface> surface = ResourceManager::GetInstance().FindEntity<Surface>(RenderType::RT_Surface);
+    auto tex_file = ResourceManager::GetInstance().FindFilePath("../stages/assets/textures/images/blue.png");
 
-    surface->setTexture("../stages/assets/textures/images/blue.png");
+    surface->setTexture(*tex_file);
     surface->init(surface_points, num_heights, num_revs);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -693,9 +703,10 @@ size_t RenderSystem::createSurface(std::vector<float> surface_points, TransformC
 
 size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool is_centered)
 {
-    std::shared_ptr<Cube> cube = ResourceManager::GetInstance().GetRenderEntity<Cube>(RenderType::RT_Cube8v);
-    
-    cube->setTexture("../stages/assets/textures/images/blue.png");
+    std::shared_ptr<Cube> cube = ResourceManager::GetInstance().FindEntity<Cube>(RenderType::RT_Cube8v);
+    auto tex_file = ResourceManager::GetInstance().FindFilePath("../stages/assets/textures/images/blue.png");
+
+    cube->setTexture(*tex_file);
     cube->init8v(size, is_centered);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -724,9 +735,10 @@ size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool 
 
 size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
 {
-    std::shared_ptr<Cube> cube = ResourceManager::GetInstance().GetRenderEntity<Cube>(RenderType::RT_Cube24v);
+    std::shared_ptr<Cube> cube = ResourceManager::GetInstance().FindEntity<Cube>(RenderType::RT_Cube24v);
+    auto tex_file = ResourceManager::GetInstance().FindFilePath("../stages/assets/textures/images/blue.png");
 
-    cube->setTexture("../stages/assets/textures/images/blue.png");
+    cube->setTexture(*tex_file);
     cube->init24v(size);
 
     ecs_.add_component<IdentifierComponent>(entity_);
@@ -755,9 +767,10 @@ size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
 
 size_t RenderSystem::createQuad(TransformComponent tc, const float size)
 {
-    std::shared_ptr<Quad> quad = ResourceManager::GetInstance().GetRenderEntity<Quad>(RenderType::RT_Quad);
-    
-    quad->setTexture("../stages/assets/textures/images/blue.png");
+    std::shared_ptr<Quad> quad = ResourceManager::GetInstance().FindEntity<Quad>(RenderType::RT_Quad);
+    auto tex_file = ResourceManager::GetInstance().FindFilePath("../stages/assets/textures/images/blue.png");
+
+    quad->setTexture(*tex_file);
     quad->init(size);
 
     ecs_.add_component<IdentifierComponent>(entity_);
