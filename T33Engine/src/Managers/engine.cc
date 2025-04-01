@@ -1,13 +1,8 @@
 #include "Managers/engine.h"
 
-//CloudsModel cm;
 
 
-//VolumetricClouds volumetricClouds(800, 600, &cm);
-//VolumetricClouds reflectionVolumetricClouds(1280, 720, &cm);
 
-//ScreenSpaceShader PostProcessing_("shaders/post_processing.frag");
-//ScreenSpaceShader fboVisualizer("shaders/visualizeFbo.frag");
 
 Engine::Engine(Window& window, Input& input) :
 	window(window),
@@ -22,10 +17,13 @@ Engine::Engine(Window& window, Input& input) :
 	currentTime(0.0)
 {
 	
+
+
 }
 
 Engine::~Engine()
 {
+
 }
 
 void Engine::init()
@@ -46,6 +44,7 @@ void Engine::init()
 
 	render_system.deferred.init();
 	render_system.grid.initGrid();
+
 
 	
 	
@@ -74,43 +73,9 @@ void Engine::beginFrame()
 	}
 	else {
 		render_system.forwardRender(input, dt);
-		/*
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-
-		glClearColor(0.5f, 0.6f, 0.7f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-
-
-
-		Shader2& post = PostProcessing_.getShader();
-
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-
-
-		ScreenSpaceShader::disableTests();
-
-		volumetricClouds.draw(*this);
-		unbindCurrentFrameBuffer();
 		
-
-		post.use();
-		post.setVec2("resolution", glm::vec2(800, 600));
 		
-		PostProcessing_.draw();
-		*/
+		
 
 	}
 
@@ -118,7 +83,7 @@ void Engine::beginFrame()
 
 	scripting_system.update((float)dt);
 
-	ui_manager.Render();
+	//ui_manager.Render();
 
 	lastTime = currentTime;
 }

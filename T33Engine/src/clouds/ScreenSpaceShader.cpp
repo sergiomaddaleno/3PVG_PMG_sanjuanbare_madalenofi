@@ -10,7 +10,7 @@ ScreenSpaceShader::ScreenSpaceShader(const char * fragmentPath)
 	//shad = new Shader("shaders/screen.vert", fragmentPath);
 	shad = new Shader2("ScreenQuad_" + getShaderName(fragmentPath));
 
-	shad->attachShader(BaseShader("shaders/screen.vert"));
+	shad->attachShader(BaseShader("../src/clouds/screen.vert"));
 	shad->attachShader(BaseShader(fragmentPath));
 	shad->linkPrograms();
 }

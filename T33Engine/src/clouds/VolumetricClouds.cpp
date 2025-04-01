@@ -38,7 +38,7 @@ void VolumetricClouds::draw(Engine& s) {
 			glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 
-			cloudsShader.setVec2("iResolution", glm::vec2(SCR_WIDTH, SCR_HEIGHT));
+			cloudsShader.setVec2("iResolution", glm::vec2(800, 600));
 			cloudsShader.setFloat("iTime", glfwGetTime());
 			cloudsShader.setMat4("inv_proj", glm::inverse(camera_comp->camera.getPerspectiveMatrix()));
 			cloudsShader.setMat4("inv_view", glm::inverse(camera_comp->camera.getViewMatrix()));

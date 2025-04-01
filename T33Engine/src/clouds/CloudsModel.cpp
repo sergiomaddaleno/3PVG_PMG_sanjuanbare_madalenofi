@@ -1,6 +1,6 @@
 #include "CloudsModel.h"
 
-#include "../clouds/texture.h"
+#include "texture.h"
 
 
 
@@ -14,11 +14,11 @@ CloudsModel::CloudsModel()
 
 void CloudsModel::initShaders()
 {
-	volumetricCloudsShader = new Shader2("volumetricCloudsShader", "shaders/volumetric_clouds.comp");
-	postProcessingShader = new ScreenSpaceShader("shaders/clouds_post.frag");
+	volumetricCloudsShader = new Shader2("volumetricCloudsShader", "../src/clouds/volumetric_clouds.comp");
+	postProcessingShader = new ScreenSpaceShader("../src/clouds/clouds_post.frag");
 	//compute shaders
-	weatherShader = new Shader2("weatherMap");
-	weatherShader->attachShader("shaders/weather.comp");
+	weatherShader = new Shader2("../src/clouds/weatherMap");
+	weatherShader->attachShader("../src/clouds/weather.comp");
 	weatherShader->linkPrograms();
 }
 
@@ -28,7 +28,7 @@ void CloudsModel::generateModelTextures()
 	if (!perlinTex) {
 		//compute shaders
 		Shader2 comp("perlinWorley");
-		comp.attachShader("shaders/perlinworley.comp");
+		comp.attachShader("../src/clouds/perlinworley.comp");
 		comp.linkPrograms();
 
 		//make texture
@@ -50,7 +50,7 @@ void CloudsModel::generateModelTextures()
 	if (!worley32) {
 		//compute shaders
 		Shader2 worley_git("worleyComp");
-		worley_git.attachShader("shaders/worley.comp");
+		worley_git.attachShader("../src/clouds/worley.comp");
 		worley_git.linkPrograms();
 
 		//make texture
@@ -91,26 +91,26 @@ CloudsModel::~CloudsModel()
 
 void CloudsModel::update()
 {
-	/*
-	seed = scene->seed;
+	
+	//seed = scene->seed;
 	if (seed != oldSeed) {
 		generateWeatherMap();
 		oldSeed = seed;
 	}
-	*/
+	
 }
 
 void CloudsModel::generateWeatherMap() {
-	/*
+	
 	bindTexture2D(weatherTex, 0);
 	weatherShader->use();
-	weatherShader->setVec3("seed", scene->seed);
+	//weatherShader->setVec3("seed", scene->seed);
 	weatherShader->setFloat("perlinFrequency", perlinFrequency);
 	std::cout << "computing weather!" << std::endl;
 	glDispatchCompute(INT_CEIL(1024, 8), INT_CEIL(1024, 8), 1);
 	std::cout << "weather computed!!" << std::endl;
 
-	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT); */
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT); 
 }
 
 void CloudsModel::initVariables()
