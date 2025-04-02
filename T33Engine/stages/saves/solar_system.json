@@ -1,26 +1,4 @@
 {
- "Camera": {
-  "Aspect_ratio": 1.7769999504089355,
-  "Far_clip_plane": 1000.0,
-  "Fov": 45.0,
-  "Near_clip_plane": 0.10000000149011612,
-  "Ortho_height": 600.0,
-  "Ortho_width": 800.0,
-  "Position": [
-   -31.523983001708984,
-   21.030345916748047,
-   35.923583984375
-  ],
-  "Scroll_speed": 1.0,
-  "Sensitivity": 1.0,
-  "Speed": 35.78099822998047,
-  "Use_perspective_matrix": true,
-  "View_direction": [
-   0.7231448292732239,
-   -0.359899640083313,
-   0.5895199775695801
-  ]
- },
  "Entities": [
   {
    "Hierarchy_component": {
@@ -53,7 +31,7 @@
     "Position": [
      0.0,
      1.1440868377685547,
-     0.0
+     -7.598519325256348
     ],
     "Rotation": [
      0.0,
@@ -91,8 +69,8 @@
    "Transform_component": {
     "Position": [
      0.0,
-     1.1440868377685547,
-     41.07158279418945
+     4.576347351074219,
+     25.87454605102539
     ],
     "Rotation": [
      0.0,
@@ -130,8 +108,8 @@
    "Transform_component": {
     "Position": [
      0.0,
-     1.1440868377685547,
-     46.59817886352539
+     4.576347351074219,
+     31.401142120361328
     ],
     "Rotation": [
      0.0,
@@ -171,8 +149,8 @@
    "Transform_component": {
     "Position": [
      -0.5028569102287292,
-     1.1440868377685547,
-     52.05475616455078
+     4.576347351074219,
+     36.85771942138672
     ],
     "Rotation": [
      0.0,
@@ -210,8 +188,8 @@
    "Transform_component": {
     "Position": [
      0.0,
-     1.1440868377685547,
-     59.655033111572266
+     4.576347351074219,
+     44.4579963684082
     ],
     "Rotation": [
      0.0,
@@ -249,8 +227,8 @@
    "Transform_component": {
     "Position": [
      0.0,
-     1.1440868377685547,
-     78.58647918701172
+     4.576347351074219,
+     63.389442443847656
     ],
     "Rotation": [
      0.0,
@@ -288,8 +266,8 @@
    "Transform_component": {
     "Position": [
      0.0,
-     1.1440868377685547,
-     113.15526580810547
+     4.576347351074219,
+     97.9582290649414
     ],
     "Rotation": [
      0.0,
@@ -327,8 +305,8 @@
    "Transform_component": {
     "Position": [
      0.0,
-     1.1440868377685547,
-     137.22422790527344
+     4.576347351074219,
+     122.02718353271484
     ],
     "Rotation": [
      0.0,
@@ -366,8 +344,8 @@
    "Transform_component": {
     "Position": [
      0.0,
-     1.1440868377685547,
-     157.0464324951172
+     4.576347351074219,
+     141.84938049316406
     ],
     "Rotation": [
      0.0,
@@ -404,9 +382,9 @@
    },
    "Transform_component": {
     "Position": [
-     -0.02209329605102539,
-     2.57361102104187,
-     55.5604133605957
+     -1.5306639671325684,
+     12.870392799377441,
+     188.92913818359375
     ],
     "Rotation": [
      0.0,
@@ -422,99 +400,85 @@
    }
   },
   {
+   "Camera_component": {
+    "camera": {
+     "Aspect_ratio": 1.7777777910232544,
+     "Far_clip_plane": 644.3690185546875,
+     "Fov": 45.0,
+     "Near_clip_plane": 0.10000000149011612,
+     "Ortho_height": 45.0,
+     "Ortho_width": 45.0,
+     "Position": [
+      -90.5272216796875,
+      34.71088790893555,
+      54.678077697753906
+     ],
+     "Scroll_speed": 1.0,
+     "Sensitivity": 1.0,
+     "Speed": 40.96099853515625,
+     "Use_perspective_matrix": true,
+     "View_direction": [
+      0.9347391724586487,
+      0.0043654730543494225,
+      -0.3553077280521393
+     ]
+    }
+   },
    "Hierarchy_component": {
     "Child": [],
     "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 10,
-    "Entity_name": "Directional Light [1]"
+    "Entity_name": "Camera [0]"
    },
-   "Light_component": {
-    "light": {
-     "Ambient_color": [
-      [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
-      ]
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 11,
+    "Entity_name": "Skybox [0]"
+   },
+   "Skybox_component": {
+    "skybox": {
+     "Cubemap_file_paths": [
+      "../stages\\assets\\textures\\skybox\\cubemap\\space\\right.png",
+      "../stages\\assets\\textures\\skybox\\cubemap\\space\\left.png",
+      "../stages\\assets\\textures\\skybox\\cubemap\\space\\bottom.png",
+      "../stages\\assets\\textures\\skybox\\cubemap\\space\\top.png",
+      "../stages\\assets\\textures\\skybox\\cubemap\\space\\front.png",
+      "../stages\\assets\\textures\\skybox\\cubemap\\space\\back.png"
      ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       0.0,
-       0.0,
-       1.0
-      ]
-     ],
-     "Light_color": [
-      [
-       10.0,
-       10.0,
-       10.0
-      ]
-     ],
-     "Linear_attenuation": [
-      0.0
-     ],
-     "Position": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Quadratic_attenuation": [
-      0.0
-     ],
-     "Shininnes": [
-      34.0
-     ],
-     "Specular_color": [
-      [
-       1.0,
-       1.0,
-       0.949999988079071
-      ]
-     ],
-     "Spot_angle": [
-      0.0
-     ],
-     "Spot_softness": [
-      0.0
-     ],
-     "Strength": [
-      0.0
-     ],
-     "Type": 0
+     "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
+     "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
+     "DDS_angle": -90.0,
+     "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
+     "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
+     "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
+     "Use_cubemap": true
     }
    }
   }
- ],
- "Skybox": {
-  "Cubemap_file_paths": [
-   "../stages\\assets\\textures\\skybox\\cubemap\\space\\right.png",
-   "../stages\\assets\\textures\\skybox\\cubemap\\space\\left.png",
-   "../stages\\assets\\textures\\skybox\\cubemap\\space\\bottom.png",
-   "../stages\\assets\\textures\\skybox\\cubemap\\space\\top.png",
-   "../stages\\assets\\textures\\skybox\\cubemap\\space\\front.png",
-   "../stages\\assets\\textures\\skybox\\cubemap\\space\\back.png"
-  ],
-  "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
-  "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
-  "DDS_angle": -90.0,
-  "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
-  "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
-  "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
-  "Use_cubemap": true
- }
+ ]
 }
