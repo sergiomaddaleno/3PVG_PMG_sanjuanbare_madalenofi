@@ -102,6 +102,7 @@ private:
 
     Shader new_pp_shader;
     bool post_process_compiled;
+
 };
 
 #endif // __UI_MANAGER__

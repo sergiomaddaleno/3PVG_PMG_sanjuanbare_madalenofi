@@ -44,6 +44,8 @@
 
 ImGui::FileBrowser fileDialog;
 
+static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+
 UIManager::UIManager(Engine& engine, ECSManager& ecs, RenderSystem& rs)
     : selected_entity(0),
     m_BaseDirectory("../"),
@@ -720,10 +722,6 @@ void UIManager::InspectorWindow() {
                     }
                 }
 
-                ImGui::Dummy(ImVec2(0.0f, 2.0f));
-                ImGui::Separator();
-                ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
                 ImGui::Columns(4, "TransformColumns", true);
 
                 ImGui::TextUnformatted(" ");
@@ -809,20 +807,11 @@ void UIManager::InspectorWindow() {
                         if (filePath.extension() == ".fs") {
                             fragment_file_path = filePath.string();
                             fragment_file_name = filePath.filename().string();
+
+                            initShader(rs_.shader, vertex_file_path, fragment_file_path);
                         }
                     }
                     ImGui::EndDragDropTarget();
-                }
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-                if (ImGui::Button("Compile Shader")) {
-
-                    initShader(rs_.shader, vertex_file_path, fragment_file_path);
-
-                    vertex_file_path.clear();
-                    vertex_file_name.clear();
-                    fragment_file_path.clear();
-                    fragment_file_name.clear();
                 }
                 ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
@@ -865,7 +854,7 @@ void UIManager::InspectorWindow() {
 
                 static std::string texture_file_path;
                 static std::string texture_file_name;
-                if (ImGui::Button(!texture_file_path.empty() ? texture_file_name.c_str() : ".png/.jpg drop texture here", { 200.0f, 40.0f })) {}
+                if (ImGui::Button((!texture_file_path.empty() ? texture_file_name + "##Tex" : ".png/.jpg drop texture here##Tex").c_str(), { 200.0f, 40.0f })) {}
 
                 if (ImGui::BeginDragDropTarget()) {
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -873,43 +862,33 @@ void UIManager::InspectorWindow() {
                         if ((filePath.extension() == ".png") || (filePath.extension() == ".jpg")) {
                             texture_file_path = filePath.string();
                             texture_file_name = filePath.filename().string();
+
+                            switch (render_comp->type_) {
+                            case RenderType::RT_Mesh:
+                                break;
+                            case RenderType::RT_Terrain:
+                                render_comp->terrain_->setTexture(texture_file_path);
+                                break;
+                            case RenderType::RT_Water:
+                                render_comp->water_->setTexture(texture_file_path);
+                                break;
+                            case RenderType::RT_Sphere:
+                                render_comp->sphere_->setTexture(texture_file_path);
+                                break;
+                            case RenderType::RT_Surface:
+                                render_comp->surface_->setTexture(texture_file_path);
+                                break;
+                            case RenderType::RT_Quad:
+                                render_comp->quad_->setTexture(texture_file_path);
+                                break;
+                            case RenderType::RT_Cube8v:
+                            case RenderType::RT_Cube24v:
+                                render_comp->cube_->setTexture(texture_file_path);
+                                break;
+                            }
                         }
                     }
                     ImGui::EndDragDropTarget();
-                }
-
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-                if (ImGui::Button("Compile Texture")) {
-
-                    switch (render_comp->type_) {
-                    case RenderType::RT_Mesh:
-                        break;
-
-                    case RenderType::RT_Terrain:
-                        render_comp->terrain_->setTexture(texture_file_path);
-                        break;
-                    case RenderType::RT_Water:
-                        render_comp->water_->setTexture(texture_file_path);
-                        break;
-                    case RenderType::RT_Sphere:
-                        render_comp->sphere_->setTexture(texture_file_path);
-                        break;
-                    case RenderType::RT_Surface:
-                        render_comp->surface_->setTexture(texture_file_path);
-                        break;
-                    case RenderType::RT_Quad:
-                        render_comp->quad_->setTexture(texture_file_path);
-                        break;
-
-                    case RenderType::RT_Cube8v:
-                    case RenderType::RT_Cube24v:
-                        render_comp->cube_->setTexture(texture_file_path);
-                        break;
-                    }
-
-                    texture_file_path.clear();
-                    texture_file_name.clear();
                 }
 
                 ImGui::Dummy(ImVec2(0.0f, 5.0f));
@@ -942,7 +921,7 @@ void UIManager::InspectorWindow() {
                     static std::string normalmap_file_path;
                     static std::string normalmap_file_name;
 
-                    if (ImGui::Button(!normalmap_file_path.empty() ? normalmap_file_name.c_str() : ".png/.jpg drop normal here", { 200.0f, 40.0f })) {}
+                    if (ImGui::Button((!normalmap_file_path.empty() ? normalmap_file_name + "##Normal" : ".png/.jpg drop normal here##Normal").c_str(), { 200.0f, 40.0f })) {}
 
                     if (ImGui::BeginDragDropTarget()) {
                         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -950,17 +929,11 @@ void UIManager::InspectorWindow() {
                             if ((filePath.extension() == ".png") || (filePath.extension() == ".jpg")) {
                                 normalmap_file_path = filePath.string();
                                 normalmap_file_name = filePath.filename().string();
+
+                                render_comp->quad_->setNormalMap(normalmap_file_path);
                             }
                         }
                         ImGui::EndDragDropTarget();
-                    }
-                    ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-                    if (ImGui::Button("Compile Normal map")) {
-                        render_comp->quad_->setNormalMap(normalmap_file_path);
-
-                        normalmap_file_path.clear();
-                        normalmap_file_name.clear();
                     }
 
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
@@ -1031,7 +1004,7 @@ void UIManager::InspectorWindow() {
                     static std::string parallaxmap_file_path;
                     static std::string parallaxmap_file_name;
 
-                    if (ImGui::Button(!parallaxmap_file_path.empty() ? parallaxmap_file_name.c_str() : ".png/.jpg drop parallax here", { 200.0f, 40.0f })) {}
+                    if (ImGui::Button((!parallaxmap_file_path.empty() ? parallaxmap_file_name + "##Parallax" : ".png/.jpg drop parallax here##Parallax").c_str(), { 200.0f, 40.0f })) {}
 
                     if (ImGui::BeginDragDropTarget()) {
                         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -1039,17 +1012,11 @@ void UIManager::InspectorWindow() {
                             if ((filePath.extension() == ".png") || (filePath.extension() == ".jpg")) {
                                 parallaxmap_file_path = filePath.string();
                                 parallaxmap_file_name = filePath.filename().string();
+
+                                render_comp->quad_->setParallaxMap(parallaxmap_file_path);
                             }
                         }
                         ImGui::EndDragDropTarget();
-                    }
-                    ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-                    if (ImGui::Button("Compile Parallax map")) {
-                        render_comp->quad_->setParallaxMap(parallaxmap_file_path);
-
-                        parallaxmap_file_path.clear();
-                        parallaxmap_file_name.clear();
                     }
                 }
 
@@ -1074,18 +1041,26 @@ void UIManager::InspectorWindow() {
                     static bool temp_is_centered = terrain.is_centered_;
                     static bool temp_use_pn = terrain.use_perlin_noise_;
 
-                    ImGui::InputInt("Number of Columns", &temp_num_cols);
-                    ImGui::InputInt("Number of Rows", &temp_num_rows);
-                    ImGui::SliderFloat("Height Multiplier", &temp_hm, 0.0f, 10.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
-                    ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
-                    ImGui::Checkbox("Is Centered", &temp_is_centered);
-                    ImGui::Checkbox("Perlin Noise / Heightmap", &temp_use_pn);
+                    bool updated = false;
+
+                    updated |= ImGui::InputInt("Number of Columns", &temp_num_cols);
+                    updated |= ImGui::InputInt("Number of Rows", &temp_num_rows);
+                    updated |= ImGui::SliderFloat("Height Multiplier", &temp_hm, 0.0f, 10.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
+                    updated |= ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
+                    updated |= ImGui::Checkbox("Is Centered", &temp_is_centered);
+                    updated |= ImGui::Checkbox("Perlin Noise / Heightmap", &temp_use_pn);
+
+                    if (updated) {
+                        terrain.init(temp_num_cols, temp_num_rows, temp_hm,
+                            temp_size, temp_is_centered, temp_use_pn);
+                        terrain.bind();
+                    }
 
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
                     static std::string hm_file_path;
                     static std::string hm_file_name;
-                    if (ImGui::Button(!hm_file_path.empty() ? hm_file_name.c_str() : "Heightmap drop here", { 200.0f, 40.0f })) {}
+                    if (ImGui::Button((!hm_file_path.empty() ? hm_file_name + "##HM" : "Heightmap drop here##HM").c_str(), { 200.0f, 40.0f })) {}
 
                     if (ImGui::BeginDragDropTarget()) {
                         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -1093,157 +1068,111 @@ void UIManager::InspectorWindow() {
                             if ((filePath.extension() == ".png") || (filePath.extension() == ".jpg")) {
                                 hm_file_path = filePath.string();
                                 hm_file_name = filePath.filename().string();
+
+                                terrain.setHeightMap(hm_file_path);
+                                terrain.init(temp_num_cols, temp_num_rows, temp_hm,temp_size, temp_is_centered, temp_use_pn);
                             }
                         }
                         ImGui::EndDragDropTarget();
                     }
 
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-                    if (ImGui::Button("Apply Changes")) {
-
-                        if (!hm_file_path.empty()) {
-                            render_comp->terrain_->setHeightMap(hm_file_path);
-                        }
-
-                        terrain.init(temp_num_cols, temp_num_rows, temp_hm,
-                            temp_size, temp_is_centered, temp_use_pn);
-
-                        terrain.bind();
-                    }
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
                     break;
                 }
+
                 case ::RT_Water:
                 {
                     ImGui::Separator();
-
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     ImGui::SliderFloat("Alpha", &rs_.alpha_blend, 0.0f, 1.0f, "%0.03f");
                     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     ImGui::Text("Water Dimensions");
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
                     auto& water = *ecs_.get_component<RenderComponent>(selected_entity)->water_;
-
                     static int temp_num_cols = water.num_cols_;
                     static int temp_num_rows = water.num_rows_;
                     static float temp_size = water.size_;
                     static bool temp_is_centered = water.is_centered_;
 
-                    ImGui::InputInt("Number of Columns", &temp_num_cols);
-                    ImGui::InputInt("Number of Rows", &temp_num_rows);
-                    ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
-                    ImGui::Checkbox("Is Centered", &temp_is_centered);
+                    bool updated = false;
+                    updated |= ImGui::InputInt("Number of Columns", &temp_num_cols);
+                    updated |= ImGui::InputInt("Number of Rows", &temp_num_rows);
+                    updated |= ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
+                    updated |= ImGui::Checkbox("Is Centered", &temp_is_centered);
 
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-                    if (ImGui::Button("Apply Changes")) {
-
-                        water.init(temp_num_cols, temp_num_rows, 1.0f,
-                            temp_size, temp_is_centered, true);
-
+                    if (updated) {
+                        water.init(temp_num_cols, temp_num_rows, 1.0f, temp_size, temp_is_centered, true);
                         water.bind();
                     }
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
                     break;
                 }
                 case ::RT_Sphere:
                 {
                     ImGui::Separator();
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     ImGui::Text("Sphere Dimensions");
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
                     auto& sphere = *ecs_.get_component<RenderComponent>(selected_entity)->sphere_;
-
                     static int temp_num_heights = sphere.num_heights_;
                     static int temp_num_revs = sphere.num_revs_;
                     static float temp_size = sphere.size_;
 
-                    ImGui::InputInt("Number of Heights", &temp_num_heights);
-                    ImGui::InputInt("Number of Revolutions", &temp_num_revs);
-                    ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
+                    bool updated = false;
+                    updated |= ImGui::InputInt("Number of Heights", &temp_num_heights);
+                    updated |= ImGui::InputInt("Number of Revolutions", &temp_num_revs);
+                    updated |= ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
 
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-                    if (ImGui::Button("Apply Changes")) {
+                    if (updated) {
                         sphere.init(temp_size, temp_num_heights, temp_num_revs);
                         sphere.bind();
                     }
-
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     break;
                 }
                 case ::RT_Cube8v:
                 {
                     ImGui::Separator();
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     ImGui::Text("Cube8v Dimensions");
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
                     auto& cube = *ecs_.get_component<RenderComponent>(selected_entity)->cube_;
                     static float temp_size = cube.size_;
                     static bool temp_is_centered = cube.is_centered_;
 
-                    ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
-                    ImGui::Checkbox("Is Centered", &temp_is_centered);
+                    bool updated = false;
+                    updated |= ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
+                    updated |= ImGui::Checkbox("Is Centered", &temp_is_centered);
 
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-                    if (ImGui::Button("Apply Changes")) {
+                    if (updated) {
                         cube.init8v(temp_size, temp_is_centered);
                         cube.bind();
                     }
-
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     break;
                 }
                 case ::RT_Cube24v:
                 {
                     ImGui::Separator();
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     ImGui::Text("Cube24v Dimensions");
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
                     auto& cube = *ecs_.get_component<RenderComponent>(selected_entity)->cube_;
                     static float temp_size = cube.size_;
-                    ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
 
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-                    if (ImGui::Button("Apply Changes")) {
+                    if (ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f")) {
                         cube.init24v(temp_size);
                         cube.bind();
                     }
-
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     break;
                 }
                 case ::RT_Quad:
                 {
                     ImGui::Separator();
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     ImGui::Text("Quad Dimensions");
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
                     auto& quad = *ecs_.get_component<RenderComponent>(selected_entity)->quad_;
-
                     static float temp_size = quad.size_;
-                    ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f");
 
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-                    if (ImGui::Button("Apply Changes")) {
+                    if (ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f")) {
                         quad.init(temp_size);
                         quad.bind();
                     }
-
-                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     break;
                 }
                 }
@@ -2123,6 +2052,32 @@ void UIManager::TopBarWindow() {
             }
         }
 
+        ImGui::SameLine();
+        ImGui::Spacing();
+        ImGui::SameLine();
+        ImVec2 p = ImGui::GetCursorScreenPos();
+        ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x, p.y), ImVec2(p.x, p.y + ImGui::GetTextLineHeight()), IM_COL32(255, 255, 255, 255), 1.0f);
+        ImGui::SameLine();
+
+        ImGui::Spacing();
+        ImGui::Spacing();
+
+        if (selected_entity >= 0) {
+            ImGui::Dummy({ 0.0f, 5.0f });
+            if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE)) {
+                mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+            }
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE)) {
+                mCurrentGizmoOperation = ImGuizmo::ROTATE;
+            }
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE)) {
+                mCurrentGizmoOperation = ImGuizmo::SCALE;
+            }
+            ImGui::Dummy({ 0.0f, 5.0f });
+        }
+
         if (show_fps) {
             ImGui::SameLine();
             ImGui::Spacing();
@@ -2417,11 +2372,6 @@ void UIManager::AddMeshWindow()
 
             ResetIds();
             AddConsoleMessage(obj_file_name + " added to scene");
-
-            obj_file_path.clear();
-            obj_file_name.clear();
-            texture_folder_path.clear();
-            texture_folder_name.clear();
         }
     }
 
@@ -2560,11 +2510,6 @@ void UIManager::AddEntitiesTerrainWindow()
 
             ResetIds();
             AddConsoleMessage(obj_file_name + " added to scene");
-
-            obj_file_path.clear();
-            obj_file_name.clear();
-            texture_folder_path.clear();
-            texture_folder_name.clear();
         }
     }
     else {
@@ -2583,7 +2528,6 @@ void UIManager::AddEntitiesTerrainWindow()
 
 void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity) {
 
-    static ImGuizmo::OPERATION mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
     static bool useSnap = false;
     static float snap[3] = { 1.0f, 1.0f, 1.0f };
 
@@ -2654,38 +2598,22 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
                     transform->rotation = rotation;
                     transform->scale = scale;
                 }
+
+                if (!input_->isMouseButtonDown(Input::MOUSE_RIGHT)) {
+                    if (input_->isKeyPressed(Input::Q) && selected_entity) {
+                        mCurrentGizmoOperation = ImGuizmo::SCALE;
+                    }
+
+                    if (input_->isKeyPressed(Input::W) && selected_entity) {
+                        mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+                    }
+
+                    if (input_->isKeyPressed(Input::E) && selected_entity) {
+                        mCurrentGizmoOperation = ImGuizmo::ROTATE;
+                    }
+                }
             }
         }     
-    }
-    ImGui::End();
-
-    if (ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoTitleBar)) {
-        if (selected_entity >= 0) {
-            ImGui::Dummy({ 0.0f, 5.0f });
-            if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
-                mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-            ImGui::SameLine();
-            if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
-                mCurrentGizmoOperation = ImGuizmo::ROTATE;
-            ImGui::SameLine();
-            if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
-                mCurrentGizmoOperation = ImGuizmo::SCALE;
-            ImGui::Dummy({ 0.0f, 5.0f });
-
-            if (!input_->isMouseButtonDown(Input::MOUSE_RIGHT)) {
-                if (input_->isKeyPressed(Input::Q) && selected_entity) {
-                    mCurrentGizmoOperation = ImGuizmo::SCALE;
-                }
-
-                if (input_->isKeyPressed(Input::W) && selected_entity) {
-                    mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-                }
-
-                if (input_->isKeyPressed(Input::E) && selected_entity) {
-                    mCurrentGizmoOperation = ImGuizmo::ROTATE;
-                }
-            }
-        }
     }
     ImGui::End();
 }
