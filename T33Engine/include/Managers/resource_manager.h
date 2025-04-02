@@ -13,18 +13,13 @@ class ResourceManager {
 
 public:
 
-	static ResourceManager& GetInstance() {
-		static ResourceManager instance;
-		return instance;
-	}
+	static ResourceManager& GetInstance();
 
 	std::shared_ptr<std::string> FindFilePath(const std::string& file_path);
 
 	std::shared_ptr<Mesh> FindMesh(const std::shared_ptr<std::string>& file_path, const std::shared_ptr<std::string>& texture_path);
 
 	void StoreMesh(const std::shared_ptr<std::string>& file_path, const std::shared_ptr<std::string>& texture_path, std::shared_ptr<Mesh> mesh);
-
-	//-- 
 
 	void clearMaps();
 
@@ -35,11 +30,11 @@ private:
 	ResourceManager(const ResourceManager&) = delete;
 	ResourceManager& operator=(const ResourceManager&) = delete;
 
-	template<typename T>
+	/*template<typename T>
 	static std::unordered_map<RenderType, std::shared_ptr<T>>& GetRenderEntityMap() {
 		static std::unordered_map<RenderType, std::shared_ptr<T>> entity_map;
 		return entity_map;
-	}
+	}*/
 
 	static std::unordered_map<std::string, std::shared_ptr<std::string>> file_path_map;
 	static std::unordered_map<std::string, std::shared_ptr<Mesh>> mesh_map;

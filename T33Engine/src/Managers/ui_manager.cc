@@ -388,9 +388,11 @@ void UIManager::HierarchyWindow() {
 
                         if (!manipulate_world) {
                             child_transform->local_position = child_transform->position - parent_transform->position;
+                            child_transform->local_rotation = child_transform->rotation - parent_transform->rotation;
                         }
                         else {
                             child_transform->position = parent_transform->position + child_transform->local_position;
+                            child_transform->rotation = parent_transform->rotation + child_transform->local_rotation;
                         }
                     }
                 }

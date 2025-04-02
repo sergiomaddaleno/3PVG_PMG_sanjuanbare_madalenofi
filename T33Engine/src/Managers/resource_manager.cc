@@ -25,6 +25,12 @@ std::shared_ptr<T> FindEntity(RenderType type) {
     return new_entity;
 }*/
 
+ResourceManager& ResourceManager::GetInstance()
+{
+    static ResourceManager instance;
+    return instance;
+}
+
 std::shared_ptr<std::string> ResourceManager::FindFilePath(const std::string& file_path)
 {
     auto& file_map = file_path_map;
@@ -75,7 +81,7 @@ void ResourceManager::clearMaps() {
     }
     file_path_map.clear();
 
-    for (auto& pair : GetRenderEntityMap<Mesh>()) {
+    /*for (auto& pair : GetRenderEntityMap<Mesh>()) {
         pair.second.reset();
     }
     GetRenderEntityMap<Mesh>().clear();
@@ -83,6 +89,6 @@ void ResourceManager::clearMaps() {
     for (auto& pair : GetRenderEntityMap<Sphere>()) {
         pair.second.reset();
     }
-    GetRenderEntityMap<Sphere>().clear();
+    GetRenderEntityMap<Sphere>().clear();*/
 }
 
