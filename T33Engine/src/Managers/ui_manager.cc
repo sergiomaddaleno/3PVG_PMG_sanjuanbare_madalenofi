@@ -68,9 +68,11 @@ UIManager::UIManager(Engine& engine, ECSManager& ecs, RenderSystem& rs)
     ecs_(ecs),
     rs_(rs),
     engine_(engine),
-    input_(nullptr),
-    manipulate_world(true)
+    input_(nullptr)
 {
+    manipulate_world.position = true;
+    manipulate_world.rotation = false;
+    manipulate_world.scale = false;
 }
 
 UIManager::~UIManager() {
@@ -206,9 +208,6 @@ void UIManager::Render() {
         if (add_surface_window) AddSurfaceWindow();
         if (l_system_window) LSystemWindow();
         if (add_entities_terrain_window) AddEntitiesTerrainWindow();
-    }
-    else {
-        UpdateHierarchyTransforms();
     }
 
     engine_.post_process.endRender();
@@ -386,13 +385,25 @@ void UIManager::HierarchyWindow() {
                         auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
                         auto& parent_transform = ecs_.get_component<TransformComponent>(parent_id);
 
-                        if (!manipulate_world) {
+                        if (!manipulate_world.position) {
                             child_transform->local_position = child_transform->position - parent_transform->position;
-                            child_transform->local_rotation = child_transform->rotation - parent_transform->rotation;
                         }
                         else {
                             child_transform->position = parent_transform->position + child_transform->local_position;
+                        }
+
+                        if (!manipulate_world.rotation) {
+                            child_transform->local_rotation = child_transform->rotation - parent_transform->rotation;
+                        }
+                        else {
                             child_transform->rotation = parent_transform->rotation + child_transform->local_rotation;
+                        }
+
+                        if (!manipulate_world.scale) {
+                            child_transform->local_scale = child_transform->scale - parent_transform->scale;
+                        }
+                        else {
+                            child_transform->scale = parent_transform->scale + child_transform->local_scale;
                         }
                     }
                 }
@@ -605,13 +616,13 @@ void UIManager::InspectorWindow() {
                 ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
                 const char* face_labels[6] = {
-                    "Right ", "Left  ",
-                    "Bottom", "Top   ",
-                    "Front ", "Back  "
+                    "Right  ", "Left   ",
+                    "Bottom ", "Top    ",
+                    "Front  ", "Back   "
                 };
 
-                static std::array<std::string, 6> cubemap_file_paths;
-                static std::array<std::string, 6> cubemap_file_names;
+                static std::vector<std::string> cubemap_file_paths(6);
+                static std::vector<std::string> cubemap_file_names(6);
                 static bool cubemap_generated = false;
 
                 for (int i = 0; i < 6; i++) {
@@ -620,19 +631,12 @@ void UIManager::InspectorWindow() {
                     ImGui::Text("%s:", face_labels[i]);
                     ImGui::SameLine();
 
-                    ImVec4 button_color = cubemap_file_paths[i].empty()
-                        ? ImVec4(0.3f, 0.3f, 0.3f, 1.0f) 
-                        : ImVec4(0.2f, 0.8f, 0.2f, 1.0f);
-
-                    ImGui::PushStyleColor(ImGuiCol_Button, button_color);
-
                     if (ImGui::Button(!cubemap_file_paths[i].empty()
                         ? cubemap_file_names[i].c_str()
                         : "Drop texture",
                         ImVec2(200, 40)))
                     {
                     }
-                    ImGui::PopStyleColor();
 
                     if (ImGui::BeginDragDropTarget()) {
                         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
@@ -653,18 +657,24 @@ void UIManager::InspectorWindow() {
                     cubemap_file_paths.end(),
                     [](const std::string& s) { return s.empty(); }))
                 {
-                    try {
                         skybox_comp->skybox.loadCubeMap(
                             { cubemap_file_paths.begin(), cubemap_file_paths.end() },
                             "../stages/shaders/skybox/skybox_cubemap.vs",
                             "../stages/shaders/skybox/skybox_cubemap.fs"
                         );
                         skybox_comp->skybox.initcubeMap();
-                        AddConsoleMessage("Cubemap successfully generated!");
+                        AddConsoleMessage("Cubemap compiled");
                         cubemap_generated = true;
-                    }
-                    catch (const std::exception& e) {
-                    }
+                }
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                ImGui::Separator();
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                if (ImGui::Button("Clear")) {
+                    cubemap_file_paths.assign(6, "");
+                    cubemap_file_names.assign(6, "");
+                    cubemap_generated = false;
                 }
 
                 ImGui::Dummy(ImVec2(0.0f, 3.0f));
@@ -717,7 +727,9 @@ void UIManager::InspectorWindow() {
                 auto ciend = ecs_.getComponentList<CameraComponent>().end();
 
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
-                ImGui::Checkbox("Manipulate World/Local", &manipulate_world);
+                ImGui::Checkbox("Manipulate position World/Local", &manipulate_world.position);
+                ImGui::Checkbox("Manipulate rotation World/Local", &manipulate_world.rotation);
+                ImGui::Checkbox("Manipulate scale World/Local", &manipulate_world.scale);
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 ImGui::Separator();
 
@@ -1084,6 +1096,7 @@ void UIManager::InspectorWindow() {
 
                                 terrain.setHeightMap(hm_file_path);
                                 terrain.init(temp_num_cols, temp_num_rows, temp_hm,temp_size, temp_is_centered, temp_use_pn);
+                                terrain.bind();
                             }
                         }
                         ImGui::EndDragDropTarget();
@@ -2579,7 +2592,7 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
                 float objectMatrix[16];
                 std::memcpy(objectMatrix, glm::value_ptr(model), sizeof(objectMatrix));
 
-                if (manipulate_world) {
+                if (manipulate_world.position || manipulate_world.rotation || manipulate_world.scale) {
                     ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
                         mCurrentGizmoOperation, ImGuizmo::WORLD,
                         objectMatrix, nullptr);
@@ -2685,36 +2698,4 @@ void UIManager::LSystemWindow() {
 
     ImGui::Dummy({ 0.0f, 5.0f });
     ImGui::End();
-}
-
-void UIManager::UpdateHierarchyTransforms() {
-    auto hi = ecs_.getComponentList<HierarchyComponent>().begin();
-    auto hiend = ecs_.getComponentList<HierarchyComponent>().end();
-
-    auto ti = ecs_.getComponentList<TransformComponent>().begin();
-    auto tiend = ecs_.getComponentList<TransformComponent>().end();
-
-    int entity_id = 0;
-
-    for (; hi != hiend; ++hi, entity_id++) {
-        if (hi->has_value()) {
-            auto& hierarchy_comp = *hi;
-
-            if (hierarchy_comp->hasParent()) {
-                int parent_id = hierarchy_comp->getParent();
-
-                if (ecs_.has_component<TransformComponent>(parent_id)) {
-                    auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
-                    auto& parent_transform = ecs_.get_component<TransformComponent>(parent_id);
-
-                    if (!manipulate_world) {
-                        child_transform->local_position = child_transform->position - parent_transform->position;
-                    }
-                    else {
-                        child_transform->position = parent_transform->position + child_transform->local_position;
-                    }
-                }
-            }
-        }
-    }
 }
