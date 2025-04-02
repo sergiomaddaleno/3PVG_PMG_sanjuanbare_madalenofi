@@ -601,22 +601,45 @@ void UIManager::InspectorWindow() {
                 ImGui::Dummy(ImVec2(0.0f, 5.0f));
                 ImGui::Text("Drag and Drop 6 Cubemap files");
                 ImGui::Dummy(ImVec2(0.0f, 5.0f));
-                ImGui::Text("Use this order: right, left, bottom, top, front, back");
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-                static std::vector<std::string> cubemap_file_paths(6);
-                static std::vector<std::string> cubemap_file_names(6);
+                const char* face_labels[6] = {
+                    "Right ", "Left  ",
+                    "Bottom", "Top   ",
+                    "Front ", "Back  "
+                };
+
+                static std::array<std::string, 6> cubemap_file_paths;
+                static std::array<std::string, 6> cubemap_file_names;
+                static bool cubemap_generated = false;
 
                 for (int i = 0; i < 6; i++) {
                     ImGui::PushID(i);
-                    if (ImGui::Button(!cubemap_file_paths[i].empty() ? cubemap_file_names[i].c_str() : "Cubemap file", { 200.0f, 40.0f })) {}
+
+                    ImGui::Text("%s:", face_labels[i]);
+                    ImGui::SameLine();
+
+                    ImVec4 button_color = cubemap_file_paths[i].empty()
+                        ? ImVec4(0.3f, 0.3f, 0.3f, 1.0f) 
+                        : ImVec4(0.2f, 0.8f, 0.2f, 1.0f);
+
+                    ImGui::PushStyleColor(ImGuiCol_Button, button_color);
+
+                    if (ImGui::Button(!cubemap_file_paths[i].empty()
+                        ? cubemap_file_names[i].c_str()
+                        : "Drop texture",
+                        ImVec2(200, 40)))
+                    {
+                    }
+                    ImGui::PopStyleColor();
 
                     if (ImGui::BeginDragDropTarget()) {
                         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                            std::filesystem::path filePath = (const wchar_t*)payload->Data;
-                            if (filePath.extension() == ".png" || filePath.extension() == ".jpg") {
-                                cubemap_file_paths[i] = filePath.string();
-                                cubemap_file_names[i] = filePath.filename().string();
+                            const wchar_t* payload_path = (const wchar_t*)payload->Data;
+                            std::filesystem::path file_path(payload_path);
+
+                            if (file_path.extension() == ".png" || file_path.extension() == ".jpg") {
+                                cubemap_file_paths[i] = file_path.string();
+                                cubemap_file_names[i] = file_path.filename().string();
                             }
                         }
                         ImGui::EndDragDropTarget();
@@ -624,29 +647,25 @@ void UIManager::InspectorWindow() {
                     ImGui::PopID();
                 }
 
-                ImGui::Dummy(ImVec2(0.0f, 3.0f));
-                ImGui::Separator();
-                ImGui::Dummy(ImVec2(0.0f, 3.0f));
-
-                if (ImGui::Button("Compile Cubemap")) {
-                    if (std::all_of(cubemap_file_paths.begin(), cubemap_file_paths.end(), [](const std::string& s) { return !s.empty(); })) {
-                        std::vector<std::string> full_paths;
-                        for (const auto& file : cubemap_file_paths) {
-                            full_paths.push_back(file);
-                        }
+                if (!cubemap_generated && std::none_of(cubemap_file_paths.begin(),
+                    cubemap_file_paths.end(),
+                    [](const std::string& s) { return s.empty(); }))
+                {
+                    try {
                         skybox_comp->skybox.loadCubeMap(
-                            full_paths,
+                            { cubemap_file_paths.begin(), cubemap_file_paths.end() },
                             "../stages/shaders/skybox/skybox_cubemap.vs",
                             "../stages/shaders/skybox/skybox_cubemap.fs"
                         );
                         skybox_comp->skybox.initcubeMap();
-                        AddConsoleMessage("Cubemap compiled");
-
-                        //cubemap_file_paths.clear();
-                        //cubemap_file_names.clear();
+                        AddConsoleMessage("Cubemap successfully generated!");
+                        cubemap_generated = true;
+                    }
+                    catch (const std::exception& e) {
                     }
                 }
-                ImGui::Dummy({ 0.0f, 5.0f });
+
+                ImGui::Dummy(ImVec2(0.0f, 3.0f));
             }
             else {
                 ImGui::Dummy(ImVec2(0.0f, 5.0f));
@@ -663,29 +682,21 @@ void UIManager::InspectorWindow() {
                         if (filePath.extension() == ".dds") {
                             skybox_file_path = filePath.string();
                             skybox_file_name = filePath.filename().string();
+
+                            skybox_comp->skybox.loadDDS(
+                                (skybox_file_path).c_str(),
+                                "../stages/shaders/skybox/skybox_dds.vs",
+                                "../stages/shaders/skybox/skybox_dds.fs"
+                            );
+                            skybox_comp->skybox.initDDS();
+
+                            AddConsoleMessage(skybox_file_name + " compiled");
                         }
                     }
                     ImGui::EndDragDropTarget();
                 }
 
                 ImGui::Dummy(ImVec2(0.0f, 3.0f));
-                ImGui::Separator();
-                ImGui::Dummy(ImVec2(0.0f, 3.0f));
-
-                if (ImGui::Button("Compile DDS")) {
-                    skybox_comp->skybox.loadDDS(
-                        (skybox_file_path).c_str(),
-                        "../stages/shaders/skybox/skybox_dds.vs",
-                        "../stages/shaders/skybox/skybox_dds.fs"
-                    );
-                    skybox_comp->skybox.initDDS();
-
-                    AddConsoleMessage(skybox_file_name + " compiled");
-
-                    skybox_file_path.clear();
-                    skybox_file_name.clear();
-                }
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
             }
         }
     }
@@ -1530,24 +1541,15 @@ void UIManager::InspectorWindow() {
                     if (filePath.extension() == ".lua") {
                         lua_file_path = filePath.string();
                         lua_file_name = filePath.filename().string();
+
+                        ls_comp.value().script_path = lua_file_path;
+                        ls_comp.value().entity_id = selected_entity;
+                        engine_.scripting_system.init();
                     }
                 }
                 ImGui::EndDragDropTarget();
             }
 
-            ImGui::Dummy(ImVec2(0.0f, 2.0f));
-            ImGui::Separator();
-            ImGui::Dummy(ImVec2(0.0f, 2.0f));
-
-            if (ImGui::Button("Read file")) {
-
-                ls_comp.value().script_path = lua_file_path;
-                ls_comp.value().entity_id = selected_entity;
-                engine_.scripting_system.init();
-
-                lua_file_path.clear();
-                lua_file_name.clear();
-            }
             ImGui::Dummy(ImVec2(0.0f, 5.0f));
         }
     }
@@ -1906,7 +1908,7 @@ void UIManager::TopBarWindow() {
         ImGui::SameLine();
         if (ImGui::BeginMenu("Tools")) {
 
-            if (ImGui::MenuItem("Add Camera")) {
+            if (ImGui::MenuItem("Add Camera") ) {
                 rs_.addCamera();
                 ResetIds();
 
