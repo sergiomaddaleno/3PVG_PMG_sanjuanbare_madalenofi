@@ -18,37 +18,7 @@ public:
 		return instance;
 	}
 
-	// For all render types except mesh
-	template<typename T>
-	std::shared_ptr<T> FindEntity(RenderType type) {
-		auto& entity_map = GetRenderEntityMap<T>();
-
-		auto it = entity_map.find(type);
-		if (it != entity_map.end()) {
-			return it->second;
-		}
-
-		auto new_entity = std::make_shared<T>();
-		entity_map[type] = new_entity;
-
-		return new_entity;
-	}
-
-	std::shared_ptr<std::string> FindFilePath(const std::string& file_path) {
-		auto& file_map = file_path_map;
-
-		auto it = file_map.find(file_path);
-		if (it != file_map.end()) {
-			return it->second;
-		}
-
-		auto new_file = std::make_shared<std::string>(file_path);
-		file_map[file_path] = new_file;
-
-		return new_file;
-	}
-
-	//-- 
+	std::shared_ptr<std::string> FindFilePath(const std::string& file_path);
 
 	std::shared_ptr<Mesh> FindMesh(const std::shared_ptr<std::string>& file_path, const std::shared_ptr<std::string>& texture_path);
 
