@@ -280,10 +280,28 @@ void RenderSystem::deferredRender(Input& input, double dt)
         if (ci->has_value()) {
             auto& camera_comp = *ci;
 
+            if (window_width != camera_comp->window_width ||
+                window_height != camera_comp->window_height) {
+                camera_comp->window_width = window_width;
+                camera_comp->window_height = window_height;
+                camera_comp->camera.setAspectRatio((float)camera_comp->window_width / (float)camera_comp->window_height);
+            }
             camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
 
             deferred.resize(window_width, window_height);
             deferred.render(ecs_, camera_comp->camera);
+
+            //--
+
+            auto li = ecs_.getComponentList<LightComponent>().begin();
+            auto liend = ecs_.getComponentList<LightComponent>().end();
+
+            for (; li != liend; ++li) {
+                if (li->has_value()) {
+                    auto& light_comp = *li;
+                    light_comp->shadow_map_.resize(window_width, window_height);
+                }
+            }
 
             /*auto si = ecs_.getComponentList<SkyboxComponent>().begin();
             auto siend = ecs_.getComponentList<SkyboxComponent>().end();
@@ -292,7 +310,7 @@ void RenderSystem::deferredRender(Input& input, double dt)
                 if (si->has_value()) {
                     auto& skybox_comp = *si;
 
-                    if (global.use_skybox) skybox_comp->skybox.render(camera_comp->camera);
+                    if (use_skybox) skybox_comp->skybox.render(camera_comp->camera);
                 }
             }*/
 
