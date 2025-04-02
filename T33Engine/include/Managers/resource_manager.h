@@ -18,7 +18,7 @@ public:
 		return instance;
 	}
 
-	//For al render types except Mesh
+	// For all render types except mesh
 	template<typename T>
 	std::shared_ptr<T> FindEntity(RenderType type) {
 		auto& entity_map = GetRenderEntityMap<T>();
@@ -34,8 +34,8 @@ public:
 		return new_entity;
 	}
 
-	std::shared_ptr<std::string> FindFilePath(std::string file_path) {
-		auto& file_map = GetFilePath();
+	std::shared_ptr<std::string> FindFilePath(const std::string& file_path) {
+		auto& file_map = file_path_map;
 
 		auto it = file_map.find(file_path);
 		if (it != file_map.end()) {
@@ -48,20 +48,15 @@ public:
 		return new_file;
 	}
 
-	//--
+	//-- 
 
-	std::shared_ptr<Mesh> FindMesh(const std::shared_ptr<std::string>& path) {
-		auto it = mesh_entities_.find(*path);
-		if (it != mesh_entities_.end()) {
-			return it->second;
-		}
-		return nullptr;
-	}
+	std::shared_ptr<Mesh> FindMesh(const std::shared_ptr<std::string>& file_path, const std::shared_ptr<std::string>& texture_path);
 
-	void StoreMesh(const std::shared_ptr<std::string>& path, std::shared_ptr<Mesh> mesh) {
-		mesh_entities_[*path] = mesh;
-	}
+	void StoreMesh(const std::shared_ptr<std::string>& file_path, const std::shared_ptr<std::string>& texture_path, std::shared_ptr<Mesh> mesh);
 
+	//-- 
+
+	void clearMaps();
 
 private:
 	ResourceManager() = default;
@@ -76,22 +71,9 @@ private:
 		return entity_map;
 	}
 
-	template<typename T>
-	static std::unordered_map<Light::LightType, std::shared_ptr<T>>& GetLightEntityMap() {
-		static std::unordered_map<Light::LightType, std::shared_ptr<T>> entity_map;
-		return entity_map;
-	}
-
-	static std::unordered_map<std::string, std::shared_ptr<std::string>>& GetFilePath() {
-		static std::unordered_map<std::string, std::shared_ptr<std::string>> file_path_map;
-		return file_path_map;
-	}
-
-	static std::unordered_map<std::string, std::shared_ptr<Mesh>> mesh_entities_;
+	static std::unordered_map<std::string, std::shared_ptr<std::string>> file_path_map;
+	static std::unordered_map<std::string, std::shared_ptr<Mesh>> mesh_map;
 
 };
-
-std::unordered_map<std::string, std::shared_ptr<Mesh>> ResourceManager::mesh_entities_;
-
 
 #endif // !__RESOURCE_MANAGER__

@@ -528,7 +528,7 @@ size_t RenderSystem::createMesh(std::string file, std::string textureFolder,
     auto file_path = ResourceManager::GetInstance().FindFilePath(file);
     auto texture_path = ResourceManager::GetInstance().FindFilePath(textureFolder);
 
-    mesh = ResourceManager::GetInstance().FindMesh(file_path);
+    mesh = ResourceManager::GetInstance().FindMesh(file_path, texture_path);
 
     if (!mesh) {
         mesh = ResourceManager::GetInstance().FindEntity<Mesh>(RenderType::RT_Mesh);
@@ -537,7 +537,7 @@ size_t RenderSystem::createMesh(std::string file, std::string textureFolder,
             return -1;
         }
 
-        ResourceManager::GetInstance().StoreMesh(file_path, mesh);
+        ResourceManager::GetInstance().StoreMesh(file_path, texture_path, mesh);
     }
     
     ecs_.add_component<IdentifierComponent>(entity_);

@@ -7,6 +7,7 @@
 #include "Render/light.h"
 #include "Render/skybox.h"
 
+#include "Managers/resource_manager.h"
 #include "Components/components.h"
 
 #include <../nlohmann/json.hpp>
@@ -144,6 +145,8 @@ void SaveManager::deSerialize(const nlohmann::json& j) {
     rs_.entity_ = 0;
 
     rs_.entity_counts_ = {};
+
+    ResourceManager::GetInstance().clearMaps();
     
     //-----------------------------------------------------------
 
