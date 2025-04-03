@@ -21,7 +21,7 @@ public:
 	);
 
 	void init();
-	void render(double time);
+	void render(float time);
 
 	void resize(unsigned int width, unsigned int height);
 
