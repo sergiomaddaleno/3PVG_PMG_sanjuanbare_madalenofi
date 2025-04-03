@@ -6,6 +6,7 @@
 
 #include "Core/shader.h"
 #include "Geometry/sphere.h"
+#include "Core/texture.h"
 
 class RayMarch{
 
@@ -28,6 +29,7 @@ public:
 	double DPR;
 
 	Shader shader_;
+	Texture noise_;
 
 private:
 
