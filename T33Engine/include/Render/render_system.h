@@ -47,6 +47,14 @@ public:
 	void initLights();
 	void initSkybox();
 
+	void initshaders() {
+		initShader(shader, "../stages/shaders/forward_shading.vs", "../stages/shaders/forward_shading.fs");
+		initShader(texture_shader, "../stages/shaders/basic/texture.vs", "../stages/shaders/basic/texture.fs");
+
+		initShader(deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
+		initShader(deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
+	}
+
 	void forwardRender(Input &input, double dt);
 	void deferredRender(Input& input, double dt);
 

@@ -11,6 +11,8 @@
 #include "Render/post_processing.h"
 #include "Core/window.h"
 #include "Core/input.h"
+#include "Render/raymarch.h"
+
 #include "../src/clouds/CloudsModel.h"
 #include "../src/clouds/VolumetricClouds.h"
 
@@ -38,8 +40,7 @@ public:
 	ScriptingSystem scripting_system;
 
 	PostProcessing post_process;
-
-	
+	RayMarch raymarch;
 
 	//------------------
 
