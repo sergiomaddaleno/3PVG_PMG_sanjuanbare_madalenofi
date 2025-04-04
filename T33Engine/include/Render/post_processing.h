@@ -19,6 +19,8 @@
 #include <vector>
 #include <../deps/glm/glm.hpp>
 
+#include "Geometry/quad.h"
+
  /**
   * @class PostProcessing
   * @brief Implements post-processing effects for rendered scenes.
@@ -44,11 +46,13 @@ public:
 	int kernel_types_;
 
 	FrameBuffer frame_buffer_;
-private:
 
+private:
 	unsigned int width_, height_;
 
-	GLuint rectVAO, rectVBO, RBO;
+	Quad screen_quad_;
+
+	GLuint RBO;
 };
 
 #endif // __POST_PROCESS__

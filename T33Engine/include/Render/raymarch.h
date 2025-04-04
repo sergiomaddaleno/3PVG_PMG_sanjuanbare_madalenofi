@@ -5,8 +5,8 @@
 #include "../Render/render_system.h"
 
 #include "Core/shader.h"
-#include "Geometry/sphere.h"
 #include "Core/texture.h"
+#include "Geometry/quad.h"
 
 class RayMarch{
 
@@ -26,11 +26,11 @@ public:
 	void resize(unsigned int width, unsigned int height);
 
 	int window_width, window_height;
-	double DPR;
 
 	Shader shader_;
 	Texture noise_;
 
+	Quad screen_quad_;
 private:
 
 	ECSManager& ecs_;

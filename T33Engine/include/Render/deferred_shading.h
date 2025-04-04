@@ -16,6 +16,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "Geometry/quad.h"
+
 class ECSManager;
 class Shader;
 class Camera;
@@ -40,6 +42,7 @@ public:
 	void resize(unsigned int width, unsigned int height);
 
 	Shader gbuffer, deferred_shading;
+	//Quad screen_quad_;
 
 	int deferred_option;
 

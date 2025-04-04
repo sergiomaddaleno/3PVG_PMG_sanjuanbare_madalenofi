@@ -1,15 +1,14 @@
 #version 330 core
 
-#define MAX_STEPS 100
-
 uniform float u_time;
 uniform vec2 u_resolution;
-uniform vec3 u_ray_origin; 
+uniform vec3 u_camera_pos; 
 uniform sampler2D u_noise;
 
 in vec2 vUv;
 out vec4 FragColor;
 
+#define MAX_STEPS 100
 const float MARCH_SIZE = 0.08; 
 
 float sdSphere(vec3 p, float radius) {
@@ -55,7 +54,7 @@ float scene(vec3 p) {
 vec4 raymarch(vec3 ro, vec3 rd) {
     
     float depth = 0.0;
-    vec3 p = u_ray_origin + depth * rd;
+    vec3 p = u_camera_pos + depth * rd;
 
     vec4 res = vec4(0.0);
 

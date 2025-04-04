@@ -291,6 +291,20 @@ void Skybox::loadCubeMap(std::vector<std::string> faces_files, const char* verte
     free(loc_frag);
 }
 
+/*Shader Skybox::loadShaders(const char* vertex_file, const char* fragment_file)
+{
+    char* loc_vert = ReadFile(vertex_file);
+    char* loc_frag = ReadFile(fragment_file);
+
+    Shader shader;
+    shader.compile(loc_vert, loc_frag);
+
+    free(loc_vert);
+    free(loc_frag);
+
+    return shader;
+}*/
+
 bool Skybox::loadDDSFile(const char* dds_file)
 {
     if (dds_file == nullptr) {

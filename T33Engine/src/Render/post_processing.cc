@@ -5,22 +5,11 @@
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
 
-static float rect_screen_vertices[] = {
-    // positions   // texCoords
-    -1.0f, -1.0f,  0.0f, 0.0f,
-     1.0f, -1.0f,  1.0f, 0.0f,
-     1.0f,  1.0f,  1.0f, 1.0f,
-
-    -1.0f, -1.0f,  0.0f, 0.0f,
-     1.0f,  1.0f,  1.0f, 1.0f,
-    -1.0f,  1.0f,  0.0f, 1.0f
-};
-
 PostProcessing::PostProcessing()
     : grey_(0.0f), negative_(1.0f), waves_(0.0f), blur_(0.0f),
     kernel_types_(0), frame_buffer_(),
     width_(800), height_(600),
-    rectVAO(0), rectVBO(0), RBO(0) {
+    RBO(0) {
 }
 
 PostProcessing::~PostProcessing()
@@ -38,19 +27,8 @@ void PostProcessing::initData()
 
     // --
 
-    glGenVertexArrays(1, &rectVAO);
-    glGenBuffers(1, &rectVBO);
-    glBindVertexArray(rectVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, rectVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(rect_screen_vertices), rect_screen_vertices, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    screen_quad_.init();
+    screen_quad_.bind();
 }
 
 void PostProcessing::beginRender()
@@ -89,12 +67,10 @@ void PostProcessing::render(Shader& shader)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, frame_buffer_.GetColorTexture());
 
-    //Screen quad
-    glBindVertexArray(rectVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    screen_quad_.draw();
+
     glBindVertexArray(0);
     glUseProgram(0);
-
 }
 
 void PostProcessing::resize(unsigned int width, unsigned int height)

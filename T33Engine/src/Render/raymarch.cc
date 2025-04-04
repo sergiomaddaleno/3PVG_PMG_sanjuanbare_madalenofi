@@ -9,20 +9,9 @@
 
 #include "utils.h"
 
-static float screen_quad[] = {
-    -1.0f, -1.0f,   0.0f, 0.0f,
-    1.0f, -1.0f,    1.0f, 0.0f,
-    1.0f,  1.0f,    1.0f, 1.0f,
-
-    -1.0f, -1.0f,    0.0f, 0.0f,
-     1.0f,  1.0f,    1.0f, 1.0f,
-    -1.0f,  1.0f,    0.0f, 1.0f
-};
-
 RayMarch::RayMarch(ECSManager& ecs) :
     ecs_(ecs),
-    window_width(800), window_height(600),
-    DPR(0.75)
+    window_width(800), window_height(600)
 {
 }
 
@@ -44,20 +33,8 @@ void RayMarch::init()
 
     noise_.loadTexture("../stages/assets/textures/noise/noise.png");
 
-    glGenVertexArrays(1, &quadVAO);
-    glBindVertexArray(quadVAO);
-
-    glGenBuffers(1, &quadVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(screen_quad), screen_quad, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    screen_quad_.init();
+    screen_quad_.bind();
 }
 
 void RayMarch::render(float time)
@@ -66,6 +43,7 @@ void RayMarch::render(float time)
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_FALSE);
 
     shader_.setUniformValue(shader_.getUniformLocation("u_time"), ValueType::T_FLOAT_1, &time);
 
@@ -86,14 +64,17 @@ void RayMarch::render(float time)
             auto& camera_comp = *ci;
 
             glm::vec3 camera_position = camera_comp->camera.getPosition();
-            shader_.setUniformValue(shader_.getUniformLocation("u_ray_origin"), ValueType::T_FLOAT_3, &camera_position);
+            glm::mat4x4 view = camera_comp->camera.getViewMatrix();
+            glm::mat4 projection = camera_comp->camera.getUsePerspectiveMatrix() ? camera_comp->camera.getPerspectiveMatrix() : camera_comp->camera.getOrthograficMatrix();
 
-            glBindVertexArray(quadVAO);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+            shader_.setUniformValue(shader_.getUniformLocation("u_camera_pos"), ValueType::T_FLOAT_3, &camera_position);
+            shader_.setUniformValue(shader_.getUniformLocation("view"), ValueType::T_MAT_4x4, &view);
+            shader_.setUniformValue(shader_.getUniformLocation("projection"), ValueType::T_MAT_4x4, &projection);
+
+            screen_quad_.draw();
         }
     }
 
-    glDisable(GL_BLEND);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
