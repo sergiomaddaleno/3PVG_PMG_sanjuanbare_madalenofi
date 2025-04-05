@@ -1,28 +1,10 @@
 {
- "Camera": {
-  "Aspect_ratio": 1.7769999504089355,
-  "Far_clip_plane": 1000.0,
-  "Fov": 45.0,
-  "Near_clip_plane": 0.10000000149011612,
-  "Ortho_height": 600.0,
-  "Ortho_width": 800.0,
-  "Position": [
-   -110.3112564086914,
-   22.974742889404297,
-   29.42471694946289
-  ],
-  "Scroll_speed": 1.0,
-  "Sensitivity": 1.0,
-  "Speed": 20.25,
-  "Use_perspective_matrix": true,
-  "View_direction": [
-   0.8304903507232666,
-   -0.12337503582239151,
-   -0.54319828748703
-  ]
- },
  "Entities": [
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 0,
     "Entity_name": "Mario"
@@ -41,7 +23,7 @@
      -9.625251770019531
     ],
     "Rotation": [
-     0.011709405109286308,
+     0.011709406040608883,
      -0.2624877393245697,
      0.003185519017279148,
      0.9648590087890625
@@ -54,6 +36,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 1,
     "Entity_name": "Terrain [1]"
@@ -91,6 +77,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 2,
     "Entity_name": "Water [2]"
@@ -128,6 +118,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 3,
     "Entity_name": "Mesh [9]"
@@ -159,6 +153,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 4,
     "Entity_name": "Mesh [10]"
@@ -190,6 +188,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 5,
     "Entity_name": "Mesh [11]"
@@ -221,6 +223,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 6,
     "Entity_name": "Mesh [12]"
@@ -252,6 +258,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 7,
     "Entity_name": "Mesh [13]"
@@ -283,6 +293,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 8,
     "Entity_name": "Mesh [14]"
@@ -314,6 +328,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 9,
     "Entity_name": "Mesh [15]"
@@ -345,6 +363,10 @@
    }
   },
   {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
    "Identifier_component": {
     "Entity_id": 10,
     "Entity_name": "Directional Light [1]"
@@ -370,9 +392,9 @@
      ],
      "Direction": [
       [
-       -0.18814417719841003,
-       -0.24434611201286316,
-       -0.1745329350233078
+       -0.5309535264968872,
+       -0.6895585656166077,
+       -0.4925418198108673
       ]
      ],
      "Light_color": [
@@ -417,23 +439,87 @@
      "Type": 0
     }
    }
+  },
+  {
+   "Camera_component": {
+    "camera": {
+     "Aspect_ratio": 1.7777777910232544,
+     "Far_clip_plane": 509.8059997558594,
+     "Fov": 45.0,
+     "Near_clip_plane": 0.10000000149011612,
+     "Ortho_height": 45.0,
+     "Ortho_width": 45.0,
+     "Position": [
+      -55.434181213378906,
+      37.71775436401367,
+      65.79466247558594
+     ],
+     "Scroll_speed": 1.0,
+     "Sensitivity": 1.0,
+     "Speed": 31.68400001525879,
+     "Use_perspective_matrix": true,
+     "View_direction": [
+      0.5189205408096313,
+      -0.34492015838623047,
+      -0.7821454405784607
+     ]
+    }
+   },
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 11,
+    "Entity_name": "Camera [0]"
+   },
+   "Transform_component": {
+    "Position": [
+     -50.913902282714844,
+     51.103092193603516,
+     57.38212203979492
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 12,
+    "Entity_name": "Skybox [0]"
+   },
+   "Skybox_component": {
+    "skybox": {
+     "Cubemap_file_paths": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+     ],
+     "Cubemap_fragment_file": "",
+     "Cubemap_vertex_file": "",
+     "DDS_angle": -90.0,
+     "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
+     "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
+     "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
+     "Use_cubemap": false
+    }
+   }
   }
- ],
- "Skybox": {
-  "Cubemap_file_paths": [
-   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\right.png",
-   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\left.png",
-   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\bottom.png",
-   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\top.png",
-   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\front.png",
-   "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\back.png"
-  ],
-  "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
-  "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
-  "DDS_angle": -90.0,
-  "DDS_file_path": "../stages\\assets\\textures\\skybox\\sky.dds",
-  "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
-  "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
-  "Use_cubemap": false
- }
+ ]
 }

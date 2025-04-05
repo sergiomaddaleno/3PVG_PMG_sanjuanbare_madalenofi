@@ -33,6 +33,7 @@ public:
     void deleteTexture();
 
     bool loadTexture(const std::string& file_path);
+    bool loadTexture3D(const std::string& file_path, int slices = 0);
 
     //--
     void setID(GLuint texID) { textureID = texID; }

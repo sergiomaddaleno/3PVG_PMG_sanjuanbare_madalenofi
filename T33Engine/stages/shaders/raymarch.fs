@@ -5,8 +5,8 @@ uniform vec2 u_resolution;
 uniform vec3 u_camera_pos; 
 uniform sampler2D u_noise;
 
-in vec2 vUv;
 out vec4 FragColor;
+in vec3 v_ray_dir;
 
 #define MAX_STEPS 100
 const float MARCH_SIZE = 0.08; 
@@ -85,5 +85,5 @@ void main() {
   vec4 res = raymarch(ray_origin, ray_dir);
   color = res.rgb;
 
-  gl_FragColor = vec4(color, 1.0);
+  FragColor = vec4(color, 1.0);
 }

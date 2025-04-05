@@ -7,6 +7,7 @@
 #include "Core/shader.h"
 #include "Core/texture.h"
 #include "Geometry/quad.h"
+#include "Geometry/cube.h"
 
 class RayMarch{
 

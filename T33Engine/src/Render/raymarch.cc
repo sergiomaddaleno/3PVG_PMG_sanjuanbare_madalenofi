@@ -41,9 +41,11 @@ void RayMarch::render(float time)
 {
     shader_.useProgram();
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     shader_.setUniformValue(shader_.getUniformLocation("u_time"), ValueType::T_FLOAT_1, &time);
 

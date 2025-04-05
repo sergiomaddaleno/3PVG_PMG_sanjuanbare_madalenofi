@@ -14,6 +14,7 @@ Texture::~Texture()
 }
 
 bool Texture::loadTexture(const std::string& file_path) {
+    if (file_path.empty()) return false;
 
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
@@ -23,11 +24,17 @@ bool Texture::loadTexture(const std::string& file_path) {
         return false;
     }
 
-    generate();
+    this->generate();
+    this->bind2D();
 
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    GLenum format = 1;
+    switch (channels) {
+    case 1: format = GL_RED;  break;
+    case 2: format = GL_RG;   break;
+    case 3: format = GL_RGB;  break;
+    case 4: format = GL_RGBA; break;
+    }
 
-    GLenum format = (channels == 4) ? GL_RGBA : GL_RGB;
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -35,7 +42,48 @@ bool Texture::loadTexture(const std::string& file_path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    return true;
+}
+
+bool Texture::loadTexture3D(const std::string& file_path, int slices) {
+    if (file_path.empty()) return false;
+
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
+    if (!data) {
+        printf("Failed to load texture: %s\n", file_path.c_str());
+        return false;
+    }
+
+    if (slices <= 0) slices = width / height; 
+
+    if (width * height * channels % slices != 0) {
+        printf("Error");
+        stbi_image_free(data);
+        return false;
+    }
+
+    this->generate();
+    this->bind3D();
+
+    GLenum format = 1;
+    switch (channels) {
+    case 1: format = GL_RED;  break;
+    case 2: format = GL_RG;   break;
+    case 3: format = GL_RGB;  break;
+    case 4: format = GL_RGBA; break;
+    }
+
+    int slice_size = width * height * channels / slices;
+    glTexImage3D(GL_TEXTURE_3D, 0, format, width, height / slices, slices, 0, format, GL_UNSIGNED_BYTE, data );
+
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glGenerateMipmap(GL_TEXTURE_3D);
 
     return true;
 }
