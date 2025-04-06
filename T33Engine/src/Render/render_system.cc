@@ -235,9 +235,9 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                             auto& render_comp = *ri;
                             auto& transform_comp = *ti;
 
-                            setUniforms(*transform_comp, shader, camera_comp->camera);
+                            this->setUniforms(*transform_comp, shader, camera_comp->camera);
 
-                            renderScene(*render_comp, shader);
+                            this->renderScene(*render_comp, shader);
                         }
                     }
                     glBlendFunc(GL_ONE, GL_ONE);
@@ -258,9 +258,9 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                         auto& render_comp = *ri;
                         auto& transform_comp = *ti;
 
-                        setUniforms(*transform_comp, texture_shader, camera_comp->camera);
+                        this->setUniforms(*transform_comp, texture_shader, camera_comp->camera);
 
-                        renderScene(*render_comp, texture_shader);
+                        this->renderScene(*render_comp, texture_shader);
                     }
                 }
             }

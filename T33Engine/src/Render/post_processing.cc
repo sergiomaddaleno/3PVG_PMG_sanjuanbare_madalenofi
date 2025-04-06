@@ -27,8 +27,8 @@ void PostProcessing::initData()
 
     // --
 
-    screen_quad_.init();
-    screen_quad_.bind();
+    quad_.initVec2();
+    quad_.bindVec2();
 }
 
 void PostProcessing::beginRender()
@@ -44,7 +44,6 @@ void PostProcessing::endRender()
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     
     glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
     frame_buffer_.unbind();
 }
 
@@ -67,7 +66,7 @@ void PostProcessing::render(Shader& shader)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, frame_buffer_.GetColorTexture());
 
-    screen_quad_.draw();
+    quad_.drawVec2();
 
     glBindVertexArray(0);
     glUseProgram(0);

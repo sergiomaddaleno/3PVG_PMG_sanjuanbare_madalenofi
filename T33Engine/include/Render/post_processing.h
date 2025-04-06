@@ -19,7 +19,7 @@
 #include <vector>
 #include <../deps/glm/glm.hpp>
 
-#include "Geometry/quad.h"
+#include "Geometry/screen_quad.h"
 
  /**
   * @class PostProcessing
@@ -50,7 +50,7 @@ public:
 private:
 	unsigned int width_, height_;
 
-	Quad screen_quad_;
+	ScreenQuad quad_;
 
 	GLuint RBO;
 };

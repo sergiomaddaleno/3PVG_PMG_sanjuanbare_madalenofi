@@ -26,7 +26,7 @@ void Engine::init()
 	window.initGLEW();
 	window.setResizeCallback();
 
-	post_process.initData(window.getWidth(), window.getHeight());
+	post_process.initData();
 	render_system.setupEntities();
 	ui_manager.Init(&window, &input);
 
@@ -34,7 +34,7 @@ void Engine::init()
 	render_system.deferred.init();
 	render_system.grid.initGrid();
 
-	raymarch.init();
+	//raymarch.init();
 
 	//render_system.compileShaderForBuild();
 }
@@ -65,7 +65,7 @@ void Engine::beginFrame()
     physics_system.update(static_cast<float>(dt));
     scripting_system.update(static_cast<float>(dt));
 
-    raymarch.resize(width, height);
+    //raymarch.resize(width, height);
     // raymarch.render(static_cast<float>(window.getTime()));
 
     // --- 
