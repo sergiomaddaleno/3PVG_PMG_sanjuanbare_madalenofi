@@ -37,7 +37,8 @@ void RayMarch::render(float time)
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-    shader_.setUniformValue(shader_.getUniformLocation("u_time"), ValueType::T_FLOAT_1, &time);
+    float ti = (float)time;
+    shader_.setUniformValue(shader_.getUniformLocation("u_time"), ValueType::T_FLOAT_1, &ti);
 
     glm::vec2 resolution = { window_width, window_height };
     shader_.setUniformValue(shader_.getUniformLocation("u_resolution"), ValueType::T_FLOAT_2, &resolution);
