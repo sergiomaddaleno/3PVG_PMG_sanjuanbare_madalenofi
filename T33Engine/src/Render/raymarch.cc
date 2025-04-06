@@ -27,16 +27,6 @@ void RayMarch::initRaymarchShader(std::string vertex_path, std::string fragment_
     fragment_path_ = fragment_path;
 }
 
-void RayMarch::init()
-{
-    initRaymarchShader();
-
-    noise_.loadTexture("../stages/assets/textures/noise/noise.png");
-
-    screen_quad_.init();
-    screen_quad_.bind();
-}
-
 void RayMarch::render(float time)
 {
     shader_.useProgram();
@@ -52,12 +42,17 @@ void RayMarch::render(float time)
     glm::vec2 resolution = { window_width, window_height };
     shader_.setUniformValue(shader_.getUniformLocation("u_resolution"), ValueType::T_FLOAT_2, &resolution);
 
-    noise_.active(TextureID::TI_Albedo);
-    noise_.bind2D();
+    noise_2D_.active(GL_TEXTURE0);
+    noise_2D_.bind2D();
+    int tex_id = GL_TEXTURE0;
+    shader_.setUniformValue(shader_.getUniformLocation("u_noise_2D"), ValueType::T_INT_1, &tex_id);
 
-    int tex_id = TextureID::TI_Albedo;
-    shader_.setUniformValue(shader_.getUniformLocation("u_noise"), ValueType::T_INT_1, &tex_id);
+    noise_3D_.active(GL_TEXTURE1);
+    noise_3D_.bind3D();
+    tex_id = GL_TEXTURE1;
+    shader_.setUniformValue(shader_.getUniformLocation("u_noise_3D"), ValueType::T_INT_1, &tex_id);
 
+    framebuffer_.GetColorTexture();
     auto ci = ecs_.getComponentList<CameraComponent>().begin();
     auto ciend = ecs_.getComponentList<CameraComponent>().end();
 

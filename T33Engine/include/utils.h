@@ -27,6 +27,8 @@ enum TextureID {
 	TI_ShadowMap,
 	TI_Parallax,
 	TI_ShadowMapCube,
+	TI_Screen_Color,
+	TI_Screen_Depth,
 	
 };
 

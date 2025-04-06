@@ -35,8 +35,10 @@ public:
     ~UIManager();
 
     void Init(Window* window, Input* input);
-    void Render();
+    void BeginFrame();
+    void EndFrame();
     void Cleanup();
+    void Render();
 
     void SetImguiTheme();
 

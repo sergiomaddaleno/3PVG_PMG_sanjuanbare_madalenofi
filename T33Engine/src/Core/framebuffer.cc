@@ -49,6 +49,14 @@ void FrameBuffer::init(int width, int height, bool use_color, bool use_depth)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void FrameBuffer::blitTo(FrameBuffer& target, unsigned int width, unsigned int height)
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, this->GetFBO());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target.GetFBO());
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void FrameBuffer::bind()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, FBO_);
@@ -61,40 +69,9 @@ void FrameBuffer::unbind()
 
 void FrameBuffer::resize(int width, int height)
 {
-    width_ = width;
-    height_ = height;
+    if (width == width_ && height == height_) return;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO_);
-
-    if (use_color_) {
-        glBindTexture(GL_TEXTURE_2D, FBColorTexture_);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    }
-
-    if (use_depth_) {
-        glBindTexture(GL_TEXTURE_2D, FBDepthTexture_);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width_, height_, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-GLuint FrameBuffer::captureWindowToTexture() {
-    GLuint captureTexture;
-    glGenTextures(1, &captureTexture);
-
-    glBindTexture(GL_TEXTURE_2D, captureTexture);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, width_, height_, 0);
-
-    return captureTexture;
+    init(width, height, use_color_, use_depth_);
 }
 
 GLuint FrameBuffer::GetFBO() const

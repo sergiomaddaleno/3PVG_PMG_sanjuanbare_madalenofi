@@ -188,10 +188,27 @@ void UIManager::Init(Window* window, Input* input) {
 
 }
 
-void UIManager::Render() {
+void UIManager::BeginFrame()
+{
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
+}
+
+void UIManager::EndFrame()
+{
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+    }
+}
+
+void UIManager::Render() {
 
     ImguiWindow();
 
@@ -208,22 +225,6 @@ void UIManager::Render() {
         if (add_surface_window) AddSurfaceWindow();
         if (l_system_window) LSystemWindow();
         if (add_entities_terrain_window) AddEntitiesTerrainWindow();
-    }
-
-    engine_.post_process.endRender();
-
-    GameWindow();
-
-    // ---
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
-        glfwMakeContextCurrent(backup_current_context);
     }
 }
 

@@ -12,6 +12,7 @@
 #include "Core/window.h"
 #include "Core/input.h"
 #include "Render/raymarch.h"
+#include "Core/framebuffer.h"
 
 #include "../src/clouds/CloudsModel.h"
 #include "../src/clouds/VolumetricClouds.h"

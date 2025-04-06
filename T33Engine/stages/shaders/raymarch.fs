@@ -3,7 +3,8 @@
 uniform float u_time;
 uniform vec2 u_resolution;
 uniform vec3 u_camera_pos; 
-uniform sampler2D u_noise;
+uniform sampler2D u_noise_2D;
+uniform sampler3D u_noise_3D;
 
 out vec4 FragColor;
 in vec3 v_ray_dir;
@@ -21,7 +22,7 @@ float noise(vec3 x ) {
   f = f * f * (3. - 2. * f);
 
   vec2 uv = (p.xy + vec2(37.0, 239.0) * p.z) + f.xy;
-  vec2 tex = textureLod(u_noise,(uv + 0.5) / 256.0, 0.0).yx;
+  vec2 tex = textureLod(u_noise_2D,(uv + 0.5) / 256.0, 0.0).yx;
 
   return mix( tex.x, tex.y, f.z ) * 2.0 - 1.0;
 }

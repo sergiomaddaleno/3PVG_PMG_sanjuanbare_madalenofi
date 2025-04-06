@@ -26,7 +26,7 @@ void Engine::init()
 	window.initGLEW();
 	window.setResizeCallback();
 
-	post_process.initData();
+	post_process.initData(window.getWidth(), window.getHeight());
 	render_system.setupEntities();
 	ui_manager.Init(&window, &input);
 
@@ -41,32 +41,42 @@ void Engine::init()
 
 void Engine::beginFrame()
 {
-	currentTime = window.getTime();
-	dt = currentTime - lastTime;
+    currentTime = window.getTime();
+    dt = currentTime - lastTime;
 
-	window.updateWindow();
-	window.toggleFullScreen(input);
+    window.updateWindow();
+    window.toggleFullScreen(input);
 
-	post_process.resize(window.getWidth(), window.getHeight());
-	post_process.beginRender();
+    unsigned int width = window.getWidth();
+    unsigned int height = window.getHeight();
 
-	render_system.resize(window.getWidth(), window.getHeight());
+    post_process.resize(width, height);
+    post_process.beginRender();
+
+    // --- Render scene
+    render_system.resize(width, height);
 	if (render_system.use_deferred_shading) {
-		render_system.deferredRender(input, dt);
+        render_system.deferredRender(input, dt);
 	}
 	else {
-		render_system.forwardRender(input, dt);
+        render_system.forwardRender(input, dt);
 	}
 
-	physics_system.update((float)dt);
-	scripting_system.update((float)dt);
+    physics_system.update(static_cast<float>(dt));
+    scripting_system.update(static_cast<float>(dt));
 
-	raymarch.resize(window.getWidth(), window.getHeight());
-	//raymarch.render((float)window.getTime());
+    raymarch.resize(width, height);
+    // raymarch.render(static_cast<float>(window.getTime()));
 
-	ui_manager.Render();
+    // --- 
+    ui_manager.BeginFrame();
+    ui_manager.Render();
 
-	lastTime = currentTime;
+	post_process.endRender();
+	this->clearWindow();
+
+    ui_manager.GameWindow();
+    ui_manager.EndFrame();
 }
 
 void Engine::endFrame()
