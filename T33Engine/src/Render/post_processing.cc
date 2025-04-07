@@ -20,11 +20,6 @@ void PostProcessing::initData()
 {
     frame_buffer_.init(width_, height_, true, true);
 
-    glGenRenderbuffers(1, &RBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
-
     // --
 
     quad_.initVec2();
@@ -42,7 +37,7 @@ void PostProcessing::endRender()
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, frame_buffer_.GetFBO());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    
+
     glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     frame_buffer_.unbind();
 }

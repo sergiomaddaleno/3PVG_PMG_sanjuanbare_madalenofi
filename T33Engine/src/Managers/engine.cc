@@ -51,7 +51,7 @@ void Engine::beginFrame()
     unsigned int height = window.getHeight();
 
     post_process.resize(width, height);
-    post_process.beginRender();
+    //post_process.beginRender();
 
     // --- Render scene
     render_system.resize(width, height);
@@ -69,14 +69,15 @@ void Engine::beginFrame()
     // raymarch.render(static_cast<float>(window.getTime()));
 
     // --- 
-    ui_manager.BeginFrame();
+	//post_process.endRender();
+
+    /*ui_manager.BeginFrame();
     ui_manager.Render();
 
-	post_process.endRender();
 	this->clearWindow();
 
     ui_manager.GameWindow();
-    ui_manager.EndFrame();
+    ui_manager.EndFrame();*/
 }
 
 void Engine::endFrame()

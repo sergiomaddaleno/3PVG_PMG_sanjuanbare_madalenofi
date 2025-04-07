@@ -46,7 +46,7 @@ void FrameBuffer::init(int width, int height, bool use_color, bool use_depth)
         printf("Error: Framebuffer is not complete\n");
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    this->unbind();
 }
 
 void FrameBuffer::blitTo(FrameBuffer& target, unsigned int width, unsigned int height)

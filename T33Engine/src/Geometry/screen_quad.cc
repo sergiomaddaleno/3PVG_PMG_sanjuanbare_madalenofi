@@ -38,8 +38,6 @@ void ScreenQuad::bindVec2()
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 1);
 }
 
 void ScreenQuad::drawVec2()
@@ -77,8 +75,6 @@ void ScreenQuad::bindVec3()
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 1);
 }
 
 void ScreenQuad::drawVec3()
