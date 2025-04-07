@@ -319,6 +319,46 @@ void RenderSystem::deferredRender(Input& input, double dt)
     }
 }
 
+void RenderSystem::SSAORender(Input& input, double dt)
+{
+    auto ci = ecs_.getComponentList<CameraComponent>().begin();
+    auto ciend = ecs_.getComponentList<CameraComponent>().end();
+
+    for (; ci != ciend; ++ci) {
+        if (ci->has_value()) {
+            auto& camera_comp = *ci;
+
+            if (window_width != camera_comp->window_width ||
+                window_height != camera_comp->window_height) {
+                camera_comp->window_width = window_width;
+                camera_comp->window_height = window_height;
+                camera_comp->camera.setAspectRatio((float)camera_comp->window_width / (float)camera_comp->window_height);
+            }
+            camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
+
+            ssao.resize(window_width, window_height);
+            ssao.render(ecs_, camera_comp->camera);
+
+            //--
+
+            auto li = ecs_.getComponentList<LightComponent>().begin();
+            auto liend = ecs_.getComponentList<LightComponent>().end();
+
+            for (; li != liend; ++li) {
+                if (li->has_value()) {
+                    auto& light_comp = *li;
+                    light_comp->shadow_map_.resize(window_width, window_height);
+                }
+            }
+
+           
+
+            if (!is_playing) grid.drawGrid(camera_comp->camera);
+        }
+    }
+
+}
+
 void RenderSystem::renderScene(RenderComponent& rc, Shader& shader)
 {
     switch (rc.type_) {

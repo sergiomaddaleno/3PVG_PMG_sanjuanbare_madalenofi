@@ -18,6 +18,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "Render/ssao.h"
 
 #include "../Systems/ecs_manager.h"
 #include "Core/camera.h"
@@ -53,10 +54,17 @@ public:
 
 		initShader(deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
 		initShader(deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
+
+		initShader(ssao.ssao_shader, "../stages/shaders/ssao_shader.vs", "../stages/shaders/ssao_shader.fs");
+
+		initShader(ssao.ssao_geometry, "../stages/shaders/g_buffer_ssao.vs", "../stages/shaders/g_buffer_ssao.fs");
+
+		
 	}
 
 	void forwardRender(Input &input, double dt);
 	void deferredRender(Input& input, double dt);
+	void SSAORender(Input& input, double dt);
 
 	void setupEntities() {
 		entity_ = ecs_.create_entity();
@@ -128,6 +136,7 @@ public:
 	Shader texture_shader;
 
 	Deferred deferred;
+	SSAO ssao;
 	Terrain grid;
 	ECSManager& ecs_;
 

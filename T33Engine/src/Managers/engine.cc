@@ -32,6 +32,7 @@ void Engine::init()
 
 	render_system.initshaders();
 	render_system.deferred.init();
+	render_system.ssao.init();
 	render_system.grid.initGrid();
 
 	//raymarch.init();
@@ -55,12 +56,13 @@ void Engine::beginFrame()
 
     // --- Render scene
     render_system.resize(width, height);
-	if (render_system.use_deferred_shading) {
-        render_system.deferredRender(input, dt);
-	}
-	else {
-        render_system.forwardRender(input, dt);
-	}
+	//if (render_system.use_deferred_shading) {
+    //    render_system.deferredRender(input, dt);
+	//}
+	//else {
+      //  render_system.forwardRender(input, dt);
+	//}
+	render_system.SSAORender(input, dt);
 
     physics_system.update(static_cast<float>(dt));
     scripting_system.update(static_cast<float>(dt));
