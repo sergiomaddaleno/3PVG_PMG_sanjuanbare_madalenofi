@@ -67,13 +67,9 @@ void FrameBuffer::unbind()
 
 void FrameBuffer::resize(int width, int height)
 {
-    if (width_ != width || height_ != height) {
+    if (width == width_ && height == height_) return;
 
-        width_ = width;
-        height_ = height;
-
-        init(width, height, use_color_, use_depth_);
-    }
+    init(width, height, use_color_, use_depth_);
 }
 
 GLuint FrameBuffer::GetFBO() const
