@@ -20,14 +20,6 @@
 #include <memory> 
 #include <iostream>
 
-float quadVertices[] = {
-	// positions        // texture Coords
-	-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-	-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-	 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-	 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-};
-
 Deferred::Deferred() : gBuffer(0), rboDepth(0),
 	gPosition(0),gNormal(0), gAlbedoSpec(0), shadowMap(0),
 	quadVAO(0), quadVBO(0), u_light_space(0),
@@ -37,25 +29,6 @@ Deferred::Deferred() : gBuffer(0), rboDepth(0),
 
 Deferred::~Deferred()
 {
-}
-
-void Deferred::renderQuad()
-{
-	if (quadVAO == 0)
-	{
-		glGenVertexArrays(1, &quadVAO);
-		glGenBuffers(1, &quadVBO);
-		glBindVertexArray(quadVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	}
-	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(1);
 }
 
 void Deferred::resize(unsigned int width, unsigned int height)
@@ -70,6 +43,9 @@ void Deferred::resize(unsigned int width, unsigned int height)
 
 void Deferred::init()
 {
+	screen_quad_.initVec3();
+	screen_quad_.bindVec3();
+
 	glGenFramebuffers(1, &gBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 
@@ -232,8 +208,7 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-
-			renderQuad();
+			screen_quad_.drawVec3();
 		}
 		glBlendFunc(GL_ONE, GL_ONE);
 	}
