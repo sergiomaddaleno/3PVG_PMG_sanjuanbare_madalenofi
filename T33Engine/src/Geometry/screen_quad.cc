@@ -44,7 +44,7 @@ void ScreenQuad::drawVec2()
 {
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
+
 }
 
 void ScreenQuad::initVec3(const float size)

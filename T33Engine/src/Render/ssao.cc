@@ -26,15 +26,6 @@ float quadVertices_[] = {
      1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
 };
 
-float SSAO::ourLerp(float a, float b, float f) {
-    return a + f * (b - a);
-}
-
-float SSAO::randFloat() {
-    return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);  // entre 0.0 y 1.0
-}
-
-
 void SSAO::init()
 {
 
@@ -77,6 +68,7 @@ void SSAO::init()
     glGenFramebuffers(1, &ssaoFBO); 
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
     unsigned int ssaoColorBuffer, ssaoColorBufferBlur;
+
     // SSAO color buffer
     glGenTextures(1, &ssaoColorBuffer);
     glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
@@ -97,8 +89,7 @@ void SSAO::init()
         sample *= randomFloats(generator);
         float scale = float(i) / 64.0f;
 
-       
-        scale = ourLerp(0.1f, 1.0f, scale * scale);
+        scale = std::lerp(0.1f, 1.0f, scale * scale);
         sample *= scale;
         ssaoKernel.push_back(sample);
     }
@@ -119,8 +110,6 @@ void SSAO::init()
  
     quad.initVec3();
     quad.bindVec3();
-
-
 }
 
 void SSAO::render(ECSManager& ecs, Camera cam)
@@ -264,6 +253,7 @@ void SSAO::render(ECSManager& ecs, Camera cam)
 
 
             renderQuad();
+            //quad.drawVec3();
         }
         glBlendFunc(GL_ONE, GL_ONE);
     }
@@ -278,8 +268,6 @@ void SSAO::render(ECSManager& ecs, Camera cam)
 
     glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
-
-    
 }
 
 void SSAO::renderQuad()

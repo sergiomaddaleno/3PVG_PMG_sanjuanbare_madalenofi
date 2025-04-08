@@ -20,26 +20,34 @@ void PostProcessing::initData()
 {
     frame_buffer_.init(width_, height_, true, true);
 
-    // --
-
     quad_.initVec2();
     quad_.bindVec2();
+
+    frame_buffer_.bind();
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "Post-processing framebuffer incomplete!" << std::endl;
+    }
+
+    frame_buffer_.unbind();
 }
 
 void PostProcessing::beginRender()
 {
     frame_buffer_.bind();
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+
+    /*int fb = frame_buffer_.GetFBO();
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fb);
+    std::cout << "Currently bound FBO: " << fb << std::endl;*/
 }
 
 void PostProcessing::endRender()
 {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, frame_buffer_.GetFBO());
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-    glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     frame_buffer_.unbind();
+    glDisable(GL_DEPTH_TEST);
 }
 
 void PostProcessing::render(Shader& shader)
@@ -75,8 +83,5 @@ void PostProcessing::resize(unsigned int width, unsigned int height)
         height_ = height;
 
         frame_buffer_.resize(width_, height_);
-
-        glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width_, height_);
     }
 }

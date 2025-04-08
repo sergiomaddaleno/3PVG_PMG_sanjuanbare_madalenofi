@@ -114,21 +114,18 @@ void RenderSystem::initSkybox() {
         if (si->has_value()) {
             auto& skybox_comp = *si;
 
-            if (skybox_comp->skybox.use_cubemap) {
-                skybox_comp->skybox.loadCubeMap(
-                    skybox_comp->skybox.faces_files_,
-                    skybox_comp->skybox.cubemap_vertex_file_.c_str(),
-                    skybox_comp->skybox.cubemap_fragment_file_.c_str()
-                );
-                skybox_comp->skybox.initcubeMap();
-            }
-            else {
-                skybox_comp->skybox.loadDDS(skybox_comp->skybox.dds_file_.c_str(),
-                    skybox_comp->skybox.dds_vertex_file_.c_str(),
-                    skybox_comp->skybox.dds_fragment_file_.c_str()
-                );
-                skybox_comp->skybox.initDDS();
-            }
+            skybox_comp->skybox.loadCubeMap(
+                skybox_comp->skybox.faces_files_,
+                skybox_comp->skybox.cubemap_vertex_file_.c_str(),
+                skybox_comp->skybox.cubemap_fragment_file_.c_str()
+            );
+            skybox_comp->skybox.initcubeMap();
+            
+            skybox_comp->skybox.loadDDS(skybox_comp->skybox.dds_file_.c_str(),
+                skybox_comp->skybox.dds_vertex_file_.c_str(),
+                skybox_comp->skybox.dds_fragment_file_.c_str()
+            );
+            skybox_comp->skybox.initDDS();
         }
     }
 }
@@ -236,7 +233,6 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                             auto& transform_comp = *ti;
 
                             this->setUniforms(*transform_comp, shader, camera_comp->camera);
-
                             this->renderScene(*render_comp, shader);
                         }
                     }
@@ -259,7 +255,6 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                         auto& transform_comp = *ti;
 
                         this->setUniforms(*transform_comp, texture_shader, camera_comp->camera);
-
                         this->renderScene(*render_comp, texture_shader);
                     }
                 }
@@ -350,8 +345,6 @@ void RenderSystem::SSAORender(Input& input, double dt)
                     light_comp->shadow_map_.resize(window_width, window_height);
                 }
             }
-
-           
 
             if (!is_playing) grid.drawGrid(camera_comp->camera);
         }
