@@ -28,7 +28,7 @@ float noise(vec3 x ) {
 }
 
 float fbm(vec3 p) {
-  vec3 q = p + u_time * 0.5 * vec3(1.0, -0.2, -1.0);
+  vec3 q = p + u_time * 0.005 * vec3(1.0, -0.2, -1.0);
   float g = noise(q);
 
   float f = 0.0;
@@ -80,11 +80,11 @@ void main() {
   uv.x *= u_resolution.x / u_resolution.y;
 
   vec3 ray_origin = vec3(0.0, 0.0, 5.0);
-  vec3 ray_dir = normalize(vec3(uv, -1.0));
+  vec3 ray_dir = v_ray_dir;//normalize(vec3(uv, -1.0));
 
   vec3 color = vec3(0.0);
   vec4 res = raymarch(ray_origin, ray_dir);
   color = res.rgb;
 
-  FragColor = vec4(color, 1.0);
+  FragColor = vec4(color, res.a);
 }

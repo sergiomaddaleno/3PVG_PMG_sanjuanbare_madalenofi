@@ -165,7 +165,7 @@ void RenderSystem::setUniforms(TransformComponent& tc, Shader& shader, Camera& c
 void RenderSystem::forwardRender(Input &input, double dt) {
     
     glEnable(GL_DEPTH_TEST);
-    glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
 
     glBlendFunc(GL_ONE, GL_ZERO);

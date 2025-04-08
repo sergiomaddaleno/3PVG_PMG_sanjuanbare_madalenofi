@@ -31,11 +31,11 @@ void RayMarch::render(float time)
 {
     shader_.useProgram();
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_FALSE);
+    glDisable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    //glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     float ti = (float)time;
     shader_.setUniformValue(shader_.getUniformLocation("u_time"), ValueType::T_FLOAT_1, &ti);
@@ -69,7 +69,7 @@ void RayMarch::render(float time)
             shader_.setUniformValue(shader_.getUniformLocation("view"), ValueType::T_MAT_4x4, &view);
             shader_.setUniformValue(shader_.getUniformLocation("projection"), ValueType::T_MAT_4x4, &projection);
 
-            screen_quad_.draw();
+            screen_quad_.drawVec2();
         }
     }
 

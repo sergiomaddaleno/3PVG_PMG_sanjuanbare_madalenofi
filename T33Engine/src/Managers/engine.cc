@@ -35,7 +35,7 @@ void Engine::init()
 	render_system.ssao.init();
 	render_system.grid.initGrid();
 
-	//raymarch.init();
+	raymarch.init();
 
 	//render_system.compileShaderForBuild();
 }
@@ -56,26 +56,26 @@ void Engine::beginFrame()
 
     // --- Render scene
     render_system.resize(width, height);
-	//if (render_system.use_deferred_shading) {
-    //    render_system.deferredRender(input, dt);
-	//}
-	//else {
-      //  render_system.forwardRender(input, dt);
-	//}
-	render_system.SSAORender(input, dt);
+	if (render_system.use_deferred_shading) {
+        render_system.deferredRender(input, dt);
+	}
+	else {
+        render_system.forwardRender(input, dt);
+	}
+	//render_system.SSAORender(input, dt);
 
     physics_system.update(static_cast<float>(dt));
     scripting_system.update(static_cast<float>(dt));
 
-    //raymarch.resize(width, height);
-    // raymarch.render(static_cast<float>(window.getTime()));
+    raymarch.resize(width, height);
+    raymarch.render(static_cast<float>(window.getTime()));
 
     // --- 
-	//post_process.endRender();
 
     /*ui_manager.BeginFrame();
     ui_manager.Render();
 
+    post_process.endRender();
 	this->clearWindow();
 
     ui_manager.GameWindow();
