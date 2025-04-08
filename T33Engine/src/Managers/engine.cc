@@ -52,7 +52,7 @@ void Engine::beginFrame()
     unsigned int height = window.getHeight();
 
     post_process.resize(width, height);
-    //post_process.beginRender();
+    post_process.beginRender();
 
     // --- Render scene
     render_system.resize(width, height);
@@ -64,22 +64,21 @@ void Engine::beginFrame()
 	}
 	//render_system.SSAORender(input, dt);
 
-    physics_system.update(static_cast<float>(dt));
-    scripting_system.update(static_cast<float>(dt));
+    physics_system.update((float)dt);
+    scripting_system.update((float)dt);
 
     raymarch.resize(width, height);
-    raymarch.render(static_cast<float>(window.getTime()));
+    raymarch.render((float)(window.getTime()));
 
     // --- 
 
-    /*ui_manager.BeginFrame();
+    ui_manager.BeginFrame();
     ui_manager.Render();
 
     post_process.endRender();
-	this->clearWindow();
 
     ui_manager.GameWindow();
-    ui_manager.EndFrame();*/
+    ui_manager.EndFrame();
 }
 
 void Engine::endFrame()

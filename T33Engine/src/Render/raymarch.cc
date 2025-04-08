@@ -48,12 +48,11 @@ void RayMarch::render(float time)
     int tex_id = GL_TEXTURE0;
     shader_.setUniformValue(shader_.getUniformLocation("u_noise_2D"), ValueType::T_INT_1, &tex_id);
 
-    noise_3D_.active(GL_TEXTURE1);
+    /*noise_3D_.active(GL_TEXTURE1);
     noise_3D_.bind3D();
     tex_id = GL_TEXTURE1;
-    shader_.setUniformValue(shader_.getUniformLocation("u_noise_3D"), ValueType::T_INT_1, &tex_id);
+    shader_.setUniformValue(shader_.getUniformLocation("u_noise_3D"), ValueType::T_INT_1, &tex_id);*/
 
-    framebuffer_.GetColorTexture();
     auto ci = ecs_.getComponentList<CameraComponent>().begin();
     auto ciend = ecs_.getComponentList<CameraComponent>().end();
 
@@ -62,7 +61,7 @@ void RayMarch::render(float time)
             auto& camera_comp = *ci;
 
             glm::vec3 camera_position = camera_comp->camera.getPosition();
-            glm::mat4x4 view = camera_comp->camera.getViewMatrix();
+            glm::mat4 view = camera_comp->camera.getViewMatrix();
             glm::mat4 projection = camera_comp->camera.getUsePerspectiveMatrix() ? camera_comp->camera.getPerspectiveMatrix() : camera_comp->camera.getOrthograficMatrix();
 
             shader_.setUniformValue(shader_.getUniformLocation("u_camera_pos"), ValueType::T_FLOAT_3, &camera_position);

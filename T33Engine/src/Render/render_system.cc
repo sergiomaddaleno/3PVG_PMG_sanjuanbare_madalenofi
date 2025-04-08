@@ -195,7 +195,6 @@ void RenderSystem::forwardRender(Input &input, double dt) {
             for (; si != siend; ++si) {
                 if (si->has_value()) {
                     auto& skybox_comp = *si;
-
                     if (use_skybox) skybox_comp->skybox.render(camera_comp->camera);
                 }
             }
@@ -282,6 +281,7 @@ void RenderSystem::deferredRender(Input& input, double dt)
                 camera_comp->camera.setAspectRatio((float)camera_comp->window_width / (float)camera_comp->window_height);
             }
             camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
+
 
             deferred.resize(window_width, window_height);
             deferred.render(ecs_, camera_comp->camera);

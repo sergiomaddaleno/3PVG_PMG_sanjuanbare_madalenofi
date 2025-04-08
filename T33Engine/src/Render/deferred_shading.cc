@@ -239,6 +239,7 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	}
 	
 	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
 	glUseProgram(0);
 	
 	// ----------------------------------------------------------------------------------
