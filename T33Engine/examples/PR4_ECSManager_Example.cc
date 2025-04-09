@@ -16,14 +16,13 @@
 auto teapot_mesh = std::make_unique<Mesh>();
 auto toad_mesh = std::make_unique<Mesh>();
 auto mario_mesh = std::make_unique<Mesh>();
-
-RenderSystem render_system;
 ECSManager ecs;
 
 int num_entities = 5000;
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
 
 Shader shader_tex;
+RenderComponent rc;
 
 int main(int, char**) {
    
@@ -32,6 +31,8 @@ int main(int, char**) {
     window->initGLEW();
 
     Input input{ window->getWindow() };
+
+    RenderSystem render_system{ ecs };
 
     // ---
     if (!toad_mesh->loadOBJ("../stages/assets/obj/toad.obj", "../stages/assets/textures/toad")) {
@@ -77,7 +78,7 @@ int main(int, char**) {
 
     initShader(shader_tex, "../stages/shaders/basic/texture.vs", "../stages/shaders/basic/texture.fs");
 
-    render_system.init(ecs);
+    render_system.initRenderTypes();
     render_system.shader = shader_tex;
 
     double lastTime = window->getTime();
@@ -97,9 +98,11 @@ int main(int, char**) {
         ecs.get_component<TransformComponent>(0)->moveEntity(input, dt);
         ecs.get_component<TransformComponent>(1)->moveEntity(input, dt);
 
-        render_system.forwardRender(ecs);
+        render_system.forwardRender(input, dt);
 
         if (window->closePressed(input)) done = true;
+        lastTime = currentTime;
+
     }
 
     return 0;
