@@ -7,14 +7,16 @@
 #include "Core/shader.h"
 #include "Components/render_component.h"
 #include "Components/transform_component.h"
+#include "Render/render_system.h"
 #include "Core/input.h"
 #include "utils.h"
 
 #include <../deps/glm/glm.hpp>
 
-auto mesh_ = std::make_unique<Mesh>();
+auto mesh_ = std::make_shared<Mesh>();
 RenderComponent rc;
 TransformComponent tc;
+Shader shader;
 
 int main(int, char**) {
 	
@@ -34,8 +36,7 @@ int main(int, char**) {
 	tc.position = glm::vec3{ 0.0f, 0.0f, -5.0f };
 	tc.scale = glm::vec3{ 5.0f, 5.0f, 5.0f };
 
-	initShader(rc.mesh_->shader, "../stages/shaders/basic/normals.vs", "../stages/shaders/basic/normals.fs");
-	rc.mesh_->bind();
+	initShader(shader, "../stages/shaders/basic/normals.vs", "../stages/shaders/basic/normals.fs");
 
 	double lastTime = window->getTime();
 	bool done = false;
@@ -47,7 +48,7 @@ int main(int, char**) {
 		float time = (float)window->getTime() * 2;
 		tc.rotation = glm::vec3{ 0.0f, time, 0.0f };
 
-		rc.mesh_->render(rc, tc);
+		rc.mesh_->basicRender(shader, rc, tc);
 
 		if (window->closePressed(input)) done = true;
 	}

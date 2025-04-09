@@ -8,6 +8,8 @@ uniform sampler3D u_noise_3D;
 
 out vec4 FragColor;
 in vec3 v_ray_dir;
+in vec3 position;
+in vec3 direction;
 
 #define MAX_STEPS 100
 const float MARCH_SIZE = 0.08; 
@@ -80,10 +82,10 @@ void main() {
   uv.x *= u_resolution.x / u_resolution.y;
 
   vec3 ray_origin = vec3(0.0, 0.0, 5.0);
-  vec3 ray_dir = v_ray_dir;//normalize(vec3(uv, -1.0));
+  vec3 ray_dir = v_ray_dir; //normalize(vec3(uv, -1.0));
 
   vec3 color = vec3(0.0);
-  vec4 res = raymarch(ray_origin, ray_dir);
+  vec4 res = raymarch(position, direction);
   color = res.rgb;
 
   FragColor = vec4(color, res.a);

@@ -36,6 +36,12 @@ class Mesh {
 public:
     Mesh();
     ~Mesh();
+
+    struct Vertex {
+        glm::vec3 pos;
+        glm::vec3 normal;
+        glm::vec2 tex_coord;
+    };
     
     bool loadOBJ(const std::string& file, const std::string& textureFolder = "");
 
@@ -44,6 +50,11 @@ public:
 
     std::vector<float> getVertex();
     Texture getTexture(int shape_index);
+
+    std::vector<Vertex> Getvertices();
+    GLuint getVAO();
+    GLuint getVBO();
+    GLuint getEBO();
 
     nlohmann::json serialize() const;
 
@@ -54,13 +65,9 @@ public:
     std::string mesh_path;
     std::string texture_folder;
 
-private:
-    struct Vertex {
-        glm::vec3 pos;
-        glm::vec3 normal;
-        glm::vec2 tex_coord;
-    };
+    void basicRender(Shader shader, RenderComponent rc, TransformComponent tc, Camera cam = Camera());
 
+private:
     std::vector<Vertex> vertices;
     std::vector<Texture> textures;
 
