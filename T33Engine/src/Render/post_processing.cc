@@ -44,6 +44,7 @@ void PostProcessing::endRender()
 
 void PostProcessing::render(Shader& shader)
 {
+
     shader.useProgram();
 
     // -- 
