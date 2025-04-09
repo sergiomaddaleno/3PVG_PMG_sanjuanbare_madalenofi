@@ -45,9 +45,8 @@ public:
 
 	static std::optional<Triangle> make(float size_, Color color);
 
-	void render(RenderComponent rc, TransformComponent tc, Camera cam = Camera());
+	void render(Shader shader, RenderComponent rc, TransformComponent tc, Camera cam = Camera());
 
-	Shader shader;
 	PointsTriangle my_triangle[3];   
 };
 

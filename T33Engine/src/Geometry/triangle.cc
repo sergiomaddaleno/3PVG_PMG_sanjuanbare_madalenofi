@@ -62,9 +62,9 @@ std::optional<Triangle> Triangle::make(float size_, Color color)
     return std::optional<Triangle>(t);
 }
 
-void Triangle::render(RenderComponent rc, TransformComponent tc, Camera cam)
+void Triangle::render(Shader shader, RenderComponent rc, TransformComponent tc, Camera cam)
 {
-    GLuint vertex_buffer;
+    GLuint vao, vertex_buffer;
 
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
@@ -74,30 +74,30 @@ void Triangle::render(RenderComponent rc, TransformComponent tc, Camera cam)
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, tc.position);
-    model = model * glm::mat4_cast(tc.rotation);
+    model *= glm::mat4_cast(tc.rotation);
     model = glm::scale(model, tc.scale);
 
     glm::mat4 view = cam.getViewMatrix();
     glm::mat4 projection = cam.getPerspectiveMatrix();
-    glm::mat4 mvp = projection * view * model;
 
-    GLint mvpLocation = shader.getUniformLocation("mvp");
-    shader.setUniformValue(mvpLocation, ValueType::T_MAT_4x4, glm::value_ptr(mvp));
+    shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+    shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+    shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-    GLuint vpos_location = glGetAttribLocation(shader.getProgram(), "a_position");
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(vpos_location);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
-    GLuint vcol_location = glGetAttribLocation(shader.getProgram(), "a_color");
-    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
-    glEnableVertexAttribArray(vcol_location);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    glDisableVertexAttribArray(vpos_location);
-    glDisableVertexAttribArray(vcol_location);
+    glBindVertexArray(0);
+    glDeleteBuffers(1, &vertex_buffer);
+    glDeleteVertexArrays(1, &vao);
 
     glUseProgram(0);
+
 }
 
 
