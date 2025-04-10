@@ -16,6 +16,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "Geometry/screen_quad.h"
+
 class ECSManager;
 class Shader;
 class Camera;
@@ -33,10 +35,7 @@ public:
     ~Deferred();
 
     void init();
-
     void render(ECSManager& ecs, Camera cam);
-    void renderQuad();
-
     void resize(unsigned int width, unsigned int height);
 
     Shader gbuffer, deferred_shading;
@@ -53,6 +52,8 @@ private:
 
     unsigned int width_;
     unsigned int height_;
+
+    ScreenQuad screen_quad_;
 };
 
 #endif // !__DEFERRED__

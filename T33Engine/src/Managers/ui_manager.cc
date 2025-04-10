@@ -70,7 +70,7 @@ UIManager::UIManager(Engine& engine, ECSManager& ecs, RenderSystem& rs)
     engine_(engine),
     input_(nullptr)
 {
-    manipulate_world.position = true;
+    manipulate_world.position = false;
     manipulate_world.rotation = false;
     manipulate_world.scale = false;
 }

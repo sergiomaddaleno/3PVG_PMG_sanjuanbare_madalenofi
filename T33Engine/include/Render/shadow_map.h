@@ -46,7 +46,6 @@ public:
 	void bindCubeMap();
 
 	void render(ECSManager& ecs, Shader shader, LightComponent lc);
-
 	void resize(unsigned int window_width, unsigned int window_height);
 
 	float near_plane, far_plane;
