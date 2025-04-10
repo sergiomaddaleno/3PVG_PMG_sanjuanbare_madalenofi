@@ -16,8 +16,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "Geometry/screen_quad.h"
-
 class ECSManager;
 class Shader;
 class Camera;
@@ -31,30 +29,30 @@ class Deferred {
 
 public:
 
-	Deferred();
-	~Deferred();
+    Deferred();
+    ~Deferred();
 
-	void init();
-	void render(ECSManager& ecs, Camera cam);
+    void init();
 
-	void resize(unsigned int width, unsigned int height);
+    void render(ECSManager& ecs, Camera cam);
+    void renderQuad();
 
-	Shader gbuffer, deferred_shading;
+    void resize(unsigned int width, unsigned int height);
 
-	int deferred_option;
+    Shader gbuffer, deferred_shading;
+
+    int deferred_option;
 
 private:
-	unsigned int gBuffer, rboDepth;
-	unsigned int gPosition, gNormal, gAlbedoSpec, shadowMap;
+    unsigned int gBuffer, rboDepth;
+    unsigned int gPosition, gNormal, gAlbedoSpec, shadowMap;
 
-	unsigned int quadVAO, quadVBO;
+    unsigned int quadVAO, quadVBO;
 
-	glm::mat4 u_light_space;
+    glm::mat4 u_light_space;
 
-	unsigned int width_;
-	unsigned int height_;
-
-	ScreenQuad screen_quad_;
+    unsigned int width_;
+    unsigned int height_;
 };
 
 #endif // !__DEFERRED__

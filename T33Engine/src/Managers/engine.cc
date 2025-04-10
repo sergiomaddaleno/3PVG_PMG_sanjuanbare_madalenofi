@@ -67,8 +67,7 @@ void Engine::beginFrame()
     physics_system.update((float)dt);
     scripting_system.update((float)dt);
 
-    raymarch.resize(width, height);
-    raymarch.render((float)(window.getTime()));
+
 
     // --- 
 

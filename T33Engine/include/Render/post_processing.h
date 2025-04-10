@@ -19,8 +19,6 @@
 #include <vector>
 #include <../deps/glm/glm.hpp>
 
-#include "Geometry/screen_quad.h"
-
  /**
   * @class PostProcessing
   * @brief Implements post-processing effects for rendered scenes.
@@ -28,31 +26,29 @@
 class PostProcessing {
 public:
 
-	PostProcessing();
-	~PostProcessing();
+    PostProcessing();
+    ~PostProcessing();
 
-	void initData();
+    void initData();
 
-	void beginRender();
-	void endRender();
+    void beginRender();
+    void endRender();
 
-	void render(Shader& shader);
-	void resize(unsigned int width, unsigned int height);
+    void render(Shader& shader);
+    void resize(unsigned int width, unsigned int height);
 
-	float grey_;
-	float negative_;
-	float waves_;
-	float blur_;
-	int kernel_types_;
+    float grey_;
+    float negative_;
+    float waves_;
+    float blur_;
+    int kernel_types_;
 
-	FrameBuffer frame_buffer_;
-
+    FrameBuffer frame_buffer_;
 private:
-	unsigned int width_, height_;
 
-	ScreenQuad quad_;
+    unsigned int width_, height_;
 
-	GLuint RBO;
+    GLuint rectVAO, rectVBO, RBO;
 };
 
 #endif // __POST_PROCESS__

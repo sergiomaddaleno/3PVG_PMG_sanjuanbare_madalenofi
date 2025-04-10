@@ -1,8 +1,7 @@
-
 #include "Core/framebuffer.h"
 #include <cstdio>
 
-FrameBuffer::FrameBuffer() 
+FrameBuffer::FrameBuffer()
     : FBO_(0), FBColorTexture_(0), FBDepthTexture_(0), width_(800), height_(600), use_color_(true), use_depth_(true)
 {}
 
@@ -17,7 +16,7 @@ void FrameBuffer::init(int width, int height, bool use_color, bool use_depth)
     use_color_ = use_color;
     use_depth_ = use_depth;
 
-	glGenFramebuffers(1, &FBO_);
+    glGenFramebuffers(1, &FBO_);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO_);
 
     if (use_color_) {
@@ -34,24 +33,18 @@ void FrameBuffer::init(int width, int height, bool use_color, bool use_depth)
     if (use_depth_) {
         glGenTextures(1, &FBDepthTexture_);
         glBindTexture(GL_TEXTURE_2D, FBDepthTexture_);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width_, height_, 0,GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width_, height_, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, FBDepthTexture_, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, FBDepthTexture_, 0);
     }
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         printf("Error: Framebuffer is not complete\n");
     }
 
-    this->unbind();
-}
-
-void FrameBuffer::blitTo(FrameBuffer& target, unsigned int width, unsigned int height)
-{
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, this->GetFBO());
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target.GetFBO());
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -67,13 +60,40 @@ void FrameBuffer::unbind()
 
 void FrameBuffer::resize(int width, int height)
 {
-    if (width_ != width || height_ != height) {
+    width_ = width;
+    height_ = height;
 
-        width_ = width;
-        height_ = height;
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO_);
 
-        init(width, height, use_color_, use_depth_);
+    if (use_color_) {
+        glBindTexture(GL_TEXTURE_2D, FBColorTexture_);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     }
+
+    if (use_depth_) {
+        glBindTexture(GL_TEXTURE_2D, FBDepthTexture_);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width_, height_, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+GLuint FrameBuffer::captureWindowToTexture() {
+    GLuint captureTexture;
+    glGenTextures(1, &captureTexture);
+
+    glBindTexture(GL_TEXTURE_2D, captureTexture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, width_, height_, 0);
+
+    return captureTexture;
 }
 
 GLuint FrameBuffer::GetFBO() const

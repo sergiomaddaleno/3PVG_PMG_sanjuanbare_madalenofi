@@ -17,7 +17,7 @@ int main(int, char**) {
 
     T33Engine.init();
 
-    T33Engine.save_manager.loadFromFile("../stages/saves/solar_system.json");
+    T33Engine.save_manager.loadFromFile("../stages/saves/main_scene.json");
 
     bool done = false;
     while (!done) {

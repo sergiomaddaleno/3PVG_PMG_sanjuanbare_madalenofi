@@ -1,4 +1,3 @@
-
 #include "Render/deferred_shading.h"
 #include "Systems/ecs_manager.h"
 #include "Core/shader.h"
@@ -20,15 +19,42 @@
 #include <memory> 
 #include <iostream>
 
+float quadVertices[] = {
+	// positions        // texture Coords
+	-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+	-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+	 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+	 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+};
+
 Deferred::Deferred() : gBuffer(0), rboDepth(0),
-	gPosition(0),gNormal(0), gAlbedoSpec(0), shadowMap(0),
-	quadVAO(0), quadVBO(0), u_light_space(0),
-	deferred_option(0),
-	width_(800), height_(600)
+gPosition(0), gNormal(0), gAlbedoSpec(0), shadowMap(0),
+quadVAO(0), quadVBO(0), u_light_space(0),
+deferred_option(0),
+width_(800), height_(600)
 {}
 
 Deferred::~Deferred()
 {
+}
+
+void Deferred::renderQuad()
+{
+	if (quadVAO == 0)
+	{
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(1);
 }
 
 void Deferred::resize(unsigned int width, unsigned int height)
@@ -43,9 +69,6 @@ void Deferred::resize(unsigned int width, unsigned int height)
 
 void Deferred::init()
 {
-	screen_quad_.initVec3();
-	screen_quad_.bindVec3();
-
 	glGenFramebuffers(1, &gBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 
@@ -70,7 +93,7 @@ void Deferred::init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
 
-	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+	unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 	glDrawBuffers(3, attachments);
 
 	glGenRenderbuffers(1, &rboDepth);
@@ -87,7 +110,7 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 {
 	// Geometry pass -------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-	glClearColor(0.0, 0.0, 0.0, 1.0); 
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	gbuffer.useProgram();
@@ -117,8 +140,8 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			gbuffer.setUniformValue(gbuffer.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
 			int tex_id = 0;
-			gbuffer.setUniformValue(gbuffer.getUniformLocation("texture_diffuse"), ValueType::T_INT_1, &tex_id);			
-		   
+			gbuffer.setUniformValue(gbuffer.getUniformLocation("texture_diffuse"), ValueType::T_INT_1, &tex_id);
+
 			GLuint screen_tex_loc = glGetUniformLocation(gbuffer.getProgram(), "u_screen_tex");
 			glUniform1i(screen_tex_loc, 0);
 
@@ -150,7 +173,7 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			}
 		}
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 1);
 
 	// Lightning pass -------------------------------------------------
 
@@ -170,13 +193,13 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex_id);
 	tex_id = TI_Albedo;
 	deferred_shading.setUniformValue(deferred_shading.getUniformLocation("gAlbedoSpec"), ValueType::T_INT_1, &tex_id);
-	
+
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
 
 	glBlendFunc(GL_ONE, GL_ZERO);
-	glDepthMask(GL_FALSE);
+	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
 
 	auto li = ecs.getComponentList<LightComponent>().begin();
@@ -189,13 +212,13 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			int useDepthMapInt = useDepthMap ? 1 : 0;
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_useDepthMap"), ValueType::T_INT_1, &useDepthMapInt);
 
-			light_comp->shadow_map_.render(ecs, deferred_shading,*light_comp);
+			light_comp->shadow_map_.render(ecs, deferred_shading, *light_comp);
 
 			//pass to light
 
-			 useDepthMap = false;
-			 useDepthMapInt = useDepthMap ? 1 : 0;
-			
+			useDepthMap = false;
+			useDepthMapInt = useDepthMap ? 1 : 0;
+
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_useDepthMap"), ValueType::T_INT_1, &useDepthMapInt);
 			light_comp->light.setUniforms(deferred_shading);
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
@@ -208,21 +231,21 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-			screen_quad_.drawVec3();
+
+			renderQuad();
 		}
 		glBlendFunc(GL_ONE, GL_ONE);
 	}
-	
+
 	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
 	glUseProgram(0);
-	
+
 	// ----------------------------------------------------------------------------------
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 1);
 
 	glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 1);
 
 }

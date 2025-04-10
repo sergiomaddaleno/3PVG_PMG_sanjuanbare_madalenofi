@@ -21,15 +21,15 @@ public:
     FrameBuffer();
     ~FrameBuffer();
 
-    void init(int width, int height, 
-        bool useColor = true, 
+    void init(int width, int height,
+        bool useColor = true,
         bool useDepth = true);
-
-    void blitTo(FrameBuffer& target, unsigned int width, unsigned int height);
 
     void bind();
     void unbind();
     void resize(int width, int height);
+
+    GLuint captureWindowToTexture();
 
     GLuint GetFBO() const;
     GLuint GetColorTexture() const;

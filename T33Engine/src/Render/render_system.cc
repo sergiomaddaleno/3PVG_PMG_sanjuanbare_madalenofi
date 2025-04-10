@@ -213,7 +213,7 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                     light_in_scene = true;
 
                     light_comp->shadow_map_.render(ecs_, shader, *light_comp);
-                    //light_comp->shadow_map_.resize(window_width, window_height);
+                    light_comp->shadow_map_.resize(window_width, window_height);
 
                     shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(camera_comp->camera.getPosition()));
 
@@ -283,7 +283,7 @@ void RenderSystem::deferredRender(Input& input, double dt)
             camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
 
 
-            //deferred.resize(window_width, window_height);
+            deferred.resize(window_width, window_height);
             deferred.render(ecs_, camera_comp->camera);
 
             //--
