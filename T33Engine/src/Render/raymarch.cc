@@ -33,7 +33,7 @@ void RayMarch::render(float time)
 
     glDisable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-    //glDepthMask(GL_FALSE);
+    glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -78,8 +78,13 @@ void RayMarch::render(float time)
         }
     }
 
-    glBindVertexArray(0);
+    glEnable(GL_DEPTH_TEST); 
+    glDepthFunc(GL_LESS);
+    glDepthMask(GL_TRUE); 
+    glDisable(GL_BLEND);
+
     glBindTexture(GL_TEXTURE_2D, 0);
+    glUseProgram(0);
 }
 
 void RayMarch::resize(unsigned int width, unsigned int height)
