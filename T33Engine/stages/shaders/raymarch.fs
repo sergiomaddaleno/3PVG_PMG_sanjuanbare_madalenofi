@@ -6,6 +6,8 @@ uniform vec3 u_camera_pos;
 uniform sampler2D u_noise_2D;
 uniform sampler3D u_noise_3D;
 
+uniform vec3 sun_dir = vec3(0.0f, 1.0f, 1.0f);
+
 out vec4 FragColor;
 in vec3 v_ray_dir;
 in vec3 position;
@@ -15,8 +17,9 @@ in vec3 world_pos;
 in vec3 ray_origin;
 in vec3 ray_direction;
 
-#define MAX_STEPS 70
-const float MARCH_SIZE = 0.04; 
+
+#define MAX_STEPS 100
+const float MARCH_SIZE = 0.08; 
 
 float sdSphere(vec3 p, float radius) {
     return length(p) - radius;
@@ -53,7 +56,7 @@ float fbm(vec3 p) {
 
 float scene(vec3 p) {
   float distance = sdSphere(p, 1.0);
-  float f = fbm(p * 0.5);
+  float f = fbm(p);
 
   return -distance + f;
 }
@@ -67,11 +70,11 @@ vec4 raymarch(vec3 ro, vec3 rd) {
     for(int i = 0; i < MAX_STEPS; i++) {
         float density = scene(p);
 
-        if(density > 0) {
-            vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
+        if (density > 0.0) {
+          vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
 
-            color.rgb *= color.a;
-            res += color*(1.0-res.a);
+          color.rgb *= color.a;
+          res += color*(1.0-res.a);
         }
         depth += MARCH_SIZE;
         p = ro + depth * rd;
