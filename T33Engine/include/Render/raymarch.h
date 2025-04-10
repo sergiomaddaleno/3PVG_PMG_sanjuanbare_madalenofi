@@ -7,7 +7,7 @@
 #include "Core/shader.h"
 #include "Core/texture.h"
 #include "Core/framebuffer.h"
-#include "Geometry/screen_quad.h"
+#include "Geometry/Cube.h"
 
 class RayMarch{
 
@@ -24,10 +24,9 @@ public:
 		initRaymarchShader();
 
 		noise_2D_.loadTexture("../stages/assets/textures/noise/noise.png");
-		//noise_3D_.loadTexture3D("../stages/assets/textures/noise/HDR_L.raw");
 
-		screen_quad_.initVec2();
-		screen_quad_.bindVec2();
+		cube.init8v();
+		cube.bind();
 	}
 
 	void render(float time);
@@ -37,11 +36,9 @@ public:
 	int window_width, window_height;
 
 	Shader shader_;
-
 	Texture noise_2D_;
-	Texture noise_3D_;
 
-	ScreenQuad screen_quad_;
+	Cube cube;
 
 private:
 

@@ -1,25 +1,23 @@
 #version 330 core
 
 layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
 
+uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform vec3 u_camera_pos;
 
-out vec3 v_ray_dir;
-out mat4 inverse_view;
-out vec3 position;
-out vec3 direction;
+out vec3 world_pos;
+out vec3 ray_origin;
+out vec3 ray_direction;
+
+uniform vec3 u_camera_pos;
 
 void main()
 {
-    mat4 inverse_view = inverse(view);
-    position = (inverse_view * vec4(0,0,0,1)).xyz;
-    direction = (inverse_view * vec4(0,0,-1,0)).xyz;
+    vec4 loc_world_pos = model * vec4(aPos, 1.0);
+    world_pos = loc_world_pos.xyz;
+    ray_origin = u_camera_pos;
+    ray_direction = world_pos - u_camera_pos;
 
-
-    //v_ray_dir = mat3(inverse(view)) * normalize(aPos);
-
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = projection * view * vec4(world_pos, 1.0);
 }

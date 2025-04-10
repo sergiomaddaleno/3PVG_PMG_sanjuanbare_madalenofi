@@ -11,8 +11,12 @@ in vec3 v_ray_dir;
 in vec3 position;
 in vec3 direction;
 
-#define MAX_STEPS 100
-const float MARCH_SIZE = 0.08; 
+in vec3 world_pos;
+in vec3 ray_origin;
+in vec3 ray_direction;
+
+#define MAX_STEPS 70
+const float MARCH_SIZE = 0.04; 
 
 float sdSphere(vec3 p, float radius) {
     return length(p) - radius;
@@ -30,7 +34,7 @@ float noise(vec3 x ) {
 }
 
 float fbm(vec3 p) {
-  vec3 q = p + u_time * 0.005 * vec3(1.0, -0.2, -1.0);
+  vec3 q = p + u_time * 0.5 * vec3(1.0, -0.2, -1.0);
   float g = noise(q);
 
   float f = 0.0;
@@ -58,7 +62,6 @@ vec4 raymarch(vec3 ro, vec3 rd) {
     
     float depth = 0.0;
     vec3 p = u_camera_pos + depth * rd;
-
     vec4 res = vec4(0.0);
 
     for(int i = 0; i < MAX_STEPS; i++) {
@@ -66,6 +69,7 @@ vec4 raymarch(vec3 ro, vec3 rd) {
 
         if(density > 0) {
             vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
+
             color.rgb *= color.a;
             res += color*(1.0-res.a);
         }
@@ -77,16 +81,8 @@ vec4 raymarch(vec3 ro, vec3 rd) {
 }
 
 void main() {
-  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-  uv -= 0.5;
-  uv.x *= u_resolution.x / u_resolution.y;
+    //FragColor = vec4(normalize(ray_direction) * 0.5 + 0.5, 1.0);
 
-  vec3 ray_origin = vec3(0.0, 0.0, 5.0);
-  vec3 ray_dir = v_ray_dir; //normalize(vec3(uv, -1.0));
-
-  vec3 color = vec3(0.0);
-  vec4 res = raymarch(position, direction);
-  color = res.rgb;
-
-  FragColor = vec4(color, res.a);
+    vec4 result = raymarch(ray_origin, ray_direction);
+    FragColor = result;
 }

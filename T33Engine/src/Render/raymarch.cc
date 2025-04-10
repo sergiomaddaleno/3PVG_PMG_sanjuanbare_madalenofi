@@ -60,15 +60,21 @@ void RayMarch::render(float time)
         if (ci->has_value()) {
             auto& camera_comp = *ci;
 
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+            model = model * glm::mat4_cast(glm::quat(0.0f, 0.0f, 0.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+
             glm::vec3 camera_position = camera_comp->camera.getPosition();
             glm::mat4 view = camera_comp->camera.getViewMatrix();
             glm::mat4 projection = camera_comp->camera.getUsePerspectiveMatrix() ? camera_comp->camera.getPerspectiveMatrix() : camera_comp->camera.getOrthograficMatrix();
 
+            shader_.setUniformValue(shader_.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
             shader_.setUniformValue(shader_.getUniformLocation("u_camera_pos"), ValueType::T_FLOAT_3, &camera_position);
             shader_.setUniformValue(shader_.getUniformLocation("view"), ValueType::T_MAT_4x4, &view);
             shader_.setUniformValue(shader_.getUniformLocation("projection"), ValueType::T_MAT_4x4, &projection);
 
-            screen_quad_.drawVec2();
+            cube.draw();
         }
     }
 
