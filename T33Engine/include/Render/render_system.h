@@ -58,8 +58,6 @@ public:
 		initShader(ssao.ssao_shader, "../stages/shaders/ssao_shader.vs", "../stages/shaders/ssao_shader.fs");
 
 		initShader(ssao.ssao_geometry, "../stages/shaders/g_buffer_ssao.vs", "../stages/shaders/g_buffer_ssao.fs");
-
-		
 	}
 
 	void forwardRender(Input &input, double dt);
@@ -87,6 +85,8 @@ public:
 	size_t addCamera(Camera camera = Camera());
 
 	size_t addSkybox(Skybox skybox = Skybox());
+
+	size_t createCloud(float size = 1.0f, TransformComponent tc = TransformComponent());
 
 	size_t createMesh(std::string file, std::string textureFolder, 
 		TransformComponent tc = TransformComponent());

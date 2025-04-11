@@ -2,33 +2,27 @@
 
 uniform float u_time;
 uniform vec2 u_resolution;
-uniform vec3 u_camera_pos; 
 uniform sampler2D u_noise_2D;
-uniform sampler3D u_noise_3D;
 
-uniform vec3 sun_dir = vec3(0.0f, 1.0f, 1.0f);
-
-out vec4 FragColor;
-in vec3 v_ray_dir;
-in vec3 position;
-in vec3 direction;
+uniform vec3 u_cube_scale;
+uniform vec3 u_light_color = vec3(1.0, 1.0, 1.0);
+uniform vec3 u_absorption = vec3(0.2, 0.2, 0.2);
+uniform float u_speed = 1.0f;
+uniform float u_march_size = 0.04;
+uniform int u_max_steps = 200;
+uniform float u_amplitude = 2.0;
+uniform float u_frequency = 0.5;
+uniform vec3 u_cloud_direction = vec3(0.1, 0.2, -0.3);
 
 in vec3 world_pos;
 in vec3 ray_origin;
 in vec3 ray_direction;
-
-
-#define MAX_STEPS 100
-const float MARCH_SIZE = 0.08; 
-
-float sdSphere(vec3 p, float radius) {
-    return length(p) - radius;
-}
+out vec4 FragColor;
 
 float noise(vec3 x ) {
   vec3 p = floor(x);
   vec3 f = fract(x);
-  f = f * f * (3. - 2. * f);
+  f = f * f * (3.0 - 2.0 * f);
 
   vec2 uv = (p.xy + vec2(37.0, 239.0) * p.z) + f.xy;
   vec2 tex = textureLod(u_noise_2D,(uv + 0.5) / 256.0, 0.0).yx;
@@ -37,55 +31,65 @@ float noise(vec3 x ) {
 }
 
 float fbm(vec3 p) {
-  vec3 q = p + u_time * 0.5 * vec3(1.0, -0.2, -1.0);
-  float g = noise(q);
-
   float f = 0.0;
-  float scale = 0.5;
-  float factor = 2.02;
+  float amp = u_amplitude;
+  float freq = u_frequency;
 
-  for (int i = 0; i < 6; i++) {
-      f += scale * noise(q);
-      q *= factor;
-      factor += 0.21;
-      scale *= 0.5;
+  for (int i = 0; i < 5; i++) {
+      f += amp * noise(p * freq);
+      freq *= 2.0;
+      amp *= 0.5;
   }
 
-  return f;
+  return clamp(f, 0.0, 1.0);
 }
 
-float scene(vec3 p) {
-  float distance = sdSphere(p, 1.0);
-  float f = fbm(p);
+bool cubeIntersection(vec3 ro, vec3 rd, out float tmin, out float tmax) {
+    vec3 box_min = vec3(-u_cube_scale * 0.5);
+    vec3 box_max = vec3( u_cube_scale * 0.5);
 
-  return -distance + f;
+    vec3 inv_dir = 1.0 / rd;
+    vec3 t0 = (box_min - ro) * inv_dir;
+    vec3 t1 = (box_max - ro) * inv_dir;
+
+    vec3 tmin_vec = min(t0, t1);
+    vec3 tmax_vec = max(t0, t1);
+
+    tmin = max(max(tmin_vec.x, tmin_vec.y), tmin_vec.z);
+    tmax = min(min(tmax_vec.x, tmax_vec.y), tmax_vec.z);
+
+    return tmax >= max(tmin, 0.0);
 }
 
-vec4 raymarch(vec3 ro, vec3 rd) {
-    
-    float depth = 0.0;
-    vec3 p = u_camera_pos + depth * rd;
-    vec4 res = vec4(0.0);
+vec4 raymarch(vec3 ro, vec3 rd, float tmin, float tmax) {
+    vec4 accum = vec4(0.0);
+    float t = tmin;
 
-    for(int i = 0; i < MAX_STEPS; i++) {
-        float density = scene(p);
+    for (int i = 0; i < u_max_steps && t < tmax; ++i) {
+        vec3 pos = ro + t * rd;
+        float density = fbm(pos * 2.0 + (u_time * u_speed) * u_cloud_direction);
+        density = max(0.0, density - 0.3); 
 
-        if (density > 0.0) {
-          vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
+        vec3 transmittance = exp(-u_absorption * density * u_march_size);
+        vec3 color = u_light_color * density;
 
-          color.rgb *= color.a;
-          res += color*(1.0-res.a);
-        }
-        depth += MARCH_SIZE;
-        p = ro + depth * rd;
+        accum.rgb += (1.0 - accum.a) * color * transmittance;
+        accum.a += (1.0 - accum.a) * density * 0.2;
+
+        t += u_march_size;
     }
 
-    return res;
+    return accum;
 }
 
 void main() {
-    //FragColor = vec4(normalize(ray_direction) * 0.5 + 0.5, 1.0);
+    float tmin, tmax;
 
-    vec4 result = raymarch(ray_origin, ray_direction);
-    FragColor = result;
+    vec3 rd = normalize(ray_direction);
+    if (cubeIntersection(ray_origin, rd, tmin, tmax)) {
+        FragColor = raymarch(ray_origin, rd, tmin, tmax);
+        return;
+    }
+
+    FragColor = vec4(0.0);
 }

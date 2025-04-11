@@ -7,155 +7,6 @@
    },
    "Identifier_component": {
     "Entity_id": 0,
-    "Entity_name": "box"
-   },
-   "Render_component": {
-    "Quad": {
-     "NormalMap_path": "../stages\\assets\\textures\\materials\\wood_box\\toy_box_normal.png",
-     "ParallaxMap_path": "../stages\\assets\\textures\\materials\\wood_box\\toy_box_disp.png",
-     "Texture_path": "../stages\\assets\\textures\\materials\\wood_box\\wood.png",
-     "size": 1.0
-    },
-    "Render_type": 5
-   },
-   "Transform_component": {
-    "Position": [
-     -1.9010000228881836,
-     7.119019508361816,
-     -3.2702112197875977
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     0.9999897480010986,
-     0.9999897480010986,
-     0.9999997615814209
-    ]
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 1,
-    "Entity_name": "Cube8v [0]"
-   },
-   "Render_component": {
-    "Cube": {
-     "Is_centered": true,
-     "Texture_path": "../stages\\assets\\textures\\apple\\red.jpg",
-     "cube_24v": false,
-     "cube_8v": true,
-     "size": 1.0
-    },
-    "Render_type": 3
-   },
-   "Transform_component": {
-    "Position": [
-     -9.686514854431152,
-     3.369457960128784,
-     -10.793911933898926
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 2,
-    "Entity_name": "Sphere [0]"
-   },
-   "Render_component": {
-    "Render_type": 2,
-    "Sphere": {
-     "Texture_path": "../stages/assets/textures/images/blue.png",
-     "num_heights": 60,
-     "num_revs": 60,
-     "size": 1.0
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     -8.371593475341797,
-     2.627809762954712,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 3,
-    "Entity_name": "brick"
-   },
-   "Render_component": {
-    "Quad": {
-     "NormalMap_path": "../stages\\assets\\textures\\materials\\brick_wall_2\\bricks2_normal.jpg",
-     "ParallaxMap_path": "../stages\\assets\\textures\\materials\\brick_wall_2\\bricks2_disp.jpg",
-     "Texture_path": "../stages\\assets\\textures\\materials\\brick_wall_2\\bricks2.jpg",
-     "size": 1.0
-    },
-    "Render_type": 5
-   },
-   "Transform_component": {
-    "Position": [
-     0.9665501117706299,
-     7.228512763977051,
-     0.25687703490257263
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 4,
     "Entity_name": "Bucket"
    },
    "Render_component": {
@@ -200,9 +51,9 @@
      0.0
     ],
     "Rotation": [
-     -5.228677579793839e-08,
+     5.228677579793839e-08,
      0.975300669670105,
-     -5.228677579793839e-08,
+     5.228677579793839e-08,
      -0.22088129818439484
     ],
     "Scale": [
@@ -218,7 +69,7 @@
     "Parent": []
    },
    "Identifier_component": {
-    "Entity_id": 5,
+    "Entity_id": 1,
     "Entity_name": "Terrain [1]"
    },
    "Render_component": {
@@ -226,7 +77,7 @@
     "Terrain": {
      "Heightmap_path": "../stages\\assets\\textures\\heightmaps\\volcano.png",
      "Texture_path": "../stages/assets/textures/images/grass.png",
-     "height_mult": 0.5230000019073486,
+     "height_mult": 0.0,
      "is_centered": true,
      "num_cols": 50,
      "num_rows": 50,
@@ -237,7 +88,7 @@
    "Transform_component": {
     "Position": [
      0.0,
-     0.0,
+     -0.9770601987838745,
      0.0
     ],
     "Rotation": [
@@ -254,12 +105,64 @@
    }
   },
   {
+   "Camera_component": {
+    "camera": {
+     "Aspect_ratio": 1.7777777910232544,
+     "Far_clip_plane": 577.0869750976563,
+     "Fov": 45.0,
+     "Near_clip_plane": 0.10000000149011612,
+     "Ortho_height": 45.0,
+     "Ortho_width": 45.0,
+     "Position": [
+      -3.3036129474639893,
+      1.9634299278259277,
+      -3.6420435905456543
+     ],
+     "Scroll_speed": 1.0,
+     "Sensitivity": 1.0,
+     "Speed": 5.0,
+     "Use_perspective_matrix": true,
+     "View_direction": [
+      0.6152321100234985,
+      -0.34081968665122986,
+      0.7108666300773621
+     ]
+    }
+   },
    "Hierarchy_component": {
     "Child": [],
     "Parent": []
    },
    "Identifier_component": {
-    "Entity_id": 6,
+    "Entity_id": 2,
+    "Entity_name": "Camera [0]"
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 3,
     "Entity_name": "Directional Light [1]"
    },
    "Light_component": {
@@ -329,40 +232,6 @@
      ],
      "Type": 0
     }
-   }
-  },
-  {
-   "Camera_component": {
-    "camera": {
-     "Aspect_ratio": 1.9374369382858276,
-     "Far_clip_plane": 577.0869750976563,
-     "Fov": 45.0,
-     "Near_clip_plane": 0.10000000149011612,
-     "Ortho_height": 45.0,
-     "Ortho_width": 45.0,
-     "Position": [
-      16.43938446044922,
-      9.584566116333008,
-      -10.028032302856445
-     ],
-     "Scroll_speed": 1.0,
-     "Sensitivity": 1.0,
-     "Speed": 5.0,
-     "Use_perspective_matrix": true,
-     "View_direction": [
-      -0.5253673195838928,
-      -0.498812198638916,
-      0.6893297433853149
-     ]
-    }
-   },
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 7,
-    "Entity_name": "Camera [0]"
    }
   }
  ]

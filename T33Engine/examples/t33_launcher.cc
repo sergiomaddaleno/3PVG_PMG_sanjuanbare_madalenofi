@@ -10,7 +10,7 @@
 
 int main(int, char**) {
 
-    auto window = Window::make(800, 600, "T33Engine", false);
+    auto window = Window::make(800, 600, "T33Engine", true);
     Input input{ window->getWindow() };
 
     Engine T33Engine{*window, input};

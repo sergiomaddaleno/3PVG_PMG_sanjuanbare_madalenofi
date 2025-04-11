@@ -8,8 +8,8 @@ Engine::Engine(Window& window, Input& input) :
 	ui_manager(*this, ecs, render_system),
 	save_manager(ecs, render_system),
 	physics_system(ecs, render_system),
-	raymarch(ecs),
 	scripting_system(ecs),
+	raymarch(ecs),
 	lastTime(0.0),
 	currentTime(0.0)
 {
@@ -34,8 +34,6 @@ void Engine::init()
 	render_system.deferred.init();
 	render_system.ssao.init();
 	render_system.grid.initGrid();
-
-	raymarch.init();
 
 	//render_system.compileShaderForBuild();
 }
@@ -66,9 +64,6 @@ void Engine::beginFrame()
 
     physics_system.update((float)dt);
     scripting_system.update((float)dt);
-
-    raymarch.resize(width, height);
-    raymarch.render((float)(window.getTime()));
 
     // --- 
 

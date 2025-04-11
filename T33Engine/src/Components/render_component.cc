@@ -8,6 +8,7 @@ RenderComponent::RenderComponent()
     quad_(nullptr),
     surface_(nullptr),
     water_(nullptr),
+    cloud_(nullptr),
     type_(RT_None),
     triangle_(triangle_.my_triangle)
 {}
@@ -15,26 +16,28 @@ RenderComponent::RenderComponent()
 RenderComponent& RenderComponent::operator=(const RenderComponent & other)
 {
     if (this != &other) {
-        mesh_ = other.mesh_ ? std::make_unique<Mesh>(*other.mesh_) : nullptr;
-        terrain_ = other.terrain_ ? std::make_unique<Terrain>(*other.terrain_) : nullptr;
-        water_ = other.water_ ? std::make_unique<Terrain>(*other.water_) : nullptr;
-        sphere_ = other.sphere_ ? std::make_unique<Sphere>(*other.sphere_) : nullptr;
-        surface_ = other.surface_ ? std::make_unique<Surface>(*other.surface_) : nullptr;
-        cube_ = other.cube_ ? std::make_unique<Cube>(*other.cube_) : nullptr;
-        quad_ = other.quad_ ? std::make_unique<Quad>(*other.quad_) : nullptr;
+        mesh_ = other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr;
+        terrain_ = other.terrain_ ? std::make_shared<Terrain>(*other.terrain_) : nullptr;
+        water_ = other.water_ ? std::make_shared<Terrain>(*other.water_) : nullptr;
+        sphere_ = other.sphere_ ? std::make_shared<Sphere>(*other.sphere_) : nullptr;
+        surface_ = other.surface_ ? std::make_shared<Surface>(*other.surface_) : nullptr;
+        cube_ = other.cube_ ? std::make_shared<Cube>(*other.cube_) : nullptr;
+        quad_ = other.quad_ ? std::make_shared<Quad>(*other.quad_) : nullptr;
+        cloud_ = other.cloud_ ? std::make_shared<RayMarch>(*other.cloud_) : nullptr;
     }
     return *this;
 }
 
 RenderComponent::RenderComponent(const RenderComponent& other)
 
-    : mesh_(other.mesh_ ? std::make_unique<Mesh>(*other.mesh_) : nullptr),
-    terrain_(other.terrain_ ? std::make_unique<Terrain>(*other.terrain_) : nullptr),
-    water_(other.water_ ? std::make_unique<Terrain>(*other.water_) : nullptr),
-    sphere_(other.sphere_ ? std::make_unique<Sphere>(*other.sphere_) : nullptr),
-    surface_(other.surface_ ? std::make_unique<Surface>(*other.surface_) : nullptr),
-    cube_(other.cube_ ? std::make_unique<Cube>(*other.cube_) : nullptr),
-    quad_(other.quad_ ? std::make_unique<Quad>(*other.quad_) : nullptr),
+    : mesh_(other.mesh_ ? std::make_shared<Mesh>(*other.mesh_) : nullptr),
+    terrain_(other.terrain_ ? std::make_shared<Terrain>(*other.terrain_) : nullptr),
+    water_(other.water_ ? std::make_shared<Terrain>(*other.water_) : nullptr),
+    sphere_(other.sphere_ ? std::make_shared<Sphere>(*other.sphere_) : nullptr),
+    surface_(other.surface_ ? std::make_shared<Surface>(*other.surface_) : nullptr),
+    cube_(other.cube_ ? std::make_shared<Cube>(*other.cube_) : nullptr),
+    quad_(other.quad_ ? std::make_shared<Quad>(*other.quad_) : nullptr),
+    cloud_(other.cloud_ ? std::make_shared<RayMarch>(*other.cloud_) : nullptr),
     triangle_(other.triangle_),
     type_(other.type_)
 {}

@@ -16,6 +16,8 @@
 #include "Geometry/quad.h"
 #include "Geometry/surface.h"
 
+#include "Render/raymarch.h"
+
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
 #include <../deps/glm/gtc/type_ptr.hpp>
@@ -77,6 +79,9 @@ void RenderSystem::initRenderTypes() {
                 break;
             case RenderType::RT_Surface:
                 render_comp->surface_->bind();
+                break;
+            case RenderType::RT_Cloud:
+                render_comp->cloud_->cube.bind();
                 break;
             }
         }
@@ -410,6 +415,12 @@ void RenderSystem::renderScene(RenderComponent& rc, Shader& shader)
             ValueType::T_INT_1, &type);
     }
     break;
+    case RenderType::RT_Cloud:
+    {
+        rc.cloud_->resize(window_width, window_height);
+        rc.cloud_->render((float)glfwGetTime());
+    }
+    break;
     case RenderType::RT_Water:
         // For Blend
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -567,6 +578,38 @@ size_t RenderSystem::addSkybox(Skybox skybox)
 
     entity_++;
     entity_counts_.skybox++;
+
+    return entity_;
+}
+
+size_t RenderSystem::createCloud(float size, TransformComponent tc)
+{
+    auto cloud = std::make_shared<RayMarch>(ecs_);
+
+    cloud->initRaymarchShader();
+    cloud->loadNoiseTexture2D();
+    cloud->initBoundingBox(size);
+
+    ecs_.add_component<IdentifierComponent>(entity_);
+    ecs_.add_component<RenderComponent>(entity_);
+    ecs_.add_component<TransformComponent>(entity_);
+    ecs_.add_component<HierarchyComponent>(entity_);
+
+    //---
+    ecs_.get_component<IdentifierComponent>(entity_)->name = "Cloud [" + std::to_string(entity_counts_.cloud) + "]";
+    ecs_.get_component<IdentifierComponent>(entity_)->id = (int)entity_;
+
+    auto& transform = ecs_.get_component<TransformComponent>(entity_);
+    transform->position = tc.position;
+    transform->local_position = tc.position;
+    transform->rotation = tc.rotation;
+    transform->scale = tc.scale;
+
+    ecs_.get_component<RenderComponent>(entity_)->type_ = RenderType::RT_Cloud;
+    ecs_.get_component<RenderComponent>(entity_)->cloud_ = cloud;
+
+    entity_++;
+    entity_counts_.cloud++;
 
     return entity_;
 }

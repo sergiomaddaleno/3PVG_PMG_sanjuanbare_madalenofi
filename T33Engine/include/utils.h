@@ -47,6 +47,7 @@ enum FrameBufferID {
 struct EntityCounters {
 	int camera = 0;
 	int skybox = 0;
+	int cloud = 0;
 	int mesh = 0;
 	int terrain = 0;
 	int water = 0;

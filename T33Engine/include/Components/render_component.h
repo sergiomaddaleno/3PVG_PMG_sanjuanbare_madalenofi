@@ -11,6 +11,7 @@
 #include "Geometry/cube.h"
 #include "Geometry/quad.h"
 #include "Geometry/surface.h"
+#include "Render/raymarch.h"
 
 #include "../deps/nlohmann/json.hpp"
 
@@ -23,6 +24,7 @@ enum RenderType {
     RT_Quad,
     RT_Surface,
     RT_Water,
+    RT_Cloud,
     RT_None
 };
 
@@ -37,6 +39,8 @@ struct RenderComponent {
     std::shared_ptr<Cube>cube_;
     std::shared_ptr<Quad>quad_;
     std::shared_ptr<Surface>surface_;
+
+    std::shared_ptr<RayMarch> cloud_;
     Triangle triangle_;
 
     //--

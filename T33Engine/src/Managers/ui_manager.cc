@@ -873,52 +873,54 @@ void UIManager::InspectorWindow() {
 
                 ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.3f, 0.0f, 1.0f));
-                ImGui::Text("Change Texture");
-                ImGui::Dummy(ImVec2(0.0f, 2.0f));
-                ImGui::PopStyleColor();
+                if (render_comp->type_ != RT_Cloud) {
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 0.3f, 0.0f, 1.0f));
+                    ImGui::Text("Change Texture");
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                    ImGui::PopStyleColor();
 
-                static std::string texture_file_path;
-                static std::string texture_file_name;
-                if (ImGui::Button((!texture_file_path.empty() ? texture_file_name + "##Tex" : ".png/.jpg drop texture here##Tex").c_str(), { 200.0f, 40.0f })) {}
+                    static std::string texture_file_path;
+                    static std::string texture_file_name;
+                    if (ImGui::Button((!texture_file_path.empty() ? texture_file_name + "##Tex" : ".png/.jpg drop texture here##Tex").c_str(), { 200.0f, 40.0f })) {}
+                    
+                    if (ImGui::BeginDragDropTarget()) {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                            std::filesystem::path filePath = (const wchar_t*)payload->Data;
+                            if ((filePath.extension() == ".png") || (filePath.extension() == ".jpg")) {
+                                texture_file_path = filePath.string();
+                                texture_file_name = filePath.filename().string();
 
-                if (ImGui::BeginDragDropTarget()) {
-                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                        std::filesystem::path filePath = (const wchar_t*)payload->Data;
-                        if ((filePath.extension() == ".png") || (filePath.extension() == ".jpg")) {
-                            texture_file_path = filePath.string();
-                            texture_file_name = filePath.filename().string();
-
-                            switch (render_comp->type_) {
-                            case RenderType::RT_Mesh:
-                                break;
-                            case RenderType::RT_Terrain:
-                                render_comp->terrain_->setTexture(texture_file_path);
-                                break;
-                            case RenderType::RT_Water:
-                                render_comp->water_->setTexture(texture_file_path);
-                                break;
-                            case RenderType::RT_Sphere:
-                                render_comp->sphere_->setTexture(texture_file_path);
-                                break;
-                            case RenderType::RT_Surface:
-                                render_comp->surface_->setTexture(texture_file_path);
-                                break;
-                            case RenderType::RT_Quad:
-                                render_comp->quad_->setTexture(texture_file_path);
-                                break;
-                            case RenderType::RT_Cube8v:
-                            case RenderType::RT_Cube24v:
-                                render_comp->cube_->setTexture(texture_file_path);
-                                break;
+                                switch (render_comp->type_) {
+                                case RenderType::RT_Mesh:
+                                    break;
+                                case RenderType::RT_Terrain:
+                                    render_comp->terrain_->setTexture(texture_file_path);
+                                    break;
+                                case RenderType::RT_Water:
+                                    render_comp->water_->setTexture(texture_file_path);
+                                    break;
+                                case RenderType::RT_Sphere:
+                                    render_comp->sphere_->setTexture(texture_file_path);
+                                    break;
+                                case RenderType::RT_Surface:
+                                    render_comp->surface_->setTexture(texture_file_path);
+                                    break;
+                                case RenderType::RT_Quad:
+                                    render_comp->quad_->setTexture(texture_file_path);
+                                    break;
+                                case RenderType::RT_Cube8v:
+                                case RenderType::RT_Cube24v:
+                                    render_comp->cube_->setTexture(texture_file_path);
+                                    break;
+                                }
                             }
                         }
+                        ImGui::EndDragDropTarget();
                     }
-                    ImGui::EndDragDropTarget();
+
+                    ImGui::Dummy(ImVec2(0.0f, 5.0f));
                 }
-
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
+                
                 if (render_comp->type_ == RenderType::RT_Quad) {
 
                     ImGui::Separator();
@@ -1045,8 +1047,6 @@ void UIManager::InspectorWindow() {
                         ImGui::EndDragDropTarget();
                     }
                 }
-
-                ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
                 // -----------------------------------------------------------------
 
@@ -1199,6 +1199,29 @@ void UIManager::InspectorWindow() {
                     if (ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f")) {
                         quad.init(temp_size);
                         quad.bind();
+                    }
+                    break;
+                }
+                case ::RT_Cloud:
+                {
+                    ImGui::Text("Cloud Parameters");
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+                    auto& cloud = *ecs_.get_component<RenderComponent>(selected_entity)->cloud_;
+
+                    ImGui::ColorEdit3("Light Color", glm::value_ptr(cloud.light_color_));
+                    ImGui::SliderFloat("Speed", &cloud.speed_, 0.0f, 10.0f, "%.3f");
+                    ImGui::SliderFloat3("Cloud Direction", &cloud.cloud_direction_.x, -1.0f, 1.0f);
+                    ImGui::SliderFloat("Amplitude", &cloud.amplitude_, 0.0f, 10.0f, "%.03f");
+                    ImGui::SliderFloat("Frequency", &cloud.march_size_, 0.02f, 1.0f, "%.03f");
+
+                    ImGui::SliderFloat("March size", &cloud.march_size_, 0.02f, 1.0f, "%.0003f");
+                    ImGui::SliderInt("Max steps", &cloud.max_steps_, 0, 300, "%d");
+
+                    static float temp_size = cloud.cube_size_;
+                    if (ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f")) {
+                        cloud.cube.init8v(temp_size);
+                        cloud.cube.bind();
                     }
                     break;
                 }
@@ -1931,14 +1954,6 @@ void UIManager::TopBarWindow() {
                 AddConsoleMessage("Camera added");
             }
 
-            if (ImGui::MenuItem("Add Skybox")) {
-                rs_.addSkybox();
-                rs_.initSkybox();
-                ResetIds();
-
-                AddConsoleMessage("Skybox added");
-            }
-
             if (ImGui::BeginMenu("Add Geometry")) {
 
                 if (ImGui::MenuItem("Sphere")) {
@@ -2033,6 +2048,21 @@ void UIManager::TopBarWindow() {
                 ImGui::Checkbox(("Add mesh Window"), &add_mesh_window);
                 
                 ImGui::EndMenu();
+            }
+
+            if (ImGui::MenuItem("Add Skybox")) {
+                rs_.addSkybox();
+                rs_.initSkybox();
+                ResetIds();
+
+                AddConsoleMessage("Skybox added");
+            }
+
+            if (ImGui::MenuItem("Add Cloud")) {
+                rs_.createCloud();
+                ResetIds();
+
+                AddConsoleMessage("Cloud added");
             }
 
             if (ImGui::BeginMenu("Spawn Entities in terrain")) {
