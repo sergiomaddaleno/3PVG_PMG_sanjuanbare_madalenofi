@@ -34,6 +34,7 @@ public:
 	glm::vec3 cloud_direction_;
 	float march_size_;
 	int max_steps_;
+	int max_steps_light_;
 	float speed_;
 	float amplitude_;
 	float frequency_;

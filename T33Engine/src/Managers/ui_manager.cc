@@ -1217,6 +1217,7 @@ void UIManager::InspectorWindow() {
 
                     ImGui::SliderFloat("March size", &cloud.march_size_, 0.02f, 1.0f, "%.0003f");
                     ImGui::SliderInt("Max steps", &cloud.max_steps_, 0, 300, "%d");
+                    ImGui::SliderInt("Max steps light", &cloud.max_steps_light_, 0, 50, "%d");
 
                     static float temp_size = cloud.cube_size_;
                     if (ImGui::SliderFloat("Size", &temp_size, 0.0f, 10.0f, "%.3f")) {

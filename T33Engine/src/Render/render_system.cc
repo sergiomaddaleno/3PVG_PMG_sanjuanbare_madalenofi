@@ -119,18 +119,21 @@ void RenderSystem::initSkybox() {
         if (si->has_value()) {
             auto& skybox_comp = *si;
 
-            skybox_comp->skybox.loadCubeMap(
-                skybox_comp->skybox.faces_files_,
-                skybox_comp->skybox.cubemap_vertex_file_.c_str(),
-                skybox_comp->skybox.cubemap_fragment_file_.c_str()
-            );
-            skybox_comp->skybox.initcubeMap();
-            
-            skybox_comp->skybox.loadDDS(skybox_comp->skybox.dds_file_.c_str(),
-                skybox_comp->skybox.dds_vertex_file_.c_str(),
-                skybox_comp->skybox.dds_fragment_file_.c_str()
-            );
-            skybox_comp->skybox.initDDS();
+            if (skybox_comp->skybox.use_cubemap) {
+                skybox_comp->skybox.loadCubeMap(
+                    skybox_comp->skybox.faces_files_,
+                    skybox_comp->skybox.cubemap_vertex_file_.c_str(),
+                    skybox_comp->skybox.cubemap_fragment_file_.c_str()
+                );
+                skybox_comp->skybox.initcubeMap();
+            }
+            else {
+                skybox_comp->skybox.loadDDS(skybox_comp->skybox.dds_file_.c_str(),
+                    skybox_comp->skybox.dds_vertex_file_.c_str(),
+                    skybox_comp->skybox.dds_fragment_file_.c_str()
+                );
+                skybox_comp->skybox.initDDS();
+            }
         }
     }
 }
@@ -567,6 +570,12 @@ size_t RenderSystem::addCamera(Camera camera)
 
 size_t RenderSystem::addSkybox(Skybox skybox)
 {
+    skybox.loadDDS("../stages/assets/textures/skybox/sky.dds", 
+        "../stages/shaders/skybox/skybox_dds.vs",
+        "../stages/shaders/skybox/skybox_dds.fs"
+    );
+    skybox.initDDS();
+
     ecs_.add_component<SkyboxComponent>(entity_);
     ecs_.add_component<IdentifierComponent>(entity_);
     ecs_.add_component<HierarchyComponent>(entity_);

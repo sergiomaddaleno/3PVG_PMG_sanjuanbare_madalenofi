@@ -20,7 +20,8 @@ RayMarch::RayMarch(ECSManager& ecs) :
     amplitude_(2.0f),
     frequency_(0.5f),
     cloud_direction_(0.1f, 0.2f, -0.3f),
-    max_steps_(200)
+    max_steps_(200),
+    max_steps_light_(6)
 {
 }
 
@@ -67,11 +68,6 @@ void RayMarch::render(float time)
     int tex_id = GL_TEXTURE0;
     shader_.setUniformValue(shader_.getUniformLocation("u_noise_2D"), ValueType::T_INT_1, &tex_id);
 
-    /*noise_3D_.active(GL_TEXTURE1);
-    noise_3D_.bind3D();
-    tex_id = GL_TEXTURE1;
-    shader_.setUniformValue(shader_.getUniformLocation("u_noise_3D"), ValueType::T_INT_1, &tex_id);*/
-
     auto ci = ecs_.getComponentList<CameraComponent>().begin();
     auto ciend = ecs_.getComponentList<CameraComponent>().end();
 
@@ -106,17 +102,31 @@ void RayMarch::render(float time)
                     shader_.setUniformValue(shader_.getUniformLocation("u_cube_scale"), ValueType::T_FLOAT_3, glm::value_ptr(transform_comp->scale));
                     shader_.setUniformValue(shader_.getUniformLocation("u_cloud_pos"),ValueType::T_FLOAT_3, glm::value_ptr(transform_comp->position));
                 
-                    shader_.setUniformValue(shader_.getUniformLocation("u_light_color"), ValueType::T_FLOAT_3, &light_color_);
                     shader_.setUniformValue(shader_.getUniformLocation("u_absorption"), ValueType::T_FLOAT_3, &absorption_);
                     shader_.setUniformValue(shader_.getUniformLocation("u_speed"), ValueType::T_FLOAT_1, &speed_);
                     shader_.setUniformValue(shader_.getUniformLocation("u_march_size"), ValueType::T_FLOAT_1, &march_size_);
                     shader_.setUniformValue(shader_.getUniformLocation("u_max_steps"), ValueType::T_INT_1, &max_steps_);
+                    shader_.setUniformValue(shader_.getUniformLocation("u_max_steps_light"), ValueType::T_INT_1, &max_steps_light_);
                     shader_.setUniformValue(shader_.getUniformLocation("u_amplitude"), ValueType::T_FLOAT_1, &amplitude_);
                     shader_.setUniformValue(shader_.getUniformLocation("u_frequency"), ValueType::T_FLOAT_1, &frequency_);
                     shader_.setUniformValue(shader_.getUniformLocation("u_cloud_direction"), ValueType::T_FLOAT_3, &cloud_direction_);
                 }
             }
 
+            auto li = ecs_.getComponentList<LightComponent>().begin();
+            auto liend = ecs_.getComponentList<LightComponent>().end();
+
+            for (; li != liend; ++li) {
+                if (li->has_value()) {
+                    auto& light_comp = *li;
+
+                    if (light_comp->light.type_ == Light::LightType::LT_Directional) {
+
+                        shader_.setUniformValue(shader_.getUniformLocation("u_light_color"), ValueType::T_FLOAT_3, &light_comp->light.light_color_);
+                        shader_.setUniformValue(shader_.getUniformLocation("u_sun_dir"), ValueType::T_FLOAT_3, &light_comp->light.dir_);
+                    }
+                }
+            }
             cube.draw();
         }
     }

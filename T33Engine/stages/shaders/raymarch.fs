@@ -10,9 +10,11 @@ uniform vec3 u_absorption = vec3(0.2, 0.2, 0.2);
 uniform float u_speed = 1.0f;
 uniform float u_march_size = 0.04;
 uniform int u_max_steps = 200;
+uniform int u_max_steps_lights = 6;
 uniform float u_amplitude = 2.0;
 uniform float u_frequency = 0.5;
 uniform vec3 u_cloud_direction = vec3(0.1, 0.2, -0.3);
+uniform vec3 u_sun_dir = vec3(0.0, -1.0, 0.0);
 
 in vec3 world_pos;
 in vec3 ray_origin;
@@ -44,6 +46,10 @@ float fbm(vec3 p) {
   return clamp(f, 0.0, 1.0);
 }
 
+vec3 BeersLaw(float dist, vec3 absorption) {
+    return exp(-dist * absorption);
+}
+
 bool cubeIntersection(vec3 ro, vec3 rd, out float tmin, out float tmax) {
     vec3 box_min = vec3(-u_cube_scale * 0.5);
     vec3 box_max = vec3( u_cube_scale * 0.5);
@@ -61,6 +67,21 @@ bool cubeIntersection(vec3 ro, vec3 rd, out float tmin, out float tmax) {
     return tmax >= max(tmin, 0.0);
 }
 
+vec3 lightmarch(vec3 position, vec3 ray_direction){
+  float totalDensity = 0.0;
+
+  for (int step = 0; step < u_max_steps_lights; step++) {
+      position += u_sun_dir * u_march_size;
+
+      float lightSample = fbm(position * 2.0 + (u_time * u_speed) * u_cloud_direction);
+      lightSample = max(0.0, lightSample - 0.3);
+
+      totalDensity += lightSample;
+  }
+
+  return BeersLaw(totalDensity * u_march_size, u_absorption);
+}
+
 vec4 raymarch(vec3 ro, vec3 rd, float tmin, float tmax) {
     vec4 accum = vec4(0.0);
     float t = tmin;
@@ -70,8 +91,9 @@ vec4 raymarch(vec3 ro, vec3 rd, float tmin, float tmax) {
         float density = fbm(pos * 2.0 + (u_time * u_speed) * u_cloud_direction);
         density = max(0.0, density - 0.3); 
 
-        vec3 transmittance = exp(-u_absorption * density * u_march_size);
-        vec3 color = u_light_color * density;
+        vec3 transmittance = BeersLaw(density * u_march_size, u_absorption);
+        vec3 light = lightmarch(pos, u_sun_dir);
+        vec3 color = u_light_color * density * light;
 
         accum.rgb += (1.0 - accum.a) * color * transmittance;
         accum.a += (1.0 - accum.a) * density * 0.2;
