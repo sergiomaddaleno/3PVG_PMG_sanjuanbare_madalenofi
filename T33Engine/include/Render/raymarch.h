@@ -2,10 +2,10 @@
 #define __RAYMARCH__
 
 #include "../Systems/ecs_manager.h"
-
 #include "Core/shader.h"
 #include "Core/texture.h"
 #include "Geometry/Cube.h"
+#include "../deps/nlohmann/json.hpp"
 
 class RayMarch{
 
@@ -16,7 +16,9 @@ public:
 	void initRaymarchShader( std::string vertex_path = "../stages/shaders/raymarch.vs",
 							  std::string fragment_path = "../stages/shaders/raymarch.fs");
 	void loadNoiseTexture2D(std::string path = "../stages/assets/textures/noise/noise.png");
-	void initBoundingBox(float size = 10.0);
+	void loadBlueNoiseTexture2D(std::string path = "../stages/assets/textures/noise/blue-noise-pattern.png");
+
+	void initBoundingBox(float size = 10.0f);
 
 	void render(float time);
 	void resize(unsigned int width, unsigned int height);
@@ -25,11 +27,11 @@ public:
 
 	Shader shader_;
 	Texture noise_2D_;
+	Texture blue_noise_2D_;
 
 	Cube cube;
 	float cube_size_;
 
-	glm::vec3 light_color_;
 	glm::vec3 absorption_;
 	glm::vec3 cloud_direction_;
 	float march_size_;
@@ -38,11 +40,13 @@ public:
 	float speed_;
 	float amplitude_;
 	float frequency_;
+	bool use_blue_noise_;
+
+	nlohmann::json serialize() const;
 
 private:
 	ECSManager& ecs_;
 
-	unsigned int quadVAO, quadVBO;
 };
 
 #endif // !__RAYMARCH__

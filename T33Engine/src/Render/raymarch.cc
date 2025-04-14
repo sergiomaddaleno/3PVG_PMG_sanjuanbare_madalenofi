@@ -13,15 +13,15 @@ RayMarch::RayMarch(ECSManager& ecs) :
     ecs_(ecs),
     window_width(800), window_height(600),
     cube_size_(10.0f),
-    light_color_(1.0f, 1.0f, 1.0f),
     absorption_(1.0f, 1.0f, 1.0f),
     march_size_(0.04f),
     speed_(1.0f),
     amplitude_(2.0f),
     frequency_(0.5f),
     cloud_direction_(0.1f, 0.2f, -0.3f),
-    max_steps_(200),
-    max_steps_light_(6)
+    max_steps_(30),
+    max_steps_light_(6),
+    use_blue_noise_(false)
 {
 }
 
@@ -37,6 +37,11 @@ void RayMarch::initRaymarchShader(std::string vertex_path, std::string fragment_
 void RayMarch::loadNoiseTexture2D(std::string path)
 {
     noise_2D_.loadTexture(path);
+}
+
+void RayMarch::loadBlueNoiseTexture2D(std::string path)
+{
+    blue_noise_2D_.loadTexture(path);
 }
 
 void RayMarch::initBoundingBox(float size)
@@ -59,14 +64,21 @@ void RayMarch::render(float time)
 
     float ti = (float)time;
     shader_.setUniformValue(shader_.getUniformLocation("u_time"), ValueType::T_FLOAT_1, &ti);
+    int uFrame = int(floor(time * 60.0));
+    shader_.setUniformValue(shader_.getUniformLocation("u_frame"), ValueType::T_INT_1, &uFrame);
 
-    glm::vec2 resolution = { window_width, window_height };
-    shader_.setUniformValue(shader_.getUniformLocation("u_resolution"), ValueType::T_FLOAT_2, &resolution);
+    int use_blue_noise = use_blue_noise_;
+    shader_.setUniformValue(shader_.getUniformLocation("u_use_blue_noise"), ValueType::T_INT_1, &use_blue_noise);
 
     noise_2D_.active(GL_TEXTURE0);
     noise_2D_.bind2D();
     int tex_id = GL_TEXTURE0;
     shader_.setUniformValue(shader_.getUniformLocation("u_noise_2D"), ValueType::T_INT_1, &tex_id);
+
+    blue_noise_2D_.active(GL_TEXTURE1);
+    blue_noise_2D_.bind2D();
+    tex_id = GL_TEXTURE1;
+    shader_.setUniformValue(shader_.getUniformLocation("u_blue_noise_2D"), ValueType::T_INT_1, &tex_id);
 
     auto ci = ecs_.getComponentList<CameraComponent>().begin();
     auto ciend = ecs_.getComponentList<CameraComponent>().end();
@@ -94,12 +106,12 @@ void RayMarch::render(float time)
                     model = model * glm::mat4_cast(transform_comp->rotation);
                     model = glm::scale(model, transform_comp->scale);
 
+                    shader_.setUniformValue(shader_.getUniformLocation("u_cube_scale"), ValueType::T_FLOAT_3, glm::value_ptr(transform_comp->scale));
                     shader_.setUniformValue(shader_.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
                     shader_.setUniformValue(shader_.getUniformLocation("u_camera_pos"), ValueType::T_FLOAT_3, &camera_position);
                     shader_.setUniformValue(shader_.getUniformLocation("view"), ValueType::T_MAT_4x4, &view);
                     shader_.setUniformValue(shader_.getUniformLocation("projection"), ValueType::T_MAT_4x4, &projection);
 
-                    shader_.setUniformValue(shader_.getUniformLocation("u_cube_scale"), ValueType::T_FLOAT_3, glm::value_ptr(transform_comp->scale));
                     shader_.setUniformValue(shader_.getUniformLocation("u_cloud_pos"),ValueType::T_FLOAT_3, glm::value_ptr(transform_comp->position));
                 
                     shader_.setUniformValue(shader_.getUniformLocation("u_absorption"), ValueType::T_FLOAT_3, &absorption_);
@@ -147,5 +159,23 @@ void RayMarch::resize(unsigned int width, unsigned int height)
         window_width = width;
         window_height = height;
     }
+}
+
+nlohmann::json RayMarch::serialize() const
+{
+    nlohmann::json json_data;
+
+        json_data["cube_size"] = cube_size_;
+        json_data["absorption"] = { absorption_.x, absorption_.y, absorption_.z };
+        json_data["march_size_"] = march_size_;
+        json_data["speed"] = speed_;
+        json_data["amplitude"] = amplitude_;
+        json_data["frequency"] = frequency_;
+        json_data["cloud_direction"] = { cloud_direction_.x, cloud_direction_.y, cloud_direction_.z};
+        json_data["max_steps"] = max_steps_;
+        json_data["max_steps_light_"] = max_steps_light_;
+        json_data["use_blue_noise"] = use_blue_noise_;
+
+    return json_data;
 }
 

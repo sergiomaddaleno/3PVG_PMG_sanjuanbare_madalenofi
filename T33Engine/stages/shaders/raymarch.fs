@@ -1,8 +1,9 @@
 #version 330 core
 
 uniform float u_time;
-uniform vec2 u_resolution;
+uniform int u_frame;
 uniform sampler2D u_noise_2D;
+uniform sampler2D u_blue_noise_2D;
 
 uniform vec3 u_cube_scale;
 uniform vec3 u_light_color = vec3(1.0, 1.0, 1.0);
@@ -15,6 +16,7 @@ uniform float u_amplitude = 2.0;
 uniform float u_frequency = 0.5;
 uniform vec3 u_cloud_direction = vec3(0.1, 0.2, -0.3);
 uniform vec3 u_sun_dir = vec3(0.0, -1.0, 0.0);
+uniform bool u_use_blue_noise = false;
 
 in vec3 world_pos;
 in vec3 ray_origin;
@@ -67,37 +69,27 @@ bool cubeIntersection(vec3 ro, vec3 rd, out float tmin, out float tmax) {
     return tmax >= max(tmin, 0.0);
 }
 
-vec3 lightmarch(vec3 position, vec3 ray_direction){
-  float totalDensity = 0.0;
-
-  for (int step = 0; step < u_max_steps_lights; step++) {
-      position += u_sun_dir * u_march_size;
-
-      float lightSample = fbm(position * 2.0 + (u_time * u_speed) * u_cloud_direction);
-      lightSample = max(0.0, lightSample - 0.3);
-
-      totalDensity += lightSample;
-  }
-
-  return BeersLaw(totalDensity * u_march_size, u_absorption);
-}
-
 vec4 raymarch(vec3 ro, vec3 rd, float tmin, float tmax) {
     vec4 accum = vec4(0.0);
     float t = tmin;
 
+    if(u_use_blue_noise){
+        float blueNoise = texture(u_blue_noise_2D, gl_FragCoord.xy / 1024.0).r;
+        float offset = fract(blueNoise + float(u_frame % 32) / sqrt(0.5));
+        t = tmin + u_march_size * offset;
+    }
+
     for (int i = 0; i < u_max_steps && t < tmax; ++i) {
         vec3 pos = ro + t * rd;
         float density = fbm(pos * 2.0 + (u_time * u_speed) * u_cloud_direction);
-        density = max(0.0, density - 0.3); 
 
-        vec3 transmittance = BeersLaw(density * u_march_size, u_absorption);
-        vec3 light = lightmarch(pos, u_sun_dir);
-        vec3 color = u_light_color * density * light;
+        if (density > 0.0) {
+            vec3 transmittance = BeersLaw(density * u_march_size, u_absorption);
+            vec3 color = u_light_color * density;
 
-        accum.rgb += (1.0 - accum.a) * color * transmittance;
-        accum.a += (1.0 - accum.a) * density * 0.2;
-
+            accum.rgb += (1.0 - accum.a) * color * transmittance;
+            accum.a += (1.0 - accum.a) * density * 0.2;
+        }
         t += u_march_size;
     }
 
@@ -105,9 +97,10 @@ vec4 raymarch(vec3 ro, vec3 rd, float tmin, float tmax) {
 }
 
 void main() {
-    float tmin, tmax;
 
     vec3 rd = normalize(ray_direction);
+
+    float tmin, tmax;
     if (cubeIntersection(ray_origin, rd, tmin, tmax)) {
         FragColor = raymarch(ray_origin, rd, tmin, tmax);
         return;

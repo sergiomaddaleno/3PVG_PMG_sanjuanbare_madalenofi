@@ -252,6 +252,14 @@ void SaveManager::deSerialize(const nlohmann::json& j) {
                 break;
             }
 
+            case RenderType::RT_Cloud: {
+                const auto& cloud = entity["Render_component"]["Cloud"];
+
+                rs_.createCloud(cloud["cube_size"], tc);
+
+                break;
+            }
+
             case RenderType::RT_Water: {
                 const auto& water = entity["Render_component"]["Water"];
 

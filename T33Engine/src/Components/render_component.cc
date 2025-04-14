@@ -57,6 +57,7 @@ nlohmann::json RenderComponent::serialize() const
     if (surface_) { json_data["Surface"] = surface_->serialize(); }
     if (cube_) { json_data["Cube"] = cube_->serialize(); }
     if (quad_) { json_data["Quad"] = quad_->serialize(); }
+    if (cloud_) { json_data["Cloud"] = cloud_->serialize(); }
 
     json_data["Render_type"] = (int)type_;
 
