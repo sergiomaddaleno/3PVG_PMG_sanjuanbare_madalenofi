@@ -195,6 +195,14 @@ void ScriptingSystem::registerTransform(lua_State* L, size_t entity_id) {
     lua_setglobal(L, "getRotation");
 
     lua_pushlightuserdata(L, this);
+    lua_pushcclosure(L, [](lua_State* L) -> int {
+        ScriptingSystem* self = static_cast<ScriptingSystem*>(lua_touserdata(L, lua_upvalueindex(1)));
+        size_t entity_id = static_cast<size_t>(luaL_checkinteger(L, 1));
+        return self->get_rotation_component(L, entity_id);
+        }, 1);
+    lua_setglobal(L, "getRotationOf");
+
+    lua_pushlightuserdata(L, this);
     lua_pushinteger(L, entity_id);
     lua_pushcclosure(L, [](lua_State* L) -> int {
         ScriptingSystem* self = static_cast<ScriptingSystem*>(lua_touserdata(L, lua_upvalueindex(1)));
@@ -202,6 +210,14 @@ void ScriptingSystem::registerTransform(lua_State* L, size_t entity_id) {
         return self->get_scale_component(L, entity);
         }, 2);
     lua_setglobal(L, "getScale");
+
+    lua_pushlightuserdata(L, this);
+    lua_pushcclosure(L, [](lua_State* L) -> int {
+        ScriptingSystem* self = static_cast<ScriptingSystem*>(lua_touserdata(L, lua_upvalueindex(1)));
+        size_t entity_id = static_cast<size_t>(luaL_checkinteger(L, 1));
+        return self->get_scale_component(L, entity_id);
+        }, 1);
+    lua_setglobal(L, "getScaleOf");
 
     //------------------------------------
 
