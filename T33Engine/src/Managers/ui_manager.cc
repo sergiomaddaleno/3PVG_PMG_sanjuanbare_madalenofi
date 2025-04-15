@@ -1584,7 +1584,7 @@ void UIManager::InspectorWindow() {
 
                         ls_comp.value().script_path = lua_file_path;
                         ls_comp.value().entity_id = selected_entity;
-                        engine_.scripting_system.init();
+                        engine_.scripting_system.init(selected_entity);
                     }
                 }
                 ImGui::EndDragDropTarget();

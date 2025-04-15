@@ -81,7 +81,7 @@
      "is_centered": true,
      "num_cols": 50,
      "num_rows": 50,
-     "size": 1.0,
+     "size": 10.0,
      "use_perlin_noise": false
     }
    },
@@ -114,18 +114,18 @@
      "Ortho_height": 45.0,
      "Ortho_width": 45.0,
      "Position": [
-      -10.53349494934082,
-      -0.8255559802055359,
-      -6.443210601806641
+      -22.20840072631836,
+      20.00910758972168,
+      -9.31000804901123
      ],
      "Scroll_speed": 1.0,
      "Sensitivity": 1.0,
      "Speed": 5.0,
      "Use_perspective_matrix": true,
      "View_direction": [
-      0.8319888114929199,
-      0.37343737483024597,
-      0.41029155254364014
+      0.9016864895820618,
+      -0.4320276975631714,
+      0.017706982791423798
      ]
     }
    },
@@ -232,57 +232,6 @@
      ],
      "Type": 0
     }
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 4,
-    "Entity_name": "Cloud [0]"
-   },
-   "Render_component": {
-    "Cloud": {
-     "absorption": [
-      1.0,
-      1.0,
-      1.0
-     ],
-     "amplitude": 2.0,
-     "cloud_direction": [
-      0.10000000149011612,
-      0.20000000298023224,
-      -0.30000001192092896
-     ],
-     "cube_size": 1.0,
-     "frequency": 0.5,
-     "march_size_": 0.03999999910593033,
-     "max_steps": 30,
-     "max_steps_light_": 6,
-     "speed": 1.0,
-     "use_blue_noise": false
-    },
-    "Render_type": 8
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     6.701438903808594,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     13.60770320892334,
-     1.0,
-     17.23119354248047
-    ]
    }
   }
  ]

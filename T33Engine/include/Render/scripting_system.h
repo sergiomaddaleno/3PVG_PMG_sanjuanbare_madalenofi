@@ -20,7 +20,8 @@ public:
     ScriptingSystem(ECSManager& ecs);
     ~ScriptingSystem();
 
-    void init();
+    void init(size_t entity_id);
+    void initAll();
 
     void loadScript(ScriptingComponent& script_comp);
     void update(float dt);

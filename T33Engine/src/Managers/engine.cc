@@ -6,9 +6,9 @@ Engine::Engine(Window& window, Input& input) :
 	ecs(), 
 	render_system(ecs),
 	ui_manager(*this, ecs, render_system),
-	save_manager(ecs, render_system),
 	physics_system(ecs, render_system),
 	scripting_system(ecs),
+	save_manager(ecs, render_system, scripting_system),
 	raymarch(ecs),
 	lastTime(0.0),
 	currentTime(0.0)

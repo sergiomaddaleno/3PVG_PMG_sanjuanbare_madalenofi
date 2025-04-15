@@ -2,16 +2,7 @@
  "Entities": [
   {
    "Hierarchy_component": {
-    "Child": [
-     1,
-     2,
-     3,
-     4,
-     5,
-     6,
-     7,
-     8
-    ],
+    "Child": [],
     "Parent": []
    },
    "Identifier_component": {
@@ -30,8 +21,8 @@
    "Transform_component": {
     "Position": [
      0.0,
-     200.1440868377685547,
-     -7.598519325256348
+     0.0,
+     11.272027969360352
     ],
     "Rotation": [
      0.0,
@@ -49,9 +40,7 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": [
-     0
-    ]
+    "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 1,
@@ -66,17 +55,21 @@
      "size": 1.0
     }
    },
+   "Scripting_component": {
+    "entity_id": 1,
+    "script_path": "../stages\\scripts\\orbit.lua"
+   },
    "Transform_component": {
     "Position": [
+     64.84507751464844,
      0.0,
-     6.864521026611328,
-     10.677508354187012
+     -7.139991760253906
     ],
     "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
+     -0.0,
+     0.06600980460643768,
+     -0.0,
+     -0.9978189468383789
     ],
     "Scale": [
      0.9980000257492065,
@@ -88,9 +81,7 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": [
-     0
-    ]
+    "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 2,
@@ -105,17 +96,21 @@
      "size": 1.0
     }
    },
+   "Scripting_component": {
+    "entity_id": 2,
+    "script_path": "../stages\\scripts\\orbit.lua"
+   },
    "Transform_component": {
     "Position": [
+     76.79267120361328,
      0.0,
-     6.864521026611328,
-     16.204105377197266
+     -12.2156343460083
     ],
     "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
+     -0.0,
+     0.08415999263525009,
+     -0.0,
+     -0.996452271938324
     ],
     "Scale": [
      1.1929999589920044,
@@ -129,9 +124,7 @@
     "Child": [
      9
     ],
-    "Parent": [
-     0
-    ]
+    "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 3,
@@ -146,31 +139,33 @@
      "size": 1.0
     }
    },
+   "Scripting_component": {
+    "entity_id": 3,
+    "script_path": "../stages\\scripts\\orbit.lua"
+   },
    "Transform_component": {
     "Position": [
-     -0.5028569102287292,
-     6.864521026611328,
-     21.660682678222656
+     101.88763427734375,
+     0.0,
+     -39.174625396728516
     ],
     "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
+     -0.0,
+     0.21992309391498566,
+     -0.0,
+     -0.975517213344574
     ],
     "Scale": [
+     1.8009998798370361,
      1.8009999990463257,
-     1.8009999990463257,
-     1.8009999990463257
+     1.8009998798370361
     ]
    }
   },
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": [
-     0
-    ]
+    "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 4,
@@ -185,17 +180,21 @@
      "size": 1.0
     }
    },
+   "Scripting_component": {
+    "entity_id": 4,
+    "script_path": "../stages\\scripts\\orbit.lua"
+   },
    "Transform_component": {
     "Position": [
+     72.40159606933594,
      0.0,
-     6.864521026611328,
-     29.26095962524414
+     -51.55148696899414
     ],
     "Rotation": [
      0.0,
+     -0.3115147650241852,
      0.0,
-     0.0,
-     1.0
+     0.9502413272857666
     ],
     "Scale": [
      1.1929999589920044,
@@ -207,9 +206,7 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": [
-     0
-    ]
+    "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 5,
@@ -224,17 +221,21 @@
      "size": 1.0
     }
    },
+   "Scripting_component": {
+    "entity_id": 5,
+    "script_path": "../stages\\scripts\\orbit.lua"
+   },
    "Transform_component": {
     "Position": [
+     156.00778198242188,
      0.0,
-     6.864521026611328,
-     48.192405700683594
+     29.965621948242188
     ],
     "Rotation": [
      0.0,
+     0.1002962589263916,
      0.0,
-     0.0,
-     1.0
+     0.9949576258659363
     ],
     "Scale": [
      15.086000442504883,
@@ -246,9 +247,7 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": [
-     0
-    ]
+    "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 6,
@@ -263,17 +262,21 @@
      "size": 1.0
     }
    },
+   "Scripting_component": {
+    "entity_id": 6,
+    "script_path": "../stages\\scripts\\orbit.lua"
+   },
    "Transform_component": {
     "Position": [
+     -175.1010284423828,
      0.0,
-     6.864521026611328,
-     82.76119232177734
+     -92.3569107055664
     ],
     "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
+     -0.0,
+     0.9663530588150024,
+     -0.0,
+     -0.2572194039821625
     ],
     "Scale": [
      12.795999526977539,
@@ -285,9 +288,7 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": [
-     0
-    ]
+    "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 7,
@@ -302,17 +303,21 @@
      "size": 1.0
     }
    },
+   "Scripting_component": {
+    "entity_id": 7,
+    "script_path": "../stages\\scripts\\orbit.lua"
+   },
    "Transform_component": {
     "Position": [
+     66.01573181152344,
      0.0,
-     6.864521026611328,
-     106.83014678955078
+     -186.53225708007813
     ],
     "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
+     -0.0,
+     0.6038814783096313,
+     -0.0,
+     -0.7970741391181946
     ],
     "Scale": [
      5.715000152587891,
@@ -324,9 +329,7 @@
   {
    "Hierarchy_component": {
     "Child": [],
-    "Parent": [
-     0
-    ]
+    "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 8,
@@ -341,22 +344,26 @@
      "size": 1.0
     }
    },
+   "Scripting_component": {
+    "entity_id": 8,
+    "script_path": "../stages\\scripts\\orbit.lua"
+   },
    "Transform_component": {
     "Position": [
+     -145.6451416015625,
      0.0,
-     6.864521026611328,
-     126.65233612060547
+     -155.17225646972656
     ],
     "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
+     -0.0,
+     0.9038118720054626,
+     -0.0,
+     -0.4279300570487976
     ],
     "Scale": [
+     5.551999568939209,
      5.552000045776367,
-     5.552000045776367,
-     5.552000045776367
+     5.552003383636475
     ]
    }
   },
@@ -380,22 +387,26 @@
      "size": 1.0
     }
    },
+   "Scripting_component": {
+    "entity_id": 9,
+    "script_path": "../stages\\scripts\\moon_orbit.lua"
+   },
    "Transform_component": {
     "Position": [
-     -2.5363779067993164,
-     25.45534896850586,
-     239.84902954101563
+     106.35782623291016,
+     0.0,
+     -41.41456985473633
     ],
     "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
+     -0.0,
+     0.23017500340938568,
+     -0.0,
+     -0.9731492400169373
     ],
     "Scale": [
+     0.49000003933906555,
      0.49000000953674316,
-     0.49000000953674316,
-     0.49000000953674316
+     0.49000006914138794
     ]
    }
   },
@@ -409,18 +420,18 @@
      "Ortho_height": 45.0,
      "Ortho_width": 45.0,
      "Position": [
-      -2.5272216796875,
-      0.71088790893555,
-      0.678077697753906
+      29.50686264038086,
+      50.98762130737305,
+      -135.07769775390625
      ],
      "Scroll_speed": 1.0,
      "Sensitivity": 1.0,
-     "Speed": 5.96099853515625,
+     "Speed": 42.86399841308594,
      "Use_perspective_matrix": true,
      "View_direction": [
-      0.9059160947799683,
-      -0.14932283759117126,
-      -0.39625582098960876
+      0.16037589311599731,
+      -0.4095865786075592,
+      0.8980637192726135
      ]
     }
    },

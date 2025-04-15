@@ -20,6 +20,7 @@
 
 class ECSManager;
 class RenderSystem;
+class ScriptingSystem;
 class Shader;
 
 /**
@@ -30,7 +31,7 @@ class SaveManager {
 
 public:
 
-	SaveManager(ECSManager& ecs, RenderSystem& rs);
+	SaveManager(ECSManager& ecs_, RenderSystem& rs_, ScriptingSystem& ss_);
 	~SaveManager();
 	
 	void saveToFile(std::string filename);
@@ -50,6 +51,7 @@ private:
 
 	ECSManager& ecs_;
 	RenderSystem& rs_;
+	ScriptingSystem& ss_;
 };
 
 

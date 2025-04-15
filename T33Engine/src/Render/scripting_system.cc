@@ -16,7 +16,16 @@ ScriptingSystem::~ScriptingSystem()
 {
 }
 
-void ScriptingSystem::init() {
+void ScriptingSystem::init(size_t entity_id)
+{
+    auto& entity = ecs_.get_component<ScriptingComponent>(entity_id);
+
+    if (entity.has_value()) {
+        loadScript(*entity);
+    }
+}
+
+void ScriptingSystem::initAll() {
     auto si = ecs_.getComponentList<ScriptingComponent>().begin();
     auto siend = ecs_.getComponentList<ScriptingComponent>().end();
 
@@ -167,6 +176,14 @@ void ScriptingSystem::registerTransform(lua_State* L, size_t entity_id) {
         return self->get_position_component(L, entity);
         }, 2);
     lua_setglobal(L, "getPosition");
+
+    lua_pushlightuserdata(L, this);
+    lua_pushcclosure(L, [](lua_State* L) -> int {
+        ScriptingSystem* self = static_cast<ScriptingSystem*>(lua_touserdata(L, lua_upvalueindex(1)));
+        size_t entity_id = static_cast<size_t>(luaL_checkinteger(L, 1));
+        return self->get_position_component(L, entity_id);
+        }, 1);
+    lua_setglobal(L, "getPositionOf");
 
     lua_pushlightuserdata(L, this);
     lua_pushinteger(L, entity_id);

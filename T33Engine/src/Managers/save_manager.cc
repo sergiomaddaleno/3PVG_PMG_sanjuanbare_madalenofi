@@ -16,11 +16,12 @@
 #include <filesystem>
 #include "utils.h"
 
-SaveManager::SaveManager(ECSManager& ecs_, RenderSystem& rs_)
+SaveManager::SaveManager(ECSManager& ecs_, RenderSystem& rs_, ScriptingSystem& ss_)
     : current_scene_file(""),
     number_of_scenes(0),
     ecs_(ecs_),
-    rs_(rs_)
+    rs_(rs_),
+    ss_(ss_)
 {
 }
 
@@ -377,6 +378,8 @@ void SaveManager::deSerialize(const nlohmann::json& j) {
 
             script_comp->script_path = sc["script_path"];
             script_comp->entity_id = sc["entity_id"];
+
+            ss_.init(script_comp->entity_id);
         }
 
         if (entity.contains("Physics_component")) {
