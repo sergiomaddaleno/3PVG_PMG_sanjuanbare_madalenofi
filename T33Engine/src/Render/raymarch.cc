@@ -56,12 +56,6 @@ void RayMarch::render(float time)
 {
     shader_.useProgram();
 
-    glDisable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glDepthMask(GL_FALSE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     float ti = (float)time;
     shader_.setUniformValue(shader_.getUniformLocation("u_time"), ValueType::T_FLOAT_1, &ti);
     int uFrame = int(floor(time * 60.0));
@@ -142,11 +136,6 @@ void RayMarch::render(float time)
             cube.draw();
         }
     }
-
-    glEnable(GL_DEPTH_TEST); 
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE); 
-    glDisable(GL_BLEND);
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glUseProgram(0);

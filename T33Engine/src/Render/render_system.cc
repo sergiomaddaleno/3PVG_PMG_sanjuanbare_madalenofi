@@ -177,7 +177,7 @@ void RenderSystem::forwardRender(Input &input, double dt) {
     glEnable(GL_BLEND);
 
     glBlendFunc(GL_ONE, GL_ZERO);
-    glDepthMask(GL_TRUE);
+    //glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
 
     auto ci = ecs_.getComponentList<CameraComponent>().begin();
@@ -224,7 +224,7 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                     light_comp->shadow_map_.resize(window_width, window_height);
 
                     shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(camera_comp->camera.getPosition()));
-
+                    
                     light_comp->light.setUniforms(shader);
 
                     // ---------------------------------------------------------------
@@ -420,8 +420,12 @@ void RenderSystem::renderScene(RenderComponent& rc, Shader& shader)
     break;
     case RenderType::RT_Cloud:
     {
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         rc.cloud_->resize(window_width, window_height);
         rc.cloud_->render((float)glfwGetTime());
+
+        glBlendFunc(GL_ONE, GL_ZERO);
     }
     break;
     case RenderType::RT_Water:
@@ -434,8 +438,7 @@ void RenderSystem::renderScene(RenderComponent& rc, Shader& shader)
         rc.water_->draw();
 
         glBlendFunc(GL_ONE, GL_ZERO);
-
-        break;
+    break;
     }
 }
 

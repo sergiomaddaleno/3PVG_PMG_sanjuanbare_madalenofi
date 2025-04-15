@@ -219,7 +219,7 @@ void SSAO::render(ECSManager& ecs, Camera cam)
     glEnable(GL_BLEND);
 
     glBlendFunc(GL_ONE, GL_ZERO);
-    glDepthMask(GL_TRUE);
+    //glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
 
     auto li = ecs.getComponentList<LightComponent>().begin();

@@ -254,8 +254,6 @@ GLuint Mesh::getEBO()
     return EBO;
 }
 
-
-
 nlohmann::json Mesh::serialize() const
 {
     nlohmann::json json_data;
