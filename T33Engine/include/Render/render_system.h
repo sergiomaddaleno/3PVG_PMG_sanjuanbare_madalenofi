@@ -56,7 +56,6 @@ public:
 		initShader(deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
 
 		initShader(ssao.ssao_shader, "../stages/shaders/ssao_shader.vs", "../stages/shaders/ssao_shader.fs");
-
 		initShader(ssao.ssao_geometry, "../stages/shaders/g_buffer_ssao.vs", "../stages/shaders/g_buffer_ssao.fs");
 	}
 
