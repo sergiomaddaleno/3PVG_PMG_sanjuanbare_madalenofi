@@ -1,7 +1,7 @@
 
 #include "Core/window.h"
 #include "Core/mesh.h"
-#include "Systems/job_sistem.h"
+#include "Systems/job_system.h"
 #include "Core/input.h"
 #include "Components/render_component.h"
 #include "Components/transform_component.h"
@@ -19,12 +19,12 @@
 #include <string>
 
 std::vector<std::string> meshFiles = {
-        "../stages/assets/obj/SM_Suzanne.obj",
-        "../stages/assets/obj/SM_Teapot.obj",
+        "../stages/assets/obj/LMcQueen.obj",
+        "../stages/assets/obj/Toad.obj",
         "../stages/assets/obj/Mario.obj",
 };
 
-auto mesh_ = std::make_unique<Mesh>();
+auto mesh_ = std::make_shared<Mesh>();
 std::future<std::unique_ptr<Mesh>> monetemesh;
 
 JobSystem jb;
@@ -50,9 +50,11 @@ int main(int, char**) {
 
     tc.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };  
     tc.scale = glm::vec3{ 0.8f, 0.8f, 0.8f };
-    tc.position = glm::vec3{ 0.0f, -2.0f, 0.0f };
+    tc.position = glm::vec3{ 0.0f, 3.0f, 0.0f };
 
-    initShader(rc.mesh_->shader, "../stages/shaders/basic/normals.vs", "../stages/shaders/basic/normals.fs");
+    Shader shader_tex;
+
+    initShader(shader_tex, "../stages/shaders/basic/normals.vs", "../stages/shaders/basic/normals.fs");
     //---
 
     double lastTime = window->getTime();
@@ -62,7 +64,7 @@ int main(int, char**) {
         float dt = float(currentTime - lastTime);
         window->updateWindow();
 
-        rc.mesh_ = std::move(mesh_);
+        rc.mesh_ = mesh_;
 
         float time = (float)window->getTime() * 2;
         tc.rotation = glm::vec3{ 0.0f, time, 0.0f };
@@ -88,10 +90,10 @@ int main(int, char**) {
         }
 
         if (loadingNewMesh) {
-            std::unique_ptr<Mesh> loadedMesh = monetemesh.get();
+            std::shared_ptr<Mesh> loadedMesh = monetemesh.get();
             if (loadedMesh) {
 
-                mesh_ = std::move(loadedMesh);
+                mesh_ = loadedMesh;
                 printf("Malla asignada\n");
             }
             else {
@@ -100,7 +102,7 @@ int main(int, char**) {
             loadingNewMesh = false;
         }
     
-        rc.mesh_->render(rc, tc);
+        rc.mesh_->basicRender(shader_tex, rc,tc);
 
         if (window->closePressed(input)) done = true;
     }
