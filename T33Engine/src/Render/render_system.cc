@@ -600,6 +600,7 @@ size_t RenderSystem::createCloud(float size, TransformComponent tc)
 
     cloud->initRaymarchShader();
     cloud->loadNoiseTexture2D();
+    cloud->loadNoiseTexture3D();
     cloud->initBoundingBox(size);
 
     ecs_.add_component<IdentifierComponent>(entity_);

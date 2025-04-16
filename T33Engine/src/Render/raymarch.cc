@@ -15,13 +15,14 @@ RayMarch::RayMarch(ECSManager& ecs) :
     cube_size_(10.0f),
     absorption_(1.0f, 1.0f, 1.0f),
     march_size_(0.04f),
-    speed_(1.0f),
+    speed_(0.3f),
     amplitude_(2.0f),
     frequency_(0.5f),
-    cloud_direction_(0.1f, 0.2f, -0.3f),
+    direction_(0.1f, 0.2f, -0.3f),
     max_steps_(30),
     max_steps_light_(6),
-    use_blue_noise_(false)
+    use_blue_noise_(false),
+    density_(0.05f)
 {
 }
 
@@ -42,6 +43,11 @@ void RayMarch::loadNoiseTexture2D(std::string path)
 void RayMarch::loadBlueNoiseTexture2D(std::string path)
 {
     blue_noise_2D_.loadTexture(path);
+}
+
+void RayMarch::loadNoiseTexture3D(std::string path)
+{
+    noise_3D_.loadTexture3D(path);
 }
 
 void RayMarch::initBoundingBox(float size)
@@ -73,6 +79,11 @@ void RayMarch::render(float time)
     blue_noise_2D_.bind2D();
     tex_id = GL_TEXTURE1;
     shader_.setUniformValue(shader_.getUniformLocation("u_blue_noise_2D"), ValueType::T_INT_1, &tex_id);
+
+    noise_3D_.active(GL_TEXTURE2);
+    noise_3D_.bind3D();
+    tex_id = GL_TEXTURE2;
+    shader_.setUniformValue(shader_.getUniformLocation("u_noise_3D"), ValueType::T_INT_1, &tex_id);
 
     auto ci = ecs_.getComponentList<CameraComponent>().begin();
     auto ciend = ecs_.getComponentList<CameraComponent>().end();
@@ -115,7 +126,8 @@ void RayMarch::render(float time)
                     shader_.setUniformValue(shader_.getUniformLocation("u_max_steps_light"), ValueType::T_INT_1, &max_steps_light_);
                     shader_.setUniformValue(shader_.getUniformLocation("u_amplitude"), ValueType::T_FLOAT_1, &amplitude_);
                     shader_.setUniformValue(shader_.getUniformLocation("u_frequency"), ValueType::T_FLOAT_1, &frequency_);
-                    shader_.setUniformValue(shader_.getUniformLocation("u_cloud_direction"), ValueType::T_FLOAT_3, &cloud_direction_);
+                    shader_.setUniformValue(shader_.getUniformLocation("u_direction"), ValueType::T_FLOAT_3, &direction_);
+                    shader_.setUniformValue(shader_.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &density_);
                 }
             }
 
@@ -160,8 +172,9 @@ nlohmann::json RayMarch::serialize() const
         json_data["speed"] = speed_;
         json_data["amplitude"] = amplitude_;
         json_data["frequency"] = frequency_;
-        json_data["cloud_direction"] = { cloud_direction_.x, cloud_direction_.y, cloud_direction_.z};
+        json_data["direction"] = { direction_.x, direction_.y, direction_.z};
         json_data["max_steps"] = max_steps_;
+        json_data["density"] = density_;
         json_data["max_steps_light_"] = max_steps_light_;
         json_data["use_blue_noise"] = use_blue_noise_;
 

@@ -3,6 +3,7 @@
 uniform float u_time;
 uniform int u_frame;
 uniform sampler2D u_noise_2D;
+uniform sampler3D u_noise_3D;
 uniform sampler2D u_blue_noise_2D;
 
 uniform vec3 u_cube_scale;
@@ -14,9 +15,10 @@ uniform int u_max_steps = 200;
 uniform int u_max_steps_lights = 6;
 uniform float u_amplitude = 2.0;
 uniform float u_frequency = 0.5;
-uniform vec3 u_cloud_direction = vec3(0.1, 0.2, -0.3);
+uniform vec3 u_direction = vec3(0.1, 0.2, -0.3);
 uniform vec3 u_sun_dir = vec3(0.0, -1.0, 0.0);
 uniform bool u_use_blue_noise = false;
+uniform float u_density = 2.0;
 
 in vec3 world_pos;
 in vec3 ray_origin;
@@ -46,6 +48,21 @@ float fbm(vec3 p) {
   }
 
   return clamp(f, 0.0, 1.0);
+}
+
+float fbm3D(vec3 p) {
+    float f = 0.0;
+    float amp = u_amplitude;
+    float freq = u_frequency;
+
+    for (int i = 0; i < 5; i++) {
+        vec3 samplePos = fract(p * freq);
+        f += amp * texture(u_noise_3D, samplePos).r;
+        freq *= 2.0;
+        amp *= 0.5;
+    }
+
+    return clamp(f, 0.0, 1.0);
 }
 
 vec3 BeersLaw(float dist, vec3 absorption) {
@@ -81,7 +98,7 @@ vec4 raymarch(vec3 ro, vec3 rd, float tmin, float tmax) {
 
     for (int i = 0; i < u_max_steps && t < tmax; ++i) {
         vec3 pos = ro + t * rd;
-        float density = fbm(pos * 2.0 + (u_time * u_speed) * u_cloud_direction);
+        float density = fbm(pos * u_density + (u_time * u_speed) * u_direction);
 
         if (density > 0.0) {
             vec3 transmittance = BeersLaw(density * u_march_size, u_absorption);

@@ -1210,7 +1210,8 @@ void UIManager::InspectorWindow() {
                     auto& cloud = *ecs_.get_component<RenderComponent>(selected_entity)->cloud_;
 
                     ImGui::SliderFloat("Speed", &cloud.speed_, 0.0f, 10.0f, "%.3f");
-                    ImGui::SliderFloat3("Cloud Direction", &cloud.cloud_direction_.x, -1.0f, 1.0f);
+                    ImGui::SliderFloat3("Direction", &cloud.direction_.x, -1.0f, 1.0f);
+                    ImGui::SliderFloat("Density", &cloud.density_, 0.0f, 3.0f, "%.00003f");
                     ImGui::SliderFloat("Amplitude", &cloud.amplitude_, 0.0f, 10.0f, "%.03f");
                     ImGui::SliderFloat("Frequency", &cloud.march_size_, 0.02f, 1.0f, "%.03f");
 

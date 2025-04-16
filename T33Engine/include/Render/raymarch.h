@@ -17,8 +17,9 @@ public:
 							  std::string fragment_path = "../stages/shaders/raymarch.fs");
 	void loadNoiseTexture2D(std::string path = "../stages/assets/textures/noise/noise.png");
 	void loadBlueNoiseTexture2D(std::string path = "../stages/assets/textures/noise/blue-noise-pattern.png");
+	void loadNoiseTexture3D(std::string path = "../stages/assets/textures/noise/HDR_LA_0.png");
 
-	void initBoundingBox(float size = 10.0f);
+	void initBoundingBox(float size = 1.0f);
 
 	void render(float time);
 	void resize(unsigned int width, unsigned int height);
@@ -27,13 +28,14 @@ public:
 
 	Shader shader_;
 	Texture noise_2D_;
+	Texture noise_3D_;
 	Texture blue_noise_2D_;
 
 	Cube cube;
 	float cube_size_;
 
 	glm::vec3 absorption_;
-	glm::vec3 cloud_direction_;
+	glm::vec3 direction_;
 	float march_size_;
 	int max_steps_;
 	int max_steps_light_;
@@ -41,6 +43,7 @@ public:
 	float amplitude_;
 	float frequency_;
 	bool use_blue_noise_;
+	float density_;
 
 	nlohmann::json serialize() const;
 

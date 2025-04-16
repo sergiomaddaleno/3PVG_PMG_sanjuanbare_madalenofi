@@ -21,13 +21,14 @@
 auto teapot_mesh = std::make_shared<Mesh>();
 auto toad_mesh = std::make_shared<Mesh>();
 auto mario_mesh = std::make_shared<Mesh>();
+
 ECSManager ecs;
-
-int num_entities = 500;
-glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
-
+Camera cam;
 Shader shader_tex;
 RenderComponent rc;
+
+glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
+int num_entities = 500;
 
 void renderScene(RenderComponent& rc, Shader& shader)
 {
@@ -40,54 +41,6 @@ void renderScene(RenderComponent& rc, Shader& shader)
         }
     }
     break;
-    case RenderType::RT_Terrain:
-    {
-        rc.terrain_->wave_.setUniforms(shader, (float)glfwGetTime());
-        rc.terrain_->draw();
-    }
-    break;
-    case RenderType::RT_Sphere:
-    {
-        rc.sphere_->wave_.setUniforms(shader, (float)glfwGetTime());
-        rc.sphere_->draw();
-    }
-    break;
-    case RenderType::RT_Surface:
-    {
-        rc.surface_->wave_.setUniforms(shader, (float)glfwGetTime());
-        rc.surface_->draw();
-    }
-    break;
-    case RenderType::RT_Cube8v:
-    case RenderType::RT_Cube24v:
-    {
-        rc.cube_->wave_.setUniforms(shader, (float)glfwGetTime());
-        rc.cube_->draw();
-    }
-    break;
-    case RenderType::RT_Quad:
-    {
-        rc.quad_->wave_.setUniforms(shader, (float)glfwGetTime());
-        rc.quad_->draw();
-
-        int use = rc.quad_->use_normal_map_;
-        shader.setUniformValue(shader.getUniformLocation("u_use_normal_map"),
-            ValueType::T_INT_1, &use);
-
-        use = rc.quad_->use_parallax_map_;
-        shader.setUniformValue(shader.getUniformLocation("u_use_parallax_map"),
-            ValueType::T_INT_1, &use);
-
-        float scale = rc.quad_->parallax_scale_;
-        shader.setUniformValue(shader.getUniformLocation("u_parallax_scale"),
-            ValueType::T_FLOAT_1, &scale);
-
-        int type = rc.quad_->parallax_type;
-        shader.setUniformValue(shader.getUniformLocation("u_parallax_type"),
-            ValueType::T_INT_1, &type);
-    }
-    break;
-
     }
 }
 
@@ -107,9 +60,6 @@ void setUniforms(TransformComponent& tc, Shader& shader, Camera& cam)
 
     int tex_id = TextureID::TI_Diffuse;
     shader.setUniformValue(shader.getUniformLocation("u_texture"), ValueType::T_INT_1, &tex_id);
-
-
-
 }
 
 void forwardRender(Shader shader,Camera cam) {
@@ -124,24 +74,21 @@ void forwardRender(Shader shader,Camera cam) {
    
     shader.useProgram();
 
-                    auto ri = ecs.getComponentList<RenderComponent>().begin();
-                    auto ti = ecs.getComponentList<TransformComponent>().begin();
-                    auto riend = ecs.getComponentList<RenderComponent>().end();
-                    auto tiend = ecs.getComponentList<TransformComponent>().end();
+    auto ri = ecs.getComponentList<RenderComponent>().begin();
+    auto ti = ecs.getComponentList<TransformComponent>().begin();
+    auto riend = ecs.getComponentList<RenderComponent>().end();
+    auto tiend = ecs.getComponentList<TransformComponent>().end();
 
-                    for (; ri != riend && ti != tiend; ++ri, ++ti) {
-                        if (ri->has_value() && ti->has_value()) {
-                            auto& render_comp = *ri;
-                            auto& transform_comp = *ti;
+    for (; ri != riend && ti != tiend; ++ri, ++ti) {
+        if (ri->has_value() && ti->has_value()) {
+            auto& render_comp = *ri;
+            auto& transform_comp = *ti;
 
-                            setUniforms(*transform_comp, shader,cam);
-                            renderScene(*render_comp, shader);
-                        }
-                    }
-                    
-                
+            setUniforms(*transform_comp, shader,cam);
+            renderScene(*render_comp, shader);
+        }
+    }
 
-   
     glUseProgram(0);
 }
 
@@ -149,11 +96,9 @@ int main(int, char**) {
    
     auto window = Window::make(800, 600, "Window");
     window->setWindowActive();
-    window->initGLEW();
+    window->initGLEW(); 
 
     Input input{ window->getWindow() };
-
-    RenderSystem render_system{ ecs };
 
     // ---
     if (!toad_mesh->loadOBJ("../stages/assets/obj/toad.obj", "../stages/assets/textures/toad")) {
@@ -164,11 +109,13 @@ int main(int, char**) {
         return -1;
     }
 
-    if (!teapot_mesh->loadOBJ("../stages/assets/obj/Yoda.obj", "../stages/assets/textures/yoda")) {
+    if (!teapot_mesh->loadOBJ("../stages/assets/obj/SM_Teapot.obj")) {
        return -1;
     }
 
-    auto j = ecs.create_entity() +1;
+    initShader(shader_tex, "../stages/shaders/basic/texture.vs", "../stages/shaders/basic/texture.fs");
+
+    auto j = ecs.create_entity() + 1;
 
     ecs.add_component_type<RenderComponent>();
     ecs.add_component_type<TransformComponent>();
@@ -189,24 +136,29 @@ int main(int, char**) {
     ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 2.0f, 0.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
 
-    
-
     for (int i = 2; i < num_entities ; i++) {
         j++;
         ecs.add_component<RenderComponent>(j);
         ecs.add_component<TransformComponent>(j);
         ecs.get_component<RenderComponent>(j)->type_ = RT_Mesh;
-        ecs.get_component<RenderComponent>(j)->mesh_ =teapot_mesh;
-        ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
+        ecs.get_component<RenderComponent>(j)->mesh_ = mario_mesh;
+        ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
     }
-    
+   
+    auto ri = ecs.getComponentList<RenderComponent>().begin();
+    auto riend = ecs.getComponentList<RenderComponent>().end();
 
-    initShader(shader_tex, "../stages/shaders/basic/normals.vs", "../stages/shaders/basic/normals.fs");
+    for (; ri != riend; ++ri) {
+        if (ri->has_value()) {
+            auto& render_comp = *ri;
 
-    Camera cam;
-
-    render_system.initRenderTypes();
-    render_system.shader = shader_tex;
+            switch (render_comp->type_) {
+            case RenderType::RT_Mesh:
+                render_comp->mesh_->bind();
+                break;
+            }
+        }
+    }
 
     double lastTime = window->getTime();
     bool done = false;
@@ -216,11 +168,9 @@ int main(int, char**) {
         window->updateWindow();
         window->colorWindow(color);
 
-        float angle = (float)window->getTime();
         cam.update(input,dt);
 
-   
-
+        float angle = (float)window->getTime();
         for (int i = 2; i < num_entities; i++) {
             ecs.get_component<TransformComponent>(i)->position = glm::vec3{ cos(angle + (float)i) * 8, (sin(angle + (float)i) * 8), -10.0f };
         }

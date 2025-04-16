@@ -27,7 +27,6 @@ Mesh::~Mesh()
     if (EBO != 0) glDeleteBuffers(1, &EBO);
 };
 
-
 bool Mesh::loadOBJ(const std::string& file,
     const std::string& textureFolder)
 {
@@ -80,7 +79,7 @@ bool Mesh::loadOBJ(const std::string& file,
         }
 
         //For textures ---
-        if (textureFolder != "") {
+        if (!textureFolder.empty()) {
             materialID = shape.mesh.material_ids.empty() ? -1 : shape.mesh.material_ids[0];
 
             if (materialID >= 0 && materialID < materials.size()) {
@@ -143,8 +142,6 @@ void Mesh::draw() {
                 mesh.textures[0].bind2D();
             }
              
-            
-
             glBindVertexArray(mesh.VAO);
             glDrawElements(GL_TRIANGLES, (GLsizei)mesh.indices.size(), GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);
