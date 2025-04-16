@@ -1,0 +1,402 @@
+{
+ "Entities": [
+  {
+   "Camera_component": {
+    "camera": {
+     "Aspect_ratio": 1.7777777910232544,
+     "Far_clip_plane": 200.0,
+     "Fov": 45.0,
+     "Near_clip_plane": 0.10000000149011612,
+     "Ortho_height": 45.0,
+     "Ortho_width": 45.0,
+     "Position": [
+      -0.8185861706733704,
+      7.221892833709717,
+      18.85677146911621
+     ],
+     "Scroll_speed": 1.0,
+     "Sensitivity": 1.0,
+     "Speed": 5.0,
+     "Use_perspective_matrix": true,
+     "View_direction": [
+      0.0062877461314201355,
+      -0.27717119455337524,
+      -0.9607999920845032
+     ]
+    }
+   },
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 0,
+    "Entity_name": "Camera [0]"
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     5.0,
+     10.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 1,
+    "Entity_name": "Terrain [0]"
+   },
+   "Render_component": {
+    "Render_type": 1,
+    "Terrain": {
+     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
+     "Texture_path": "../stages/assets/textures/images/grass.png",
+     "height_mult": 0.0,
+     "is_centered": true,
+     "num_cols": 2,
+     "num_rows": 2,
+     "size": 10.0,
+     "use_perlin_noise": false
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 2,
+    "Entity_name": "Mesh [0]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\Mario.obj",
+     "Texture_folder": "../stages\\assets\\textures\\mario"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 3,
+    "Entity_name": "Directional Light [0]"
+   },
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
+      ]
+     ],
+     "Light_color": [
+      [
+       10.0,
+       10.0,
+       10.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Spot_softness": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 4,
+    "Entity_name": "Spot Light [0]"
+   },
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       0.0,
+       0.0,
+       1.0
+      ]
+     ],
+     "Light_color": [
+      [
+       150.0,
+       150.0,
+       150.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.699999988079071
+     ],
+     "Position": [
+      [
+       0.0,
+       7.823810577392578,
+       -4.999826908111572
+      ]
+     ],
+     "Quadratic_attenuation": [
+      1.7999999523162842
+     ],
+     "Shininnes": [
+      32.0
+     ],
+     "Specular_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Spot_angle": [
+      45.0
+     ],
+     "Spot_softness": [
+      10.0
+     ],
+     "Strength": [
+      1.0
+     ],
+     "Type": 1
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     7.823810577392578,
+     -4.999826908111572
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 5,
+    "Entity_name": "Point Light [0]"
+   },
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       0.0,
+       0.0,
+       1.0
+      ]
+     ],
+     "Light_color": [
+      [
+       150.0,
+       150.0,
+       150.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.699999988079071
+     ],
+     "Position": [
+      [
+       5.763932228088379,
+       6.304203510284424,
+       -9.829073905944824
+      ]
+     ],
+     "Quadratic_attenuation": [
+      1.7999999523162842
+     ],
+     "Shininnes": [
+      32.0
+     ],
+     "Specular_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Spot_softness": [
+      0.0
+     ],
+     "Strength": [
+      1.0
+     ],
+     "Type": 2
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     5.763932228088379,
+     6.304203510284424,
+     -9.829073905944824
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  }
+ ]
+}
