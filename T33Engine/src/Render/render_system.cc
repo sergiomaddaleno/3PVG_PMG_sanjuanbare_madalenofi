@@ -440,6 +440,8 @@ void RenderSystem::renderScene(RenderComponent& rc, Shader& shader)
         glBlendFunc(GL_ONE, GL_ZERO);
     break;
     }
+
+    shader.useProgram();
 }
 
 void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type, float spawn_prob, float y_spawn_height)
@@ -622,6 +624,7 @@ size_t RenderSystem::createCloud(float size, TransformComponent tc)
     ecs_.get_component<RenderComponent>(entity_)->cloud_ = cloud;
 
     entity_++;
+
     entity_counts_.cloud++;
 
     return entity_;

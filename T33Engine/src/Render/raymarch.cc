@@ -85,6 +85,8 @@ void RayMarch::render(float time)
     tex_id = GL_TEXTURE2;
     shader_.setUniformValue(shader_.getUniformLocation("u_noise_3D"), ValueType::T_INT_1, &tex_id);
 
+    cube.draw();
+
     auto ci = ecs_.getComponentList<CameraComponent>().begin();
     auto ciend = ecs_.getComponentList<CameraComponent>().end();
 
@@ -96,6 +98,20 @@ void RayMarch::render(float time)
             glm::mat4 view = camera_comp->camera.getViewMatrix();
             glm::mat4 projection = camera_comp->camera.getUsePerspectiveMatrix() ? camera_comp->camera.getPerspectiveMatrix() : camera_comp->camera.getOrthograficMatrix();
             
+            shader_.setUniformValue(shader_.getUniformLocation("view"), ValueType::T_MAT_4x4, &view);
+            shader_.setUniformValue(shader_.getUniformLocation("projection"), ValueType::T_MAT_4x4, &projection);
+            shader_.setUniformValue(shader_.getUniformLocation("u_camera_pos"), ValueType::T_FLOAT_3, &camera_position);
+
+            shader_.setUniformValue(shader_.getUniformLocation("u_absorption"), ValueType::T_FLOAT_3, &absorption_);
+            shader_.setUniformValue(shader_.getUniformLocation("u_speed"), ValueType::T_FLOAT_1, &speed_);
+            shader_.setUniformValue(shader_.getUniformLocation("u_march_size"), ValueType::T_FLOAT_1, &march_size_);
+            shader_.setUniformValue(shader_.getUniformLocation("u_max_steps"), ValueType::T_INT_1, &max_steps_);
+            shader_.setUniformValue(shader_.getUniformLocation("u_max_steps_light"), ValueType::T_INT_1, &max_steps_light_);
+            shader_.setUniformValue(shader_.getUniformLocation("u_amplitude"), ValueType::T_FLOAT_1, &amplitude_);
+            shader_.setUniformValue(shader_.getUniformLocation("u_frequency"), ValueType::T_FLOAT_1, &frequency_);
+            shader_.setUniformValue(shader_.getUniformLocation("u_direction"), ValueType::T_FLOAT_3, &direction_);
+            shader_.setUniformValue(shader_.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &density_);
+
             auto ri = ecs_.getComponentList<RenderComponent>().begin();
             auto ti = ecs_.getComponentList<TransformComponent>().begin();
             auto riend = ecs_.getComponentList<RenderComponent>().end();
@@ -106,46 +122,19 @@ void RayMarch::render(float time)
                     auto& render_comp = *ri;
                     auto& transform_comp = *ti;
 
-                    glm::mat4 model = glm::mat4(1.0f);
-                    model = glm::translate(model, transform_comp->position);
-                    model = model * glm::mat4_cast(transform_comp->rotation);
-                    model = glm::scale(model, transform_comp->scale);
+                    if (render_comp->type_ == RT_Cloud) {
+                        glm::mat4 model = glm::mat4(1.0f);
+                        model = glm::translate(model, transform_comp->position);
+                        model = model * glm::mat4_cast(transform_comp->rotation);
+                        model = glm::scale(model, transform_comp->scale);
 
-                    shader_.setUniformValue(shader_.getUniformLocation("u_cube_scale"), ValueType::T_FLOAT_3, glm::value_ptr(transform_comp->scale));
-                    shader_.setUniformValue(shader_.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
-                    shader_.setUniformValue(shader_.getUniformLocation("u_camera_pos"), ValueType::T_FLOAT_3, &camera_position);
-                    shader_.setUniformValue(shader_.getUniformLocation("view"), ValueType::T_MAT_4x4, &view);
-                    shader_.setUniformValue(shader_.getUniformLocation("projection"), ValueType::T_MAT_4x4, &projection);
+                        shader_.setUniformValue(shader_.getUniformLocation("u_cube_scale"), ValueType::T_FLOAT_3, glm::value_ptr(transform_comp->scale));
+                        shader_.setUniformValue(shader_.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+                        shader_.setUniformValue(shader_.getUniformLocation("u_cloud_pos"), ValueType::T_FLOAT_3, glm::value_ptr(transform_comp->position));
 
-                    shader_.setUniformValue(shader_.getUniformLocation("u_cloud_pos"),ValueType::T_FLOAT_3, glm::value_ptr(transform_comp->position));
-                
-                    shader_.setUniformValue(shader_.getUniformLocation("u_absorption"), ValueType::T_FLOAT_3, &absorption_);
-                    shader_.setUniformValue(shader_.getUniformLocation("u_speed"), ValueType::T_FLOAT_1, &speed_);
-                    shader_.setUniformValue(shader_.getUniformLocation("u_march_size"), ValueType::T_FLOAT_1, &march_size_);
-                    shader_.setUniformValue(shader_.getUniformLocation("u_max_steps"), ValueType::T_INT_1, &max_steps_);
-                    shader_.setUniformValue(shader_.getUniformLocation("u_max_steps_light"), ValueType::T_INT_1, &max_steps_light_);
-                    shader_.setUniformValue(shader_.getUniformLocation("u_amplitude"), ValueType::T_FLOAT_1, &amplitude_);
-                    shader_.setUniformValue(shader_.getUniformLocation("u_frequency"), ValueType::T_FLOAT_1, &frequency_);
-                    shader_.setUniformValue(shader_.getUniformLocation("u_direction"), ValueType::T_FLOAT_3, &direction_);
-                    shader_.setUniformValue(shader_.getUniformLocation("u_density"), ValueType::T_FLOAT_1, &density_);
-                }
-            }
-
-            auto li = ecs_.getComponentList<LightComponent>().begin();
-            auto liend = ecs_.getComponentList<LightComponent>().end();
-
-            for (; li != liend; ++li) {
-                if (li->has_value()) {
-                    auto& light_comp = *li;
-
-                    if (light_comp->light.type_ == Light::LightType::LT_Directional) {
-
-                        shader_.setUniformValue(shader_.getUniformLocation("u_light_color"), ValueType::T_FLOAT_3, &light_comp->light.light_color_);
-                        shader_.setUniformValue(shader_.getUniformLocation("u_sun_dir"), ValueType::T_FLOAT_3, &light_comp->light.dir_);
                     }
                 }
             }
-            cube.draw();
         }
     }
 

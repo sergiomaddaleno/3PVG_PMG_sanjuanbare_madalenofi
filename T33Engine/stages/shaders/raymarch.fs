@@ -70,8 +70,8 @@ vec3 BeersLaw(float dist, vec3 absorption) {
 }
 
 bool cubeIntersection(vec3 ro, vec3 rd, out float tmin, out float tmax) {
-    vec3 box_min = vec3(-u_cube_scale * 0.5);
-    vec3 box_max = vec3( u_cube_scale * 0.5);
+    vec3 box_min = vec3(-u_cube_scale);
+    vec3 box_max = vec3( u_cube_scale);
 
     vec3 inv_dir = 1.0 / rd;
     vec3 t0 = (box_min - ro) * inv_dir;
