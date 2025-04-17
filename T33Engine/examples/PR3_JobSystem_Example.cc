@@ -7,6 +7,10 @@
 #include "Components/transform_component.h"
 
 #include <../deps/glm/glm.hpp>
+#include <../deps/glm/gtc/matrix_transform.hpp>
+#include <../deps/glm/gtc/type_ptr.hpp>
+#include <../deps/glm/gtc/quaternion.hpp>
+
 #include "utils.h"
 
 #include <iostream>
@@ -19,9 +23,9 @@
 #include <string>
 
 std::vector<std::string> meshFiles = {
-        "../stages/assets/obj/LMcQueen.obj",
+        "../stages/assets/obj/SM_Teapot.obj",
         "../stages/assets/obj/Toad.obj",
-        "../stages/assets/obj/Mario.obj",
+        "../stages/assets/obj/SM_Suzanne.obj",
 };
 
 auto mesh_ = std::make_shared<Mesh>();
@@ -30,31 +34,59 @@ std::future<std::unique_ptr<Mesh>> monetemesh;
 JobSystem jb;
 RenderComponent rc;
 TransformComponent tc;
+Shader shader;
+Camera cam;
 
 int currentMeshIndex = 0;
 bool loadingNewMesh = false;
 
+void render(Shader shader, Mesh& mesh) {
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+
+    shader.useProgram();
+
+    for (auto& submesh : mesh.meshes) {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, tc.position);
+        model = model * glm::mat4_cast(tc.rotation);
+        model = glm::scale(model, tc.scale);
+
+        glm::mat4 view = cam.getViewMatrix();
+        glm::mat4 projection = cam.getPerspectiveMatrix();
+
+        shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+        shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
+        shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
+
+        mesh.draw();
+    }
+}
+
 int main(int, char**) {
     
-    if (!mesh_->loadOBJ(meshFiles[currentMeshIndex],"l")) {
-        return -1;
-    }
-
-    //---
     auto window = Window::make(800, 600, "Window");
     window->setWindowActive();
     window->initGLEW();
-    //---
 
     Input input{ window->getWindow() };
 
-    tc.rotation = glm::vec3{ 0.0f, 1.0f, 0.0f };  
-    tc.scale = glm::vec3{ 0.8f, 0.8f, 0.8f };
-    tc.position = glm::vec3{ 0.0f, 3.0f, 0.0f };
+    if (!mesh_->loadOBJ(meshFiles[currentMeshIndex], "l")) {
+        return -1;
+    }
 
-    Shader shader_tex;
+    initShader(shader, "../stages/shaders/basic/normals.vs", "../stages/shaders/basic/normals.fs");
 
-    initShader(shader_tex, "../stages/shaders/basic/normals.vs", "../stages/shaders/basic/normals.fs");
+    tc.position = glm::vec3{ 0.0f, 1.0f, -3.0f };
+    tc.scale = glm::vec3{ 5.0f, 5.0f, 5.0f };
+
+    mesh_->bind();
+
+    cam.setViewDir(glm::vec3(0, 0, -1.0));
+    cam.lockViewDirection(true);
+    cam.lockMovement(true);
+
     //---
 
     double lastTime = window->getTime();
@@ -64,12 +96,15 @@ int main(int, char**) {
         float dt = float(currentTime - lastTime);
         window->updateWindow();
 
-        rc.mesh_ = mesh_;
-
         float time = (float)window->getTime() * 2;
         tc.rotation = glm::vec3{ 0.0f, time, 0.0f };
       
+        mesh_ = mesh_;
+
         if (input.isKeyPressed(Input::RIGHT) && !loadingNewMesh) {
+
+            mesh_ = mesh_;
+            mesh_->bind();
 
             currentMeshIndex = (currentMeshIndex + 1) % meshFiles.size();
             std::string nextMeshFile = meshFiles[currentMeshIndex];
@@ -78,31 +113,23 @@ int main(int, char**) {
             monetemesh = jb.Add_Task([nextMeshFile]() {
 
                 std::unique_ptr<Mesh> newMesh = std::make_unique<Mesh>();
-                if (newMesh->loadOBJ(nextMeshFile,"s")) {
-                    printf("Malla cargada: %s\n", nextMeshFile.c_str());
+                if (newMesh->loadOBJ(nextMeshFile)) {
                     return newMesh;
                 }
-                else {
-                    printf("Error malla: %s\n", nextMeshFile.c_str());
-                    return std::unique_ptr<Mesh>(nullptr);
-                }
-                });
+            });
         }
 
-        if (loadingNewMesh) {
-            std::shared_ptr<Mesh> loadedMesh = monetemesh.get();
+        if (loadingNewMesh && monetemesh.valid()) {
+            std::unique_ptr<Mesh> loadedMesh = monetemesh.get();
             if (loadedMesh) {
-
-                mesh_ = loadedMesh;
-                printf("Malla asignada\n");
-            }
-            else {
-                printf("Error en asignar malla\n");
+                mesh_ = std::move(loadedMesh);
+                mesh_->bind();
             }
             loadingNewMesh = false;
         }
     
-        rc.mesh_->basicRender(shader_tex, rc,tc);
+        cam.update(input, dt);
+        render(shader, *mesh_);
 
         if (window->closePressed(input)) done = true;
     }
