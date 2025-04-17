@@ -65,8 +65,6 @@ public:
     std::string mesh_path;
     std::string texture_folder;
 
-    void basicRender(Shader shader, RenderComponent rc, TransformComponent tc, Camera cam = Camera());
-
 private:
     std::vector<Vertex> vertices;
     std::vector<Texture> textures;

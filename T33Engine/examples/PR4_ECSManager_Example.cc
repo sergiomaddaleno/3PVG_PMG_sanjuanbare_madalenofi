@@ -28,7 +28,7 @@ Shader shader_tex;
 RenderComponent rc;
 
 glm::vec4 color = { 0.5f, 0.5f, 0.5f, 1.0f };
-int num_entities = 500;
+int num_entities = 5000;
 
 void renderScene(RenderComponent& rc, Shader& shader)
 {
@@ -124,7 +124,7 @@ int main(int, char**) {
     ecs.add_component<RenderComponent>(j);
     ecs.get_component<RenderComponent>(j)->type_ = RT_Mesh;
     ecs.get_component<RenderComponent>(j)->mesh_ = mario_mesh;
-    ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 0.0f, 0.0f, 0.0f };
+    ecs.get_component<TransformComponent>(j)->position = glm::vec3{ -1.0f, 4.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
 
     j++;
@@ -133,7 +133,7 @@ int main(int, char**) {
     ecs.add_component<TransformComponent>(j);
     ecs.get_component<RenderComponent>(j)->type_ = RT_Mesh;
     ecs.get_component<RenderComponent>(j)->mesh_ = toad_mesh;
-    ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 2.0f, 0.0f, 0.0f };
+    ecs.get_component<TransformComponent>(j)->position = glm::vec3{ 1.0f, 4.0f, 0.0f };
     ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 1.0f, 1.0f, 1.0f };
 
     for (int i = 2; i < num_entities ; i++) {
@@ -141,7 +141,7 @@ int main(int, char**) {
         ecs.add_component<RenderComponent>(j);
         ecs.add_component<TransformComponent>(j);
         ecs.get_component<RenderComponent>(j)->type_ = RT_Mesh;
-        ecs.get_component<RenderComponent>(j)->mesh_ = mario_mesh;
+        ecs.get_component<RenderComponent>(j)->mesh_ = teapot_mesh;
         ecs.get_component<TransformComponent>(j)->scale = glm::vec3{ 0.2f, 0.2f, 0.2f };
     }
    
@@ -160,6 +160,10 @@ int main(int, char**) {
         }
     }
 
+    cam.setViewDir(glm::vec3(0, 0, -1.0));
+    cam.lockViewDirection(true);
+    cam.lockMovement(true);
+
     double lastTime = window->getTime();
     bool done = false;
     while (!done) {
@@ -172,7 +176,7 @@ int main(int, char**) {
 
         float angle = (float)window->getTime();
         for (int i = 2; i < num_entities; i++) {
-            ecs.get_component<TransformComponent>(i)->position = glm::vec3{ cos(angle + (float)i) * 8, (sin(angle + (float)i) * 8), -10.0f };
+            ecs.get_component<TransformComponent>(i)->position = glm::vec3{ cos(angle + (float)i) * 8, 5.0f + (sin(angle + (float)i) * 8), -10.0f };
         }
 
         ecs.get_component<TransformComponent>(0)->moveEntity(input, dt);

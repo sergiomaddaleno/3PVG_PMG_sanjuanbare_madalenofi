@@ -65,9 +65,15 @@ public:
 	void setUsePerspectiveMatrix(bool use_perspective_matrix) { use_perspective_matrix_ = use_perspective_matrix; }
 
 	void setScrollSpeed(float scroll_speed) { scroll_speed_ = scroll_speed; }
-	void setViewDir(glm::vec3 view_direction) {view_direction_ = view_direction;}
+	void setViewDir(glm::vec3 view_direction) {
+		view_direction_ = glm::normalize(view_direction);
+		view_ = initViewTarget();
+	}
 	void setOrientation(glm::quat orientation);
 	void setUp(glm::vec3 up) { up_ = up; }
+
+	void lockViewDirection(bool lock) { lock_view_dir_ = lock; }
+	void lockMovement(bool lock) { lock_move_ = lock; }
 
 	//Save data
 	nlohmann::json serialize();
@@ -100,6 +106,8 @@ private:
 	float ortho_height_;
 
 	bool use_perspective_matrix_;
+	bool lock_view_dir_;
+	bool lock_move_;
 };
 
 

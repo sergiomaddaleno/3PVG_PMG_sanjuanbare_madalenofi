@@ -16,14 +16,14 @@ const float PI = 3.141592653589793f;
 Camera::Camera()
     :
     position_(0.0f, 5.0f, 10.0f),
-    view_direction_(0.0f, 0.0f, -1.0f),
+    view_direction_(0.0f, 0.0f, 1.0f),
     up_(0.0f, 1.0f, 0.0f),
     pos_mouse(0.0f, 0.0f),
     curr_mouse(0.0f, 0.0f),
     last_mouse(0.0f, 0.0f),
     delta_mouse(0.0f, 0.0f),
     accum_mouse_offset_(0.0f, 0.0f),
-    speed_(5.0f),
+    speed_(3.0f),
     sensitivity_(1.0f),
     fov_(45.0f),
     aspect_ratio_(800.0f / 600.0f),
@@ -33,6 +33,8 @@ Camera::Camera()
     ortho_height_(45.0f),
     scroll_speed_(1.0f),
     use_perspective_matrix_(true),
+    lock_view_dir_(false),
+    lock_move_(false),
     view_(initViewTarget())
 {}
 
@@ -68,7 +70,7 @@ void Camera::update(Input& input, const double dt, const int window_width, const
         last_mouse = curr_mouse;
     }
 
-    if (input.isMouseButtonDown(Input::MouseButton::MOUSE_RIGHT)) {
+    if (!lock_view_dir_ && input.isMouseButtonDown(Input::MouseButton::MOUSE_RIGHT)) {
         delta_mouse = curr_mouse - last_mouse;
         delta_mouse.x = delta_mouse.x / window_width;
         delta_mouse.y = delta_mouse.y / window_height;
@@ -76,16 +78,16 @@ void Camera::update(Input& input, const double dt, const int window_width, const
         accum_mouse_offset_ += delta_mouse;
 
         accum_mouse_offset_.y = glm::clamp(accum_mouse_offset_.y, -90.0f / sensitivity_, 90.0f / sensitivity_);
+
+        float alpha = accum_mouse_offset_.x * (PI * 2) * sensitivity_;
+        float omega = accum_mouse_offset_.y * (PI - 1.57f) * sensitivity_;
+
+        omega = glm::clamp((float)omega, -1.57f, 1.57f);
+
+        view_direction_.x = cosf(alpha) * cosf(omega);
+        view_direction_.y = sinf(omega);
+        view_direction_.z = sinf(alpha) * cosf(omega);
     }
-
-    float alpha = accum_mouse_offset_.x * (PI * 2) * sensitivity_;
-    float omega = accum_mouse_offset_.y * (PI - 1.57f) * sensitivity_;
-
-    omega = glm::clamp((float)omega, -1.57f, 1.57f);
-
-    view_direction_.x = cosf(alpha) * cosf(omega);
-    view_direction_.y = sinf(omega);
-    view_direction_.z = sinf(alpha) * cosf(omega);
 
     view_ = initViewTarget();
 
@@ -93,25 +95,13 @@ void Camera::update(Input& input, const double dt, const int window_width, const
     glm::vec3 right_vec = glm::normalize(glm::cross(forward_vec, up_));
 
     // ----------------- Camera Movement
-    if (input.isMouseButtonDown(Input::MouseButton::MOUSE_RIGHT)) {
-        if (input.isKeyDown(Input::A)) {
-            position_ -= right_vec * speed_ * (float)dt;
-        }
-        if (input.isKeyDown(Input::D)) {
-            position_ += right_vec * speed_ * (float)dt;
-        }
-        if (input.isKeyDown(Input::W)) {
-            position_ += forward_vec * speed_ * (float)dt;
-        }
-        if (input.isKeyDown(Input::S)) {
-            position_ -= forward_vec * speed_ * (float)dt;
-        }
-        if (input.isKeyDown(Input::E)) {
-            position_.y += speed_ * (float)dt;
-        }
-        if (input.isKeyDown(Input::Q)) {
-            position_.y -= speed_ * (float)dt;
-        }
+    if (!lock_move_ && input.isMouseButtonDown(Input::MouseButton::MOUSE_RIGHT)) {
+        if (input.isKeyDown(Input::A)) position_ -= right_vec * speed_ * (float)dt;
+        if (input.isKeyDown(Input::D)) position_ += right_vec * speed_ * (float)dt;
+        if (input.isKeyDown(Input::W)) position_ += forward_vec * speed_ * (float)dt;
+        if (input.isKeyDown(Input::S)) position_ -= forward_vec * speed_ * (float)dt;
+        if (input.isKeyDown(Input::E)) position_.y += speed_ * (float)dt;
+        if (input.isKeyDown(Input::Q)) position_.y -= speed_ * (float)dt;
     }
 
     // ----------------------------------------
@@ -143,8 +133,6 @@ void Camera::update(Input& input, const double dt, const int window_width, const
 void Camera::setViewMatrix(const glm::mat4 view)
 {
     view_ = view;
-
-    this->initViewTarget();
 }
 
 glm::quat Camera::getOrientation() const
