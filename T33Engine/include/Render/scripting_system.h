@@ -11,13 +11,14 @@
 
 #include "../Systems/ecs_manager.h"
 #include "Systems/scripting.h"
+#include "Core/input.h"
 #include "Core/shader.h"
 
 struct ScriptingComponent;
 
 class ScriptingSystem {
 public:
-    ScriptingSystem(ECSManager& ecs);
+    ScriptingSystem(ECSManager& ecs, Input& input);
     ~ScriptingSystem();
 
     void init(size_t entity_id);
@@ -37,9 +38,11 @@ public:
 
 private:
     void registerTransform(lua_State* L, size_t entity_id);
+    void registerInput(lua_State* L);
 
     std::unordered_map<size_t, LuaScript> entity_scripts_;
     ECSManager& ecs_;
+    Input& input_;
 };
 
 #endif // !__SCRIPTING_SYSTEM__

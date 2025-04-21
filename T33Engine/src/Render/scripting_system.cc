@@ -7,8 +7,8 @@
 
 #include "utils.h"
 
-ScriptingSystem::ScriptingSystem(ECSManager& ecs) :
-    ecs_(ecs)
+ScriptingSystem::ScriptingSystem(ECSManager& ecs, Input& input) :
+    ecs_(ecs), input_(input)
 {
 }
 
@@ -48,6 +48,7 @@ void ScriptingSystem::loadScript(ScriptingComponent& script_comp) {
     lua_setglobal(L, "CURRENT_ENTITY");
 
     registerTransform(L, script_comp.entity_id);
+    registerInput(L);
 
     lua_script.run(loc_lua_file);
 }
@@ -247,5 +248,60 @@ void ScriptingSystem::registerTransform(lua_State* L, size_t entity_id) {
         return self->set_scale_component(L, entity);
         }, 2);
     lua_setglobal(L, "setScale");
+}
+
+void ScriptingSystem::registerInput(lua_State* L)
+{
+    lua_pushlightuserdata(L, this);
+    lua_pushcclosure(L, [](lua_State* L) -> int {
+        ScriptingSystem* self = static_cast<ScriptingSystem*>(lua_touserdata(L, lua_upvalueindex(1)));
+
+        const char* key_str = luaL_checkstring(L, 1);
+        std::string key_upper = key_str;
+        std::transform(key_upper.begin(), key_upper.end(), key_upper.begin(), ::toupper);
+
+        auto key_map = Input::stringMap();
+
+        auto it = key_map.find(key_upper);
+        if (it != key_map.end())
+        {
+            bool isPressed = self->input_.isKeyPressed(it->second);
+            lua_pushboolean(L, isPressed);
+        }
+        else
+        {
+            lua_pushboolean(L, false);
+        }
+
+        return 1;
+        }, 1);
+
+    lua_setglobal(L, "isKeyPressed");
+
+    lua_pushlightuserdata(L, this);
+    lua_pushcclosure(L, [](lua_State* L) -> int {
+        ScriptingSystem* self = static_cast<ScriptingSystem*>(lua_touserdata(L, lua_upvalueindex(1)));
+
+        const char* key_str = luaL_checkstring(L, 1);
+        std::string key_upper = key_str;
+        std::transform(key_upper.begin(), key_upper.end(), key_upper.begin(), ::toupper);
+
+        auto key_map = Input::stringMap();
+
+        auto it = key_map.find(key_upper);
+        if (it != key_map.end())
+        {
+            bool isdown = self->input_.isKeyDown(it->second);
+            lua_pushboolean(L, isdown);
+        }
+        else
+        {
+            lua_pushboolean(L, false);
+        }
+
+        return 1;
+        }, 1);
+
+    lua_setglobal(L, "isKeyDown");
 }
 

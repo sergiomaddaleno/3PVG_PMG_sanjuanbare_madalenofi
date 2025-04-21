@@ -8,7 +8,7 @@ Engine::Engine(Window& window, Input& input) :
 	render_system(ecs),
 	ui_manager(*this, ecs, render_system),
 	physics_system(ecs, render_system),
-	scripting_system(ecs),
+	scripting_system(ecs, input),
 	save_manager(ecs, render_system, scripting_system),
 	raymarch(ecs),
 	lastTime(0.0),

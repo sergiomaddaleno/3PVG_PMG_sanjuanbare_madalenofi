@@ -71,6 +71,8 @@ public:
     double getScrollY() const { return scroll_y; }
     void resetScroll();
 
+    static std::unordered_map<std::string, Input::Keys> stringMap();
+
 private:
 
     void InitKeyMap();

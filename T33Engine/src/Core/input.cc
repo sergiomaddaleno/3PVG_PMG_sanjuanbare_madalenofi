@@ -180,6 +180,51 @@ void Input::resetScroll() {
     scroll_y = 0.0f;
 }
 
+std::unordered_map<std::string, Input::Keys> Input::stringMap()
+{
+    std::unordered_map<std::string, Input::Keys> key_map = {
+        {"A", Keys::A}, {"B", Keys::B}, {"C", Keys::C}, {"D", Keys::D},
+        {"E", Keys::E}, {"F", Keys::F}, {"G", Keys::G}, {"H", Keys::H},
+        {"I", Keys::I}, {"J", Keys::J}, {"K", Keys::K}, {"L", Keys::L},
+        {"M", Keys::M}, {"N", Keys::N}, {"O", Keys::O}, {"P", Keys::P},
+        {"Q", Keys::Q}, {"R", Keys::R}, {"S", Keys::S}, {"T", Keys::T},
+        {"U", Keys::U}, {"V", Keys::V}, {"W", Keys::W}, {"X", Keys::X},
+        {"Y", Keys::Y}, {"Z", Keys::Z},
+
+        {"0", Keys::NUM0}, {"1", Keys::NUM1}, {"2", Keys::NUM2}, {"3", Keys::NUM3},
+        {"4", Keys::NUM4}, {"5", Keys::NUM5}, {"6", Keys::NUM6}, {"7", Keys::NUM7},
+        {"8", Keys::NUM8}, {"9", Keys::NUM9},
+
+        {"UP", Keys::UP}, {"DOWN", Keys::DOWN}, {"LEFT", Keys::LEFT}, {"RIGHT", Keys::RIGHT},
+
+        {"ENTER", Keys::ENTER}, {"ESC", Keys::ESC}, {"SPACE", Keys::SPACEBAR},
+        {"BACKSPACE", Keys::BACKSPACE}, {"TAB", Keys::TAB}, {"CAPSLOCK", Keys::CAPSLOCK},
+        {"INSERT", Keys::INSERT}, {"DELETE", Keys::SUPR}, {"HOME", Keys::HOME},
+        {"END", Keys::END}, {"PAGEUP", Keys::PAGEUP}, {"PAGEDOWN", Keys::PAGEDOWN},
+        {"PRINTSCREEN", Keys::PRINTSCREEN}, {"SCROLLLOCK", Keys::SCROLLLOCK},
+        {"PAUSE", Keys::PAUSE},
+
+        {"LCTRL", Keys::LCTRL}, {"RCTRL", Keys::RCTRL}, {"CTRL", Keys::CTRL},
+        {"LSHIFT", Keys::LSHIFT}, {"RSHIFT", Keys::RSHIFT}, {"SHIFT", Keys::SHIFT},
+        {"LALT", Keys::LALT}, {"RALT", Keys::RALT},
+
+        {"F1", Keys::F1}, {"F2", Keys::F2}, {"F3", Keys::F3}, {"F4", Keys::F4},
+        {"F5", Keys::F5}, {"F6", Keys::F6}, {"F7", Keys::F7}, {"F8", Keys::F8},
+        {"F9", Keys::F9}, {"F10", Keys::F10}, {"F11", Keys::F11}, {"F12", Keys::F12},
+
+        {"NUMLOCK", Keys::NUMLOCK},
+        {"NUM+", Keys::NUMPLUS}, {"NUM-", Keys::NUMMINUS},
+        {"NUM*", Keys::NUMMULTIPLY}, {"NUM/", Keys::NUMDIVIDE},
+        {"NUM.", Keys::NUMDECIMAL}, {"NUMENTER", Keys::NUMENTER},
+        {"NUM0", Keys::NUM0}, {"NUM1", Keys::NUM1}, {"NUM2", Keys::NUM2},
+        {"NUM3", Keys::NUM3}, {"NUM4", Keys::NUM4}, {"NUM5", Keys::NUM5},
+        {"NUM6", Keys::NUM6}, {"NUM7", Keys::NUM7}, {"NUM8", Keys::NUM8},
+        {"NUM9", Keys::NUM9}
+    };
+
+    return key_map;
+}
+
 bool Input::isKeyDown(Keys key) {
     return keys[static_cast<int>(key)];
 }
