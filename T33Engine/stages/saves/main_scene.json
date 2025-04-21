@@ -1,64 +1,56 @@
 {
  "Entities": [
   {
+   "Camera_component": {
+    "camera": {
+     "Aspect_ratio": 1.7777777910232544,
+     "Far_clip_plane": 200.0,
+     "Fov": 45.0,
+     "Lock_move": false,
+     "Lock_view_dir": false,
+     "Lock_wheel_mouse": false,
+     "Near_clip_plane": 0.10000000149011612,
+     "Ortho_height": 45.0,
+     "Ortho_width": 45.0,
+     "Position": [
+      14.385372161865234,
+      10.489363670349121,
+      25.346923828125
+     ],
+     "Scroll_speed": 1.0,
+     "Sensitivity": 1.0,
+     "Speed": 3.0,
+     "Use_perspective_matrix": true,
+     "View_direction": [
+      -0.3448716998100281,
+      -0.24063007533550262,
+      -0.9072819948196411
+     ]
+    }
+   },
    "Hierarchy_component": {
     "Child": [],
     "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 0,
-    "Entity_name": "Bucket"
-   },
-   "Render_component": {
-    "Render_type": 6,
-    "Surface": {
-     "Points": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ],
-      [
-       1.0,
-       0.0,
-       0.0
-      ],
-      [
-       1.0,
-       1.0,
-       0.0
-      ],
-      [
-       1.0,
-       0.0,
-       0.0
-      ],
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Texture_path": "../stages\\assets\\textures\\apple\\red.jpg",
-     "num_heights": 4,
-     "num_revs": 4
-    }
+    "Entity_name": "Camera [0]"
    },
    "Transform_component": {
     "Position": [
-     9.335000038146973,
-     0.0,
-     0.0
+     12.99211597442627,
+     13.899153709411621,
+     25.54380989074707
     ],
     "Rotation": [
-     -5.228677579793839e-08,
-     0.975300669670105,
-     -5.228677579793839e-08,
-     -0.22088129818439484
+     0.0,
+     0.0,
+     0.0,
+     1.0
     ],
     "Scale": [
      1.0,
-     2.0,
+     1.0,
      1.0
     ]
    }
@@ -70,25 +62,25 @@
    },
    "Identifier_component": {
     "Entity_id": 1,
-    "Entity_name": "Terrain [1]"
+    "Entity_name": "Terrain [0]"
    },
    "Render_component": {
     "Render_type": 1,
     "Terrain": {
-     "Heightmap_path": "../stages\\assets\\textures\\heightmaps\\volcano.png",
+     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
      "Texture_path": "../stages/assets/textures/images/grass.png",
-     "height_mult": 0.2800000011920929,
+     "height_mult": 0.17900000512599945,
      "is_centered": true,
      "num_cols": 50,
      "num_rows": 50,
-     "size": 0.9710000157356262,
+     "size": 1.0,
      "use_perlin_noise": false
     }
    },
    "Transform_component": {
     "Position": [
      0.0,
-     -0.9770601987838745,
+     0.0,
      0.0
     ],
     "Rotation": [
@@ -105,49 +97,32 @@
    }
   },
   {
-   "Camera_component": {
-    "camera": {
-     "Aspect_ratio": 1.7777777910232544,
-     "Far_clip_plane": 577.0869750976563,
-     "Fov": 45.0,
-     "Near_clip_plane": 0.10000000149011612,
-     "Ortho_height": 45.0,
-     "Ortho_width": 45.0,
-     "Position": [
-      -47.12944793701172,
-      2.7509403228759766,
-      -20.37384033203125
-     ],
-     "Scroll_speed": 1.0,
-     "Sensitivity": 1.0,
-     "Speed": 39.82099914550781,
-     "Use_perspective_matrix": true,
-     "View_direction": [
-      0.9289858341217041,
-      0.19375963509082794,
-      0.3153451085090637
-     ]
-    }
-   },
    "Hierarchy_component": {
     "Child": [],
     "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 2,
-    "Entity_name": "Camera [0]"
+    "Entity_name": "Mario"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\Mario.obj",
+     "Texture_folder": "../stages\\assets\\textures\\mario"
+    },
+    "Render_type": 0
    },
    "Transform_component": {
     "Position": [
-     0.0,
-     0.0,
+     9.232542037963867,
+     -1.0088560581207275,
      0.0
     ],
     "Rotation": [
      0.0,
      0.0,
      0.0,
-     0.0
+     1.0
     ],
     "Scale": [
      1.0,
@@ -163,7 +138,7 @@
    },
    "Identifier_component": {
     "Entity_id": 3,
-    "Entity_name": "Directional Light [1]"
+    "Entity_name": "Directional Light [0]"
    },
    "Light_component": {
     "light": {
@@ -241,7 +216,7 @@
    },
    "Identifier_component": {
     "Entity_id": 4,
-    "Entity_name": "Skybox [0]"
+    "Entity_name": "Skybox"
    },
    "Skybox_component": {
     "skybox": {
@@ -261,58 +236,6 @@
      "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
      "Use_cubemap": true
     }
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 5,
-    "Entity_name": "Cloud [1]"
-   },
-   "Render_component": {
-    "Cloud": {
-     "absorption": [
-      1.0,
-      1.0,
-      1.0
-     ],
-     "amplitude": 1.9420000314712524,
-     "cube_size": 1.0,
-     "density": 0.0560000017285347,
-     "direction": [
-      0.10000000149011612,
-      0.20000000298023224,
-      -0.30000001192092896
-     ],
-     "frequency": 0.5,
-     "march_size_": 0.18199999630451202,
-     "max_steps": 22,
-     "max_steps_light_": 20,
-     "speed": 0.30000001192092896,
-     "use_blue_noise": false
-    },
-    "Render_type": 8
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     86.58267974853516,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1210.5322265625,
-     11.431041717529297,
-     1124.365234375
-    ]
    }
   }
  ]
