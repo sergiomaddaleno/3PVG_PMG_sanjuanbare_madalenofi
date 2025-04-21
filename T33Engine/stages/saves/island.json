@@ -443,26 +443,29 @@
   {
    "Camera_component": {
     "camera": {
-     "Aspect_ratio": 1.7777777910232544,
-     "Far_clip_plane": 509.8059997558594,
-     "Fov": 45.0,
-     "Near_clip_plane": 0.10000000149011612,
-     "Ortho_height": 45.0,
-     "Ortho_width": 45.0,
-     "Position": [
-      -55.434181213378906,
-      37.71775436401367,
-      65.79466247558594
-     ],
-     "Scroll_speed": 1.0,
-     "Sensitivity": 1.0,
-     "Speed": 31.68400001525879,
-     "Use_perspective_matrix": true,
-     "View_direction": [
-      0.5189205408096313,
-      -0.34492015838623047,
-      -0.7821454405784607
-     ]
+      "Aspect_ratio": 1.7777777910232544,
+      "Far_clip_plane": 509.8059997558594,
+      "Fov": 45.0,
+      "Near_clip_plane": 0.10000000149011612,
+      "Ortho_height": 45.0,
+      "Ortho_width": 45.0,
+      "Lock_move": false,
+      "Lock_view_dir": false,
+      "Lock_wheel_mouse": false,
+      "Position": [
+        -55.434181213378906,
+        37.71775436401367,
+        65.79466247558594
+      ],
+      "Scroll_speed": 1.0,
+      "Sensitivity": 1.0,
+      "Speed": 31.68400001525879,
+      "Use_perspective_matrix": true,
+      "View_direction": [
+        0.5189205408096313,
+        -0.34492015838623047,
+        -0.7821454405784607
+      ]
     }
    },
    "Hierarchy_component": {
