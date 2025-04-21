@@ -1,4 +1,5 @@
 #include "Managers/engine.h"
+#include "Managers/resource_manager.h"
 
 Engine::Engine(Window& window, Input& input) :
 	window(window),
@@ -35,7 +36,10 @@ void Engine::init()
 	render_system.ssao.init();
 	render_system.grid.initGrid();
 
-	//render_system.compileShaderForBuild();
+	ecs.remove_entities();
+	render_system.entity_ = 0;
+	render_system.entity_counts_ = {};
+	ResourceManager::GetInstance().clearMaps();
 }
 
 void Engine::beginFrame()
@@ -62,8 +66,10 @@ void Engine::beginFrame()
 	}
 	//render_system.SSAORender(input, dt);
 
-    physics_system.update((float)dt);
-    scripting_system.update((float)dt);
+	if (is_playing) {
+		physics_system.update((float)dt);
+		scripting_system.update((float)dt);
+	}
 
     // --- 
 

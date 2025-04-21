@@ -55,7 +55,7 @@ UIManager::UIManager(Engine& engine, ECSManager& ecs, RenderSystem& rs)
     post_process_window(false),
     add_entities_terrain_window(false),
     add_surface_window(false),
-    console_window(false),
+    console_window(true),
     fog_window(false),
     l_system_window(false),
     new_pp_shader(),
@@ -1879,7 +1879,7 @@ void UIManager::TopBarWindow() {
             if (ImGui::MenuItem("Save Scene [CTRL + S]")) {
 
                 if (engine_.save_manager.getCurrentScene().empty()) {
-                    engine_.save_manager.saveToFile("../stages/saves/scene_0.json");
+                    engine_.save_manager.saveToFile("../stages/saves/scene_empty.json");
                 }
                 else {
                     engine_.save_manager.saveToFile(engine_.save_manager.getCurrentScene());

@@ -159,9 +159,6 @@ public:
 
 	EntityCounters entity_counts_;
 
-	//Dont use
-	void compileShaderForBuild();
-
 private:
 	bool light_in_scene;
 

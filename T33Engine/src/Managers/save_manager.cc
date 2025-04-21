@@ -465,26 +465,26 @@ std::string SaveManager::newFile()
 
     if (!std::filesystem::exists(dirPath)) std::filesystem::create_directories(dirPath);
 
-    std::string filename = directory + "scene_" + std::to_string(number_of_scenes) + ".json";
-    std::ofstream file(filename);
+    std::string filename;
+    do {
+        filename = directory + "scene_" + std::to_string(number_of_scenes++) + ".json";
+    } while (std::filesystem::exists(filename));
 
+    std::ofstream file(filename);
     if (file.is_open()) {
         nlohmann::json defaultJson = {
-            {"Entities", nlohmann::json::array()} 
+            {"Entities", nlohmann::json::array()}
         };
-
         file << defaultJson.dump(4);
         file.close();
-
-        printf("New file created\n");
+        printf("New file created: %s\n", filename.c_str());
     }
     else {
         printf("Unable to create file\n");
     }
 
-    number_of_scenes++;
-
     return filename;
 }
+
 
 

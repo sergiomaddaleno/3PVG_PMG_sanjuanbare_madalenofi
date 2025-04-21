@@ -326,7 +326,7 @@ void Terrain::drawGrid(Camera cam)
     glPolygonMode(GL_BACK, prevPolygonMode[1]);
 
     glDepthMask(GL_TRUE);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glUseProgram(0);
 }
 
