@@ -560,6 +560,21 @@ void UIManager::InspectorWindow() {
                 camera_comp->camera.setScrollSpeed(scroll_speed);
             }
 
+            bool lock_mouse = camera_comp->camera.getLockViewDirection();
+            if (ImGui::Checkbox("Lock mouse", &lock_mouse)) {
+                camera_comp->camera.lockViewDirection(lock_mouse);
+            }
+
+            bool lock_movement = camera_comp->camera.getLockMovement();
+            if (ImGui::Checkbox("Lock movement", &lock_movement)) {
+                camera_comp->camera.lockMovement(lock_movement);
+            }
+
+            bool lock_wheel = camera_comp->camera.getLockWheel();
+            if (ImGui::Checkbox("Lock wheel", &lock_wheel)) {
+                camera_comp->camera.lockWheel(lock_wheel);
+            }
+
             //--
             ImGui::Dummy({ 0.0f, 2.0f });
 

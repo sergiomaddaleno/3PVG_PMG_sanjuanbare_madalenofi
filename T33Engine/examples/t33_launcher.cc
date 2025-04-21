@@ -25,7 +25,6 @@ int main(int, char**) {
         T33Engine.beginFrame();
 
 
-
         T33Engine.endFrame();
         if (window->closePressed(input)) done = true;
     }

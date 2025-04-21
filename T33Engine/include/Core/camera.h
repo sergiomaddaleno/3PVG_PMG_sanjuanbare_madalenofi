@@ -51,6 +51,9 @@ public:
 	const float getNearCliPlane() { return near_clip_plane_; }
 	const float getFarCliPlane() { return far_clip_plane_; }
 	const bool getUsePerspectiveMatrix() { return use_perspective_matrix_; }
+	const bool getLockViewDirection() { return lock_view_dir_; }
+	const bool getLockMovement() { return lock_move_; }
+	const bool getLockWheel() { return lock_wheel_mouse_; }
 
 	// Setters
 	void setSpeed(const float speed){ speed_ = speed; }
@@ -74,6 +77,7 @@ public:
 
 	void lockViewDirection(bool lock) { lock_view_dir_ = lock; }
 	void lockMovement(bool lock) { lock_move_ = lock; }
+	void lockWheel(bool lock) { lock_wheel_mouse_ = lock; }
 
 	//Save data
 	nlohmann::json serialize();
@@ -108,6 +112,7 @@ private:
 	bool use_perspective_matrix_;
 	bool lock_view_dir_;
 	bool lock_move_;
+	bool lock_wheel_mouse_;
 };
 
 

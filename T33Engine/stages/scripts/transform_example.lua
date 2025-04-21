@@ -5,6 +5,8 @@ setScale(1, 2, 1)
 
 local yRotation = 0
 
+-- local posx, posy, posz = getPositionOf("EntityId")), also scale/rotation
+
 function update(dt)
 
     local x, y, z = getPosition()

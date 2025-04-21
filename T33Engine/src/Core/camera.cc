@@ -35,6 +35,7 @@ Camera::Camera()
     use_perspective_matrix_(true),
     lock_view_dir_(false),
     lock_move_(false),
+    lock_wheel_mouse_(false),
     view_(initViewTarget())
 {}
 
@@ -106,28 +107,30 @@ void Camera::update(Input& input, const double dt, const int window_width, const
 
     // ----------------------------------------
 
-    float scroll_delta = (float)input.getScrollY();
+    if (!lock_wheel_mouse_) {
+        float scroll_delta = (float)input.getScrollY();
 
-    if (use_perspective_matrix_) {
-        if (scroll_delta > 0.0f) {
-            position_ += view_direction_ * scroll_speed_;
+        if (use_perspective_matrix_) {
+            if (scroll_delta > 0.0f) {
+                position_ += view_direction_ * scroll_speed_;
+            }
+            if (scroll_delta < 0.0f) {
+                position_ -= view_direction_ * scroll_speed_;
+            }
         }
-        if (scroll_delta < 0.0f) {
-            position_ -= view_direction_ * scroll_speed_;
+        else {
+            if (scroll_delta > 0.0f) {
+                ortho_width_ *= 0.9f;
+                ortho_height_ *= 0.9f;
+            }
+            if (scroll_delta < 0.0f) {
+                ortho_width_ *= 1.1f;
+                ortho_height_ *= 1.1f;
+            }
         }
-    }
-    else {
-        if (scroll_delta > 0.0f) {
-            ortho_width_ *= 0.9f;
-            ortho_height_ *= 0.9f;
-        }
-        if (scroll_delta < 0.0f) {
-            ortho_width_ *= 1.1f;
-            ortho_height_ *= 1.1f;
-        }
-    }
 
-    input.resetScroll();
+        input.resetScroll();
+    }
 }
 
 void Camera::setViewMatrix(const glm::mat4 view)
@@ -167,6 +170,9 @@ nlohmann::json Camera::serialize()
     json_data["Ortho_width"] = ortho_width_;
     json_data["Ortho_height"] = ortho_height_;
     json_data["Use_perspective_matrix"] = use_perspective_matrix_;
+    json_data["Lock_view_dir"] = lock_view_dir_;
+    json_data["Lock_move"] = lock_move_;
+    json_data["Lock_wheel_mouse"] = lock_wheel_mouse_;
 
     return json_data;
 }
@@ -188,4 +194,7 @@ void Camera::deserialize(const nlohmann::json& cam)
     this->setUsePerspectiveMatrix(cam["Use_perspective_matrix"]);
     this->setViewDir(parseVec3(cam["View_direction"]));
     this->initViewTarget();
+    this->lockViewDirection(cam["Lock_view_dir"]);
+    this->lockMovement(cam["Lock_move"]);
+    this->lockWheel(cam["Lock_wheel_mouse"]);
 }
