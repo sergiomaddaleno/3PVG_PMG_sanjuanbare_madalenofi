@@ -21,7 +21,6 @@ int main(int, char**) {
 
     bool done = false;
     while (!done) {
-
         T33Engine.beginFrame();
 
 

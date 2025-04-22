@@ -35,6 +35,8 @@ public:
     bool loadTexture(const std::string& file_path);
     bool loadTexture3D(const std::string& file_path, int slices = 0);
 
+    bool generateNoise3D(int width = 64, int height = 64, int depth = 64);
+
     //--
     void setID(GLuint texID) { textureID = texID; }
 

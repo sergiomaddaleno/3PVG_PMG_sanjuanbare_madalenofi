@@ -88,6 +88,44 @@ bool Texture::loadTexture3D(const std::string& file_path, int slices) {
     return true;
 }
 
+bool Texture::generateNoise3D(int width, int height, int depth) {
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_3D, textureID);
+
+    std::vector<GLubyte> data(width * height * depth);
+
+    for (int z = 0; z < depth; ++z) {
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                float fx = x / (float)width;
+                float fy = y / (float)height;
+                float fz = z / (float)depth;
+
+                float noise = 0.0f;
+                noise += sin(fx * 5 + fz * 3) * 0.5f + 0.5f;
+                noise += cos(fy * 7 + fx * 2) * 0.25f + 0.25f;
+                noise += sin(fz * 9 + fy * 4) * 0.125f + 0.125f;
+
+                data[x + y * width + z * width * height] =
+                    static_cast<GLubyte>(noise * 255);
+            }
+        }
+    }
+
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, width, height, depth, 0,
+        GL_RED, GL_UNSIGNED_BYTE, data.data());
+
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    glGenerateMipmap(GL_TEXTURE_3D);
+
+    return true;
+}
+
+
 void Texture::generate()
 {
     glGenTextures(1, &textureID);
