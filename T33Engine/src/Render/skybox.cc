@@ -190,7 +190,7 @@ void Skybox::renderDDS(Camera cam) {
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
-    //glDepthMask(GL_TRUE);
+    glDepthMask(GL_TRUE);
     glCullFace(GL_BACK);
     glDisable(GL_CULL_FACE);
     glUseProgram(0);

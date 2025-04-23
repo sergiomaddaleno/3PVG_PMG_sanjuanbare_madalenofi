@@ -70,9 +70,6 @@ UIManager::UIManager(Engine& engine, ECSManager& ecs, RenderSystem& rs)
     engine_(engine),
     input_(nullptr)
 {
-    manipulate_world.position = false;
-    manipulate_world.rotation = false;
-    manipulate_world.scale = false;
 }
 
 UIManager::~UIManager() {
@@ -218,6 +215,10 @@ void UIManager::Render() {
         ContentBrowserWindow();
         TopBarWindow();
 
+        for (auto& win : custom_windows_) {
+            win();
+        }
+
         if (console_window) ConsoleWindow();
         if (fog_window) FogWindow();
         if (post_process_window) PostProcessWindow();
@@ -225,6 +226,24 @@ void UIManager::Render() {
         if (add_surface_window) AddSurfaceWindow();
         if (l_system_window) LSystemWindow();
         if (add_entities_terrain_window) AddEntitiesTerrainWindow();
+    }
+
+    auto ti = ecs_.getComponentList<TransformComponent>().begin();
+    auto tiend = ecs_.getComponentList<TransformComponent>().end();
+
+    int entity_id = 0;
+    for (; ti != tiend; ++ti, ++entity_id) {
+        if (!ti->has_value()) continue;
+        if (ecs_.has_component<CameraComponent>(entity_id)) {
+            auto& camera_comp = ecs_.get_component<CameraComponent>(entity_id);
+
+            if (camera_comp->camera.getLockMovement()) {
+                glm::mat4 worldTransform = rs_.getWorldTransform(entity_id);
+                glm::vec3 worldPosition = glm::vec3(worldTransform[3]);
+
+                camera_comp->camera.setPosition(worldPosition);
+            }
+        }
     }
 }
 
@@ -352,17 +371,27 @@ void UIManager::HierarchyWindow() {
     ImGui::Selectable("Root", false, ImGuiSelectableFlags_None, ImVec2(0, 20));
     if (ImGui::BeginDragDropTarget()) {
         const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY");
+
         if (payload) {
             int draggedEntityId = *reinterpret_cast<int*>(payload->Data);
             auto& draggedHierarchy = ecs_.get_component<HierarchyComponent>(draggedEntityId);
 
             if (!draggedHierarchy->getParents().empty()) {
+                glm::mat4 worldTransform = rs_.getWorldTransform(draggedEntityId);
+                glm::vec3 worldPosition = glm::vec3(worldTransform[3]);
+
                 auto previousParentId = draggedHierarchy->getParent();
                 auto& previousParentHierarchy = ecs_.get_component<HierarchyComponent>(previousParentId);
                 previousParentHierarchy->removeChild(draggedEntityId);
                 draggedHierarchy->clearParents();
+
+                if (ecs_.has_component<TransformComponent>(draggedEntityId)) {
+                    auto& childTransf = ecs_.get_component<TransformComponent>(draggedEntityId);
+                    childTransf->position = worldPosition;
+                }
             }
         }
+
         ImGui::EndDragDropTarget();
     }
 
@@ -374,42 +403,6 @@ void UIManager::HierarchyWindow() {
 
             if (hierarchy_comp->getParents().empty()) {
                 HierarchyTree(name_comp->name, entity_id);
-            }
-
-            if (ti != tiend && ti->has_value()) {
-                auto& transf_comp = *ti;
-
-                if (hierarchy_comp->hasParent()) {
-                    auto parent_id = hierarchy_comp->getParent();
-
-                    if (ecs_.has_component<TransformComponent>(parent_id)) {
-                        auto& child_transform = ecs_.get_component<TransformComponent>(entity_id);
-                        auto& parent_transform = ecs_.get_component<TransformComponent>(parent_id);
-
-                        if (!manipulate_world.position) {
-                            child_transform->local_position = child_transform->position - parent_transform->position;
-                        }
-                        else {
-                            child_transform->position = parent_transform->position + child_transform->local_position;
-                        }
-
-                        if (!manipulate_world.rotation) {
-                            child_transform->local_rotation = child_transform->rotation - parent_transform->rotation;
-                        }
-                        else {
-                            child_transform->rotation = parent_transform->rotation + child_transform->local_rotation;
-                        }
-
-                        if (!manipulate_world.scale) {
-                            child_transform->local_scale = child_transform->scale - parent_transform->scale;
-                        }
-                        else {
-                            child_transform->scale = parent_transform->scale + child_transform->local_scale;
-                        }
-                    }
-                }
-
-                ++ti;
             }
         }
     }
@@ -453,21 +446,31 @@ void UIManager::HierarchyTree(const std::string& name, int entity_id)
 
                 if (!draggedHierarchy->hasChildren()) {
 
+                    glm::mat4 childWorld = rs_.getWorldTransform(draggedEntityId);
+
                     if (!draggedHierarchy->getParents().empty()) {
                         auto previousParentId = draggedHierarchy->getParent();
                         auto& previousParentHierarchy = ecs_.get_component<HierarchyComponent>(previousParentId);
-                        if (!draggedHierarchy->hasParent()) {
-                            previousParentHierarchy->removeChild(draggedEntityId);
-                        }
+                        previousParentHierarchy->removeChild(draggedEntityId);
                     }
 
-                    if (!draggedHierarchy->hasParent()) {
-                        targetHierarchy->addChild(draggedEntityId);
-                        draggedHierarchy->clearParents();
-                        draggedHierarchy->addParent(entity_id);
+                    targetHierarchy->addChild(draggedEntityId);
+                    draggedHierarchy->clearParents();
+                    draggedHierarchy->addParent(entity_id);
+
+                    if (ecs_.has_component<TransformComponent>(draggedEntityId) &&
+                        ecs_.has_component<TransformComponent>(entity_id)) {
+
+                        auto& childTransf = ecs_.get_component<TransformComponent>(draggedEntityId);
+                        glm::mat4 parentWorld = rs_.getWorldTransform(entity_id);
+                        glm::mat4 parentWorldInv = glm::inverse(parentWorld);
+
+                        glm::vec4 newLocalPos = parentWorldInv * glm::vec4(glm::vec3(childWorld[3]), 1.0f);
+                        childTransf->position = glm::vec3(newLocalPos);
                     }
                 }
             }
+
             ImGui::EndDragDropTarget();
         }
 
@@ -743,11 +746,6 @@ void UIManager::InspectorWindow() {
                 auto ciend = ecs_.getComponentList<CameraComponent>().end();
 
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
-                ImGui::Checkbox("Manipulate position World/Local", &manipulate_world.position);
-                ImGui::Checkbox("Manipulate rotation World/Local", &manipulate_world.rotation);
-                ImGui::Checkbox("Manipulate scale World/Local", &manipulate_world.scale);
-                ImGui::Dummy(ImVec2(0.0f, 2.0f));
-                ImGui::Separator();
 
                 for (; ci != ciend; ++ci) {
                     if (ci->has_value()) {
@@ -1515,18 +1513,18 @@ void UIManager::InspectorWindow() {
                 ImGui::Text("Shadow Map");
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-                static float near_plane = light_comp->shadow_map_.near_plane;
+                static float near_plane = light_comp->shadow_map_->near_plane;
                 ImGui::SliderFloat("Near Plane", &near_plane, 0.1f, 100.0f);
 
-                static float far_plane = light_comp->shadow_map_.far_plane;
+                static float far_plane = light_comp->shadow_map_->far_plane;
                 ImGui::SliderFloat("Far Plane", &far_plane, 10.0f, 1000.0f);
 
-                static int shadow_width = light_comp->shadow_map_.shadow_width_;
-                static int shadow_height = light_comp->shadow_map_.shadow_height_;
+                static int shadow_width = light_comp->shadow_map_->shadow_width_;
+                static int shadow_height = light_comp->shadow_map_->shadow_height_;
                 ImGui::SliderInt("Shadow Width", &shadow_width, 512, 8192);
                 ImGui::SliderInt("Shadow Height", &shadow_height, 512, 8192);
 
-                static float directional_size = light_comp->shadow_map_.directional_size_;
+                static float directional_size = light_comp->shadow_map_->directional_size_;
                 if (light_comp->light.type_ == Light::LightType::LT_Directional) {
                     ImGui::SliderFloat("Directional Size", &directional_size, 10.0f, 1000.0f);
                 }
@@ -1534,13 +1532,13 @@ void UIManager::InspectorWindow() {
                 ImGui::Dummy({ 0.0f, 5.0f });
 
                 if (ImGui::Button("Apply Shadow Map")) {
-                    light_comp->shadow_map_.near_plane = near_plane;
-                    light_comp->shadow_map_.far_plane = far_plane;
-                    light_comp->shadow_map_.shadow_width_ = shadow_width;
-                    light_comp->shadow_map_.shadow_height_ = shadow_height;
-                    light_comp->shadow_map_.directional_size_ = directional_size;
+                    light_comp->shadow_map_->near_plane = near_plane;
+                    light_comp->shadow_map_->far_plane = far_plane;
+                    light_comp->shadow_map_->shadow_width_ = shadow_width;
+                    light_comp->shadow_map_->shadow_height_ = shadow_height;
+                    light_comp->shadow_map_->directional_size_ = directional_size;
 
-                    light_comp->shadow_map_.init2D();
+                    light_comp->shadow_map_->init2D();
                 }
                 ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 ImGui::Separator();
@@ -2185,6 +2183,11 @@ void UIManager::TopBarWindow() {
     }
     ImGui::End();
 }
+
+void UIManager::AddCustomWindow(const std::function<void()>& window_func)
+{
+    custom_windows_.push_back(window_func);
+}
 //--
 
 void UIManager::PostProcessWindow()
@@ -2611,48 +2614,51 @@ void UIManager::Gizmo(const glm::mat4& view, const glm::mat4& projection, int se
         auto liend = ecs_.getComponentList<LightComponent>().end();
 
         int entity_id = 0;
-
         for (; ti != tiend; ++ti, ++entity_id) {
-            
+            if (!ti->has_value()) continue;
+
+            auto& transform = ecs_.get_component<TransformComponent>(entity_id);
+
+            if (ecs_.has_component<LightComponent>(entity_id)) {
+                auto& light_comp = ecs_.get_component<LightComponent>(entity_id);
+
+                glm::mat4 worldTransform = rs_.getWorldTransform(entity_id);
+                glm::vec3 worldPosition = glm::vec3(worldTransform[3]);
+                glm::vec3 worldDirection = glm::normalize(
+                    glm::mat3(worldTransform) * glm::vec3(0.0f, 0.0f, 1.0f)
+                );
+
+                light_comp->light.pos_ = worldPosition;
+                light_comp->light.dir_ = worldDirection;
+            }
+
             if (entity_id == selected_entity && ti->has_value()) {
 
                 auto& transform = ecs_.get_component<TransformComponent>(selected_entity);
 
-                if (ecs_.has_component<LightComponent>(selected_entity)) {
-                    auto& light_comp = ecs_.get_component<LightComponent>(selected_entity);
-                    light_comp->light.pos_ = transform->position;
-                    light_comp->light.dir_ = glm::mat3(transform->rotation) * glm::vec3(0.0f, 0.0f, 1.0f);
-                }
-
-                if (ecs_.has_component<CameraComponent>(selected_entity)) {
-                    auto& camera_comp = ecs_.get_component<CameraComponent>(selected_entity);
-
-                    transform->position = camera_comp->camera.getPosition();
-
-                    camera_comp->camera.setPosition(transform->position);
-                }
-
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, transform->position);
-                model = model * glm::mat4_cast(transform->rotation);
-                model = glm::scale(model, transform->scale);
+                glm::mat4 model = rs_.getWorldTransform(selected_entity);
 
                 float objectMatrix[16];
                 std::memcpy(objectMatrix, glm::value_ptr(model), sizeof(objectMatrix));
 
-                if (manipulate_world.position || manipulate_world.rotation || manipulate_world.scale) {
-                    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-                        mCurrentGizmoOperation, ImGuizmo::WORLD,
-                        objectMatrix, nullptr);
-                }
-                else {
-                    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-                        mCurrentGizmoOperation, ImGuizmo::LOCAL,
-                        objectMatrix, nullptr);
-                }
-                
+                ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
+                    mCurrentGizmoOperation, ImGuizmo::WORLD,
+                    objectMatrix, nullptr);
+
                 if (ImGuizmo::IsUsing()) {
                     glm::mat4 newModelMatrix = glm::make_mat4(objectMatrix);
+
+                    if (ecs_.has_component<HierarchyComponent>(selected_entity)) {
+                        auto& hierarchy = ecs_.get_component<HierarchyComponent>(selected_entity);
+                        if (hierarchy->hasParent()) {
+                            int parent_id = hierarchy->getParent();
+
+                            glm::mat4 parentWorldMatrix = rs_.getWorldTransform(parent_id);
+                            glm::mat4 parentWorldInverse = glm::inverse(parentWorldMatrix);
+                            newModelMatrix = parentWorldInverse * newModelMatrix;
+                        }
+                    }
+
                     glm::vec3 scale, translation, skew;
                     glm::vec4 perspective;
                     glm::quat rotation;

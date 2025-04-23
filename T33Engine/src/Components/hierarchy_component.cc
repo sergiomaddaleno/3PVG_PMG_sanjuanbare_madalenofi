@@ -7,7 +7,7 @@ void HierarchyComponent::addParent(int id)
 
 int HierarchyComponent::getParent()
 {
-	return parent_[0];
+	return parent_.empty() ? -1 : parent_[0];
 }
 
 void HierarchyComponent::removeParent(int id)
@@ -30,7 +30,7 @@ void HierarchyComponent::addChild(int id)
 
 int HierarchyComponent::getChild()
 {
-	return child_[0];
+	return child_.empty() ? -1 : child_[0];
 }
 
 void HierarchyComponent::removeChild(int id)

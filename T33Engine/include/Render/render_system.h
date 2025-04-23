@@ -131,6 +131,8 @@ public:
 	
 	//-----------------------
 
+	glm::mat4 getWorldTransform(int entity);
+
 	Shader shader;
 	Shader texture_shader;
 
@@ -164,7 +166,9 @@ private:
 
 	void renderScene(RenderComponent& rc, Shader& shader);
 
-	void setUniforms(TransformComponent& tc, Shader& shader, Camera& cam);
+
+	void setUniforms(int entity, TransformComponent& tc, Shader& shader, Camera& cam);
 };
 
 #endif // __RENDER_SYSTEM__
+

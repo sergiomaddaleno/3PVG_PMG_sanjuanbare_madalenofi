@@ -232,7 +232,7 @@ void SSAO::render(ECSManager& ecs, Camera cam)
             int useDepthMapInt = useDepthMap ? 1 : 0;
             ssao_shader.setUniformValue(ssao_shader.getUniformLocation("u_useDepthMap"), ValueType::T_INT_1, &useDepthMapInt);
 
-            light_comp->shadow_map_.render(ecs, ssao_shader, *light_comp);
+            //light_comp->shadow_map_.render(ecs, ssao_shader, *light_comp);
 
             //pass to light
 

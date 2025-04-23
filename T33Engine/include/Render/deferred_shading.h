@@ -31,12 +31,14 @@ class Deferred {
 
 public:
 
-    Deferred();
+    Deferred(ECSManager& ecs);
     ~Deferred();
 
     void init();
-    void render(ECSManager& ecs, Camera cam);
+    void render(Camera cam);
     void resize(unsigned int width, unsigned int height);
+
+    glm::mat4 getWorldTransform(int entity);
 
     Shader gbuffer, deferred_shading;
 
@@ -54,6 +56,7 @@ private:
     unsigned int height_;
 
     ScreenQuad screen_quad_;
+    ECSManager& ecs_;
 };
 
 #endif // !__DEFERRED__

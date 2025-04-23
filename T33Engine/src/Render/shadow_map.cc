@@ -9,9 +9,7 @@
 #include "Geometry/cube.h"
 #include "Geometry/quad.h"
 
-#include "Components\transform_component.h"
-#include "Components\render_component.h"
-#include "Components\light_component.h"
+#include "Components\components.h"
 #include "utils.h"
 
 #include <../deps/glm/glm.hpp>
@@ -22,11 +20,12 @@
 #include <memory> 
 #include <iostream>
 
-ShadowMap::ShadowMap() : depthMapFBO(0), depthMap(0), 
+ShadowMap::ShadowMap(ECSManager& ecs) : depthMapFBO(0), depthMap(0), 
     near_plane(1.0f), far_plane(100.0f), directional_size_(50.0f),
     shadow_width_(4098), shadow_height_(4098),
     window_width_(800), window_height_(600),
-    depthCubemap(0), lightProjection(1.0f), lightView(1.0f), lightSpaceMatrix(1.0f)
+    depthCubemap(0), lightProjection(1.0f), lightView(1.0f), lightSpaceMatrix(1.0f),
+    ecs_(ecs)
 {
 }
 
@@ -110,7 +109,7 @@ void ShadowMap::bindCubeMap()
     }
 }
 
-void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
+void ShadowMap::renderScene(Shader& shader, LightComponent& lc) {
     
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_FRONT);
@@ -138,20 +137,18 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        auto ri = ecs.getComponentList<RenderComponent>().begin();
-        auto ti = ecs.getComponentList<TransformComponent>().begin();
-        auto riend = ecs.getComponentList<RenderComponent>().end();
-        auto tiend = ecs.getComponentList<TransformComponent>().end();
+        auto ri = ecs_.getComponentList<RenderComponent>().begin();
+        auto ti = ecs_.getComponentList<TransformComponent>().begin();
+        auto riend = ecs_.getComponentList<RenderComponent>().end();
+        auto tiend = ecs_.getComponentList<TransformComponent>().end();
 
-        for (; ri != riend && ti != tiend; ++ri, ++ti) {
+        int entity = 0;
+        for (; ri != riend && ti != tiend; ++ri, ++ti, entity++) {
             if (ri->has_value() && ti->has_value()) {
                 auto& render_comp = *ri;
                 auto& transform_comp = *ti;
 
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, transform_comp->position);
-                model = model * glm::mat4_cast(transform_comp->rotation);
-                model = glm::scale(model, transform_comp->scale);
+                glm::mat4 model = this->getWorldTransform(entity);
                 shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
 
                 switch (render_comp->type_) {
@@ -188,7 +185,7 @@ void ShadowMap::renderScene(ECSManager& ecs, Shader shader, LightComponent lc) {
     glViewport(0, 0, window_width_, window_height_);
 }
 
-void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
+void ShadowMap::render(Shader& shader, LightComponent& lc) {
 
     switch(lc.light.type_) {
     case Light::LightType::LT_Spot: {
@@ -199,7 +196,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
         lightView = glm::lookAt(lc.light.pos_, lc.light.pos_ + lc.light.dir_, glm::vec3(0.0f, 1.0f, 0.0f));
         lightSpaceMatrix = lightProjection * lightView;
 
-        renderScene(ecs, shader, lc);
+        renderScene(shader, lc);
 
         break;
     }
@@ -211,7 +208,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
 
         lightSpaceMatrix = lightProjection * lightView;
 
-        renderScene(ecs, shader, lc);
+        renderScene(shader, lc);
 
         break;
     }
@@ -242,20 +239,18 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
         simple_depth.setUniformValue(simple_depth.getUniformLocation("u_far_plane"), ValueType::T_FLOAT_1, &far_plane);
         simple_depth.setUniformValue(simple_depth.getUniformLocation("u_light_pos"), ValueType::T_FLOAT_3, &lc.light.pos_);
 
-        auto ri = ecs.getComponentList<RenderComponent>().begin();
-        auto ti = ecs.getComponentList<TransformComponent>().begin();
-        auto riend = ecs.getComponentList<RenderComponent>().end();
-        auto tiend = ecs.getComponentList<TransformComponent>().end();
+        auto ri = ecs_.getComponentList<RenderComponent>().begin();
+        auto ti = ecs_.getComponentList<TransformComponent>().begin();
+        auto riend = ecs_.getComponentList<RenderComponent>().end();
+        auto tiend = ecs_.getComponentList<TransformComponent>().end();
 
-        for (; ri != riend && ti != tiend; ++ri, ++ti) {
+        int entity = 0;
+        for (; ri != riend && ti != tiend; ++ri, ++ti, entity++) {
             if (ri->has_value() && ti->has_value()) {
                 auto& render_comp = *ri;
                 auto& transform_comp = *ti;
 
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, transform_comp->position);
-                model = model * glm::mat4_cast(transform_comp->rotation);
-                model = glm::scale(model, transform_comp->scale);
+                glm::mat4 model = this->getWorldTransform(entity);
                 simple_depth.setUniformValue(simple_depth.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
 
                 switch (render_comp->type_) {
@@ -284,7 +279,7 @@ void ShadowMap::render(ECSManager& ecs, Shader shader, LightComponent lc) {
             }
         }
 
-        renderScene(ecs, shader, lc);
+        renderScene(shader, lc);
        
         break;
     }
@@ -298,4 +293,25 @@ void ShadowMap::resize(unsigned int window_width, unsigned int window_height)
         window_width_ = window_width;
         window_height_ = window_height;
     }
+}
+
+glm::mat4 ShadowMap::getWorldTransform(int entity)
+{
+    if (!ecs_.has_component<TransformComponent>(entity))
+        return glm::mat4(1.0f);
+
+    auto& transform = ecs_.get_component<TransformComponent>(entity);
+    glm::mat4 local = glm::translate(glm::mat4(1.0f), transform->position) *
+        glm::mat4_cast(transform->rotation) *
+        glm::scale(glm::mat4(1.0f), transform->scale);
+
+    if (ecs_.has_component<HierarchyComponent>(entity)) {
+        auto& hierarchy = ecs_.get_component<HierarchyComponent>(entity);
+        if (hierarchy->hasParent()) {
+            int parent = hierarchy->getParent();
+            return getWorldTransform(parent) * local;
+        }
+    }
+
+    return local;
 }

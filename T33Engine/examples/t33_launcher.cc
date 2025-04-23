@@ -8,6 +8,8 @@
 #include "Core/input.h"
 #include "utils.h"
 
+#include "imgui.h"
+
 int main(int, char**) {
 
     auto window = Window::make(800, 600, "T33Engine", true);
@@ -23,6 +25,11 @@ int main(int, char**) {
     while (!done) {
         T33Engine.beginFrame();
 
+        /*T33Engine.ui_manager.AddCustomWindow([]() {
+            ImGui::Begin("New window");
+
+            ImGui::End();
+        });*/
 
         T33Engine.endFrame();
         if (window->closePressed(input)) done = true;

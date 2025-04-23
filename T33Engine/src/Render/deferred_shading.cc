@@ -7,9 +7,7 @@
 #include "Geometry/cube.h"
 #include "Geometry/quad.h"
 
-#include "Components\transform_component.h"
-#include "Components\render_component.h"
-#include "Components\light_component.h"
+#include "Components\components.h"
 
 #include <../deps/glm/glm.hpp>
 #include <../deps/glm/gtc/matrix_transform.hpp>
@@ -19,11 +17,12 @@
 #include <memory> 
 #include <iostream>
 
-Deferred::Deferred() : gBuffer(0), rboDepth(0),
+Deferred::Deferred(ECSManager& ecs) : gBuffer(0), rboDepth(0),
 gPosition(0), gNormal(0), gAlbedoSpec(0), shadowMap(0),
 quadVAO(0), quadVBO(0), u_light_space(0),
 deferred_option(0),
-width_(800), height_(600)
+width_(800), height_(600),
+ecs_(ecs)
 {}
 
 Deferred::~Deferred()
@@ -38,6 +37,27 @@ void Deferred::resize(unsigned int width, unsigned int height)
 
 		init();
 	}
+}
+
+glm::mat4 Deferred::getWorldTransform(int entity)
+{
+	if (!ecs_.has_component<TransformComponent>(entity))
+		return glm::mat4(1.0f);
+
+	auto& transform = ecs_.get_component<TransformComponent>(entity);
+	glm::mat4 local = glm::translate(glm::mat4(1.0f), transform->position) *
+		glm::mat4_cast(transform->rotation) *
+		glm::scale(glm::mat4(1.0f), transform->scale);
+
+	if (ecs_.has_component<HierarchyComponent>(entity)) {
+		auto& hierarchy = ecs_.get_component<HierarchyComponent>(entity);
+		if (hierarchy->hasParent()) {
+			int parent = hierarchy->getParent();
+			return getWorldTransform(parent) * local;
+		}
+	}
+
+	return local;
 }
 
 void Deferred::init()
@@ -82,7 +102,7 @@ void Deferred::init()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Deferred::render(ECSManager& ecs, Camera cam)
+void Deferred::render(Camera cam)
 {
 	// Geometry pass -------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
@@ -91,21 +111,18 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 
 	gbuffer.useProgram();
 
-	auto ri = ecs.getComponentList<RenderComponent>().begin();
-	auto ti = ecs.getComponentList<TransformComponent>().begin();
-	auto riend = ecs.getComponentList<RenderComponent>().end();
-	auto tiend = ecs.getComponentList<TransformComponent>().end();
+	auto ri = ecs_.getComponentList<RenderComponent>().begin();
+	auto ti = ecs_.getComponentList<TransformComponent>().begin();
+	auto riend = ecs_.getComponentList<RenderComponent>().end();
+	auto tiend = ecs_.getComponentList<TransformComponent>().end();
 
-	for (; ri != riend && ti != tiend; ++ri, ++ti) {
+	int entity = 0;
+	for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity) {
 		if (ri->has_value() && ti->has_value()) {
 			auto& render_comp = *ri;
 			auto& transform_comp = *ti;
 
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, transform_comp->position);
-			model = model * glm::mat4_cast(transform_comp->rotation);
-			model = glm::scale(model, transform_comp->scale);
-
+			glm::mat4 model = this->getWorldTransform(entity);
 			glm::mat4 view = cam.getViewMatrix();
 			glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();
 
@@ -178,8 +195,8 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 	//glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
 
-	auto li = ecs.getComponentList<LightComponent>().begin();
-	auto liend = ecs.getComponentList<LightComponent>().end();
+	auto li = ecs_.getComponentList<LightComponent>().begin();
+	auto liend = ecs_.getComponentList<LightComponent>().end();
 	for (; li != liend; ++li) {
 		if (li->has_value()) {
 			auto& light_comp = *li;
@@ -188,7 +205,7 @@ void Deferred::render(ECSManager& ecs, Camera cam)
 			int useDepthMapInt = useDepthMap ? 1 : 0;
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_useDepthMap"), ValueType::T_INT_1, &useDepthMapInt);
 
-			light_comp->shadow_map_.render(ecs, deferred_shading, *light_comp);
+			light_comp->shadow_map_->render(deferred_shading, *light_comp);
 
 			//pass to light
 

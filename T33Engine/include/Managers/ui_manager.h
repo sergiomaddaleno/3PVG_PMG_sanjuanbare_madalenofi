@@ -51,6 +51,8 @@ public:
     void ContentBrowserWindow();
     void TopBarWindow();
 
+    void AddCustomWindow(const std::function<void()>& window_func);
+
     void PostProcessWindow();
     void FogWindow();
     void ConsoleWindow();
@@ -102,14 +104,7 @@ private:
     Shader new_pp_shader;
     bool post_process_compiled;
 
-    struct ManipulateWorld {
-        bool position;
-        bool rotation;
-        bool scale;
-    };
-
-    ManipulateWorld manipulate_world;
-
+    std::vector<std::function<void()>> custom_windows_;
 };
 
 #endif // __UI_MANAGER__

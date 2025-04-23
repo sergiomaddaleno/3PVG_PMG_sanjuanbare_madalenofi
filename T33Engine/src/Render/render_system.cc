@@ -42,7 +42,8 @@ RenderSystem::RenderSystem(ECSManager& ecs_)
     fog_gradient(1.0f),
     use_skybox(true),
     is_playing(false),
-    light_in_scene(false)
+    light_in_scene(false),
+    deferred(ecs_)
 {
 }
 
@@ -100,10 +101,10 @@ void RenderSystem::initLights() {
             switch (light_comp->light.type_) {
             case Light::LightType::LT_Spot:
             case Light::LightType::LT_Directional:
-                light_comp->shadow_map_.init2D();
+                light_comp->shadow_map_->init2D();
                 break;
             case Light::LightType::LT_Point:
-                light_comp->shadow_map_.initCubeMap();
+                light_comp->shadow_map_->initCubeMap();
                 break;
             }
         }
@@ -138,13 +139,9 @@ void RenderSystem::initSkybox() {
     }
 }
 
-void RenderSystem::setUniforms(TransformComponent& tc, Shader& shader, Camera& cam)
+void RenderSystem::setUniforms(int entity, TransformComponent& tc, Shader& shader, Camera& cam)
 {
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, tc.position);
-    model = model * glm::mat4_cast(tc.rotation);
-    model = glm::scale(model, tc.scale);
-
+    glm::mat4 model = getWorldTransform(entity);
     glm::mat4 view = cam.getViewMatrix();
     glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();
 
@@ -171,7 +168,7 @@ void RenderSystem::setUniforms(TransformComponent& tc, Shader& shader, Camera& c
 }
 
 void RenderSystem::forwardRender(Input &input, double dt) {
-    
+
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
@@ -220,8 +217,8 @@ void RenderSystem::forwardRender(Input &input, double dt) {
 
                     light_in_scene = true;
 
-                    light_comp->shadow_map_.render(ecs_, shader, *light_comp);
-                    light_comp->shadow_map_.resize(window_width, window_height);
+                    light_comp->shadow_map_->resize(window_width, window_height);
+                    light_comp->shadow_map_->render(shader, *light_comp);
 
                     shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(camera_comp->camera.getPosition()));
                     
@@ -234,12 +231,13 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                     auto riend = ecs_.getComponentList<RenderComponent>().end();
                     auto tiend = ecs_.getComponentList<TransformComponent>().end();
 
-                    for (; ri != riend && ti != tiend; ++ri, ++ti) {
+                    int entity = 0;
+                    for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity) {
                         if (ri->has_value() && ti->has_value()) {
                             auto& render_comp = *ri;
                             auto& transform_comp = *ti;
 
-                            this->setUniforms(*transform_comp, shader, camera_comp->camera);
+                            this->setUniforms(entity, *transform_comp, shader, camera_comp->camera);
                             this->renderScene(*render_comp, shader);
                         }
                     }
@@ -256,12 +254,13 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                 auto riend = ecs_.getComponentList<RenderComponent>().end();
                 auto tiend = ecs_.getComponentList<TransformComponent>().end();
 
-                for (; ri != riend && ti != tiend; ++ri, ++ti) {
+                int entity = 0;
+                for (; ri != riend && ti != tiend; ++ri, ++ti, ++entity) {
                     if (ri->has_value() && ti->has_value()) {
                         auto& render_comp = *ri;
                         auto& transform_comp = *ti;
 
-                        this->setUniforms(*transform_comp, texture_shader, camera_comp->camera);
+                        this->setUniforms(entity, *transform_comp, texture_shader, camera_comp->camera);
                         this->renderScene(*render_comp, texture_shader);
                     }
                 }
@@ -292,7 +291,7 @@ void RenderSystem::deferredRender(Input& input, double dt)
 
 
             deferred.resize(window_width, window_height);
-            deferred.render(ecs_, camera_comp->camera);
+            deferred.render(camera_comp->camera);
 
             //--
 
@@ -302,7 +301,7 @@ void RenderSystem::deferredRender(Input& input, double dt)
             for (; li != liend; ++li) {
                 if (li->has_value()) {
                     auto& light_comp = *li;
-                    light_comp->shadow_map_.resize(window_width, window_height);
+                    light_comp->shadow_map_->resize(window_width, window_height);
                 }
             }
 
@@ -350,7 +349,7 @@ void RenderSystem::SSAORender(Input& input, double dt)
             for (; li != liend; ++li) {
                 if (li->has_value()) {
                     auto& light_comp = *li;
-                    light_comp->shadow_map_.resize(window_width, window_height);
+                    light_comp->shadow_map_->resize(window_width, window_height);
                 }
             }
 
@@ -442,6 +441,27 @@ void RenderSystem::renderScene(RenderComponent& rc, Shader& shader)
     }
 
     shader.useProgram();
+}
+
+glm::mat4 RenderSystem::getWorldTransform(int entity)
+{
+    if (!ecs_.has_component<TransformComponent>(entity))
+        return glm::mat4(1.0f);
+
+    auto& transform = ecs_.get_component<TransformComponent>(entity);
+    glm::mat4 local = glm::translate(glm::mat4(1.0f), transform->position) *
+        glm::mat4_cast(transform->rotation) *
+        glm::scale(glm::mat4(1.0f), transform->scale);
+
+    if (ecs_.has_component<HierarchyComponent>(entity)) {
+        auto& hierarchy = ecs_.get_component<HierarchyComponent>(entity);
+        if (hierarchy->hasParent()) {
+            int parent = hierarchy->getParent();
+            return getWorldTransform(parent) * local;
+        }
+    }
+
+    return local;
 }
 
 void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type, float spawn_prob, float y_spawn_height)
@@ -616,7 +636,6 @@ size_t RenderSystem::createCloud(float size, TransformComponent tc)
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
-    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -662,7 +681,6 @@ size_t RenderSystem::createMesh(std::string file, std::string textureFolder, Tra
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
-    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -696,7 +714,6 @@ size_t RenderSystem::createTerrain(TransformComponent tc,
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
-    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -730,7 +747,6 @@ size_t RenderSystem::createWater(TransformComponent tc,
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
-    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -762,7 +778,6 @@ size_t RenderSystem::createSphere(TransformComponent tc, int num_heights_, int n
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
-    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -794,7 +809,6 @@ size_t RenderSystem::createSurface(std::vector<float> surface_points, TransformC
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
-    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -825,7 +839,6 @@ size_t RenderSystem::createCube8v(TransformComponent tc, const float size, bool 
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
-    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -856,7 +869,6 @@ size_t RenderSystem::createCube24v(TransformComponent tc, const float size)
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
-    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -887,7 +899,6 @@ size_t RenderSystem::createQuad(TransformComponent tc, const float size)
 
     auto& transform = ecs_.get_component<TransformComponent>(entity_);
     transform->position = tc.position;
-    transform->local_position = tc.position;
     transform->rotation = tc.rotation;
     transform->scale = tc.scale;
 
@@ -917,6 +928,8 @@ size_t RenderSystem::createSpotLight(Light li, bool default_light)
     // ----
     auto& light_comp = ecs_.get_component<LightComponent>(entity_);
     light_comp->light.type_ = Light::LightType::LT_Spot;
+    light_comp->shadow_map_ = std::make_unique<ShadowMap>(ecs_);
+
 
     if (default_light) {
 
@@ -967,6 +980,7 @@ size_t RenderSystem::createPointLight(Light li, bool default_light)
 
     auto& light_comp = ecs_.get_component<LightComponent>(entity_);
     light_comp->light.type_ = Light::LightType::LT_Point;
+    light_comp->shadow_map_ = std::make_unique<ShadowMap>(ecs_);
 
     if (default_light) {
         light_comp->light.pos_ = li.pos_;
@@ -1007,7 +1021,8 @@ size_t RenderSystem::createDirectionalLight(Light li, bool default_light)
 
     auto& light_comp = ecs_.get_component<LightComponent>(entity_);
     light_comp->light.type_ = Light::LightType::LT_Directional;
-  
+    light_comp->shadow_map_ = std::make_unique<ShadowMap>(ecs_);
+
     if (default_light) {
         light_comp->light.dir_ = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
         light_comp->light.light_color_ = glm::vec3(10.0f, 10.0f, 10.0f);

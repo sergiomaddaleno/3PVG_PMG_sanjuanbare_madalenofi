@@ -7,11 +7,9 @@
 #include "../deps/nlohmann/json.hpp"
 
 struct LightComponent {
-
-	Light light;
-	ShadowMap shadow_map_;
-
-	nlohmann::json serialize();
+    Light light;
+    std::shared_ptr<ShadowMap> shadow_map_;
+    nlohmann::json serialize();
 };
 
 #endif //__LIGHT_COMPONENT__

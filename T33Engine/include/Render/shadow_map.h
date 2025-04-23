@@ -29,7 +29,7 @@ class ShadowMap {
 
 public:
 
-	ShadowMap();
+	ShadowMap(ECSManager& ecs);
 	~ShadowMap();
 
 	void init2D();
@@ -45,8 +45,10 @@ public:
 	void bind2D();
 	void bindCubeMap();
 
-	void render(ECSManager& ecs, Shader shader, LightComponent lc);
+	void render(Shader& shader, LightComponent& lc);
 	void resize(unsigned int window_width, unsigned int window_height);
+
+	glm::mat4 getWorldTransform(int entity);
 
 	float near_plane, far_plane;
 	unsigned int shadow_width_, shadow_height_;
@@ -56,7 +58,8 @@ public:
 
 	Shader simple_depth;
 private:
-	void renderScene(ECSManager& ecs, Shader shader, LightComponent lc);
+
+	void renderScene(Shader& shader, LightComponent& lc);
 
 	unsigned int depthMapFBO;
 	unsigned int depthMap;
@@ -65,6 +68,8 @@ private:
 	glm::mat4 lightProjection;
 	glm::mat4 lightView;
 	glm::mat4 lightSpaceMatrix;
+
+	ECSManager& ecs_;
 };
 
 #endif // !__SHADOW_MAP__
