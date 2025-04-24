@@ -1,7 +1,7 @@
 
 #include <Core/window.h>
 #include "Core/texture.h"
-
+#include "utils.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -117,7 +117,7 @@ void Window::setWindowIcon(GLFWwindow* window, std::string path)
 {
 	Texture tex;
 	if (!tex.loadTexture(path)) {
-		printf("fail");
+		AddConsoleMessage("Error in loading icon.");
 	}
 
 	GLFWimage icon[1];

@@ -432,11 +432,9 @@ void SaveManager::saveToFile(std::string filename)
     if (file.is_open()) {
         file << j.dump(1);
         file.close();
-        
-        printf("Saving in %s\n", filename.c_str());
     }
     else {
-        printf("Unable to open file\n");
+        AddConsoleMessage("Unable to open file.");
     }
 }
 
@@ -455,7 +453,6 @@ void SaveManager::loadFromFile(std::string filename) {
     file.close();
 
     deSerialize(j);
-    printf("Loaded from %s\n", filename.c_str());
 }
 
 std::string SaveManager::newFile()
@@ -477,10 +474,9 @@ std::string SaveManager::newFile()
         };
         file << defaultJson.dump(4);
         file.close();
-        printf("New file created: %s\n", filename.c_str());
     }
     else {
-        printf("Unable to create file\n");
+        AddConsoleMessage("Unable to create file.");
     }
 
     return filename;

@@ -1,5 +1,6 @@
 
 #include "Systems/scripting.h"
+#include "utils.h"
 
 LuaScript::LuaScript() 
 	: state_{ luaL_newstate(),&lua_close }
@@ -16,7 +17,8 @@ void LuaScript::check(int error)
 	if (error != LUA_OK) {
 		std::string err = lua_tostring(s, lua_gettop(s));
 		lua_pop(s, lua_gettop(s));
-		throw std::runtime_error("Lua error: " + err);
+		AddConsoleMessage("Lua error: " + err);
+		//throw std::runtime_error("Lua error: " + err);
 	}
 }
 

@@ -14,6 +14,9 @@
 #include <../deps/glm/gtc/type_ptr.hpp>
 #include <../deps/glm/gtc/quaternion.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <../deps/glm/gtx/matrix_decompose.hpp>
+
 LSystem::LSystem(ECSManager& ecs, RenderSystem& rs) :
     starting_pos_(0.0f, 0.0f, 0.0f),
     starting_rot_(1.0f, 0.0f, 0.0f, 0.0f),
@@ -51,6 +54,7 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
 
     std::stack<glm::vec3> position_stack;
     std::stack<glm::quat> rotation_stack;
+    std::stack<glm::vec3> scale_stack;
 
     size_t parent_entity = 0;
 
@@ -58,9 +62,28 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
         switch (c) {
         case 'F': {
             TransformComponent tc;
-            tc.position = position_;
-            tc.rotation = rotation_;
-            tc.scale = cube_size_;
+            if (parent_entity != 0) {
+                glm::mat4 parentWorld = rs_.getWorldTransform(parent_entity);
+                glm::mat4 invParent = glm::inverse(parentWorld);
+
+                glm::mat4 world_transform =
+                    glm::translate(glm::mat4(1.0f), position_) *
+                    glm::mat4_cast(rotation_) *
+                    glm::scale(glm::mat4(1.0f), cube_size_);
+
+                glm::mat4 local_transform = invParent * world_transform;
+
+                glm::vec3 skew;
+                glm::vec4 perspective;
+                glm::decompose(local_transform, tc.scale, tc.rotation, tc.position, skew, perspective);
+            }
+            else {
+                tc.position = position_;
+                tc.rotation = rotation_;
+                tc.scale = cube_size_;
+            }
+
+            
             size_t entity_id = rs_.createCube8v(tc, 1.0f, false);
 
             entity_id--; 
@@ -71,10 +94,10 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
             else {
                 if (ecs_.has_component<HierarchyComponent>(parent_entity) && ecs_.has_component<HierarchyComponent>(entity_id)) {
                     auto& childHierarchy = ecs_.get_component<HierarchyComponent>(entity_id);
-                    childHierarchy->addParent(parent_entity);
+                    childHierarchy->addParent((int)parent_entity);
 
                     auto& parentHierarchy = ecs_.get_component<HierarchyComponent>(parent_entity);
-                    parentHierarchy->addChild(entity_id);
+                    parentHierarchy->addChild((int)entity_id);
                 }
             }
 
@@ -98,6 +121,7 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
         case '[': {
             position_stack.push(position_);
             rotation_stack.push(rotation_);
+            scale_stack.push(cube_size_);
             break;
         }
         case ']': {
@@ -108,6 +132,10 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
             if (!rotation_stack.empty()) {
                 rotation_ = rotation_stack.top();
                 rotation_stack.pop();
+            }
+            if (!scale_stack.empty()) {
+                cube_size_ = scale_stack.top();
+                scale_stack.pop();
             }
             break;
         }
@@ -124,10 +152,6 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
 void LSystem::HierarchyTree(size_t entity_id) {
     if (ecs_.has_component<HierarchyComponent>(entity_id)) {
         auto& hierarchy = ecs_.get_component<HierarchyComponent>(entity_id);
-
-        if (ecs_.has_component<IdentifierComponent>(entity_id)) {
-            auto& name_comp = ecs_.get_component<IdentifierComponent>(entity_id);
-        }
 
         for (auto childId : hierarchy->getChildren()) {
             HierarchyTree(childId);

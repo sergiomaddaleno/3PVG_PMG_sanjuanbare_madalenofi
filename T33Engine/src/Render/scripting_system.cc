@@ -40,6 +40,9 @@ void ScriptingSystem::initAll() {
 
 void ScriptingSystem::loadScript(ScriptingComponent& script_comp) {
     char* loc_lua_file = ReadFile(script_comp.script_path.c_str());
+    if (loc_lua_file == nullptr) {
+        return;
+    }
 
     LuaScript& lua_script = entity_scripts_[script_comp.entity_id];
 
@@ -82,7 +85,8 @@ int ScriptingSystem::get_position_component(lua_State* lua_state, size_t entity)
         lua_pushnumber(lua_state, transf->position.z);
         return 3;
     }
-    luaL_error(lua_state, "Entity %d missing TransformComponent", entity);
+
+    AddConsoleMessage("Error : Entity (" + std::to_string((int)entity) + ") missing TransformComponent.");
     return 0;
 }
 
@@ -98,11 +102,18 @@ int ScriptingSystem::get_rotation_component(lua_State* lua_state, size_t entity)
 
         return 3;
     }
-    luaL_error(lua_state, "Entity %d missing TransformComponent", entity);
+
+    AddConsoleMessage("Error : Entity (" + std::to_string((int)entity) + ") missing TransformComponent.");
     return 0;
 }
 
 int ScriptingSystem::get_scale_component(lua_State* lua_state, size_t entity) {
+    
+    if (ecs_.has_component<CameraComponent>(entity)) {
+        AddConsoleMessage("Error : Camera entity (" + std::to_string((int)entity) + ") cannot get scale.");
+        return 0;
+    }
+    
     if (ecs_.has_component<TransformComponent>(entity)) {
         auto& transf = ecs_.get_component<TransformComponent>(entity);
         lua_pushnumber(lua_state, transf->scale.x);
@@ -110,7 +121,8 @@ int ScriptingSystem::get_scale_component(lua_State* lua_state, size_t entity) {
         lua_pushnumber(lua_state, transf->scale.z);
         return 3;
     }
-    luaL_error(lua_state, "Entity %d missing TransformComponent", entity);
+
+    AddConsoleMessage("Error : Entity (" + std::to_string((int)entity) + ") missing TransformComponent.");
     return 0;
 }
 
@@ -127,7 +139,7 @@ int ScriptingSystem::set_position_component(lua_State* lua_state, size_t entity)
         return 0;
     }
 
-    luaL_error(lua_state, "Entity %d missing TransformComponent", entity);
+    AddConsoleMessage("Error : Entity (" + std::to_string((int)entity) + ") missing TransformComponent.");
     return 0;
 }
 
@@ -145,7 +157,7 @@ int ScriptingSystem::set_rotation_component(lua_State* lua_state, size_t entity)
         return 0;
     }
 
-    luaL_error(lua_state, "Entity %d missing TransformComponent", entity);
+    AddConsoleMessage("Error : Entity (" + std::to_string((int)entity) + ") missing TransformComponent.");
     return 0;
 }
 
@@ -157,13 +169,18 @@ int ScriptingSystem::set_scale_component(lua_State* lua_state, size_t entity) {
     scale.y = static_cast<float>(luaL_checknumber(lua_state, 2));
     scale.z = static_cast<float>(luaL_checknumber(lua_state, 3));
 
+    if (ecs_.has_component<CameraComponent>(entity)) {
+        AddConsoleMessage("Error : Camera entity (" + std::to_string((int)entity) + ") cannot set scale.");
+        return 0;
+    }
+
     if (ecs_.has_component<TransformComponent>(entity)) {
         auto& transf = ecs_.get_component<TransformComponent>(entity);
         transf->scale = scale;
         return 0;
     }
 
-    luaL_error(lua_state, "Entity %d missing TransformComponent", entity);
+    AddConsoleMessage("Error : Entity (" + std::to_string((int)entity) + ") missing TransformComponent.");
     return 0;
 }
 

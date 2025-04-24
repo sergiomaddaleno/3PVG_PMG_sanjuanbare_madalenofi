@@ -71,6 +71,9 @@ char* ReadFile(const char* file_path = nullptr);
  */
 void initShader(Shader& shader, const std::string vertrex_path, const std::string fragment_path, const std::string geometry_path = "");
 
+void AddConsoleMessage(const std::string& message);
+const std::vector<std::string>& GetConsoleMessages();
+
 /**
  * @brief Checks for OpenGL errors and prints them if any.
  * @param file The name of the file where the check is being made.

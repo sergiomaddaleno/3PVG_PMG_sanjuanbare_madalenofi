@@ -10,21 +10,15 @@
 #include "utils.h"
 
 SSAO::SSAO() : ssaoFBO(0),
-ssaoColorBuffer(0), noiseTexture(0), width_(800), height_(600),randomFloats(0.0,1.0)
+ssaoColorBuffer(0), noiseTexture(0), width_(800), height_(600),randomFloats(0.0,1.0),
+gBuffer(0), rboDepth(0),
+gPosition(0), gNormal(0), gAlbedoSpec(0)
 {
 }
 
 SSAO::~SSAO()
 {
 }
-
-float quadVertices_[] = {
-    // positions        // texture Coords
-    -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-     1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-};
 
 void SSAO::init()
 {
@@ -67,7 +61,7 @@ void SSAO::init()
 
     glGenFramebuffers(1, &ssaoFBO); 
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-    unsigned int ssaoColorBuffer, ssaoColorBufferBlur;
+    unsigned int ssaoColorBuffer;
 
     // SSAO color buffer
     glGenTextures(1, &ssaoColorBuffer);
@@ -251,9 +245,7 @@ void SSAO::render(ECSManager& ecs, Camera cam)
             ssao_shader.setUniformValue(ssao_shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
             ssao_shader.setUniformValue(ssao_shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-
-            renderQuad();
-            //quad.drawVec3();
+            quad.drawVec3();
         }
         glBlendFunc(GL_ONE, GL_ONE);
     }
@@ -268,25 +260,6 @@ void SSAO::render(ECSManager& ecs, Camera cam)
 
     glBlitFramebuffer(0, 0, width_, height_, 0, 0, width_, height_, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
-}
-
-void SSAO::renderQuad()
-{
-    if (quadVAO == 0)
-    {
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices_), &quadVertices_, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(1);
 }
 
 void SSAO::resize(unsigned int width, unsigned int height)

@@ -19,19 +19,19 @@ void Shader::compile(const char* vertex_src, const char* fragment_src, const cha
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertex_src, nullptr);
     glCompileShader(vertexShader);
-    CheckShaderErrors(vertexShader, "Vertex");
+    CheckShaderErrors(vertexShader, "VERTEX");
 
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragment_src, nullptr);
     glCompileShader(fragmentShader);
-    CheckShaderErrors(fragmentShader, "Fragment");
+    CheckShaderErrors(fragmentShader, "FRAGMENT");
 
     unsigned int geometryShader = 0;
     if (geometry_src) {
         geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
         glShaderSource(geometryShader, 1, &geometry_src, nullptr);
         glCompileShader(geometryShader);
-        CheckShaderErrors(geometryShader, "Geometry");
+        CheckShaderErrors(geometryShader, "GEOMETRY");
     }
    
     program_ = glCreateProgram();
@@ -58,7 +58,7 @@ void Shader::compileGeometry(const char* geometry_src)
     unsigned int geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
     glShaderSource(geometryShader, 1, &geometry_src, nullptr);
     glCompileShader(geometryShader);
-    CheckShaderErrors(geometryShader, "Geometry");
+    CheckShaderErrors(geometryShader, "GEOMETRY");
 
     glLinkProgram(program_);
     CheckProgramErrors(program_);

@@ -40,9 +40,9 @@ bool Mesh::loadOBJ(const std::string& file,
 
     bool obj = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file.c_str(), textureFolder.c_str());
     if (!obj) {
-        printf("Failed to load OBJ file: ");
-        printf("Warning: %s", warn.c_str());
-        printf("Error: %s", err.c_str());
+        AddConsoleMessage("Error: Failed to load OBJ file");
+        AddConsoleMessage("Warning: " + warn);
+        AddConsoleMessage("Error: " + err);
         return false;
     }
 

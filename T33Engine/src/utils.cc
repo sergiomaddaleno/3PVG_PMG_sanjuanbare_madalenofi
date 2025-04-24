@@ -11,7 +11,7 @@ char* ReadFile(const char* file_path) {
 
     FILE* file;
     if (fopen_s(&file, file_path, "rb") != 0) {
-        printf("Error in loading file\n");
+        AddConsoleMessage("Error in loading file.");
         return nullptr;
     }
         
@@ -58,6 +58,21 @@ void initShader(Shader& shader, const std::string vertrex_path, const std::strin
     if (vs_geometry) free(vs_geometry);
 }
 
+
+static std::vector<std::string> consoleMessages;
+void AddConsoleMessage(const std::string& message) {
+    consoleMessages.push_back(message);
+    if (consoleMessages.size() > 1000) {
+        consoleMessages.erase(consoleMessages.begin());
+    }
+
+    printf("[LOG] %s\n", message.c_str());
+}
+
+const std::vector<std::string>& GetConsoleMessages() {
+    return consoleMessages;
+}
+
 void CheckGPUErrors(const char* file, int line) {
     GLenum errorCode;
     while ((errorCode = glGetError()) != GL_NO_ERROR) {
@@ -83,7 +98,8 @@ void CheckShaderErrors(GLuint shader, const char* shaderType)
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-        std::cout << "ERROR::SHADER::" << shaderType << "::COMPILATION_FAILED\n" << infoLog << std::endl;
+        AddConsoleMessage((std::string("ERROR::SHADER::COMPILATION_FAILED IN ") + shaderType).c_str());
+        AddConsoleMessage(infoLog);
     }
 }
 
@@ -94,7 +110,8 @@ void CheckProgramErrors(GLuint program) {
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(program, 1024, NULL, infoLog);
-        std::cout << "ERROR::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        AddConsoleMessage((std::string("ERROR::PROGRAM::LINKING_FAILED")).c_str());
+        AddConsoleMessage(infoLog);
     }
 }
 

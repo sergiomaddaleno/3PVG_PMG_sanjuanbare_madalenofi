@@ -1596,6 +1596,8 @@ void UIManager::InspectorWindow() {
                         lua_file_path = filePath.string();
                         lua_file_name = filePath.filename().string();
 
+                        AddConsoleMessage("Script added to this entity");
+
                         ls_comp.value().script_path = lua_file_path;
                         ls_comp.value().entity_id = selected_entity;
                         engine_.scripting_system.init(selected_entity);
@@ -1686,6 +1688,7 @@ void UIManager::InspectorWindow() {
                             switch (i) {
                             case 0:
                                 ecs_.add_component<PhysicsComponent>(selected_entity);
+                                AddConsoleMessage("PhysicsComponent added");
                                 break;
                             case 1:
                                 ecs_.add_component<LightComponent>(selected_entity);
@@ -1706,10 +1709,12 @@ void UIManager::InspectorWindow() {
                                     light_comp->light.strength_ = 1.0f;
 
                                     rs_.initLights();
+                                    AddConsoleMessage("LightComponent added");
                                 }
                                 break;
                             case 2:
                                 ecs_.add_component<ScriptingComponent>(selected_entity);
+                                AddConsoleMessage("ScriptingComponent added");
                                 break;
                             }
                             addCurrentItem = -1;
@@ -1740,9 +1745,11 @@ void UIManager::InspectorWindow() {
                             switch (i) {
                             case 0:
                                 ecs_.delete_component<PhysicsComponent>(selected_entity);
+                                AddConsoleMessage("PhysicsComponent deleted");
                                 break;
                             case 1:
                                 ecs_.delete_component<LightComponent>(selected_entity);
+                                AddConsoleMessage("LightComponent deleted");
                                 break;
                             case 2:
                                 auto& se = ecs_.get_component<ScriptingComponent>(selected_entity);
@@ -1750,6 +1757,7 @@ void UIManager::InspectorWindow() {
                                 se->entity_id = 0;
 
                                 ecs_.delete_component<ScriptingComponent>(selected_entity);
+                                AddConsoleMessage("ScriptingComponent deleted");
                                 break;
                             }
                             deleteCurrentItem = -1;
@@ -1898,7 +1906,7 @@ void UIManager::TopBarWindow() {
                     engine_.save_manager.saveToFile(engine_.save_manager.getCurrentScene());
                 }
 
-                AddConsoleMessage("Saving current scene");
+                AddConsoleMessage("Saving in " + engine_.save_manager.getCurrentScene());
             }
 
             if (ImGui::MenuItem("New Scene  [CTRL + N]")) {
@@ -2174,7 +2182,7 @@ void UIManager::TopBarWindow() {
             engine_.save_manager.saveToFile(engine_.save_manager.getCurrentScene());
         }
 
-        AddConsoleMessage("Saving current scene");
+        AddConsoleMessage("Saving in " + engine_.save_manager.getCurrentScene());
     }
 
     if (input_->isKeyDown(Input::CTRL) && input_->isKeyPressed(Input::N)) {
@@ -2335,7 +2343,7 @@ void UIManager::ConsoleWindow()
     const float footer_height = ImGui::GetFrameHeightWithSpacing() + 5.0f;
     ImGui::BeginChild("ConsoleOutput", ImVec2(0, -footer_height), true, ImGuiWindowFlags_HorizontalScrollbar);
 
-    for (const auto& message : consoleMessages)
+    for (const auto& message : GetConsoleMessages())
     {
         ImGui::TextUnformatted(message.c_str());
     }
@@ -2358,16 +2366,6 @@ void UIManager::ConsoleWindow()
     }
 
     ImGui::End();
-}
-
-void UIManager::AddConsoleMessage(const std::string& message)
-{
-    consoleMessages.push_back(message);
-
-    if (consoleMessages.size() > 1000)
-    {
-        consoleMessages.erase(consoleMessages.begin()); 
-    }
 }
 
 void UIManager::ResetIds()
@@ -2742,12 +2740,16 @@ void UIManager::LSystemWindow() {
         lsystem.starting_rot_ = glm::normalize(starting_rot);
 
         lsystem.init(axiom, rule_map, iterations);
+
+        AddConsoleMessage("L-System created");
     }
 
     ImGui::Dummy({ 0.0f, 5.0f });
 
     if (ImGui::Button("Delete all entities")) {
         ecs_.remove_entities();
+
+        AddConsoleMessage("Deleted all entities");
     }
 
     ImGui::Dummy({ 0.0f, 5.0f });

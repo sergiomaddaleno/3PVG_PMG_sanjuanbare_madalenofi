@@ -1,4 +1,5 @@
 #include "Core/framebuffer.h"
+#include "utils.h"
 #include <cstdio>
 
 FrameBuffer::FrameBuffer()
@@ -42,7 +43,7 @@ void FrameBuffer::init(int width, int height, bool use_color, bool use_depth)
     }
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        printf("Error: Framebuffer is not complete\n");
+        AddConsoleMessage("Error: Framebuffer is not complete.");
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

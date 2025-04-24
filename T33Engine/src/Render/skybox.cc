@@ -232,7 +232,7 @@ void Skybox::loadDDS(const char* dds_file, const char* vertex_file, const char* 
     char* loc_frag = ReadFile(fragment_file);
 
     if (!loadDDSFile(loc_file)) {
-        printf("Error in loading skybox\n");
+        AddConsoleMessage("Error in loading skybox.");
     }
 
     dds_shader.compile(loc_vert, loc_frag);
@@ -278,7 +278,7 @@ void Skybox::loadCubeMap(std::vector<std::string> faces_files, const char* verte
             }
         }
         else {
-            printf("Cubemap error in loading.\n");
+            AddConsoleMessage("Cubemap error in loading.");
         }
     }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

@@ -63,7 +63,6 @@ public:
     void LSystemWindow();
 
     void HierarchyTree(const std::string& name, int entity_id);
-    void AddConsoleMessage(const std::string& message);
     void ResetIds();
     void Gizmo(const glm::mat4& view, const glm::mat4& projection, int selected_entity);
 
@@ -79,8 +78,6 @@ private:
 
     std::filesystem::path m_BaseDirectory;
     std::filesystem::path m_CurrentDirectory;
-
-    std::vector<std::string> consoleMessages;
 
     Texture m_DirectoryIcon, m_FileIcon, m_EntityIcon, m_BackIcon,
     m_ToolsIcon, m_LightIcon, m_CameraIcon, m_TransformIcon, m_SettingsIcon,

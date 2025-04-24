@@ -1,6 +1,6 @@
 
 #include "Core/texture.h"
-
+#include "utils.h"
 #include "../deps/stb_image.h"
 #include <cassert>
 
@@ -20,7 +20,7 @@ bool Texture::loadTexture(const std::string& file_path) {
     unsigned char* data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
     data_ = data;
     if (!data) {
-        printf("Failed to load texture: %s\n", file_path.c_str());
+        AddConsoleMessage("Failed to load texture " + file_path);
         return false;
     }
 
@@ -51,7 +51,7 @@ bool Texture::loadTexture3D(const std::string& file_path, int slices) {
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(file_path.c_str(), &width, &height, &channels, 0);
     if (!data) {
-        printf("Failed to load texture: %s\n", file_path.c_str());
+        AddConsoleMessage("Failed to load texture " + file_path);
         return false;
     }
 
@@ -59,6 +59,7 @@ bool Texture::loadTexture3D(const std::string& file_path, int slices) {
 
     if (width * height * channels % slices != 0) {
         printf("Error");
+        AddConsoleMessage("Error");
         stbi_image_free(data);
         return false;
     }
@@ -102,9 +103,9 @@ bool Texture::generateNoise3D(int width, int height, int depth) {
                 float fz = z / (float)depth;
 
                 float noise = 0.0f;
-                noise += sin(fx * 5 + fz * 3) * 0.5f + 0.5f;
-                noise += cos(fy * 7 + fx * 2) * 0.25f + 0.25f;
-                noise += sin(fz * 9 + fy * 4) * 0.125f + 0.125f;
+                noise += sinf(fx * 5 + fz * 3) * 0.5f + 0.5f;
+                noise += cosf(fy * 7 + fx * 2) * 0.25f + 0.25f;
+                noise += sinf(fz * 9 + fy * 4) * 0.125f + 0.125f;
 
                 data[x + y * width + z * width * height] =
                     static_cast<GLubyte>(noise * 255);

@@ -39,7 +39,6 @@ public:
 
 	void init();
 	void render(ECSManager& ecs, Camera cam);
-	void renderQuad();
 	
 	void resize(unsigned int width, unsigned int height);
 
@@ -59,8 +58,6 @@ private:
 
 	unsigned int gBuffer, rboDepth;
 	unsigned int gPosition, gNormal, gAlbedoSpec;
-
-	unsigned int quadVAO, quadVBO;
 
 	ScreenQuad quad;
 
