@@ -3,7 +3,7 @@
   {
    "Camera_component": {
     "camera": {
-     "Aspect_ratio": 1.7777777910232544,
+     "Aspect_ratio": 1.9374369382858276,
      "Far_clip_plane": 200.0,
      "Fov": 45.0,
      "Lock_move": false,
@@ -13,18 +13,18 @@
      "Ortho_height": 45.0,
      "Ortho_width": 45.0,
      "Position": [
-      3.475878953933716,
-      6.220287799835205,
-      14.440539360046387
+      -20.3881778717041,
+      13.349302291870117,
+      14.739359855651855
      ],
      "Scroll_speed": 1.0,
      "Sensitivity": 1.0,
      "Speed": 25.97599983215332,
      "Use_perspective_matrix": true,
      "View_direction": [
-      -0.13590934872627258,
-      -0.4951813817024231,
-      -0.85809326171875
+      0.7317108511924744,
+      -0.31489384174346924,
+      -0.6045172810554504
      ]
     }
    },
@@ -38,9 +38,9 @@
    },
    "Transform_component": {
     "Position": [
-     3.475878953933716,
-     6.220287799835205,
-     14.440539360046387
+     0.0,
+     2.5943050384521484,
+     0.0
     ],
     "Rotation": [
      0.0,
@@ -62,160 +62,6 @@
    },
    "Identifier_component": {
     "Entity_id": 1,
-    "Entity_name": "Terrain [0]"
-   },
-   "Render_component": {
-    "Render_type": 1,
-    "Terrain": {
-     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
-     "Texture_path": "../stages/assets/textures/images/grass.png",
-     "height_mult": 0.17900000512599945,
-     "is_centered": true,
-     "num_cols": 50,
-     "num_rows": 50,
-     "size": 1.0,
-     "use_perlin_noise": false
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 2,
-    "Entity_name": "Mario"
-   },
-   "Render_component": {
-    "Mesh": {
-     "Mesh_path": "../stages\\assets\\obj\\Mario.obj",
-     "Texture_folder": "../stages\\assets\\textures\\mario"
-    },
-    "Render_type": 0
-   },
-   "Transform_component": {
-    "Position": [
-     9.232542037963867,
-     -1.0088560581207275,
-     0.0
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 3,
-    "Entity_name": "Directional Light [0]"
-   },
-   "Light_component": {
-    "light": {
-     "Ambient_color": [
-      [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
-      ]
-     ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       -0.18814417719841003,
-       -0.9407208561897278,
-       -0.28221628069877625
-      ]
-     ],
-     "Light_color": [
-      [
-       10.0,
-       10.0,
-       10.0
-      ]
-     ],
-     "Linear_attenuation": [
-      0.0
-     ],
-     "Position": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Quadratic_attenuation": [
-      0.0
-     ],
-     "Shininnes": [
-      34.0
-     ],
-     "Specular_color": [
-      [
-       1.0,
-       1.0,
-       0.949999988079071
-      ]
-     ],
-     "Spot_angle": [
-      0.0
-     ],
-     "Spot_softness": [
-      0.0
-     ],
-     "Strength": [
-      0.0
-     ],
-     "Type": 0
-    }
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 4,
     "Entity_name": "Skybox [0]"
    },
    "Skybox_component": {
@@ -236,6 +82,43 @@
      "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
      "Use_cubemap": true
     }
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 2,
+    "Entity_name": "Quad [0]"
+   },
+   "Render_component": {
+    "Quad": {
+     "NormalMap_path": "",
+     "ParallaxMap_path": "",
+     "Texture_path": "../stages/assets/textures/images/blue.png",
+     "size": 1.0
+    },
+    "Render_type": 5
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     3.6828417778015137,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     7.055099964141846,
+     7.055099964141846,
+     7.055099964141846
+    ]
    }
   }
  ]

@@ -15,6 +15,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <../deps/glm/gtc/matrix_transform.hpp>
+#include <../deps/glm/gtc/type_ptr.hpp>
+
  /**
   * @class Texture
   * @brief Encapsulates texture loading, generation, and binding for OpenGL.
@@ -35,6 +38,7 @@ public:
     bool loadTexture(const std::string& file_path);
     bool loadTexture3D(const std::string& file_path, int slices = 0);
 
+    void createColorTexture(const glm::vec3& color);
     bool generateNoise3D(int width = 64, int height = 64, int depth = 64);
 
     //--

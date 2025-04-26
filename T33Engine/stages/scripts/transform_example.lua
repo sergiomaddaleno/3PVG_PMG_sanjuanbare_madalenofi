@@ -1,18 +1,13 @@
 -- Example Lua Script for Transform component
 
-local sx, sy, sz = getScale()
-setScale(1, 2, 1)
-
-local yRotation = 0
-
 -- local posx, posy, posz = getPositionOf("EntityId")), also scale/rotation
 
 function update(dt)
 
     local x, y, z = getPosition()
-    --setPosition(x + dt, 0, 0)
 
-    yRotation = yRotation + dt * 5
-    setRotation(0, yRotation, 0)
+    x = x + dt
+
+    setPosition(x, y, z)
 
 end

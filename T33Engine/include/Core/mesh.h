@@ -68,6 +68,7 @@ public:
 private:
     std::vector<Vertex> vertices;
     std::vector<Texture> textures;
+    glm::vec3 colors;
 
     std::vector<unsigned int> indices;
     int materialID;
