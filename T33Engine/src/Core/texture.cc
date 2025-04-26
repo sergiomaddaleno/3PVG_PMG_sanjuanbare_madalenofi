@@ -89,6 +89,25 @@ bool Texture::loadTexture3D(const std::string& file_path, int slices) {
     return true;
 }
 
+void Texture::createColorTexture(const glm::vec3& color) {
+
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    unsigned char data[3] = {
+        (unsigned char)(color.r * 255),
+        (unsigned char)(color.g * 255),
+        (unsigned char)(color.b * 255)
+    };
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 bool Texture::generateNoise3D(int width, int height, int depth) {
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_3D, textureID);
