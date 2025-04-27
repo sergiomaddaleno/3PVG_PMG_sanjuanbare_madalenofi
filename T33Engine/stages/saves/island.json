@@ -18,8 +18,8 @@
    },
    "Transform_component": {
     "Position": [
-     -9.560978889465332,
-     4.646917819976807,
+     -17.38469886779785,
+     4.256918907165527,
      -9.625251770019531
     ],
     "Rotation": [
@@ -443,29 +443,29 @@
   {
    "Camera_component": {
     "camera": {
-      "Aspect_ratio": 1.7777777910232544,
-      "Far_clip_plane": 509.8059997558594,
-      "Fov": 45.0,
-      "Near_clip_plane": 0.10000000149011612,
-      "Ortho_height": 45.0,
-      "Ortho_width": 45.0,
-      "Lock_move": false,
-      "Lock_view_dir": false,
-      "Lock_wheel_mouse": false,
-      "Position": [
-        -55.434181213378906,
-        37.71775436401367,
-        65.79466247558594
-      ],
-      "Scroll_speed": 1.0,
-      "Sensitivity": 1.0,
-      "Speed": 31.68400001525879,
-      "Use_perspective_matrix": true,
-      "View_direction": [
-        0.5189205408096313,
-        -0.34492015838623047,
-        -0.7821454405784607
-      ]
+     "Aspect_ratio": 1.7777777910232544,
+     "Far_clip_plane": 509.8059997558594,
+     "Fov": 45.0,
+     "Lock_move": false,
+     "Lock_view_dir": false,
+     "Lock_wheel_mouse": false,
+     "Near_clip_plane": 0.10000000149011612,
+     "Ortho_height": 45.0,
+     "Ortho_width": 45.0,
+     "Position": [
+      -53.56402587890625,
+      2.8736090660095215,
+      33.723724365234375
+     ],
+     "Scroll_speed": 1.0,
+     "Sensitivity": 1.0,
+     "Speed": 31.68400001525879,
+     "Use_perspective_matrix": true,
+     "View_direction": [
+      0.4364512264728546,
+      0.11470604687929153,
+      -0.8923860788345337
+     ]
     }
    },
    "Hierarchy_component": {
@@ -478,15 +478,15 @@
    },
    "Transform_component": {
     "Position": [
-     -50.913902282714844,
-     51.103092193603516,
-     57.38212203979492
+     0.0,
+     0.0,
+     0.0
     ],
     "Rotation": [
      0.0,
      0.0,
      0.0,
-     1.0
+     0.0
     ],
     "Scale": [
      1.0,

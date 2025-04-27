@@ -93,6 +93,15 @@ bool Mesh::loadOBJ(const std::string& file,
                         curr_mesh.textures.push_back(tex);
                     }
                 }
+                else {
+                    Texture tex;
+                    tex.createColorTexture(glm::vec3(
+                        material.diffuse[0],
+                        material.diffuse[1],
+                        material.diffuse[2]
+                    ));
+                    curr_mesh.textures.push_back(tex);
+                }
             }
         }
         meshes.push_back(curr_mesh);
