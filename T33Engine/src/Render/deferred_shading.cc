@@ -62,8 +62,8 @@ glm::mat4 Deferred::getWorldTransform(int entity)
 
 void Deferred::init()
 {
-	screen_quad_.initVec2();
-	screen_quad_.bindVec2();
+	screen_quad_.initVec3();
+	screen_quad_.bindVec3();
 
 	glGenFramebuffers(1, &gBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
@@ -192,7 +192,6 @@ void Deferred::render(Camera cam)
 	glEnable(GL_BLEND);
 
 	glBlendFunc(GL_ONE, GL_ZERO);
-	//glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
 
 	auto li = ecs_.getComponentList<LightComponent>().begin();
@@ -200,15 +199,14 @@ void Deferred::render(Camera cam)
 	for (; li != liend; ++li) {
 		if (li->has_value()) {
 			auto& light_comp = *li;
-			//pass to calculate shadow
+			//pass shadow
 			bool useDepthMap = true;
 			int useDepthMapInt = useDepthMap ? 1 : 0;
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("u_useDepthMap"), ValueType::T_INT_1, &useDepthMapInt);
 
 			light_comp->shadow_map_->render(deferred_shading, *light_comp);
 
-			//pass to light
-
+			//pass light
 			useDepthMap = false;
 			useDepthMapInt = useDepthMap ? 1 : 0;
 
@@ -224,7 +222,7 @@ void Deferred::render(Camera cam)
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
 			deferred_shading.setUniformValue(deferred_shading.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
 
-			screen_quad_.drawVec2();
+			screen_quad_.drawVec3();
 		}
 		glBlendFunc(GL_ONE, GL_ONE);
 	}

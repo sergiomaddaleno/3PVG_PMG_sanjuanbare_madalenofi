@@ -3,6 +3,13 @@ out vec4 FragColor;
 
 in vec2 uv;
 
+uniform sampler2D gPosition;
+uniform sampler2D gNormal;
+uniform sampler2D gAlbedoSpec;
+uniform sampler2D u_shadow_map;
+uniform samplerCube u_depth_map;
+uniform int u_deferred_option;
+
 struct LightInfo {
     int type_;
     vec3 pos_;
@@ -21,31 +28,15 @@ struct LightInfo {
     float spot_softness_;
 };
 
-uniform sampler2D gPosition;
-uniform sampler2D gNormal;
-uniform sampler2D gAlbedoSpec;
-
-uniform sampler2D texNoise;
-uniform sampler2D u_shadow_map;
-uniform samplerCube u_depth_map;
-
-uniform vec3 samples[64];
-uniform mat4 projection;
-
-uniform int u_deferred_option;
 uniform LightInfo u_light;
 uniform vec3 u_ambient;
 uniform float u_far_plane;
 uniform mat4 u_light_space;
 uniform vec3 u_camera_position;
-
+vec4 FragPosLight;
 vec3 FragPos;
 vec3 normal;
 vec3 Diffuse;
-
-const vec2 noiseScale = vec2(800.0/4.0, 600.0/4.0);
-
-
 
 // --- Lights
 vec3 PointLight(LightInfo lc) {
@@ -152,65 +143,43 @@ float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
     return 1.0 - shadow; 
 }
 
-// --- SSAO Parameters ---
-int kernelSize = 64;
-float radius = 0.5;
-float bias = 0.025;
-
-float computeSSAO(vec3 fragPos, vec3 normal)
-{
-    vec3 randomVec = normalize(texture(texNoise, uv * noiseScale).xyz);
-
-    vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
-    vec3 bitangent = cross(normal, tangent);
-    mat3 TBN = mat3(tangent, bitangent, normal);
-
-    float occlusion = 0.0;
-    for(int i = 0; i < kernelSize; ++i)
-    {
-        vec3 samplePos = TBN * samples[i];
-        samplePos = fragPos + samplePos * radius;
-
-        vec4 offset = vec4(samplePos, 1.0);
-        offset = projection * offset;
-        offset.xyz /= offset.w;
-        offset.xyz = offset.xyz * 0.5 + 0.5;
-
-        float sampleDepth = texture(gPosition, offset.xy).z;
-        float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
-        occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck;
-    }
-    occlusion = 1.0 - (occlusion / kernelSize);
-    return occlusion;
-}
-
 void main()
-{
-    vec3 FragPos = texture(gPosition, uv).rgb;
-    vec3 normal = normalize(texture(gNormal, uv).rgb);
-    vec3 Diffuse = texture(gAlbedoSpec, uv).rgb;
+{     
+    FragPos = texture(gPosition, uv).rgb;
+    normal = texture(gNormal, uv).rgb;
+    Diffuse = texture(gAlbedoSpec, uv).rgb;
 
-    vec4 FragPosLight = u_light_space * vec4(FragPos, 1.0);
+    FragPosLight = u_light_space * vec4(FragPos, 1.0);
+
     float shadow = ShadowCalculation(FragPosLight);
-    float shadow_pl = ShadowCalculationPoint(FragPos, u_light.pos_);
-
-    float ssao = computeSSAO(FragPos, normal);
+    float shadow_pl = ShadowCalculationPoint(FragPosLight.xyz, u_light.pos_);
 
     vec3 final_light = u_ambient;
 
     if (u_light.type_ == 0) {
-        final_light += DirectionalLight(u_light) * shadow;
+        final_light += DirectionalLight(u_light) * shadow; 
     }
+    
     if (u_light.type_ == 1) {
-        final_light += SpotLight(u_light) * shadow;
+        final_light += SpotLight(u_light) * shadow; 
     }
+    
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light) * shadow_pl;
+        final_light += PointLight(u_light) * shadow_pl;  
     }
 
- 
-    vec3 final_color = normal ;
-    
+    vec3 final_color;
+    if(u_deferred_option==0){
+        final_color =  Diffuse *final_light;
+    }
+
+    if(u_deferred_option==1){
+        final_color =  normal;
+    }
+
+    if(u_deferred_option==2){
+        final_color =  FragPos;
+    }
 
     FragColor = vec4(final_color, 1.0);
 }

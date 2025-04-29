@@ -58,13 +58,11 @@ void Engine::beginFrame()
 
     // --- Render scene
     render_system.resize(width, height);
-	if (render_system.use_deferred_shading) {
-        render_system.deferredRender(input, dt);
+	switch (render_system.what_to_render) {
+	case WTR_forward: render_system.forwardRender(input, dt); break;
+	case WTR_deferred: render_system.deferredRender(input, dt); break;
+	case WTR_ssao: render_system.SSAORender(input, dt); break;
 	}
-	else {
-        render_system.forwardRender(input, dt);
-	}
-	//render_system.SSAORender(input, dt);
 
 	if (is_playing) {
 		physics_system.update((float)dt);

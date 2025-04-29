@@ -33,7 +33,6 @@ RenderSystem::RenderSystem(ECSManager& ecs_)
     ecs_(ecs_),
     window_width(800),
     window_height(600),
-    use_deferred_shading(false),
     alpha(1.0f),
     alpha_blend(0.8f),
     sky_colour(0.5f, 0.5f, 0.5f),
@@ -43,7 +42,9 @@ RenderSystem::RenderSystem(ECSManager& ecs_)
     use_skybox(true),
     is_playing(false),
     light_in_scene(false),
-    deferred(ecs_)
+    deferred(ecs_),
+    ssao(ecs_),
+    what_to_render(WTR_forward)
 {
 }
 
@@ -339,7 +340,7 @@ void RenderSystem::SSAORender(Input& input, double dt)
             camera_comp->camera.update(input, dt, camera_comp->window_width, camera_comp->window_height);
 
             ssao.resize(window_width, window_height);
-            ssao.render(ecs_, camera_comp->camera);
+            ssao.render(camera_comp->camera);
 
             //--
 

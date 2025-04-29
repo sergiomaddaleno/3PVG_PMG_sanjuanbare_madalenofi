@@ -1923,10 +1923,13 @@ void UIManager::TopBarWindow() {
 
             if (ImGui::BeginMenu("Render Type")) {
                 if (ImGui::MenuItem("Forward Render", nullptr)) {
-                    rs_.use_deferred_shading = false;
+                    rs_.what_to_render = WTR_forward;
                 }
                 if (ImGui::MenuItem("Deferred Render", nullptr)) {
-                    rs_.use_deferred_shading = true;
+                    rs_.what_to_render = WTR_deferred;
+                }
+                if (ImGui::MenuItem("SSAO Render", nullptr)) {
+                    rs_.what_to_render = WTR_ssao;
                 }
                 ImGui::EndMenu();
             }
@@ -2098,8 +2101,9 @@ void UIManager::TopBarWindow() {
             ImGui::EndMenu();
         }
 
-        if (rs_.use_deferred_shading) {
-
+        switch (rs_.what_to_render) {
+        case WTR_forward: break;
+        case WTR_deferred: {
             ImGui::SameLine();
             ImGui::Spacing();
             ImGui::SameLine();
@@ -2121,6 +2125,32 @@ void UIManager::TopBarWindow() {
             if (ImGui::RadioButton("Position", rs_.deferred.deferred_option == 2)) {
                 rs_.deferred.deferred_option = 2;
             }
+        }
+        break;
+        case WTR_ssao: {
+            ImGui::SameLine();
+            ImGui::Spacing();
+            ImGui::SameLine();
+            ImVec2 p = ImGui::GetCursorScreenPos();
+            ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x, p.y), ImVec2(p.x, p.y + ImGui::GetTextLineHeight()), IM_COL32(255, 255, 255, 255), 1.0f);
+            ImGui::SameLine();
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            if (ImGui::RadioButton("Albedo", rs_.ssao.ssao_option == 0)) {
+                rs_.ssao.ssao_option = 0;
+            }
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Normal", rs_.ssao.ssao_option == 1)) {
+                rs_.ssao.ssao_option = 1;
+            }
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Position", rs_.ssao.ssao_option == 2)) {
+                rs_.ssao.ssao_option = 2;
+            }
+        }
+            break;
         }
 
         ImGui::SameLine();

@@ -29,19 +29,19 @@ enum TextureID {
 	TI_ShadowMapCube,
 	TI_Screen_Color,
 	TI_Screen_Depth,
-	
+	TI_Noise,
+};
+
+enum WhatToRender {
+	WTR_forward,
+	WTR_deferred,
+	WTR_ssao,
 };
 
 enum ParallaxType {
 	ParallaxMapping,
 	SteepParallaxMapping,
 	ParallaxOcclusionMapping,
-};
-
-enum FrameBufferID {
-	FB_Main,
-	FB_Quad,
-	//...
 };
 
 struct EntityCounters {

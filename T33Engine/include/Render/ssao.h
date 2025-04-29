@@ -34,15 +34,18 @@ class SSAO {
 
 public:
 
-	SSAO();
+	SSAO(ECSManager& ecs);
 	~SSAO();
 
 	void init();
-	void render(ECSManager& ecs, Camera cam);
-	
+	void render(Camera cam);
 	void resize(unsigned int width, unsigned int height);
 
-	Shader ssao_shader, ssao_geometry;
+	glm::mat4 getWorldTransform(int entity);
+
+	Shader shader, geometry, light_pass;
+
+	int ssao_option;
 
 private:
 	unsigned int ssaoFBO;
@@ -59,10 +62,11 @@ private:
 	unsigned int gBuffer, rboDepth;
 	unsigned int gPosition, gNormal, gAlbedoSpec;
 
-	ScreenQuad quad;
-
 	unsigned int width_;
 	unsigned int height_;
+
+	ScreenQuad quad;
+	ECSManager& ecs_;
 };
 
 #endif // !__SSAO__

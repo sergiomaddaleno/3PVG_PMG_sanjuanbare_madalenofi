@@ -8,7 +8,7 @@ uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 uniform sampler2D u_shadow_map;
 uniform samplerCube u_depth_map;
-uniform int u_deferred_option;
+uniform int u_ssao_option = 0;
 
 struct LightInfo {
     int type_;
@@ -171,15 +171,15 @@ void main()
     }
 
     vec3 final_color;
-    if(u_deferred_option==0){
+    if(u_ssao_option==0){
         final_color =  Diffuse *final_light;
     }
 
-    if(u_deferred_option==1){
+    if(u_ssao_option==1){
         final_color =  normal;
     }
 
-    if(u_deferred_option==2){
+    if(u_ssao_option==2){
         final_color =  FragPos;
     }
 

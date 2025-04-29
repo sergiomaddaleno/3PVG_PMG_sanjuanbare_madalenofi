@@ -52,11 +52,12 @@ public:
 		initShader(shader, "../stages/shaders/forward_shading.vs", "../stages/shaders/forward_shading.fs");
 		initShader(texture_shader, "../stages/shaders/basic/texture.vs", "../stages/shaders/basic/texture.fs");
 
-		initShader(deferred.gbuffer, "../stages/shaders/g_buffer.vs", "../stages/shaders/g_buffer.fs");
-		initShader(deferred.deferred_shading, "../stages/shaders/deferred_shading.vs", "../stages/shaders/deferred_shading.fs");
+		initShader(deferred.gbuffer, "../stages/shaders/deferred/g_buffer.vs", "../stages/shaders/deferred/g_buffer.fs");
+		initShader(deferred.deferred_shading, "../stages/shaders/deferred/deferred_shading.vs", "../stages/shaders/deferred/deferred_shading.fs");
 
-		initShader(ssao.ssao_shader, "../stages/shaders/ssao_shader.vs", "../stages/shaders/ssao_shader.fs");
-		initShader(ssao.ssao_geometry, "../stages/shaders/g_buffer_ssao.vs", "../stages/shaders/g_buffer_ssao.fs");
+		initShader(ssao.shader, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/ssao.fs");
+		initShader(ssao.geometry, "../stages/shaders/ssao/g_buffer_ssao.vs", "../stages/shaders/ssao/g_buffer_ssao.fs");
+		initShader(ssao.light_pass, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/light_pass.fs");
 	}
 
 	void forwardRender(Input &input, double dt);
@@ -149,7 +150,7 @@ public:
 	float alpha;
 	float alpha_blend;
 
-	bool use_deferred_shading;
+	WhatToRender what_to_render;
 
 	glm::vec3 sky_colour;
 	bool use_fog;

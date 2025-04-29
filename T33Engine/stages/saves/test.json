@@ -1,22 +1,40 @@
 {
  "Entities": [
   {
+   "Camera_component": {
+    "camera": {
+     "Aspect_ratio": 1.9374369382858276,
+     "Far_clip_plane": 423.3009948730469,
+     "Fov": 48.946998596191406,
+     "Lock_move": false,
+     "Lock_view_dir": false,
+     "Lock_wheel_mouse": true,
+     "Near_clip_plane": 0.10000000149011612,
+     "Ortho_height": 45.0,
+     "Ortho_width": 45.0,
+     "Position": [
+      -12.796008110046387,
+      4.465564250946045,
+      -16.665454864501953
+     ],
+     "Scroll_speed": 1.4459999799728394,
+     "Sensitivity": 1.0,
+     "Speed": 15.748000144958496,
+     "Use_perspective_matrix": true,
+     "View_direction": [
+      0.5359287858009338,
+      -0.23382596671581268,
+      0.8112371563911438
+     ]
+    }
+   },
    "Hierarchy_component": {
     "Child": [],
     "Parent": []
    },
    "Identifier_component": {
     "Entity_id": 0,
-    "Entity_name": "Sphere [0]"
-   },
-   "Render_component": {
-    "Render_type": 2,
-    "Sphere": {
-     "Texture_path": "../stages/assets/textures/images/blue.png",
-     "num_heights": 60,
-     "num_revs": 60,
-     "size": 1.0
-    }
+    "Entity_name": "Camera [0]"
    },
    "Transform_component": {
     "Position": [
@@ -44,121 +62,6 @@
    },
    "Identifier_component": {
     "Entity_id": 1,
-    "Entity_name": "Directional Light [0]"
-   },
-   "Light_component": {
-    "light": {
-     "Ambient_color": [
-      [
-       0.10000000149011612,
-       0.10000000149011612,
-       0.10000000149011612
-      ]
-     ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       -0.18814417719841003,
-       -0.9407208561897278,
-       -0.28221628069877625
-      ]
-     ],
-     "Light_color": [
-      [
-       10.0,
-       10.0,
-       10.0
-      ]
-     ],
-     "Linear_attenuation": [
-      0.0
-     ],
-     "Position": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Quadratic_attenuation": [
-      0.0
-     ],
-     "Shininnes": [
-      34.0
-     ],
-     "Specular_color": [
-      [
-       1.0,
-       1.0,
-       0.949999988079071
-      ]
-     ],
-     "Spot_angle": [
-      0.0
-     ],
-     "Spot_softness": [
-      0.0
-     ],
-     "Strength": [
-      0.0
-     ],
-     "Type": 0
-    }
-   }
-  },
-  {
-   "Camera_component": {
-    "camera": {
-      "Aspect_ratio": 1.7777777910232544,
-      "Far_clip_plane": 423.3009948730469,
-      "Fov": 87.6500015258789,
-      "Near_clip_plane": 0.10000000149011612,
-      "Ortho_height": 45.0,
-      "Ortho_width": 45.0,
-      "Lock_move": false,
-      "Lock_view_dir": false,
-      "Lock_wheel_mouse": false,
-      "Position": [
-        -2.005031108856201,
-        19.064655303955078,
-        14.658705711364746
-      ],
-      "Scroll_speed": 1.4459999799728394,
-      "Sensitivity": 1.0,
-      "Speed": 36.20399856567383,
-      "Use_perspective_matrix": true,
-      "View_direction": [
-        0.12930729985237122,
-        -0.25613489747047424,
-        -0.9579533338546753
-      ]
-    }
-   },
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 2,
-    "Entity_name": "Camera [0]"
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 3,
     "Entity_name": "Skybox [0]"
    },
    "Skybox_component": {
@@ -174,11 +77,183 @@
      "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
      "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
      "DDS_angle": -90.0,
-     "DDS_file_path": "../stages\\assets\\textures\\skybox\\board.dds",
+     "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
      "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
      "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
      "Use_cubemap": true
     }
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 2,
+    "Entity_name": "Apple"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "..\\stages\\assets\\obj\\apple.obj",
+     "Texture_folder": "..\\stages\\assets\\textures\\apple"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     -1.7239203453063965,
+     1.5906296968460083
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 3,
+    "Entity_name": "Spot Light [0]"
+   },
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       0.0,
+       -0.9779587984085083,
+       -0.20879782736301422
+      ]
+     ],
+     "Light_color": [
+      [
+       255.0,
+       254.97450256347656,
+       254.97450256347656
+      ]
+     ],
+     "Linear_attenuation": [
+      0.699999988079071
+     ],
+     "Position": [
+      [
+       0.0,
+       10.365971565246582,
+       6.116250038146973
+      ]
+     ],
+     "Quadratic_attenuation": [
+      1.7999999523162842
+     ],
+     "Shininnes": [
+      32.0
+     ],
+     "Specular_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Spot_angle": [
+      45.0
+     ],
+     "Spot_softness": [
+      10.0
+     ],
+     "Strength": [
+      1.0
+     ],
+     "Type": 1
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     10.365971565246582,
+     6.116250038146973
+    ],
+    "Rotation": [
+     0.7774309515953064,
+     0.0,
+     0.0,
+     0.6289682388305664
+    ],
+    "Scale": [
+     1.0,
+     0.9998948574066162,
+     0.9998956322669983
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 4,
+    "Entity_name": "Terrain [0]"
+   },
+   "Render_component": {
+    "Render_type": 1,
+    "Terrain": {
+     "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
+     "Texture_path": "../stages/assets/textures/images/grass.png",
+     "height_mult": 0.0,
+     "is_centered": true,
+     "num_cols": 50,
+     "num_rows": 50,
+     "size": 1.0679999589920044,
+     "use_perlin_noise": true
+    }
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
    }
   }
  ]
