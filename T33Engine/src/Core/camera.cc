@@ -50,7 +50,7 @@ glm::mat4 Camera::initViewTarget()
 
 glm::mat4 Camera::getPerspectiveMatrix() const
 {
-    return glm::perspective(glm::radians(fov_), aspect_ratio_, near_clip_plane_, far_clip_plane_);
+     return glm::perspective(glm::radians(fov_), aspect_ratio_, near_clip_plane_, far_clip_plane_);
 }
 
 glm::mat4 Camera::getOrthograficMatrix() const
@@ -145,6 +145,16 @@ glm::quat Camera::getOrientation() const
 
 glm::mat4 Camera::getViewMatrix() const {
     return view_;
+}
+
+void Camera::setAspectRatio(float aspect_ratio)
+{
+    if (aspect_ratio <= 0.0f) {
+        aspect_ratio_ = 1.0f;
+    }
+    else {
+        aspect_ratio_ = aspect_ratio;
+    }
 }
 
 void Camera::setOrientation(glm::quat orientation)

@@ -60,7 +60,7 @@ public:
 	void setSensitibity(const float sensitivity){ sensitivity_ = sensitivity; }
 	void setPosition(glm::vec3 position) {position_ = position;}
 	void setFov(float fov) { fov_ = fov; }
-	void setAspectRatio(float aspect_ratio) { aspect_ratio_ = aspect_ratio; }
+	void setAspectRatio(float aspect_ratio);
 	void setNearCliPlane(float near_clip_plane) { near_clip_plane_ = near_clip_plane; }
 	void setFarCliPlane(float far_clip_plane) { far_clip_plane_ = far_clip_plane; }
 	void setOrthoWidth(float ortho_width) { ortho_width_ = ortho_width; }

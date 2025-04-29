@@ -30,6 +30,7 @@ enum TextureID {
 	TI_Screen_Color,
 	TI_Screen_Depth,
 	TI_Noise,
+	TI_SSAO
 };
 
 enum WhatToRender {

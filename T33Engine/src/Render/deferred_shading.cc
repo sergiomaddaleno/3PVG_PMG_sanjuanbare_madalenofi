@@ -18,8 +18,7 @@
 #include <iostream>
 
 Deferred::Deferred(ECSManager& ecs) : gBuffer(0), rboDepth(0),
-gPosition(0), gNormal(0), gAlbedoSpec(0), shadowMap(0),
-quadVAO(0), quadVBO(0), u_light_space(0),
+gPosition(0), gNormal(0), gAlbedoSpec(0),
 deferred_option(0),
 width_(800), height_(600),
 ecs_(ecs)

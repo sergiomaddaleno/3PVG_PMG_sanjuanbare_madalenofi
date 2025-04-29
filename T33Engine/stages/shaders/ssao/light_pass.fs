@@ -6,6 +6,8 @@ in vec2 uv;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
+uniform sampler2D ssaoTex;
+
 uniform sampler2D u_shadow_map;
 uniform samplerCube u_depth_map;
 uniform int u_ssao_option = 0;
@@ -152,11 +154,10 @@ void main()
 
     FragPosLight = u_light_space * vec4(FragPos, 1.0);
 
-
     float shadow = ShadowCalculation(FragPosLight);
     float shadow_pl = ShadowCalculationPoint(FragPosLight.xyz, u_light.pos_);
 
-    vec3 final_light = u_ambient;
+    vec3 final_light = u_ambient * texture(ssaoTex, uv).r;
 
     if (u_light.type_ == 0) {
         final_light += DirectionalLight(u_light) * shadow; 

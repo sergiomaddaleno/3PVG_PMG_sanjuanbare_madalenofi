@@ -127,7 +127,7 @@ void ShadowMap::renderScene(Shader& shader, LightComponent& lc) {
     bind2D();
     shader.setUniformValue(shader.getUniformLocation("u_shadow_map"), ValueType::T_INT_1, &tex_id);
 
-    tex_id = TextureID::TI_ShadowMapCube;
+    tex_id = TI_ShadowMapCube;
     active(tex_id);
     bindCubeMap();
     shader.setUniformValue(shader.getUniformLocation("u_shadow_map_cube"), ValueType::T_INT_1, &tex_id);

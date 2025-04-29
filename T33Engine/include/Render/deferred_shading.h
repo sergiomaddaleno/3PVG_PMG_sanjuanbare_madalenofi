@@ -46,11 +46,7 @@ public:
 
 private:
     unsigned int gBuffer, rboDepth;
-    unsigned int gPosition, gNormal, gAlbedoSpec, shadowMap;
-
-    unsigned int quadVAO, quadVBO;
-
-    glm::mat4 u_light_space;
+    unsigned int gPosition, gNormal, gAlbedoSpec;
 
     unsigned int width_;
     unsigned int height_;

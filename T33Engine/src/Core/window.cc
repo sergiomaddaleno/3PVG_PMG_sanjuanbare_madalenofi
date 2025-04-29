@@ -61,6 +61,7 @@ std::optional<Window> Window::make(int x, int y, const std::string& name, bool f
 
 void Window::setResizeCallback() {
 	glfwSetFramebufferSizeCallback(window_, [](GLFWwindow* window, int width, int height) {
+		if (height == 0) height = 1;
 		glViewport(0, 0, width, height);
 
 		Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
