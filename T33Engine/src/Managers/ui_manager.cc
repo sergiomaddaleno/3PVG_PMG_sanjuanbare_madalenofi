@@ -2605,7 +2605,6 @@ void UIManager::AddEntitiesTerrainWindow()
             rs_.spawnMeshInTerrain(entity_id, obj_file_path, texture_folder_path, spawn_prob, spawn_height);
 
             ResetIds();
-            AddConsoleMessage(obj_file_name + " added to scene");
         }
     }
     else {
@@ -2613,7 +2612,6 @@ void UIManager::AddEntitiesTerrainWindow()
             rs_.spawnEntitiesInTerrain(entity_id, entity_type, spawn_prob, spawn_height);
 
             ResetIds();
-            AddConsoleMessage("Entities added to scene");
         }
     }
 

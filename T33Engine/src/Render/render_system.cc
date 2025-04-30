@@ -472,6 +472,11 @@ void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type,
     auto& render_comp = ecs_.get_component<RenderComponent>(terrain_id);
     auto& transf_comp = ecs_.get_component<TransformComponent>(terrain_id);
 
+    if (!render_comp || !transf_comp) {
+        AddConsoleMessage("Terrain ID not valid");
+        return;
+    }
+
     if (render_comp->type_ == RenderType::RT_Terrain) {
         std::vector<float> model_vertices = render_comp->terrain_->GetVertexTerrain();
 
@@ -521,6 +526,7 @@ void RenderSystem::spawnEntitiesInTerrain(int terrain_id, RenderType spawn_type,
     }
 
     this->initRenderTypes();
+    AddConsoleMessage("Spawned entities added to scene");
 }
 
 void RenderSystem::spawnMeshInTerrain(int terrain_id, std::string file, std::string textureFolder, float spawn_prob, float y_spawn_height)
@@ -529,6 +535,11 @@ void RenderSystem::spawnMeshInTerrain(int terrain_id, std::string file, std::str
 
     auto& render_comp = ecs_.get_component<RenderComponent>(terrain_id);
     auto& transf_comp = ecs_.get_component<TransformComponent>(terrain_id);
+
+    if (!render_comp || !transf_comp) {
+        AddConsoleMessage("Terrain ID not valid");
+        return;
+    }
 
     if (render_comp->type_ == RenderType::RT_Terrain) {
         std::vector<float> model_vertices = render_comp->terrain_->GetVertexTerrain();
@@ -565,6 +576,7 @@ void RenderSystem::spawnMeshInTerrain(int terrain_id, std::string file, std::str
     }
 
     this->initRenderTypes();
+    AddConsoleMessage(file + " entities added to scene");
 }
 
 void RenderSystem::resize(unsigned int width, unsigned int height)
