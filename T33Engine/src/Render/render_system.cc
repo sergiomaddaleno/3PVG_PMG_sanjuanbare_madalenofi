@@ -240,6 +240,28 @@ void RenderSystem::forwardRender(Input &input, double dt) {
 
                             this->setUniforms(entity, *transform_comp, shader, camera_comp->camera);
                             this->renderScene(*render_comp, shader);
+
+                            /* Test for wave
+                            static float a = 0;
+                            static float w = 0;
+                            static float s = 0;
+                            static glm::vec2 d = {0.0f, 0.0f};
+
+                            if (render_comp->type_ == RT_Water) {
+                                a = render_comp->water_->wave_.amplitude_;
+                                w = render_comp->water_->wave_.wave_length_;
+                                s = render_comp->water_->wave_.speed_;
+                                d = render_comp->water_->wave_.direction_;
+                            }
+                            if (render_comp->type_ == RT_Mesh) {
+
+                                render_comp->mesh_->wave_.amplitude_ = a;
+                                render_comp->mesh_->wave_.wave_length_ = w;
+                                render_comp->mesh_->wave_.speed_ = s;
+                                render_comp->mesh_->wave_.direction_ = d;
+
+                                transform_comp->position.y = render_comp->mesh_->wave_.waveEffect(transform_comp->position.x, transform_comp->position.z);
+                            }*/
                         }
                     }
                     glBlendFunc(GL_ONE, GL_ONE);

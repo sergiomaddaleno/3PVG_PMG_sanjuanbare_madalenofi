@@ -1280,8 +1280,8 @@ void UIManager::InspectorWindow() {
                     auto& water = *ecs_.get_component<RenderComponent>(selected_entity)->water_;
                     ImGui::Checkbox("Use Wave Effect", &water.wave_.use_wave_);
 
-                    ImGui::SliderFloat("Amplitude", &water.wave_.amplitude_, 0.0f, 1.0f);
-                    ImGui::SliderFloat("Length", &water.wave_.wave_length_, 0.1f, 10.0f);
+                    ImGui::SliderFloat("Amplitude", &water.wave_.amplitude_, 0.0f, 10.0f);
+                    ImGui::SliderFloat("Length", &water.wave_.wave_length_, 0.1f, 50.0f);
                     ImGui::SliderFloat("Speed", &water.wave_.speed_, 0.1f, 5.0f);
 
                     ImGui::SliderFloat("Direction X", &water.wave_.direction_.x, -1.0f, 1.0f);

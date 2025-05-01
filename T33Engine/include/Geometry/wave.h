@@ -24,8 +24,8 @@ public:
     GerstnerWave();
     ~GerstnerWave();
 
-    std::vector<float> waveEffect(const std::vector<float>& aPos, float time);
-    
+    float waveEffect(float x, float z);
+
     void setUniforms(Shader& shader, float time) {
         int usewave = use_wave_;
         shader.setUniformValue(shader.getUniformLocation("u_use_wave"), ValueType::T_INT_1, &usewave);
