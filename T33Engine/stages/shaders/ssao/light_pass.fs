@@ -31,11 +31,8 @@ struct LightInfo {
 };
 
 uniform LightInfo u_light;
-uniform vec3 u_ambient;
-uniform float u_far_plane;
-uniform mat4 u_light_space;
 uniform vec3 u_camera_position;
-vec4 FragPosLight;
+
 vec3 FragPos;
 vec3 normal;
 vec3 Diffuse;
@@ -77,7 +74,7 @@ vec3 SpotLight(LightInfo lc) {
     float specStrength = pow(max(dot(viewDir, reflectDir), 0.0), lc.shininess_);
     vec3 specular = lc.spec_color_ * specStrength * attenuation * intensity;
 
-    vec3 ambient = lc.ambient_color_ * u_ambient * intensity;
+    vec3 ambient = lc.ambient_color_ * intensity;
 
     return ambient + diffuse + specular;
 }
@@ -99,76 +96,27 @@ vec3 DirectionalLight(LightInfo lc) {
     return ambient + diffuse + specular;
 }
 
-// --- Shadows
-
-//percentage-closer filtering
-float PCF(float currentDepth, float bias, vec3 projCoords){
-    float shadow = 0.0f;
-    vec2 texelSize = 1.0 / textureSize(u_shadow_map, 0);
-
-    for(int x=-1; x<=1; ++x){
-        for(int y=-1; y<1; ++y){
-            
-            float pcfDepth = texture(u_shadow_map, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
-        }
-    }
-    shadow /= 9.0;
-
-    return shadow;
-}
-
-float ShadowCalculation(vec4 fragPosLightSpace)
-{
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;  
-    projCoords = projCoords * 0.5 + 0.5; 
-
-    float closestDepth = texture(u_shadow_map, projCoords.xy).r;
-    float currentDepth = projCoords.z;
-
-    float bias = 0.0005;
-
-    //return (currentDepth - bias) > closestDepth ? 0.0 : 1.0;
-    return 1.0 - PCF(currentDepth, bias, projCoords);
-}
-
-float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
-    vec3 fragToLight = fragPos - lightPos;
-    float currentDepth = length(fragToLight); 
-    
-    float closestDepth = texture(u_shadow_map_cube, fragToLight).r;
-    closestDepth *= u_far_plane; 
-
-    float bias = 0.05; 
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-
-    return 1.0 - shadow; 
-}
-
 void main()
 {     
-    
     FragPos = texture(gPosition, uv).rgb;
     normal = texture(gNormal, uv).rgb;
     Diffuse = texture(gAlbedoSpec, uv).rgb;
 
-    FragPosLight = u_light_space * vec4(FragPos, 1.0);
+    float ambient_occlussion = texture(ssaoTex, uv).r;
 
-    float shadow = ShadowCalculation(FragPosLight);
-    float shadow_pl = ShadowCalculationPoint(FragPosLight.xyz, u_light.pos_);
-
-    vec3 final_light = vec3(1) * texture(ssaoTex, uv).r;
+    vec3 ambient = max(vec3(0.0), 0.3 * Diffuse * (1.0 - ambient_occlussion));
+    vec3 final_light = ambient;
 
     if (u_light.type_ == 0) {
-        final_light += DirectionalLight(u_light) * shadow; 
+        final_light += DirectionalLight(u_light); 
     }
     
     if (u_light.type_ == 1) {
-        final_light += SpotLight(u_light) * shadow; 
+        final_light += SpotLight(u_light); 
     }
     
     if (u_light.type_ == 2) {
-        final_light += PointLight(u_light) * shadow_pl;  
+        final_light += PointLight(u_light);  
     }
 
     vec3 final_color;
@@ -182,7 +130,7 @@ void main()
         final_color =  FragPos;
     }
     if(u_ssao_option==3){
-        final_color = vec3(1) * texture(ssaoTex, uv).r;
+        final_color = vec3(texture(ssaoTex, uv).r);
     }
 
     FragColor = vec4(final_color, 1.0);

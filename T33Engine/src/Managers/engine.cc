@@ -50,14 +50,11 @@ void Engine::beginFrame()
     window.updateWindow();
     window.toggleFullScreen(input);
 
-    unsigned int width = window.getWidth();
-    unsigned int height = window.getHeight();
-
-    post_process.resize(width, height);
+    post_process.resize(window.getWidth(), window.getHeight());
     post_process.beginRender();
 
     // --- Render scene
-    render_system.resize(width, height);
+    render_system.resize(window.getWidth(), window.getHeight());
 	switch (render_system.what_to_render) {
 	case WTR_forward: render_system.forwardRender(input, dt); break;
 	case WTR_deferred: render_system.deferredRender(input, dt); break;
@@ -75,6 +72,7 @@ void Engine::beginFrame()
     ui_manager.Render();
 
     post_process.endRender();
+	//this->clearWindow();
 
     ui_manager.GameWindow();
     ui_manager.EndFrame();

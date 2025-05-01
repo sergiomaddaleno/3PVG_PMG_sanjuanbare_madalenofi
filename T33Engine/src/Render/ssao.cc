@@ -73,10 +73,20 @@ void SSAO::init()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
 
+    glGenFramebuffers(1, &ssaoBlurFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+
+    glGenTextures(1, &ssaoColorBufferBlur);
+    glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width_, height_, 0, GL_RED, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBufferBlur, 0);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Kernel
-    for (unsigned int i = 0; i < 64; ++i)
+    for (unsigned int i = 0; i < kernel_size; ++i)
     {
         glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
         sample = glm::normalize(sample);
@@ -213,7 +223,6 @@ void SSAO::render(Camera cam)
     glBindTexture(GL_TEXTURE_2D, gNormal);
     glActiveTexture(GL_TEXTURE0 + TI_Noise);
     glBindTexture(GL_TEXTURE_2D, noiseTexture);
-    
 
     int tex = TI_Position;
     shader.setUniformValue(shader.getUniformLocation("gPosition"), ValueType::T_INT_1, &tex);
@@ -221,6 +230,21 @@ void SSAO::render(Camera cam)
     shader.setUniformValue(shader.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex);
     tex = TI_Noise;
     shader.setUniformValue(shader.getUniformLocation("texNoise"), ValueType::T_INT_1, &tex);
+
+    quad.drawVec3();
+    glBindFramebuffer(GL_FRAMEBUFFER, 1);
+
+    // Blur ----------------------------------------
+
+    glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+    glClear(GL_COLOR_BUFFER_BIT);
+    blur.useProgram();
+
+    glActiveTexture(GL_TEXTURE0 + TI_SSAO);
+    glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+
+    tex = TI_SSAO;
+    blur.setUniformValue(blur.getUniformLocation("ssaoTex"), ValueType::T_INT_1, &tex);
 
     quad.drawVec3();
     glBindFramebuffer(GL_FRAMEBUFFER, 1);
@@ -260,21 +284,9 @@ void SSAO::render(Camera cam)
     for (; li != liend; ++li) {
        if (li->has_value()) {
             auto& light_comp = *li;
-            //pass shadow
-            bool useDepthMap = true;
-            int useDepthMapInt = useDepthMap ? 1 : 0;
-            light_pass.setUniformValue(light_pass.getUniformLocation("u_useDepthMap"), ValueType::T_INT_1, &useDepthMapInt);
 
-            light_comp->shadow_map_->render(light_pass, *light_comp);
-
-            //pass light
-            useDepthMap = false;
-            useDepthMapInt = useDepthMap ? 1 : 0;
-
-            light_pass.setUniformValue(light_pass.getUniformLocation("u_useDepthMap"), ValueType::T_INT_1, &useDepthMapInt);
             light_comp->light.setUniforms(light_pass);
             light_pass.setUniformValue(light_pass.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
-
             light_pass.setUniformValue(light_pass.getUniformLocation("u_ssao_option"), ValueType::T_INT_1, &ssao_option);
             light_pass.setUniformValue(light_pass.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
 

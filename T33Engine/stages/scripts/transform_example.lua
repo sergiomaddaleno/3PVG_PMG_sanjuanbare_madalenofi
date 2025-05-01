@@ -2,12 +2,12 @@
 
 -- local posx, posy, posz = getPositionOf("EntityId")), also scale/rotation
 
+    local x, y, z = getRotation()
 function update(dt)
 
-    local x, y, z = getPosition()
 
-    x = x + dt
+    y = y + dt
 
-    setPosition(x, y, z)
+    setRotation(0.0, y, 0.0)
 
 end

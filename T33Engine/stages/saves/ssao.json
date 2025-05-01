@@ -1,0 +1,320 @@
+{
+  "Entities": [
+    {
+      "Camera_component": {
+        "camera": {
+          "Aspect_ratio": 1.9374369382858276,
+          "Far_clip_plane": 200.0,
+          "Fov": 45.0,
+          "Lock_move": false,
+          "Lock_view_dir": false,
+          "Lock_wheel_mouse": false,
+          "Near_clip_plane": 0.10000000149011612,
+          "Ortho_height": 45.0,
+          "Ortho_width": 45.0,
+          "Position": [
+            15.571401596069336,
+            4.179130554199219,
+            19.189958572387695
+          ],
+          "Scroll_speed": 1.0,
+          "Sensitivity": 1.0,
+          "Speed": 25.97599983215332,
+          "Use_perspective_matrix": true,
+          "View_direction": [
+            -0.4836612641811371,
+            -0.14212468266487122,
+            -0.8636390566825867
+          ]
+        }
+      },
+      "Hierarchy_component": {
+        "Child": [],
+        "Parent": []
+      },
+      "Identifier_component": {
+        "Entity_id": 0,
+        "Entity_name": "Camera [0]"
+      },
+      "Transform_component": {
+        "Position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "Scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "Hierarchy_component": {
+        "Child": [],
+        "Parent": []
+      },
+      "Identifier_component": {
+        "Entity_id": 1,
+        "Entity_name": "Terrain [0]"
+      },
+      "Render_component": {
+        "Render_type": 1,
+        "Terrain": {
+          "Heightmap_path": "../stages/assets/textures/heightmaps/heightmap.png",
+          "Texture_path": "../stages/assets/textures/images/grass.png",
+          "height_mult": 0.17900000512599945,
+          "is_centered": true,
+          "num_cols": 50,
+          "num_rows": 50,
+          "size": 1.0,
+          "use_perlin_noise": false
+        }
+      },
+      "Transform_component": {
+        "Position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "Scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "Hierarchy_component": {
+        "Child": [],
+        "Parent": []
+      },
+      "Identifier_component": {
+        "Entity_id": 2,
+        "Entity_name": "Mario"
+      },
+      "Render_component": {
+        "Mesh": {
+          "Mesh_path": "../stages\\assets\\obj\\Mario.obj",
+          "Texture_folder": "../stages\\assets\\textures\\mario"
+        },
+        "Render_type": 0
+      },
+      "Transform_component": {
+        "Position": [
+          9.232542037963867,
+          -1.0088560581207275,
+          0.0
+        ],
+        "Rotation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "Scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "Hierarchy_component": {
+        "Child": [],
+        "Parent": []
+      },
+      "Identifier_component": {
+        "Entity_id": 3,
+        "Entity_name": "Directional Light [0]"
+      },
+      "Light_component": {
+        "light": {
+          "Ambient_color": [
+            [
+              0.10000000149011612,
+              0.10000000149011612,
+              0.10000000149011612
+            ]
+          ],
+          "Constant_attenuation": [
+            1.0
+          ],
+          "Diffusion_color": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "Direction": [
+            [
+              -0.18814417719841003,
+              -0.9407208561897278,
+              -0.28221628069877625
+            ]
+          ],
+          "Light_color": [
+            [
+              6.3785200119018555,
+              6.37788200378418,
+              6.37788200378418
+            ]
+          ],
+          "Linear_attenuation": [
+            0.0
+          ],
+          "Position": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "Quadratic_attenuation": [
+            0.0
+          ],
+          "Shininnes": [
+            34.0
+          ],
+          "Specular_color": [
+            [
+              1.0,
+              1.0,
+              0.949999988079071
+            ]
+          ],
+          "Spot_angle": [
+            0.0
+          ],
+          "Spot_softness": [
+            0.0
+          ],
+          "Strength": [
+            0.0
+          ],
+          "Type": 0
+        }
+      }
+    },
+    {
+      "Hierarchy_component": {
+        "Child": [],
+        "Parent": []
+      },
+      "Identifier_component": {
+        "Entity_id": 4,
+        "Entity_name": "Skybox [0]"
+      },
+      "Skybox_component": {
+        "skybox": {
+          "Cubemap_file_paths": [
+            "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\right.png",
+            "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\left.png",
+            "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\bottom.png",
+            "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\top.png",
+            "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\front.png",
+            "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\back.png"
+          ],
+          "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
+          "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
+          "DDS_angle": -90.0,
+          "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
+          "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
+          "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
+          "Use_cubemap": true
+        }
+      }
+    },
+    {
+      "Hierarchy_component": {
+        "Child": [],
+        "Parent": []
+      },
+      "Identifier_component": {
+        "Entity_id": 5,
+        "Entity_name": "Suzanne"
+      },
+      "Render_component": {
+        "Mesh": {
+          "Mesh_path": "../stages\\assets\\obj\\SM_Suzanne.obj",
+          "Texture_folder": "../stages\\assets\\textures\\apple"
+        },
+        "Render_type": 0
+      },
+      "Scripting_component": {
+        "entity_id": 5,
+        "script_path": "../stages\\scripts\\transform_example.lua"
+      },
+      "Transform_component": {
+        "Position": [
+          5.858084678649902,
+          -0.8440663814544678,
+          9.89991283416748
+        ],
+        "Rotation": [
+          -3.947530657910647e-08,
+          0.232992023229599,
+          5.37905293640506e-08,
+          0.9724786281585693
+        ],
+        "Scale": [
+          3.9999613761901855,
+          4.0,
+          3.9999613761901855
+        ]
+      }
+    },
+    {
+      "Hierarchy_component": {
+        "Child": [],
+        "Parent": []
+      },
+      "Identifier_component": {
+        "Entity_id": 6,
+        "Entity_name": "Teapot"
+      },
+      "Render_component": {
+        "Mesh": {
+          "Mesh_path": "../stages\\assets\\obj\\SM_Teapot.obj",
+          "Texture_folder": "../stages\\assets\\textures\\apple"
+        },
+        "Render_type": 0
+      },
+      "Scripting_component": {
+        "entity_id": 6,
+        "script_path": "../stages\\scripts\\transform_example.lua"
+      },
+      "Transform_component": {
+        "Position": [
+          14.210965156555176,
+          0.0,
+          10.291306495666504
+        ],
+        "Rotation": [
+          0.0,
+          0.530583918094635,
+          0.0,
+          0.8476324081420898
+        ],
+        "Scale": [
+          2.0,
+          2.0,
+          2.0
+        ]
+      }
+    }
+  ]
+}
