@@ -45,6 +45,9 @@ public:
 
 	Shader shader, geometry, light_pass;
 
+	int kernel_size;
+	float radius;
+	float bias;
 	int ssao_option;
 
 private:

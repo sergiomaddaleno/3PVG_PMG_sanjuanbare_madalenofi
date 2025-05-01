@@ -2138,7 +2138,7 @@ void UIManager::TopBarWindow() {
             ImGui::Spacing();
             ImGui::Spacing();
 
-            if (ImGui::RadioButton("Albedo", rs_.ssao.ssao_option == 0)) {
+            if (ImGui::RadioButton("Diffuse", rs_.ssao.ssao_option == 0)) {
                 rs_.ssao.ssao_option = 0;
             }
             ImGui::SameLine();
@@ -2148,6 +2148,30 @@ void UIManager::TopBarWindow() {
             ImGui::SameLine();
             if (ImGui::RadioButton("Position", rs_.ssao.ssao_option == 2)) {
                 rs_.ssao.ssao_option = 2;
+            }
+            if (ImGui::RadioButton("SSAO tex", rs_.ssao.ssao_option == 3)) {
+                rs_.ssao.ssao_option = 3;
+            }
+
+            ImGui::SameLine();
+            ImGui::Spacing();
+            ImGui::SameLine();
+            p = ImGui::GetCursorScreenPos();
+            ImGui::GetWindowDrawList()->AddLine(ImVec2(p.x, p.y), ImVec2(p.x, p.y + ImGui::GetTextLineHeight()), IM_COL32(255, 255, 255, 255), 1.0f);
+            ImGui::SameLine();
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            if (ImGui::Button("SSAO Settings")) {
+                ImGui::OpenPopup("SSAO_Settings_Popup");
+            }
+
+            if (ImGui::BeginPopup("SSAO_Settings_Popup")) {
+                ImGui::SliderInt("Kernel Size", &rs_.ssao.kernel_size, 1, 128);
+                ImGui::SliderFloat("Radius", &rs_.ssao.radius, 0.01f, 5.0f, "%.3f");
+                ImGui::SliderFloat("Bias", &rs_.ssao.bias, 0.0f, 0.1f, "%.4f");
+                ImGui::EndPopup();
             }
         }
             break;

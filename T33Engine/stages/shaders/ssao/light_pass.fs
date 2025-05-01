@@ -9,7 +9,7 @@ uniform sampler2D gAlbedoSpec;
 uniform sampler2D ssaoTex;
 
 uniform sampler2D u_shadow_map;
-uniform samplerCube u_depth_map;
+uniform samplerCube u_shadow_map_cube;
 uniform int u_ssao_option = 0;
 
 struct LightInfo {
@@ -136,7 +136,7 @@ float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
     vec3 fragToLight = fragPos - lightPos;
     float currentDepth = length(fragToLight); 
     
-    float closestDepth = texture(u_depth_map, fragToLight).r;
+    float closestDepth = texture(u_shadow_map_cube, fragToLight).r;
     closestDepth *= u_far_plane; 
 
     float bias = 0.05; 
@@ -157,7 +157,7 @@ void main()
     float shadow = ShadowCalculation(FragPosLight);
     float shadow_pl = ShadowCalculationPoint(FragPosLight.xyz, u_light.pos_);
 
-    vec3 final_light = u_ambient * texture(ssaoTex, uv).r;
+    vec3 final_light = vec3(1) * texture(ssaoTex, uv).r;
 
     if (u_light.type_ == 0) {
         final_light += DirectionalLight(u_light) * shadow; 
@@ -173,15 +173,16 @@ void main()
 
     vec3 final_color;
     if(u_ssao_option==0){
-        final_color =  Diffuse *final_light;
+        final_color = Diffuse * final_light;
     }
-
     if(u_ssao_option==1){
         final_color =  normal;
     }
-
     if(u_ssao_option==2){
         final_color =  FragPos;
+    }
+    if(u_ssao_option==3){
+        final_color = vec3(1) * texture(ssaoTex, uv).r;
     }
 
     FragColor = vec4(final_color, 1.0);

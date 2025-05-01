@@ -7,7 +7,7 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 uniform sampler2D u_shadow_map;
-uniform samplerCube u_depth_map;
+uniform samplerCube u_shadow_map_cube;
 uniform int u_deferred_option;
 
 struct LightInfo {
@@ -134,7 +134,7 @@ float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
     vec3 fragToLight = fragPos - lightPos;
     float currentDepth = length(fragToLight); 
     
-    float closestDepth = texture(u_depth_map, fragToLight).r;
+    float closestDepth = texture(u_shadow_map_cube, fragToLight).r;
     closestDepth *= u_far_plane; 
 
     float bias = 0.05; 
@@ -170,15 +170,15 @@ void main()
 
     vec3 final_color;
     if(u_deferred_option==0){
-        final_color =  Diffuse *final_light;
+        final_color =  Diffuse * final_light;
     }
 
     if(u_deferred_option==1){
-        final_color =  normal;
+        final_color =  normal * final_light;
     }
 
     if(u_deferred_option==2){
-        final_color =  FragPos;
+        final_color = FragPos * final_light;
     }
 
     FragColor = vec4(final_color, 1.0);

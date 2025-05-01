@@ -13,7 +13,8 @@ SSAO::SSAO(ECSManager& ecs) : ssaoFBO(0),
 ssaoColorBuffer(0), noiseTexture(0), width_(800), height_(600),randomFloats(0.0,1.0),
 gBuffer(0), rboDepth(0),
 gPosition(0), gNormal(0), gAlbedoSpec(0),
-ecs_(ecs), ssao_option(0)
+ecs_(ecs), ssao_option(0),
+kernel_size(64), radius(0.5f), bias(0.025f)
 {
 }
 
@@ -193,18 +194,26 @@ void SSAO::render(Camera cam)
     for (unsigned int i = 0; i < 64; ++i)
         shader.setUniformValue(shader.getUniformLocation(("samples[" + std::to_string(i) + "]").c_str()), ValueType::T_FLOAT_3, &ssaoKernel[i]);
 
+    glm::mat4 model = this->getWorldTransform(entity);
+    glm::mat4 view = cam.getViewMatrix();
     glm::mat4 projection = cam.getUsePerspectiveMatrix() ? cam.getPerspectiveMatrix() : cam.getOrthograficMatrix();
+
+    shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
+    shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
     shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
     
-    // Textures ----------------------------------------
+    shader.setUniformValue(shader.getUniformLocation("u_kernel_size"), ValueType::T_INT_1, &kernel_size);
+    shader.setUniformValue(shader.getUniformLocation("u_radius"), ValueType::T_FLOAT_1, &radius);
+    shader.setUniformValue(shader.getUniformLocation("u_bias"), ValueType::T_FLOAT_1, &bias);
+
+    // generate ssao Textures ----------------------------------------
     glActiveTexture(GL_TEXTURE0 + TI_Position);
     glBindTexture(GL_TEXTURE_2D, gPosition);
     glActiveTexture(GL_TEXTURE0 + TI_Normal);
     glBindTexture(GL_TEXTURE_2D, gNormal);
     glActiveTexture(GL_TEXTURE0 + TI_Noise);
     glBindTexture(GL_TEXTURE_2D, noiseTexture);
-    glActiveTexture(GL_TEXTURE0 + TI_SSAO); 
-    glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+    
 
     int tex = TI_Position;
     shader.setUniformValue(shader.getUniformLocation("gPosition"), ValueType::T_INT_1, &tex);
@@ -212,11 +221,9 @@ void SSAO::render(Camera cam)
     shader.setUniformValue(shader.getUniformLocation("gNormal"), ValueType::T_INT_1, &tex);
     tex = TI_Noise;
     shader.setUniformValue(shader.getUniformLocation("texNoise"), ValueType::T_INT_1, &tex);
-    tex = TI_SSAO;
-    light_pass.setUniformValue(light_pass.getUniformLocation("ssaoTex"), ValueType::T_INT_1, &tex);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 1);
     quad.drawVec3();
+    glBindFramebuffer(GL_FRAMEBUFFER, 1);
 
     //Lighting pass ----------------------------------------
     
@@ -269,6 +276,7 @@ void SSAO::render(Camera cam)
             light_pass.setUniformValue(light_pass.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
 
             light_pass.setUniformValue(light_pass.getUniformLocation("u_ssao_option"), ValueType::T_INT_1, &ssao_option);
+            light_pass.setUniformValue(light_pass.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(cam.getPosition()));
 
             glm::mat4 model = this->getWorldTransform(entity);
             glm::mat4 view = cam.getViewMatrix();
