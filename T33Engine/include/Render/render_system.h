@@ -58,6 +58,7 @@ public:
 		initShader(ssao.shader, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/ssao.fs");
 		initShader(ssao.geometry, "../stages/shaders/ssao/g_buffer_ssao.vs", "../stages/shaders/ssao/g_buffer_ssao.fs");
 		initShader(ssao.light_pass, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/light_pass.fs");
+		initShader(ssao.blur, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/blur.fs");
 	}
 
 	void forwardRender(Input &input, double dt);

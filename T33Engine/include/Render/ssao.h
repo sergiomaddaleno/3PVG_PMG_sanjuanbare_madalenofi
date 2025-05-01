@@ -43,7 +43,7 @@ public:
 
 	glm::mat4 getWorldTransform(int entity);
 
-	Shader shader, geometry, light_pass;
+	Shader shader, geometry, light_pass, blur;
 
 	int kernel_size;
 	float radius;
@@ -52,7 +52,10 @@ public:
 
 private:
 	unsigned int ssaoFBO;
+	unsigned int ssaoBlurFBO;
+
 	unsigned int ssaoColorBuffer;
+	unsigned int ssaoColorBufferBlur;
 
 	std::uniform_real_distribution<GLfloat> randomFloats; 
 	std::default_random_engine generator;
