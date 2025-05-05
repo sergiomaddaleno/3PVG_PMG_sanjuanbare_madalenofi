@@ -3,7 +3,7 @@
   {
    "Camera_component": {
     "camera": {
-     "Aspect_ratio": 1.9374369382858276,
+     "Aspect_ratio": 1.7777777910232544,
      "Far_clip_plane": 423.3009948730469,
      "Fov": 48.946998596191406,
      "Lock_move": false,
@@ -13,18 +13,18 @@
      "Ortho_height": 45.0,
      "Ortho_width": 45.0,
      "Position": [
-      -12.796008110046387,
-      4.465564250946045,
-      -16.665454864501953
+      -18.282012939453125,
+      4.643691539764404,
+      1.8013800382614136
      ],
      "Scroll_speed": 1.4459999799728394,
      "Sensitivity": 1.0,
      "Speed": 15.748000144958496,
      "Use_perspective_matrix": true,
      "View_direction": [
-      0.5359287858009338,
-      -0.23382596671581268,
-      0.8112371563911438
+      0.9720311164855957,
+      -0.11759623140096664,
+      0.20328953862190247
      ]
     }
    },
@@ -39,7 +39,7 @@
    "Transform_component": {
     "Position": [
      0.0,
-     0.0,
+     -8.828957557678223,
      0.0
     ],
     "Rotation": [
@@ -62,166 +62,6 @@
    },
    "Identifier_component": {
     "Entity_id": 1,
-    "Entity_name": "Skybox [0]"
-   },
-   "Skybox_component": {
-    "skybox": {
-     "Cubemap_file_paths": [
-      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\right.png",
-      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\left.png",
-      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\bottom.png",
-      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\top.png",
-      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\front.png",
-      "../stages\\assets\\textures\\skybox\\cubemap\\nebulae\\back.png"
-     ],
-     "Cubemap_fragment_file": "../stages/shaders/skybox/skybox_cubemap.fs",
-     "Cubemap_vertex_file": "../stages/shaders/skybox/skybox_cubemap.vs",
-     "DDS_angle": -90.0,
-     "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
-     "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
-     "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
-     "Use_cubemap": true
-    }
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 2,
-    "Entity_name": "Apple"
-   },
-   "Render_component": {
-    "Mesh": {
-     "Mesh_path": "..\\stages\\assets\\obj\\apple.obj",
-     "Texture_folder": "..\\stages\\assets\\textures\\apple"
-    },
-    "Render_type": 0
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     -1.7239203453063965,
-     1.5906296968460083
-    ],
-    "Rotation": [
-     0.0,
-     0.0,
-     0.0,
-     1.0
-    ],
-    "Scale": [
-     1.0,
-     1.0,
-     1.0
-    ]
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 3,
-    "Entity_name": "Spot Light [0]"
-   },
-   "Light_component": {
-    "light": {
-     "Ambient_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Constant_attenuation": [
-      1.0
-     ],
-     "Diffusion_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Direction": [
-      [
-       0.0,
-       -0.9779587984085083,
-       -0.20879782736301422
-      ]
-     ],
-     "Light_color": [
-      [
-       255.0,
-       254.97450256347656,
-       254.97450256347656
-      ]
-     ],
-     "Linear_attenuation": [
-      0.699999988079071
-     ],
-     "Position": [
-      [
-       0.0,
-       10.365971565246582,
-       6.116250038146973
-      ]
-     ],
-     "Quadratic_attenuation": [
-      1.7999999523162842
-     ],
-     "Shininnes": [
-      32.0
-     ],
-     "Specular_color": [
-      [
-       0.0,
-       0.0,
-       0.0
-      ]
-     ],
-     "Spot_angle": [
-      45.0
-     ],
-     "Spot_softness": [
-      10.0
-     ],
-     "Strength": [
-      1.0
-     ],
-     "Type": 1
-    }
-   },
-   "Transform_component": {
-    "Position": [
-     0.0,
-     10.365971565246582,
-     6.116250038146973
-    ],
-    "Rotation": [
-     0.7774309515953064,
-     0.0,
-     0.0,
-     0.6289682388305664
-    ],
-    "Scale": [
-     1.0,
-     0.9998948574066162,
-     0.9998956322669983
-    ]
-   }
-  },
-  {
-   "Hierarchy_component": {
-    "Child": [],
-    "Parent": []
-   },
-   "Identifier_component": {
-    "Entity_id": 4,
     "Entity_name": "Terrain [0]"
    },
    "Render_component": {
@@ -253,6 +93,480 @@
      1.0,
      1.0,
      1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 2,
+    "Entity_name": "Mesh [1]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\minecraft_tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\minercaft_tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     13.63644027709961,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 3,
+    "Entity_name": "Mesh [2]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\minecraft_tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\minercaft_tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 4,
+    "Entity_name": "Mesh [3]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\minecraft_tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\minercaft_tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     7.8137969970703125,
+     0.0,
+     13.562211990356445
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 5,
+    "Entity_name": "Mesh [4]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\minecraft_tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\minercaft_tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 6,
+    "Entity_name": "Mesh [5]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\minecraft_tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\minercaft_tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     -8.255342483520508,
+     0.0,
+     5.810355186462402
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 7,
+    "Entity_name": "Mesh [6]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\minecraft_tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\minercaft_tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 8,
+    "Entity_name": "Mesh [7]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\minecraft_tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\minercaft_tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     3.1327059268951416,
+     0.0,
+     -8.028508186340332
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 9,
+    "Entity_name": "Mesh [8]"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\minecraft_tree.obj",
+     "Texture_folder": "../stages\\assets\\textures\\minercaft_tree"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     -6.620192527770996,
+     -7.27921724319458e-06,
+     -12.97067928314209
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 10,
+    "Entity_name": "Skybox [1]"
+   },
+   "Skybox_component": {
+    "skybox": {
+     "Cubemap_file_paths": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+     ],
+     "Cubemap_fragment_file": "",
+     "Cubemap_vertex_file": "",
+     "DDS_angle": -90.0,
+     "DDS_file_path": "../stages/assets/textures/skybox/sky.dds",
+     "DDS_fragment_file": "../stages/shaders/skybox/skybox_dds.fs",
+     "DDS_vertex_file": "../stages/shaders/skybox/skybox_dds.vs",
+     "Use_cubemap": false
+    }
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 11,
+    "Entity_name": "Directional Light [0]"
+   },
+   "Light_component": {
+    "light": {
+     "Ambient_color": [
+      [
+       0.10000000149011612,
+       0.10000000149011612,
+       0.10000000149011612
+      ]
+     ],
+     "Constant_attenuation": [
+      1.0
+     ],
+     "Diffusion_color": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Direction": [
+      [
+       -0.18814417719841003,
+       -0.9407208561897278,
+       -0.28221628069877625
+      ]
+     ],
+     "Light_color": [
+      [
+       10.0,
+       10.0,
+       10.0
+      ]
+     ],
+     "Linear_attenuation": [
+      0.0
+     ],
+     "Position": [
+      [
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "Quadratic_attenuation": [
+      0.0
+     ],
+     "Shininnes": [
+      34.0
+     ],
+     "Specular_color": [
+      [
+       1.0,
+       1.0,
+       0.949999988079071
+      ]
+     ],
+     "Spot_angle": [
+      0.0
+     ],
+     "Spot_softness": [
+      0.0
+     ],
+     "Strength": [
+      0.0
+     ],
+     "Type": 0
+    }
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 12,
+    "Entity_name": "Cloud [0]"
+   },
+   "Render_component": {
+    "Cloud": {
+     "absorption": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "amplitude": 2.0,
+     "cube_size": 1.0,
+     "density": 0.17499999701976776,
+     "direction": [
+      0.10000000149011612,
+      0.20000000298023224,
+      -0.30000001192092896
+     ],
+     "frequency": 0.5,
+     "march_size_": 0.03999999910593033,
+     "max_steps": 30,
+     "max_steps_light_": 6,
+     "speed": 0.30000001192092896,
+     "use_blue_noise": false
+    },
+    "Render_type": 8
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     20.749271392822266,
+     0.0
+    ],
+    "Rotation": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "Scale": [
+     100.0,
+     1.0,
+     100.0
+    ]
+   }
+  },
+  {
+   "Hierarchy_component": {
+    "Child": [],
+    "Parent": []
+   },
+   "Identifier_component": {
+    "Entity_id": 13,
+    "Entity_name": "DUCK"
+   },
+   "Render_component": {
+    "Mesh": {
+     "Mesh_path": "../stages\\assets\\obj\\duck.obj",
+     "Texture_folder": "../stages\\assets\\textures\\rubber-duck"
+    },
+    "Render_type": 0
+   },
+   "Transform_component": {
+    "Position": [
+     0.0,
+     0.0,
+     4.828658580780029
+    ],
+    "Rotation": [
+     0.0,
+     -0.5441632270812988,
+     0.0,
+     0.8389793634414673
+    ],
+    "Scale": [
+     0.9999988675117493,
+     1.0,
+     0.9999995827674866
     ]
    }
   }

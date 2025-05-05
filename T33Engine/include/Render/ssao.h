@@ -37,6 +37,13 @@ public:
 	SSAO(ECSManager& ecs);
 	~SSAO();
 
+	void initSSAOshaders() {
+		initShader(shader, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/ssao.fs");
+		initShader(geometry, "../stages/shaders/ssao/g_buffer_ssao.vs", "../stages/shaders/ssao/g_buffer_ssao.fs");
+		initShader(light_pass, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/light_pass.fs");
+		initShader(blur, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/blur.fs");
+	}
+
 	void init();
 	void render(Camera cam);
 	void resize(unsigned int width, unsigned int height);

@@ -25,6 +25,7 @@
 #include "Core/input.h"
 #include "Render/skybox.h"
 #include "Render/deferred_shading.h"
+#include "Render/outlining.h"
 
 #include "Components/components.h"
 
@@ -52,13 +53,9 @@ public:
 		initShader(shader, "../stages/shaders/forward_shading.vs", "../stages/shaders/forward_shading.fs");
 		initShader(texture_shader, "../stages/shaders/basic/texture.vs", "../stages/shaders/basic/texture.fs");
 
-		initShader(deferred.gbuffer, "../stages/shaders/deferred/g_buffer.vs", "../stages/shaders/deferred/g_buffer.fs");
-		initShader(deferred.deferred_shading, "../stages/shaders/deferred/deferred_shading.vs", "../stages/shaders/deferred/deferred_shading.fs");
-
-		initShader(ssao.shader, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/ssao.fs");
-		initShader(ssao.geometry, "../stages/shaders/ssao/g_buffer_ssao.vs", "../stages/shaders/ssao/g_buffer_ssao.fs");
-		initShader(ssao.light_pass, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/light_pass.fs");
-		initShader(ssao.blur, "../stages/shaders/ssao/ssao.vs", "../stages/shaders/ssao/blur.fs");
+		deferred.initDeferredShaders();
+		ssao.initSSAOshaders();
+		stencil_outline.initOutlineShader();
 	}
 
 	void forwardRender(Input &input, double dt);
@@ -140,6 +137,7 @@ public:
 
 	Deferred deferred;
 	SSAO ssao;
+	Outlining stencil_outline;
 	Terrain grid;
 	ECSManager& ecs_;
 
@@ -169,7 +167,7 @@ private:
 	void renderScene(RenderComponent& rc, Shader& shader);
 
 
-	void setUniforms(int entity, TransformComponent& tc, Shader& shader, Camera& cam);
+	void setUniforms(int entity, Shader& shader, Camera& cam);
 };
 
 #endif // __RENDER_SYSTEM__

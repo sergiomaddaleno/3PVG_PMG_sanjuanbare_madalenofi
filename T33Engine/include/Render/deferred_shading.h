@@ -17,6 +17,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Geometry/screen_quad.h"
+#include "utils.h"
 
 class ECSManager;
 class Shader;
@@ -34,6 +35,10 @@ public:
     Deferred(ECSManager& ecs);
     ~Deferred();
 
+    void initDeferredShaders() {
+        initShader(gbuffer, "../stages/shaders/deferred/g_buffer.vs", "../stages/shaders/deferred/g_buffer.fs");
+        initShader(deferred_shading, "../stages/shaders/deferred/deferred_shading.vs", "../stages/shaders/deferred/deferred_shading.fs");
+    }
     void init();
     void render(Camera cam);
     void resize(unsigned int width, unsigned int height);

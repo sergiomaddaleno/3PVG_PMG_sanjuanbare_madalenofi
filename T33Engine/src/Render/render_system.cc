@@ -44,6 +44,7 @@ RenderSystem::RenderSystem(ECSManager& ecs_)
     light_in_scene(false),
     deferred(ecs_),
     ssao(ecs_),
+    stencil_outline(ecs_),
     what_to_render(WTR_forward)
 {
 }
@@ -140,7 +141,7 @@ void RenderSystem::initSkybox() {
     }
 }
 
-void RenderSystem::setUniforms(int entity, TransformComponent& tc, Shader& shader, Camera& cam)
+void RenderSystem::setUniforms(int entity, Shader& shader, Camera& cam)
 {
     glm::mat4 model = getWorldTransform(entity);
     glm::mat4 view = cam.getViewMatrix();
@@ -238,7 +239,7 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                             auto& render_comp = *ri;
                             auto& transform_comp = *ti;
 
-                            this->setUniforms(entity, *transform_comp, shader, camera_comp->camera);
+                            this->setUniforms(entity, shader, camera_comp->camera);
                             this->renderScene(*render_comp, shader);
 
                             /* Test for wave
@@ -283,7 +284,7 @@ void RenderSystem::forwardRender(Input &input, double dt) {
                         auto& render_comp = *ri;
                         auto& transform_comp = *ti;
 
-                        this->setUniforms(entity, *transform_comp, texture_shader, camera_comp->camera);
+                        this->setUniforms(entity, texture_shader, camera_comp->camera);
                         this->renderScene(*render_comp, texture_shader);
                     }
                 }
