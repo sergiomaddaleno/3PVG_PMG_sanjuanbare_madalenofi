@@ -44,7 +44,6 @@ RenderSystem::RenderSystem(ECSManager& ecs_)
     light_in_scene(false),
     deferred(ecs_),
     ssao(ecs_),
-    stencil_outline(ecs_),
     what_to_render(WTR_forward)
 {
 }

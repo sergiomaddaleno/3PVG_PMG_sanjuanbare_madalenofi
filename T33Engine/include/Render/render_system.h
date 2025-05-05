@@ -25,7 +25,6 @@
 #include "Core/input.h"
 #include "Render/skybox.h"
 #include "Render/deferred_shading.h"
-#include "Render/outlining.h"
 
 #include "Components/components.h"
 
@@ -55,7 +54,6 @@ public:
 
 		deferred.initDeferredShaders();
 		ssao.initSSAOshaders();
-		stencil_outline.initOutlineShader();
 	}
 
 	void forwardRender(Input &input, double dt);
@@ -137,7 +135,6 @@ public:
 
 	Deferred deferred;
 	SSAO ssao;
-	Outlining stencil_outline;
 	Terrain grid;
 	ECSManager& ecs_;
 
