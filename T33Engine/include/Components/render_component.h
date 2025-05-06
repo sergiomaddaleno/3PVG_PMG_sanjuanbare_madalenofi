@@ -41,7 +41,6 @@ struct RenderComponent {
     std::shared_ptr<Surface>surface_;
 
     std::shared_ptr<RayMarch> cloud_;
-    Triangle triangle_;
 
     //--
 

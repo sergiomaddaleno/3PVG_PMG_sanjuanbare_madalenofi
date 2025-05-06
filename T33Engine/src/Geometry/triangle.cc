@@ -1,11 +1,8 @@
 
 #include "../include/Geometry/triangle.h"
 #include "Components/render_component.h"
-#include "Components/transform_component.h"
-#include "utils.h"
 
-#include <../deps/glm/gtc/matrix_transform.hpp>
-#include <../deps/glm/gtc/type_ptr.hpp>
+#include "utils.h"
 
 Triangle::Triangle(PointsTriangle t[3])
 {
@@ -62,43 +59,33 @@ std::optional<Triangle> Triangle::make(float size_, Color color)
     return std::optional<Triangle>(t);
 }
 
-void Triangle::render(Shader shader, RenderComponent rc, TransformComponent tc, Camera cam)
+void Triangle::bind()
 {
-    GLuint vao, vertex_buffer;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
-    glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(rc.triangle_.my_triangle[0]) * 3, rc.triangle_.my_triangle, GL_STATIC_DRAW);
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(my_triangle), my_triangle, GL_STATIC_DRAW);
 
-    shader.useProgram();
-
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, tc.position);
-    model *= glm::mat4_cast(tc.rotation);
-    model = glm::scale(model, tc.scale);
-
-    glm::mat4 view = cam.getViewMatrix();
-    glm::mat4 projection = cam.getPerspectiveMatrix();
-
-    shader.setUniformValue(shader.getUniformLocation("model"), ValueType::T_MAT_4x4, glm::value_ptr(model));
-    shader.setUniformValue(shader.getUniformLocation("view"), ValueType::T_MAT_4x4, glm::value_ptr(view));
-    shader.setUniformValue(shader.getUniformLocation("projection"), ValueType::T_MAT_4x4, glm::value_ptr(projection));
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(PointsTriangle), (void*)offsetof(PointsTriangle, pos_));
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(PointsTriangle), (void*)offsetof(PointsTriangle, rgb));
     glEnableVertexAttribArray(1);
 
+    glBindVertexArray(0);
+}
+
+void Triangle::draw()
+{
+    glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glBindVertexArray(0);
-    glDeleteBuffers(1, &vertex_buffer);
-    glDeleteVertexArrays(1, &vao);
-
-    glUseProgram(0);
-
 }
+
+
 
 
 

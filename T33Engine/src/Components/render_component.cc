@@ -9,8 +9,7 @@ RenderComponent::RenderComponent()
     surface_(nullptr),
     water_(nullptr),
     cloud_(nullptr),
-    type_(RT_None),
-    triangle_(triangle_.my_triangle)
+    type_(RT_None)
 {}
 
 RenderComponent& RenderComponent::operator=(const RenderComponent & other)
@@ -38,7 +37,6 @@ RenderComponent::RenderComponent(const RenderComponent& other)
     cube_(other.cube_ ? std::make_shared<Cube>(*other.cube_) : nullptr),
     quad_(other.quad_ ? std::make_shared<Quad>(*other.quad_) : nullptr),
     cloud_(other.cloud_ ? std::make_shared<RayMarch>(*other.cloud_) : nullptr),
-    triangle_(other.triangle_),
     type_(other.type_)
 {}
 
@@ -49,7 +47,6 @@ nlohmann::json RenderComponent::serialize() const
     if (mesh_) {
         json_data["Mesh"] = mesh_->serialize();
     }
-    //json_data["triangle"] = { triangle_.ToJson() };
 
     if (terrain_) { json_data["Terrain"] = terrain_->serialize(); }
     if (water_) { json_data["Water"] = water_->serialize(); }
