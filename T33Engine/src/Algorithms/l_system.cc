@@ -63,7 +63,7 @@ void LSystem::init(std::string axiom, std::map<char, std::string> rule_map, int 
         case 'F': {
             TransformComponent tc;
             if (parent_entity != 0) {
-                glm::mat4 parentWorld = rs_.getWorldTransform(parent_entity);
+                glm::mat4 parentWorld = rs_.getWorldTransform((int)parent_entity);
                 glm::mat4 invParent = glm::inverse(parentWorld);
 
                 glm::mat4 world_transform =
