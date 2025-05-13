@@ -4,7 +4,7 @@
 
 #include "utils.h"
 
-Triangle::Triangle(PointsTriangle t[3])
+Triangle::Triangle(PointsTriangle t[3]) : VAO(0), VBO(0)
 {
     for (int i = 0; i < 3; ++i) {
         my_triangle[i] = t[i];
@@ -13,7 +13,7 @@ Triangle::Triangle(PointsTriangle t[3])
 
 Triangle::~Triangle(){};
 
-Triangle::Triangle(const Triangle& other)
+Triangle::Triangle(const Triangle& other) : VAO(0), VBO(0)
 {
     for (int i = 0; i < 3; ++i) {
         my_triangle[i] = other.my_triangle[i];

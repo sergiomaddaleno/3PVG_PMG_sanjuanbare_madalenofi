@@ -13,11 +13,11 @@
 #pragma warning(push)
 #pragma warning(disable:26495)
 #include "../deps/tiny_obj_loader.h"
-#pragma warning(push)
+#pragma warning(pop)
 #include "../deps/stb_image.h"
 
 Mesh::Mesh() : VAO(0), VBO(0), EBO(0), materialID(0),
-use_texture_(true)
+use_texture_(true), colors(0.0f, 0.0f, 0.0f)
 {}
 
 Mesh::~Mesh()

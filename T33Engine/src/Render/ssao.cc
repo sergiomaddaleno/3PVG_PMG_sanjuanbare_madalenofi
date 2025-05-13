@@ -14,7 +14,8 @@ ssaoColorBuffer(0), noiseTexture(0), width_(800), height_(600),randomFloats(0.0,
 gBuffer(0), rboDepth(0),
 gPosition(0), gNormal(0), gAlbedoSpec(0),
 ecs_(ecs), ssao_option(0),
-kernel_size(64), radius(0.5f), bias(0.025f)
+kernel_size(64), radius(0.5f), bias(0.025f),
+ssaoBlurFBO(0), ssaoColorBufferBlur(0)
 {
 }
 
@@ -86,7 +87,7 @@ void SSAO::init()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Kernel
-    for (unsigned int i = 0; i < kernel_size; ++i)
+    for (int i = 0; i < kernel_size; ++i)
     {
         glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
         sample = glm::normalize(sample);
