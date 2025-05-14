@@ -14,12 +14,8 @@
 #include "Core/shader.h"
 #include "Core/input.h"
 #include "utils.h"
-#include <../deps/glm/glm.hpp>
-#include <filesystem>
-#include <optional>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <filesystem>
 
 class Engine;
 class ECSManager;

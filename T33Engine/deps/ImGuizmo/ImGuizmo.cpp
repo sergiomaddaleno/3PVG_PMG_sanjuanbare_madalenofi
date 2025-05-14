@@ -666,8 +666,81 @@ namespace IMGUIZMO_NAMESPACE
 
    struct Context
    {
-      Context() : mbUsing(false), mbUsingViewManipulate(false), mbEnable(true), mIsViewManipulatorHovered(false), mbUsingBounds(false)
+      Context()
+         : mDrawList(nullptr)
+         , mStyle()
+         , mMode(MODE()) // or a specific default value if you have one
+         , mViewMat(matrix_t())
+         , mProjectionMat(matrix_t())
+         , mModel(matrix_t())
+         , mModelLocal(matrix_t())
+         , mModelInverse(matrix_t())
+         , mModelSource(matrix_t())
+         , mModelSourceInverse(matrix_t())
+         , mMVP(matrix_t())
+         , mMVPLocal(matrix_t())
+         , mViewProjection(matrix_t())
+         , mModelScaleOrigin(vec_t())
+         , mCameraEye(vec_t())
+         , mCameraRight(vec_t())
+         , mCameraDir(vec_t())
+         , mCameraUp(vec_t())
+         , mRayOrigin(vec_t())
+         , mRayVector(vec_t())
+         , mRadiusSquareCenter(0.f)
+         , mScreenSquareCenter(0.f, 0.f)
+         , mScreenSquareMin(0.f, 0.f)
+         , mScreenSquareMax(0.f, 0.f)
+         , mScreenFactor(1.f)
+         , mRelativeOrigin(vec_t())
+         , mbUsing(false)
+         , mbUsingViewManipulate(false)
+         , mbEnable(true)
+         , mbMouseOver(false)
+         , mReversed(false)
+         , mIsViewManipulatorHovered(false)
+         , mTranslationPlan(vec_t())
+         , mTranslationPlanOrigin(vec_t())
+         , mMatrixOrigin(vec_t())
+         , mTranslationLastDelta(vec_t())
+         , mRotationVectorSource(vec_t())
+         , mRotationAngle(0.f)
+         , mRotationAngleOrigin(0.f)
+         , mScale(vec_t())
+         , mScaleValueOrigin(vec_t())
+         , mScaleLast(vec_t())
+         , mSaveMousePosx(0.f)
+         , mAxisMask(0)
+         , mAxisLimit(0.0025f)
+         , mPlaneLimit(0.02f)
+         , mBoundsPivot(vec_t())
+         , mBoundsAnchor(vec_t())
+         , mBoundsPlan(vec_t())
+         , mBoundsLocalPivot(vec_t())
+         , mBoundsBestAxis(0)
+         , mBoundsAxis{ 0, 0 }
+         , mbUsingBounds(false)
+         , mBoundsMatrix(matrix_t())
+         , mCurrentOperation(0)
+         , mX(0.f)
+         , mY(0.f)
+         , mWidth(0.f)
+         , mHeight(0.f)
+         , mXMax(0.f)
+         , mYMax(0.f)
+         , mDisplayRatio(1.f)
+         , mIsOrthographic(false)
+         , mbOverGizmoHotspot(false)
+         , mAlternativeWindow(nullptr)
+         , mIDStack()
+         , mEditingID(-1)
+         , mOperation(OPERATION(-1))
+         , mAllowAxisFlip(true)
+         , mGizmoSizeClipSpace(0.1f)
       {
+         mBelowAxisLimit[0] = mBelowAxisLimit[1] = mBelowAxisLimit[2] = false;
+         mBelowPlaneLimit[0] = mBelowPlaneLimit[1] = mBelowPlaneLimit[2] = false;
+         mAxisFactor[0] = mAxisFactor[1] = mAxisFactor[2] = 1.f;
       }
 
       ImDrawList* mDrawList;
@@ -682,7 +755,7 @@ namespace IMGUIZMO_NAMESPACE
       matrix_t mModelSource;
       matrix_t mModelSourceInverse;
       matrix_t mMVP;
-      matrix_t mMVPLocal; // MVP with full model matrix whereas mMVP's model matrix might only be translation in case of World space edition
+      matrix_t mMVPLocal;
       matrix_t mViewProjection;
 
       vec_t mModelScaleOrigin;
@@ -705,7 +778,7 @@ namespace IMGUIZMO_NAMESPACE
       bool mbUsingViewManipulate;
       bool mbEnable;
       bool mbMouseOver;
-      bool mReversed; // reversed projection matrix
+      bool mReversed;
       bool mIsViewManipulatorHovered;
 
       // translation
@@ -718,7 +791,6 @@ namespace IMGUIZMO_NAMESPACE
       vec_t mRotationVectorSource;
       float mRotationAngle;
       float mRotationAngleOrigin;
-      //vec_t mWorldToLocalAxis;
 
       // scale
       vec_t mScale;
@@ -728,12 +800,12 @@ namespace IMGUIZMO_NAMESPACE
 
       // save axis factor when using gizmo
       bool mBelowAxisLimit[3];
-      int mAxisMask = 0;
+      int mAxisMask;
       bool mBelowPlaneLimit[3];
       float mAxisFactor[3];
 
-      float mAxisLimit=0.0025f;
-      float mPlaneLimit=0.02f;
+      float mAxisLimit;
+      float mPlaneLimit;
 
       // bounds stretching
       vec_t mBoundsPivot;
@@ -745,28 +817,26 @@ namespace IMGUIZMO_NAMESPACE
       bool mbUsingBounds;
       matrix_t mBoundsMatrix;
 
-      //
       int mCurrentOperation;
 
-      float mX = 0.f;
-      float mY = 0.f;
-      float mWidth = 0.f;
-      float mHeight = 0.f;
-      float mXMax = 0.f;
-      float mYMax = 0.f;
-      float mDisplayRatio = 1.f;
+      float mX;
+      float mY;
+      float mWidth;
+      float mHeight;
+      float mXMax;
+      float mYMax;
+      float mDisplayRatio;
 
-      bool mIsOrthographic = false;
-      // check to not have multiple gizmo highlighted at the same time
-      bool mbOverGizmoHotspot = false;
+      bool mIsOrthographic;
+      bool mbOverGizmoHotspot;
 
-      ImGuiWindow* mAlternativeWindow = nullptr;
+      ImGuiWindow* mAlternativeWindow;
       ImVector<ImGuiID> mIDStack;
-      ImGuiID mEditingID = -1;
-      OPERATION mOperation = OPERATION(-1);
+      ImGuiID mEditingID;
+      OPERATION mOperation;
 
-      bool mAllowAxisFlip = true;
-      float mGizmoSizeClipSpace = 0.1f;
+      bool mAllowAxisFlip;
+      float mGizmoSizeClipSpace;
 
       inline ImGuiID GetCurrentID()
       {
@@ -1311,7 +1381,7 @@ namespace IMGUIZMO_NAMESPACE
          const bool usingAxis = (gContext.mbUsing && type == MT_ROTATE_Z - axis);
          const int circleMul = (hasRSC && !usingAxis) ? 1 : 2;
 
-         ImVec2* circlePos = (ImVec2*)alloca(sizeof(ImVec2) * (circleMul * halfCircleSegmentCount + 1));
+         ImVec2* circlePos = (ImVec2*)_malloca(sizeof(ImVec2) * (circleMul * halfCircleSegmentCount + 1));
 
          float angleStart = atan2f(cameraToModelNormalized[(4 - axis) % 3], cameraToModelNormalized[(3 - axis) % 3]) + ZPI * 0.5f;
 
@@ -1320,17 +1390,21 @@ namespace IMGUIZMO_NAMESPACE
             float ng = angleStart + (float)circleMul * ZPI * ((float)i / (float)(circleMul * halfCircleSegmentCount));
             vec_t axisPos = makeVect(cosf(ng), sinf(ng), 0.f);
             vec_t pos = makeVect(axisPos[axis], axisPos[(axis + 1) % 3], axisPos[(axis + 2) % 3]) * gContext.mScreenFactor * rotationDisplayFactor;
-            circlePos[i] = worldToPos(pos, gContext.mMVP);
+            if (circlePos != nullptr) 
+               circlePos[i] = worldToPos(pos, gContext.mMVP);
          }
          if (!gContext.mbUsing || usingAxis)
          {
             drawList->AddPolyline(circlePos, circleMul* halfCircleSegmentCount + 1, colors[3 - axis], false, gContext.mStyle.RotationLineThickness);
          }
 
-         float radiusAxis = sqrtf((ImLengthSqr(worldToPos(gContext.mModel.v.position, gContext.mViewProjection) - circlePos[0])));
-         if (radiusAxis > gContext.mRadiusSquareCenter)
-         {
-            gContext.mRadiusSquareCenter = radiusAxis;
+         if (circlePos != nullptr) {
+
+            float radiusAxis = sqrtf((ImLengthSqr(worldToPos(gContext.mModel.v.position, gContext.mViewProjection) - circlePos[0])));
+            if (radiusAxis > gContext.mRadiusSquareCenter)
+            {
+               gContext.mRadiusSquareCenter = radiusAxis;
+            }
          }
       }
       if(hasRSC && (!gContext.mbUsing || type == MT_ROTATE_SCREEN) && (!isMultipleAxesMasked && isNoAxesMasked))
@@ -1724,7 +1798,9 @@ namespace IMGUIZMO_NAMESPACE
       for (unsigned int axisIndex = 0; axisIndex < numAxes; ++axisIndex)
       {
          bestAxis = axes[axisIndex];
-         bestAxisWorldDirection = axesWorldDirections[axisIndex];
+         if (axesWorldDirections != nullptr) {
+             bestAxisWorldDirection = axesWorldDirections[axisIndex];
+         }
 
          // corners
          vec_t aabb[4];
@@ -2521,7 +2597,7 @@ namespace IMGUIZMO_NAMESPACE
    {
       matrix_t& mat = *(matrix_t*)matrix;
 
-      matrix_t rot[3];
+      matrix_t rot[3] = {};
       for (int i = 0; i < 3; i++)
       {
          rot[i].RotationAxis(directionUnary[i], rotation[i] * DEG2RAD);

@@ -110,12 +110,13 @@ int main(int, char**) {
             std::string nextMeshFile = meshFiles[currentMeshIndex];
 
             loadingNewMesh = true;
-            monetemesh = jb.Add_Task([nextMeshFile]() {
+            monetemesh = jb.Add_Task([nextMeshFile]() -> std::unique_ptr<Mesh> {
 
                 std::unique_ptr<Mesh> newMesh = std::make_unique<Mesh>();
                 if (newMesh->loadOBJ(nextMeshFile)) {
                     return newMesh;
                 }
+                return nullptr;
             });
         }
 

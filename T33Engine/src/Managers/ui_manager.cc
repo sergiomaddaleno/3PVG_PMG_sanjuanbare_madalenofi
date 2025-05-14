@@ -11,6 +11,12 @@
 #include "Managers/save_manager.h"
 #include "Core/window.h"
 
+#ifdef APIENTRY
+#undef APIENTRY
+#endif
+#include <GLFW/glfw3.h>
+#include <GL/glew.h>
+
 #include <iostream>
 #include <cmath>
 #include <filesystem>
