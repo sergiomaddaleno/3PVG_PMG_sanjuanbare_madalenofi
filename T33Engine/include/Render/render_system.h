@@ -156,6 +156,8 @@ public:
 	bool use_skybox;
 	bool is_playing;
 
+	bool render_shadows;
+
 	EntityCounters entity_counts_;
 
 private:

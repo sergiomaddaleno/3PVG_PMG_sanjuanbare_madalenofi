@@ -1957,6 +1957,8 @@ void UIManager::TopBarWindow() {
                 ImGui::EndMenu();
             }
 
+            ImGui::Checkbox("Render Shadows", &rs_.render_shadows);
+
             if (ImGui::BeginMenu("Post Proccess")) {
                 ImGui::Checkbox("Post Process Window", &post_process_window);
                 ImGui::EndMenu();

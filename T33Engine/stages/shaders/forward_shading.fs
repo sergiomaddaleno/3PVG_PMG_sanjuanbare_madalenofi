@@ -25,6 +25,7 @@ in vec3 FragPos;
 out vec4 FragColor;
 
 uniform vec3 u_camera_position;
+uniform bool u_render_shadows;
 uniform float u_alpha;
 
 //Samplers
@@ -266,12 +267,11 @@ float ShadowCalculationPoint(vec3 fragPos, vec3 lightPos) {
 }
 
 void main() {
-
     vec3 final_light = u_ambient;
     float shadow = ShadowCalculation(FragPosLight);
     float shadow_pl = ShadowCalculationPoint(FragPosLight.xyz, u_light.pos_);
 
-    //Parallax mapping
+    // Parallax mapping
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     vec2 texCoords = uv;
 
@@ -280,40 +280,40 @@ void main() {
         if(u_parallax_type == 1) texCoords = SteepParallaxMapping(texCoords, viewDir);
         if(u_parallax_type == 2) texCoords = ParallaxOcclusionMapping(texCoords, viewDir);
 
-        if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-        discard;
+        if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0) discard;
     }
 
-    //Normal mapping
+    // Normal mapping
     mapped_normal = texture(u_normal_map, texCoords).rgb;
     mapped_normal = normalize(mapped_normal * 2.0 - 1.0);
 
-    //Lights + shadows
-    if (u_light.type_ == 0) {
-        final_light += DirectionalLight(u_light) * shadow ; 
-    }
-    
-    if (u_light.type_ == 1) {
+    // shadows
+    float shadow_dir = u_render_shadows ? shadow : 1.0;
+    float shadow_spot = u_render_shadows ? shadow : 1.0;
+    float shadow_point = u_render_shadows ? shadow_pl : 1.0;
 
+    // Lights + shadows
+    if (u_light.type_ == 0) {
+        final_light += DirectionalLight(u_light) * shadow_dir;
+    }
+
+    if (u_light.type_ == 1) {
         if (u_use_normal_map) {
             mat3 TBN = mat3(TangentLightPos, TangentViewPos, TangentFragPos); 
             mapped_normal = normalize(TBN * mapped_normal);
-
-            final_light += NormalMappingSpot(u_light) * shadow; 
+            final_light += NormalMappingSpot(u_light) * shadow_spot;
         } else {
-            final_light += SpotLight(u_light) * shadow; 
+            final_light += SpotLight(u_light) * shadow_spot;
         }
     }
-    
-    if (u_light.type_ == 2) {
 
+    if (u_light.type_ == 2) {
         if (u_use_normal_map) {
             mat3 TBN = mat3(TangentLightPos, TangentViewPos, TangentFragPos); 
             mapped_normal = normalize(TBN * mapped_normal);
-
-            final_light += NormalMappingPoint(u_light) * shadow_pl; 
+            final_light += NormalMappingPoint(u_light) * shadow_point;
         } else {
-            final_light += PointLight(u_light) * shadow_pl; 
+            final_light += PointLight(u_light) * shadow_point;
         }
     }
 

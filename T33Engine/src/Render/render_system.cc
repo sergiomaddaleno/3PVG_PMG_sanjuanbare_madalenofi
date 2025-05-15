@@ -42,6 +42,7 @@ RenderSystem::RenderSystem(ECSManager& ecs_)
     use_skybox(true),
     is_playing(false),
     light_in_scene(false),
+    render_shadows(true),
     deferred(ecs_),
     ssao(ecs_),
     what_to_render(WTR_forward)
@@ -94,11 +95,11 @@ void RenderSystem::initLights() {
     
     auto li = ecs_.getComponentList<LightComponent>().begin();
     auto liend = ecs_.getComponentList<LightComponent>().end();
-
+    
     for (; li != liend; ++li) {
         if (li->has_value()) {
             auto& light_comp = *li;
-
+    
             switch (light_comp->light.type_) {
             case Light::LightType::LT_Spot:
             case Light::LightType::LT_Directional:
@@ -220,9 +221,11 @@ void RenderSystem::forwardRender(Input &input, double dt) {
 
                     light_comp->shadow_map_->resize(window_width, window_height);
                     light_comp->shadow_map_->render(shader, *light_comp);
-
                     shader.setUniformValue(shader.getUniformLocation("u_camera_position"), ValueType::T_FLOAT_3, glm::value_ptr(camera_comp->camera.getPosition()));
-                    
+
+                    int render_shadow = render_shadows;
+                    shader.setUniformValue(shader.getUniformLocation("u_render_shadows"), ValueType::T_INT_1, &render_shadow);
+
                     light_comp->light.setUniforms(shader);
 
                     // ---------------------------------------------------------------

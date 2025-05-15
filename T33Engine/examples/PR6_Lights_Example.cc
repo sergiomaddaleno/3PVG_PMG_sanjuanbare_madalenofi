@@ -19,6 +19,8 @@ int main(int, char**) {
 
     T33Engine.save_manager.loadFromFile("../stages/saves/Light_Scene.json");
 
+    T33Engine.render_system.render_shadows = false;
+
     bool done = false;
     while (!done) {
 
